@@ -1,11 +1,11 @@
-import neurontopology as ntn
+import tmd
 import numpy as np
 
 def ph_apical(pop, Distr):
     """Adds the persistent homology extracted from
     a population of apicals to the Distr dictionary
     """
-    ph_ang = [ntn.methods.get_ph_angles(tr) for tr in pop.apicals]
+    ph_ang = [tmd.methods.get_ph_angles(tr) for tr in pop.apicals]
 
     # Keep only the significant ones
     phs = list(np.array(ph_ang)[np.where(np.array([len(p) for p in ph_ang] ) > 2)[0]])
@@ -20,7 +20,7 @@ def ph_basal(pop, Distr):
     """Adds the persistent homology extracted from
     a population of basals to the Distr dictionary
     """
-    ph_ang = [ntn.methods.get_ph_angles(tr) for tr in pop.basals]
+    ph_ang = [tmd.methods.get_ph_angles(tr) for tr in pop.basals]
 
     # Keep only the significant ones
     phs = list(np.array(ph_ang)[np.where(np.array([len(p) for p in ph_ang] ) > 2)[0]])
@@ -35,7 +35,7 @@ def ph_axon(pop, Distr):
     """Adds the persistent homology extracted from
     a population of basals to the Distr dictionary
     """
-    ph_ang = [ntn.methods.get_ph_angles(tr) for tr in pop.axons]
+    ph_ang = [tmd.methods.get_ph_angles(tr) for tr in pop.axons]
 
     # Keep only the significant ones
     phs = list(np.array(ph_ang)[np.where(np.array([len(p) for p in ph_ang] ) > 10)[0]])

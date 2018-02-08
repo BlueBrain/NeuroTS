@@ -1,8 +1,8 @@
-#Requirements for neurontopology
+#Requirements for TNS
 #These requirements are assumed installed in the system.
 # matplotlib>=1.3.1
 # neurom
-# neurontopology
+# tmd
 
 #These can be installed with pip if necessary.
 enum34>=1.0.4
