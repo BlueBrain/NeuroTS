@@ -27,8 +27,10 @@ cd NeuroMLocal
 
 # 2. Clone and install NeuroM branch synthesis_stats
 git clone https://github.com/lidakanari/NeuroM.git
+cd NeuroM/
 git branch --track synthesis_stats origin/synthesis_stats
 git checkout synthesis_stats
+cd ../..
 pip install NeuroMLocal/NeuroM
 
 # 3. create a local directory for TMD
@@ -37,7 +39,7 @@ cd ../TMDLocal
 
 # 4. Clone and install TMD
 git clone https://bbpcode.epfl.ch/browse/code/molecularsystems/TMD/
-pip install NeuroMLocal/TMD
+pip install TMDLocal/TMD
 
 # Now you are ready to install TNS synthesizer
 cd ..
