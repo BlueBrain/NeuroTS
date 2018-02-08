@@ -1,4 +1,6 @@
+import tns
 from tns import extract_input
+from tns.grower import neuron
 
 # Extract distributions from cells in input directory
 filename = '../Input/L5SPC_Input/GoodRepaired/'
