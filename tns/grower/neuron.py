@@ -46,6 +46,9 @@ class Neuron(object):
         import h5py
         import os
 
+        if not os.path.isdir(output_path):
+            os.mkdir(output_path)
+
         opath = os.path.join(output_path, str(self.name) + '.h5')
 
         Fdata = h5py.File(opath, 'w')
