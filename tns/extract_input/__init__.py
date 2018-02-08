@@ -6,10 +6,10 @@ def distributions(filepath, neurite_types=['basal', 'apical', 'axon']):
     '''
     import from_TMD
     import from_neurom
-    import neurontopology as ntn
+    import tmd
     import neurom as nm
 
-    pop_ntn = ntn.io.load_population(filepath)
+    pop_ntn = tmd.io.load_population(filepath)
     pop_nm = nm.load_neurons(filepath)
 
     input_distributions = {}
