@@ -14,3 +14,4 @@ from tns import extract_input
 from tns import grower
 from tns import core
 from tns.process import diametrize
+import version
