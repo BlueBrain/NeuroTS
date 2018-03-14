@@ -3,7 +3,7 @@ from tns.morphmath import random_tree as rd
 from tns.morphmath.sample import ph_prob
 
 
-class Section(object):
+class SectionGrower(object):
     '''Class for the section
     '''
     def __init__(self, neuron,

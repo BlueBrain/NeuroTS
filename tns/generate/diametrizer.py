@@ -6,23 +6,6 @@ def sample(data, size=None):
     return np.random.choice(data, size=size)
 
 
-def load_h5(filename):
-    """Loads an h5 into a (points, groups)
-       representation to be used for the
-       modification of diameters"""
-    import h5py
-    from tns.core import neuron
-    import os
-
-    F = h5py.File(filename)
-    neu = neuron.Neuron()
-    neu.points = np.array(F['points'])
-    neu.groups = np.array(F['structure'])
-    neu.name = os.path.basename(filename.replace('.h5',''))
-
-    return neu
-
-
 def section_points(beg, end, secID=0):
     """Returns all the point IDs within
        a selected section.
@@ -76,7 +59,7 @@ def fill_parent_diameters(neuron, chil, secID, model, status, connections):
         return False # Action not completed, to keep in active sections
 
 
-def diametrize(neuron, model):
+def correct_diameters(neuron, model):
     """Takes as input a neuron object,
        modifies the diameters and
        returns the new object
@@ -85,6 +68,11 @@ def diametrize(neuron, model):
        Apicals: 4
        Axons: 2
     """
+    # Groups and points need to be np.arrays
+    # The following lines ensure this requirement is fulfilled.
+    neuron.groups = np.array(neuron.groups)
+    neuron.points = np.array(neuron.points)
+
     beg = neuron.groups[:, 0]
     ends = np.append(beg[1:], len(neuron.points)) -1
 
@@ -140,4 +128,3 @@ def diametrize(neuron, model):
                     active[connections[a]] = True
                     # Set status to filled
                     status[a] = True
-

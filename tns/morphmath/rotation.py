@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 def spherical_from_vector(vect):
     """Returns the spherical coordinates
@@ -38,3 +39,13 @@ def rotation_around_axis(direction, angle):
 
     mtx = ddt + np.cos(angle) * (eye - ddt) + np.sin(angle) * skew
     return mtx
+
+
+def angle3D(v1, v2):
+    """Returns the angle between v1, v2"""
+    def dotproduct(v1, v2):
+        return sum((a*b) for a, b in zip(v1, v2))
+    def length(v):
+        return math.sqrt(dotproduct(v, v))
+    return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
+

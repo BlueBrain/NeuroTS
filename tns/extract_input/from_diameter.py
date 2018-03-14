@@ -88,7 +88,7 @@ def bif_ratio(bif_point):
         return curve_fit(funct, x, y, 3./2.)[0][0]
 
 
-def diameter_model(neuron):
+def model(neuron):
     """Measures the statistical properties of a neuron's
        diameters and outputs a diameter_model"""
     from itertools import chain
@@ -126,7 +126,7 @@ def diameter_model(neuron):
     return values
 
 
-def diameter_model_population(neurons):
+def population_model(neurons):
     """Measures the statistical properties of a neuron's
        diameters and outputs a diameter_model"""
     from itertools import chain

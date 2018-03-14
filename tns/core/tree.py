@@ -18,7 +18,7 @@ all_types = {2:'axon',
              4:'apical'}
 
 
-class Tree(object):
+class TreeGrower(object):
     """Tree class"""
     def __init__(self,
                  initial_direction,
@@ -66,15 +66,15 @@ class Tree(object):
         n_sec = len(ph_angles)
         lpoint = list(self.point)
 
-        neuron.sections.append(section.Section(neuron,
-                                               parent=parent,
-                                               start_point=np.array(lpoint + [self.radius]),
-                                               direction=self.direction,
-                                               randomness=self.randomness,
-                                               targeting=self.targeting,
-                                               children=0 if n_sec > 1 else 1,
-                                               process=process,
-                                               stop_criteria=copy.deepcopy(stop)))
+        neuron.sections.append(section.SectionGrower(neuron,
+                                                     parent=parent,
+                                                     start_point=np.array(lpoint + [self.radius]),
+                                                     direction=self.direction,
+                                                     randomness=self.randomness,
+                                                     targeting=self.targeting,
+                                                     children=0 if n_sec > 1 else 1,
+                                                     process=process,
+                                                     stop_criteria=copy.deepcopy(stop)))
 
 
     def add_section(self, neuron, act, dir1, start_point,
@@ -83,15 +83,15 @@ class Tree(object):
         from all the required information. The section is
         added to the neuron.sections and activated.
         """
-        neuron.sections.append(section.Section(neuron,
-                                               parent=act,
-                                               start_point=start_point,
-                                               direction=dir1,
-                                               randomness=self.randomness,
-                                               targeting=self.targeting,
-                                               children=0,
-                                               process=process,
-                                               stop_criteria=copy.deepcopy(stop)))
+        neuron.sections.append(section.SectionGrower(neuron,
+                                                     parent=act,
+                                                     start_point=start_point,
+                                                     direction=dir1,
+                                                     randomness=self.randomness,
+                                                     targeting=self.targeting,
+                                                     children=0,
+                                                     process=process,
+                                                     stop_criteria=copy.deepcopy(stop)))
 
 
     def generate_trunk(self, neuron, input_distributions, sec_len=50, n_sec=1):
@@ -106,15 +106,15 @@ class Tree(object):
 
             neuron.groups.append(np.array([len(neuron.points), self.type, parent]))
 
-            S = section.Section(neuron,
-                                parent=parent,
-                                start_point=np.array(self.point + [self.radius]),
-                                direction=self.direction,
-                                randomness=self.randomness,
-                                targeting=self.targeting,
-                                children=0,
-                                process=None,
-                                stop_criteria={"num_seg":sec_len})
+            S = section.SectionGrower(neuron,
+                                      parent=parent,
+                                      start_point=np.array(self.point + [self.radius]),
+                                      direction=self.direction,
+                                      randomness=self.randomness,
+                                      targeting=self.targeting,
+                                      children=0,
+                                      process=None,
+                                      stop_criteria={"num_seg":sec_len})
 
             S.generate_nseg()
 
@@ -131,15 +131,15 @@ class Tree(object):
 
             neuron.groups.append(np.array([len(neuron.points), self.type, parent]))
 
-            S = section.Section(neuron,
-                                parent=parent,
-                                start_point=np.array(self.point + [self.radius]),
-                                direction=self.direction,
-                                randomness=self.randomness,
-                                targeting=self.targeting,
-                                children=0,
-                                process=None,
-                                stop_criteria={"num_seg":sec_len})
+            S = section.SectionGrower(neuron,
+                                      parent=parent,
+                                      start_point=np.array(self.point + [self.radius]),
+                                      direction=self.direction,
+                                      randomness=self.randomness,
+                                      targeting=self.targeting,
+                                      children=0,
+                                      process=None,
+                                      stop_criteria={"num_seg":sec_len})
 
             S.generate_nseg()
 
@@ -338,7 +338,8 @@ class Tree(object):
                     process2 = Sec.process
 
                 else:
-                    dir1, dir2 = rd.get_bif_soma_repulsion(Sec.direction, angles=ang, soma=self.point, curr_point=start_point[:-1])
+                    dir1, dir2 = rd.get_bif_soma_repulsion(Sec.direction, angles=ang,
+                                                           soma=self.point, curr_point=start_point[:-1])
                     #dir1, dir2 = rd.get_bif_symmetric(Sec.direction, angles=ang)
                     process1 = 'tuft'
                     process2 = 'tuft'

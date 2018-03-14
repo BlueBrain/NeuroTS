@@ -11,7 +11,6 @@
 
 
 from tns import extract_input
-from tns import grower
+from tns.generate.grower import Grower
 from tns import core
-from tns.process import diametrize
 import version

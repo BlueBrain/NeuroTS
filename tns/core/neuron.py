@@ -11,17 +11,15 @@ class Neuron(object):
     """
 
     def __init__(self, name='Neuron'):
-        """TNS Neuron Object
+        """TNS Neuron Object where groups and points are stored
 
         Parameters:
-            neuron: Obj neuron where groups and points are stored
-            initial_direction: 3D vector or random
-            initial_point:  the root of the tree
-            radius: assuming that the radius is constant for now.
-            tree_type: an integer indicating the type of the tree (choose from 2, 3, 4, 5)
+            name: given name to be used in saving into a file.
+            points: a 4-D structure of points (x, y, z, radius)
+            groups: the structure of the tree in h5 format (SegmentID, Type, ParentID)
+            sections: a set of section objects as an alternative representation of groups.
         """
         self.name = name
-
         self.points = []
         self.groups = [np.array([0, 1, -1])]
         self.sections = [[],]
@@ -42,3 +40,16 @@ class Neuron(object):
         Fdata.create_dataset(name="structure", data=np.array(self.groups))
 
         Fdata.close()
+
+
+    def load(self, input_file):
+        '''Loads a groups-points structure
+           into the Neuron object.
+        '''
+        import h5py
+        import os
+
+        F = h5py.File(input_file)
+        self.points = np.array(F['points'])
+        self.groups = np.array(F['structure'])
+        self.name = os.path.basename(input_file.replace('.h5',''))

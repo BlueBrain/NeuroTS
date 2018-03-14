@@ -17,7 +17,10 @@ def soma_data(pop, distr):
     # Extract soma size as a normal distr
     soma_size = nm.get('soma_radii', pop)
     ss = stats.fit(soma_size,  distribution='norm')
-    distr['soma_size'] = transform_distr(ss)
+
+    distr.update({"soma":{}})
+
+    distr["soma"]["size"] = transform_distr(ss)
 
 def trunk_data(pop, distr):
     # Extract trunk relative orientations to reshample
@@ -25,12 +28,14 @@ def trunk_data(pop, distr):
     angles = [i for a in angles for i in a]
     heights, bins = np.histogram(angles, bins=30)
 
-    distr["trunk_orientation_deviation"] = {"data":
+    distr.update({"trunk":{}})
+
+    distr["trunk"]["orientation_deviation"] = {"data":
                                             {"bins": (bins[1:] + bins[:-1]) / 2.,
                                              "weights": heights}}
 
     # Set trunk azimuth as a predefined uniform
-    distr["trunk_azimuth"] = {"uniform": {"min":np.pi, "max":0.0}}
+    distr["trunk"]["azimuth"] = {"uniform": {"min":np.pi, "max":0.0}}
 
 
 def radial_density(pop, distr):
@@ -68,24 +73,33 @@ def number_neurites_data(pop, distr):
     heights, bins = np.histogram(nneurites,
                                   bins=np.arange(np.min(nneurites), np.max(nneurites)+2))
 
-    distr["n_basals"] = {"data": 
-                                {"bins": bins[:-1],
-                                 "weights": heights}}
+    # Add basal key if not in distributions
+    if "basal" not in distr:
+        distr["basal"] = {}
+    distr["basal"]["num_trees"] = {"data": 
+                                          {"bins": bins[:-1],
+                                           "weights": heights}}
 
     nneurites = nm.get('number_of_neurites', pop, neurite_type=nm.AXON)
     heights, bins = np.histogram(nneurites,
                                   bins=np.arange(np.min(nneurites), np.max(nneurites)+2))
 
-    distr["n_axons"] = {"data": 
-                                {"bins": bins[:-1],
-                                 "weights": heights}}
+    # Add axon key if not in distributions
+    if "axon" not in distr:
+        distr["axon"] = {}
+    distr["axon"]["num_trees"] = {"data": 
+                                         {"bins": bins[:-1],
+                                          "weights": heights}}
 
 
     nneurites = nm.get('number_of_neurites', pop, neurite_type=nm.APICAL_DENDRITE)
     heights, bins = np.histogram(nneurites,
                                   bins=np.arange(np.min(nneurites), np.max(nneurites)+2))
 
-    distr["n_apicals"] = {"data": 
-                                {"bins": bins[:-1],
-                                 "weights": heights}}
+    # Add apical key if not in distributions
+    if "apical" not in distr:
+        distr["apical"] = {}
+    distr["apical"]["num_trees"] = {"data": 
+                                           {"bins": bins[:-1],
+                                            "weights": heights}}
 

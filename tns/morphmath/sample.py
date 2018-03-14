@@ -69,7 +69,7 @@ def soma_size(distrib):
     as sampled from a distribution
     plus some constraints.
     """
-    soma_d = Distr(distrib['soma_size'])
+    soma_d = Distr(distrib['soma']['size'])
     return soma_d.sample()
 
 
@@ -91,7 +91,7 @@ def trunk_angles(distrib, N):
     depending on the number of trunks "N"
     and the input distribution.
     """
-    trunks_d = Distr(distrib['trunk_orientation_deviation'])
+    trunks_d = Distr(distrib['trunk']['orientation_deviation'])
     angles = [ trunks_d.sample() for i in xrange(N - 1) ]
     angles = angles + [sum(angles)]
     return angles
@@ -102,7 +102,7 @@ def azimuth_angles(distrib, N):
     depending on the number of trunks "N"
     and the input distribution.
     """
-    trunks_d = Distr(d_transform(distrib['trunk_azimuth'], np.cos))
+    trunks_d = Distr(d_transform(distrib['trunk']['azimuth'], np.cos))
     angles = [ np.arccos(trunks_d.sample()) for i in xrange(N) ]
     return angles
 

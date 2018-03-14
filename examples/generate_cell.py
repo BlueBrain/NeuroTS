@@ -1,18 +1,14 @@
 import tns
-from tns import extract_input
-from tns.grower import neuron
 
 # Extract distributions from cells in input directory
 filename = './test_data/bio/'
-distr = extract_input.distributions(filename)
+distr = tns.extract_input.distributions(filename)
 
 # Generate default parameters dictionary
-params = extract_input.parameters(neurite_types=['basal'])
+params = tns.extract_input.parameters(neurite_types=['basal'])
 
 # Initialize a neuron
-from tns.grower import neuron
-N = neuron.Neuron(input_distributions=distr, input_parameters=params)
-N.name = 'Neuron'
+N = tns.Grower(input_distributions=distr, input_parameters=params, name='Neuron')
 
 # Grow your neuron
 N.grow()

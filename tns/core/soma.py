@@ -3,7 +3,7 @@ TNS class : Soma
 '''
 import numpy as np
 
-class Soma(object):
+class SomaGrower(object):
     """Soma class"""
 
     def __init__(self, initial_point=(0.,0.,0.), radius=1.0):
@@ -27,17 +27,21 @@ class Soma(object):
         """
         from scipy.spatial import ConvexHull
 
-        hull = ConvexHull(points)
+        fail_msg = 'Warning! Convex hull failed. Original points were saved instead'
 
-        selected = np.array(points)[hull.vertices]
-
-        if len(selected) > N:
-            return selected.tolist()
-        elif len(points) > N:
-            print 'Warning! Convex hull failed. Original points were saved instead'
-            return points.tolist()
+        if len(points)>3:
+            hull = ConvexHull(points)
+            selected = np.array(points)[hull.vertices]
+            if len(selected) > N:
+                return selected.tolist()
+            elif len(points) > N:
+                print fail_msg
+                return points.tolist()
+            else:
+                print fail_msg
+                return N*points.tolist()
         else:
-            print 'Warning! Convex hull failed. Original points were saved instead'
+            print fail_msg
             return N*points.tolist()
 
 
@@ -66,7 +70,8 @@ class Soma(object):
                             np.cos(theta + ang) * np.sin(phi),
                             self.center[1] + self.radius * \
                             np.sin(theta + ang) * np.sin(phi),
-                            self.center[2]]) # Make soma a 2D contour
+                            self.center[2]]) 
+                            # Make soma a 2D contour
                             # For a 3d contour replace with 
                             # self.center[1] + self.radius * \
                             # np.cos(phi)

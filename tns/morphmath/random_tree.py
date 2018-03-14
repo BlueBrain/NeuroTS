@@ -59,6 +59,29 @@ def get_bif_bio_oriented(direction, angles):
     return (np.array([x1, y1, z1]), np.array([x2, y2, z2]))
 
 
+def get_bif_bio_smoothed(direction, angles):
+    '''Input: init_phi, init_theta, dphi, dtheta.
+    '''
+    def smoothing(ang):
+        if np.abs(ang) > np.pi/2.:
+            return ang/2
+        else:
+            return ang
+
+    phi0 = np.abs(smoothing(angles[0]))
+    theta0 = smoothing(angles[1])
+    phi1 = smoothing(angles[2])
+    theta1 = smoothing(angles[3])
+
+    phi, theta = rt.spherical_from_vector(direction)
+
+    x1, y1, z1 = rt.vector_from_spherical(phi - phi0, theta - theta0)
+
+    x2, y2, z2 = rt.vector_from_spherical(phi - phi0 - phi1, theta - theta0 - theta1)
+
+    return (np.array([x1, y1, z1]), np.array([x2, y2, z2]))
+
+
 def get_bif_directional(direction, angles):
     '''Input: init_phi, init_theta, dphi, dtheta.
     '''
