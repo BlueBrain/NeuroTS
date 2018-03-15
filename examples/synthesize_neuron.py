@@ -8,7 +8,7 @@ output_path = './Results/'
 output_name = 'TestNeuron'
 
 # Extract distributions from cells in input directory
-filename = './test_data/bio/'
+filename = './TNS/test_data/bio/'
 distr = tns.extract_input.distributions(filename, diameter_model=True)
 
 # Generate default parameters dictionary
@@ -27,7 +27,7 @@ N.diametrize()
 N.save(output_path=output_path)
 
 # Load the generated neuron
-n = tmd.io.load_neuron(output_path + output_name + '.h5'
+n = tmd.io.load_neuron(output_path + output_name + '.h5')
 
 # View your generated neuron
 view.view.neuron(n)
