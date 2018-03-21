@@ -6,23 +6,98 @@ import numpy as np
 class SomaGrower(object):
     """Soma class"""
 
-    def __init__(self, initial_point=(0.,0.,0.), radius=1.0):
+    def __init__(self, initial_point, radius=1.0):
         """TNS Soma Object
 
         Parameters:
             points: numpy array
         The (x, y, z, d)-coordinates of the x-y surface trace of the soma.
         """
-        self.points = [[],]
+        self.points = []
         self.radius = radius
         self.center = initial_point
 
 
-    def interpolate(self, points, N=3):
+    def point_from_trunk_direction(self, phi, theta):
+        '''Returns the direction of the unit vector and a point
+        on the soma surface depending on the theta, phi angles.
+        theta corresponds to the angle on the x-y plane.
+        phi corresponds to the angle diversion on the z-axis.
+        '''
+        point_on_soma = [self.center[0] + self.radius * \
+                         np.cos(phi) * np.sin(theta),
+                         self.center[1] + self.radius * \
+                         np.sin(phi) * np.sin(theta),
+                         self.center[2] + self.radius * \
+                         np.cos(theta)]
+
+        return point_on_soma
+
+
+    def orientation_from_point(self, point):
+        '''Returns the unit vector that corresponds to the orientation
+        of a point on the soma surface.
+        '''
+        point_on_soma = np.subtract(np.array(point), np.array(self.center))
+
+        return point_on_soma / np.linalg.norm(point_on_soma)
+
+
+    def contour_point(self, point):
+        '''Keeps the c-y coordinates of the input point
+        but replaces the third (z) coordinate with the equivalent
+        soma-z in order to create a contour at the soma level.
+        '''
+        return [point[0], point[1], self.center[2]]
+
+
+    def add_points_from_trunk_angles(self, trunk_angles, z_angles):
+        """Generates a sequence of points in the circumference of
+        a circle of radius R, from a list of angles.
+        trunk_angles correspond to the angles on the x-y plane,
+        while z_angles correspond to the equivalent z-direction.
+        """
+        sortIDs = np.argsort(trunk_angles)
+        angle_norm = 2.*np.pi / len(trunk_angles)
+        new_points = []
+
+        for i,theta in enumerate(np.array(trunk_angles)[sortIDs]):
+
+            phi = np.array(z_angles)[sortIDs][i]
+            ang = (i + 1) * angle_norm
+            point = self.point_from_trunk_direction(theta + ang, phi)
+
+            new_points.append(point)
+    
+        self.points = self.points + new_points
+
+        return new_points
+
+
+    def add_points_from_orientations(self, vectors):
+        """Generates a sequence of points in the circumference of
+        a circle of radius R, from a list of unit vectors.
+        vectors is expected to be a list of orientations.
+        """
+        from tns.morphmath import rotation
+        new_points = []
+
+        for vect in vectors:
+
+            phi, theta = rotation.spherical_from_vector(vect)
+            point = self.point_from_trunk_direction(phi, theta)
+            new_points.append(point)
+
+        self.points = self.points + new_points
+
+        return new_points
+
+
+    def interpolate(self, points, interpolation=3):
         """Finds the convex hull from a list of points
-        and returns a number of points N that belong
+        and returns a number of interpolation points that belong
         on this convex hull.
-        N: sets the minimum number of points to be generated.
+        interpolation: sets the minimum number of points to be generated.
         points: initial set of points
         """
         from scipy.spatial import ConvexHull
@@ -32,59 +107,37 @@ class SomaGrower(object):
         if len(points)>3:
             hull = ConvexHull(points)
             selected = np.array(points)[hull.vertices]
-            if len(selected) > N:
+            if len(selected) > interpolation:
                 return selected.tolist()
-            elif len(points) > N:
+            elif len(points) > interpolation:
                 print fail_msg
                 return points.tolist()
             else:
                 print fail_msg
-                return N*points.tolist()
+                return interpolation*points.tolist()
         else:
             print fail_msg
-            return N*points.tolist()
+            return interpolation*points.tolist()
 
 
-    def generate(self, neuron, trunk_angles, z_angles, plot_soma=True, interpolation=3):
-        """Generates a soma as a sequence of points
+    def add_soma_points2neuron(self, neuron, interpolation=3):
+        """Generates a soma from a list of points,
         in the circumference of a circle of radius R.
+        The points are saved into the neuron object and
+        consist the first section of the cell.
+        If interpolation is selected points will be generated
+        until the expected number of soma points is reached.
         """
-        vectors = []
-
-        sortIDs = np.argsort(trunk_angles)
-
-        angle_norm = 2.*np.pi / len(trunk_angles)
-
-        for i,a in enumerate(np.array(trunk_angles)[sortIDs]):
-
-            phi = np.array(z_angles)[sortIDs][i]
-            ang = (i + 1) * angle_norm
-
-            # To smooth out the soma contour we interpolate
-            # among the existing soma points:
-            # theta = (a + np.array(trunk_angles)[sortIDs][i - 1]) / 2
-
-            theta = a
-
-            vectors.append([self.center[0] + self.radius * \
-                            np.cos(theta + ang) * np.sin(phi),
-                            self.center[1] + self.radius * \
-                            np.sin(theta + ang) * np.sin(phi),
-                            self.center[2]]) 
-                            # Make soma a 2D contour
-                            # For a 3d contour replace with 
-                            # self.center[1] + self.radius * \
-                            # np.cos(phi)
+        # Soma points as a contour to be saved in neuron.
+        contour = np.array([self.contour_point(p) for p in self.points])
 
         if interpolation is None:
-            self.points = [np.append(v, [0.]) for v in vectors]
+            # Fill in neuron points as a contour, including a zero radius for a 4D point.
+            neuron.points = neuron.points + [np.append(c, [0.0]) for c in contour]
         else:
-            new_vectors = self.interpolate(np.array(vectors)[:, :2], interpolation)
-            self.points = [np.append(v, [self.center[2], 0.]) for v in new_vectors]
+            new_vectors = self.interpolate(np.array(contour),
+                                           interpolation=interpolation)
+            neuron.points = neuron.points + [np.append(c, [0.0]) for c in new_vectors]
 
-        neuron.points = neuron.points + self.points
-        neuron.soma = self
-
-        return np.array(vectors)
-
-
+        # Add soma section to neuron groups and initialize
+        neuron.groups = [np.array([ 0,  1, -1])]

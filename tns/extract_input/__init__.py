@@ -62,15 +62,16 @@ def parameters(name="Test_neuron", origin=(0.,0.,0.), neurite_types=['basal', 'a
         input_parameters["apical"].update(parameters_default)
         input_parameters["apical"].update({"apical_distance": 0.0,
                                            "tree_type":4,
-                                           "orientation":(0.,1.,0.),
+                                           "orientation":[(0.,1.,0.)],
                                            "branching_method": "directional",})
 
     if 'axon' in neurite_types:
         input_parameters["axon"].update(parameters_default)
         input_parameters["axon"].update({"tree_type":2,
-                                          "orientation":(0.,-1.,0.),
+                                          "orientation":[(0.,-1.,0.)],
                                           "branching_method": "bio_oriented",})
 
+    input_parameters['grow_types'] = neurite_types
 
     return input_parameters
 

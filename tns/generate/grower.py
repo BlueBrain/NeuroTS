@@ -45,15 +45,8 @@ class Grower(object):
         """
         algorithms.grow_soma(self)
 
-        if self.input_parameters["apical"]:
-            algorithms.grow_neurite(self, tree_type="apical")
-
-        if self.input_parameters["axon"]:
-            algorithms.grow_neurite(self, tree_type="axon")
-
-        if self.input_parameters["basal"]:
-            while len(self.trunks) > 0:
-               algorithms.grow_neurite(self, tree_type="basal")
+        for tree in self.trunks:
+            algorithms.grow_neurite(self, tree)
 
 
     def diametrize(self):

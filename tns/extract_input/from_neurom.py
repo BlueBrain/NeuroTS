@@ -24,18 +24,29 @@ def soma_data(pop, distr):
 
 def trunk_data(pop, distr):
     # Extract trunk relative orientations to reshample
-    angles = [nm.get('trunk_angles', n) for n in pop]
-    angles = [i for a in angles for i in a]
-    heights, bins = np.histogram(angles, bins=30)
 
-    distr.update({"trunk":{}})
+    def get_trunk_neurite_type(pop, distr, tree_type='basal', nm_type=nm.BASAL_DENDRITE):
+        '''Extracts the trunk data for a specific tree type'''
 
-    distr["trunk"]["orientation_deviation"] = {"data":
-                                            {"bins": (bins[1:] + bins[:-1]) / 2.,
-                                             "weights": heights}}
+        angles = [nm.get('trunk_angles', n, neurite_type=nm_type) for n in pop]
+        angles = [i for a in angles for i in a]
+        heights, bins = np.histogram(angles, bins=30)
 
-    # Set trunk azimuth as a predefined uniform
-    distr["trunk"]["azimuth"] = {"uniform": {"min":np.pi, "max":0.0}}
+        if tree_type not in distr:
+            distr[tree_type] = {}
+
+        distr[tree_type].update({"trunk":{}})
+
+        distr[tree_type]["trunk"]["orientation_deviation"] = {"data":
+                                                {"bins": (bins[1:] + bins[:-1]) / 2.,
+                                                 "weights": heights}}
+
+        # Set trunk azimuth as a predefined uniform
+        distr[tree_type]["trunk"]["azimuth"] = {"uniform": {"min":np.pi, "max":0.0}}
+
+    get_trunk_neurite_type(pop, distr, tree_type='basal', nm_type=nm.BASAL_DENDRITE)
+    get_trunk_neurite_type(pop, distr, tree_type='apical', nm_type=nm.APICAL_DENDRITE)
+    get_trunk_neurite_type(pop, distr, tree_type='axon', nm_type=nm.AXON)
 
 
 def radial_density(pop, distr):
@@ -69,37 +80,20 @@ def number_neurites_data(pop, distr):
     # Extract number of neurites as a precise distribution
     # The output is given in integer numbers which are
     # the permitted values for the number of trees.
-    nneurites = nm.get('number_of_neurites', pop, neurite_type=nm.BASAL_DENDRITE)
-    heights, bins = np.histogram(nneurites,
-                                  bins=np.arange(np.min(nneurites), np.max(nneurites)+2))
+    def get_nneurite_type(pop, distr, tree_type='basal', nm_type=nm.BASAL_DENDRITE):
+        '''Extracts the number of neurites for a specific tree type'''
 
-    # Add basal key if not in distributions
-    if "basal" not in distr:
-        distr["basal"] = {}
-    distr["basal"]["num_trees"] = {"data": 
-                                          {"bins": bins[:-1],
-                                           "weights": heights}}
+        nneurites = nm.get('number_of_neurites', pop, neurite_type=nm_type)
+        heights, bins = np.histogram(nneurites,
+                                      bins=np.arange(np.min(nneurites), np.max(nneurites)+2))
 
-    nneurites = nm.get('number_of_neurites', pop, neurite_type=nm.AXON)
-    heights, bins = np.histogram(nneurites,
-                                  bins=np.arange(np.min(nneurites), np.max(nneurites)+2))
+        if tree_type not in distr:
+            distr[tree_type] = {}
 
-    # Add axon key if not in distributions
-    if "axon" not in distr:
-        distr["axon"] = {}
-    distr["axon"]["num_trees"] = {"data": 
-                                         {"bins": bins[:-1],
-                                          "weights": heights}}
+        distr[tree_type]["num_trees"] = {"data": 
+                                                {"bins": bins[:-1],
+                                                 "weights": heights}}
 
-
-    nneurites = nm.get('number_of_neurites', pop, neurite_type=nm.APICAL_DENDRITE)
-    heights, bins = np.histogram(nneurites,
-                                  bins=np.arange(np.min(nneurites), np.max(nneurites)+2))
-
-    # Add apical key if not in distributions
-    if "apical" not in distr:
-        distr["apical"] = {}
-    distr["apical"]["num_trees"] = {"data": 
-                                           {"bins": bins[:-1],
-                                            "weights": heights}}
-
+    get_nneurite_type(pop, distr, tree_type='basal', nm_type=nm.BASAL_DENDRITE)
+    get_nneurite_type(pop, distr, tree_type='apical', nm_type=nm.APICAL_DENDRITE)
+    get_nneurite_type(pop, distr, tree_type='axon', nm_type=nm.AXON)

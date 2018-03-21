@@ -28,16 +28,12 @@ class TreeGrower(object):
 
         Parameters:
             neuron: Obj neuron where groups and points are stored
-            initial_direction: 3D vector or random
-            initial_point:  the root of the tree
-            radius: assuming that the radius is constant for now.
-            tree_type: an integer indicating the type of the tree (choose from 2, 3, 4, 5)
+            initial_direction: 3D vector
+            initial_point: 3D vector that defines the starting point of the tree
+            parameters including: tree_type, radius, randomness, targeting, apical_distance
+            tree_type: an integer indicating the type (choose from 2, 3, 4, 5)
         """
-        if len(initial_direction) == 3:
-            self.direction = initial_direction
-        elif initial_direction == "random":
-            self.direction = rd.get_random_point()
-
+        self.direction = initial_direction
         self.point = list(initial_point)
         self.radius = parameters["radius"]
         self.type = parameters["tree_type"] # 2: axon, 3: basal, 4: apical, 5: other
