@@ -21,9 +21,44 @@ class Neuron(object):
         """
         self.name = name
         self.points = []
-        self.groups = [np.array([0, 1, -1])]
+        self.groups = []
         # The following implements the correct connectivity of sections, while growing.
         self.sections = [[],]
+
+
+    def add_points(self, points):
+        '''Adds a list of points in the neuron.points
+        structure ensuring that they are represented
+        as a list of 4D points.
+        '''
+        # verify that the points inserted are in 4D format [x, y, z, radius]
+        if np.shape(points)[1] != 4:
+            raise ValueError("Cannot add non 4D points to the neuron structure!")
+        # turns the input points into a list of lists.
+        list_points = np.array(points).tolist()
+        self.points.extend(list_points)
+
+
+    def add_group(self, group):
+        '''Adds a single group in the neuron.groups
+        structure ensuring that they are represented
+        as a 3D list.
+        '''
+        # verify that the groups inserted are 3D format [SegID, SegType, ParID]
+        if np.shape(group)[0] != 3:
+            raise ValueError("Cannot add non 3D points to the neuron structure!")
+        # turns the input points into a list of lists.
+        list_group = np.array(group).tolist()
+        self.groups.append(list_group)
+
+
+    def add_points_without_radius(self, points3D, radius):
+        '''Adds a list of points in the neuron.points
+        structure ensuring that they are represented
+        as a list of 4D points.
+        '''
+        new_points = np.column_stack((points3D, radius*np.ones(len(points3D))))
+        self.add_points(new_points)
 
 
     def save(self, output_path='./'):

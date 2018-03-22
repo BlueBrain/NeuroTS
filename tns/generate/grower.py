@@ -43,7 +43,7 @@ class Grower(object):
         and a list of trees encoded in the h5 format as a set of points
         and groups.
         """
-        algorithms.grow_soma(self)
+        algorithms.grow_soma(self, interpolation=None)
 
         for tree in self.trunks:
             algorithms.grow_neurite(self, tree)

@@ -80,37 +80,36 @@ def grow_trunks(grower):
         # with a direction and initial_point
         for p in points:
             tree_direction = grower.soma.orientation_from_point(p)
-            tree_list.append(TreeGrower(initial_direction=tree_direction,
+            tree_list.append(TreeGrower(grower.neuron,
+                                        initial_direction=tree_direction,
                                         initial_point=p,
                                         parameters=params))
 
     grower.trunks = tree_list
 
 
-def grow_soma(grower):
+def grow_soma(grower, interpolation=None):
     """Generates a soma based on input_distributions.
     The initial neurites need to be generated
     in order to get the soma coordinates correct.
     """
     init_soma_radius(grower)
-
     grow_trunks(grower)
-
-    grower.soma.add_soma_points2neuron(grower.neuron, interpolation=None)
+    soma_points = grower.soma.generate_neuron_soma_points3D(interpolation=interpolation)
+    grower.neuron.add_points_without_radius(points3D=soma_points, radius=0.0)
+    grower.neuron.add_group([0, 1, -1])
 
 
 def grow_neurite(grower, tree):
     """Grows the corresponding tree and registers the results
     in the neuron of the grower.
     """
-    from tns.core.tree import all_types
+    from tns.basic import neurite_types
     from tns.morphmath.rotation import angle3D
 
-    tree_type = all_types[tree.type]
-
+    tree_type = neurite_types[tree.type]
     params = grower.input_parameters[tree_type]
     distrs = grower.input_distributions[tree_type]
-
     method = params["branching_method"]
 
     assert method in bifurcation_methods, \
@@ -119,8 +118,6 @@ def grow_neurite(grower, tree):
     ph = sample.ph(distrs["ph"])
 
     if  tree_type != "apical":
-        tree.generate_ph_angles(neuron=grower.neuron, ph_angles=ph,
-                                method=method)
+        tree.generate_ph_angles(ph_angles=ph, method=method)
     else:
-        tree.generate_ph_apical(neuron=grower.neuron, ph_angles=ph,
-                                method=method)
+        tree.generate_ph_apical(ph_angles=ph, method=method)

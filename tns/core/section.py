@@ -6,7 +6,7 @@ from tns.morphmath.sample import ph_prob
 class SectionGrower(object):
     '''Class for the section
     '''
-    def __init__(self, neuron,
+    def __init__(self,
                  parent,
                  children,
                  start_point,
@@ -19,11 +19,9 @@ class SectionGrower(object):
         that are sequentially connected to each other. This process 
         generates a tubular morphology that resembles a random walk.
         '''
-        self.neuron = neuron
         self.parent = parent
         self.children = children
-        self.points = [np.array(start_point[:3])]
-        self.radius = start_point[-1]
+        self.points3D = [np.array(start_point[:3])]
         self.direction = direction
         self.parameters = {"direction": np.array(direction),
                            "randomness": randomness,
@@ -87,10 +85,10 @@ class SectionGrower(object):
         crit = self.stop_criteria["bif_term"]
         scale = self.parameters["scale_prob"]
 
-        currd = np.linalg.norm(np.subtract(self.points[-1], crit["ref"]))
+        currd = np.linalg.norm(np.subtract(self.points3D[-1], crit["ref"]))
 
         # Ensure that the section has at least two points
-        if len(self.points) < 2:
+        if len(self.points3D) < 2:
             return True
 
         if ph_prob(prob_function, crit["bif"] - currd):
@@ -106,11 +104,11 @@ class SectionGrower(object):
     def history(self, memory=5):
         '''Returns a combination of the sections history
         '''
-        hist = np.array([0., 0., 0.]) # self.points[-1][:3] - self.points[-2][:3]
+        hist = np.array([0., 0., 0.])
 
-        for i in xrange(1, min(memory, len(self.points))):
+        for i in xrange(1, min(memory, len(self.points3D))):
 
-            hist = np.add(hist, np.exp(1.-i) * (self.points[-i][:3] - self.points[-i - 1][:3]))
+            hist = np.add(hist, np.exp(1.-i) * (self.points3D[-i] - self.points3D[-i - 1]))
 
         if np.linalg.norm(hist) != 0.0:
             return hist / np.linalg.norm(hist)
@@ -123,25 +121,14 @@ class SectionGrower(object):
            until at least one stop criterion is fulfilled.
         '''
         from scipy import stats
-
-        self.neuron.points.append(np.append(self.points[0], self.radius))
-
+        self.points3D.append(self.points3D[0])
         prob_function = stats.expon(loc=0, scale=self.parameters["scale_prob"])
 
         while self.check_stop_ph(prob_function):
 
-            curr_point = self.points[-1]
-
+            curr_point = self.points3D[-1]
             point = self.next_point(curr_point, self.parameters)
-
-            self.points.append(np.array(point))
-
-            self.neuron.points.append(np.append(point, self.radius))
-
-            #if np.mod(len(self.neuron.points), 100) == 0 :
-            #    self.neuron.name = 'T_' + str(len(self.neuron.points) / 100)
-            #    self.neuron.save()
-
+            self.points3D.append(np.array(point))
             self.segs = self.segs + 1
 
         if self.children == 0:
@@ -156,24 +143,15 @@ class SectionGrower(object):
         '''
         from scipy import stats
 
-        self.neuron.points.append(np.append(self.points[0], self.radius))
+        self.points3D.append(np.array(self.points3D[0]))
 
         prob_function = stats.expon(loc=0, scale=self.parameters["scale_prob"])
 
         while self.check_stop_num_seg():
 
-            curr_point = self.points[-1]
-
+            curr_point = self.points3D[-1]
             point = self.next_point(curr_point, self.parameters)
-
-            self.points.append(np.array(point))
-
-            self.neuron.points.append(np.append(point, self.radius))
-
-            #if np.mod(len(self.neuron.points), 100) == 0 :
-            #    self.neuron.name = 'T_' + str(len(self.neuron.points) / 100)
-            #    self.neuron.save()
-
+            self.points3D.append(np.array(point))
             self.segs = self.segs + 1
 
         if self.children == 0:
@@ -184,8 +162,8 @@ class SectionGrower(object):
 
     def get_current_direction(self):
 
-        vect = np.subtract([self.points[-1][0], self.points[-1][1], self.points[-1][2]],
-                           [self.points[0][0], self.points[0][1], self.points[0][2]])
+        vect = np.subtract([self.points3D[-1][0], self.points3D[-1][1], self.points3D[-1][2]],
+                           [self.points3D[0][0], self.points3D[0][1], self.points3D[0][2]])
 
         if np.linalg.norm(vect) != 0.0:
             return vect / np.linalg.norm(vect)

@@ -13,7 +13,7 @@ class SomaGrower(object):
             points: numpy array
         The (x, y, z, d)-coordinates of the x-y surface trace of the soma.
         """
-        self.points = []
+        self.points3D = []
         self.radius = radius
         self.center = initial_point
 
@@ -59,7 +59,7 @@ class SomaGrower(object):
         """
         sortIDs = np.argsort(trunk_angles)
         angle_norm = 2.*np.pi / len(trunk_angles)
-        new_points = []
+        new_points3D = []
 
         for i,theta in enumerate(np.array(trunk_angles)[sortIDs]):
 
@@ -67,11 +67,11 @@ class SomaGrower(object):
             ang = (i + 1) * angle_norm
             point = self.point_from_trunk_direction(theta + ang, phi)
 
-            new_points.append(point)
+            new_points3D.append(point)
     
-        self.points = self.points + new_points
+        self.points3D.extend(new_points3D)
 
-        return new_points
+        return new_points3D
 
 
     def add_points_from_orientations(self, vectors):
@@ -80,20 +80,20 @@ class SomaGrower(object):
         vectors is expected to be a list of orientations.
         """
         from tns.morphmath import rotation
-        new_points = []
+        new_points3D = []
 
         for vect in vectors:
 
             phi, theta = rotation.spherical_from_vector(vect)
             point = self.point_from_trunk_direction(phi, theta)
-            new_points.append(point)
+            new_points3D.append(point)
 
-        self.points = self.points + new_points
+        self.points3D.extend(new_points3D)
 
-        return new_points
+        return new_points3D
 
 
-    def interpolate(self, points, interpolation=3):
+    def interpolate(self, points3D, interpolation=3):
         """Finds the convex hull from a list of points
         and returns a number of interpolation points that belong
         on this convex hull.
@@ -104,40 +104,34 @@ class SomaGrower(object):
 
         fail_msg = 'Warning! Convex hull failed. Original points were saved instead'
 
-        if len(points)>3:
-            hull = ConvexHull(points)
-            selected = np.array(points)[hull.vertices]
+        if len(points3D)>3:
+            hull = ConvexHull(points3D)
+            selected = np.array(points3D)[hull.vertices]
             if len(selected) > interpolation:
                 return selected.tolist()
-            elif len(points) > interpolation:
+            elif len(points3D) > interpolation:
                 print fail_msg
-                return points.tolist()
+                return points3D.tolist()
             else:
                 print fail_msg
-                return interpolation*points.tolist()
+                return interpolation*points3D.tolist()
         else:
             print fail_msg
-            return interpolation*points.tolist()
+            return interpolation*points3D.tolist()
 
 
-    def add_soma_points2neuron(self, neuron, interpolation=3):
-        """Generates a soma from a list of points,
+    def generate_neuron_soma_points3D(self, interpolation=3):
+        """Generates a soma from a list of points3D,
         in the circumference of a circle of radius R.
-        The points are saved into the neuron object and
+        The points will be saved into the neuron object and
         consist the first section of the cell.
         If interpolation is selected points will be generated
         until the expected number of soma points is reached.
         """
-        # Soma points as a contour to be saved in neuron.
-        contour = np.array([self.contour_point(p) for p in self.points])
+        # Soma 3D points as a contour to be saved in neuron.
+        contour = np.array([self.contour_point(p) for p in self.points3D])
 
         if interpolation is None:
-            # Fill in neuron points as a contour, including a zero radius for a 4D point.
-            neuron.points = neuron.points + [np.append(c, [0.0]) for c in contour]
+            return contour
         else:
-            new_vectors = self.interpolate(np.array(contour),
-                                           interpolation=interpolation)
-            neuron.points = neuron.points + [np.append(c, [0.0]) for c in new_vectors]
-
-        # Add soma section to neuron groups and initialize
-        neuron.groups = [np.array([ 0,  1, -1])]
+            return self.interpolate(np.array(contour), interpolation=interpolation)
