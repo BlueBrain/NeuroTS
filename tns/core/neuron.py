@@ -22,6 +22,7 @@ class Neuron(object):
         self.name = name
         self.points = []
         self.groups = [np.array([0, 1, -1])]
+        # The following implements the correct connectivity of sections, while growing.
         self.sections = [[],]
 
 
