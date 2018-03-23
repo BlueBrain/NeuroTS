@@ -23,18 +23,17 @@ class SectionGrower(object):
         self.children = children
         self.points3D = [np.array(start_point[:3])]
         self.direction = direction
-        self.parameters = {"direction": np.array(direction),
-                           "randomness": randomness,
-                           "targeting": targeting,
-                           "scale_prob": 1.0,
-                           "history": 1.0 - randomness - targeting}
+        self.params = {"direction": np.array(direction),
+                       "randomness": randomness,
+                       "targeting": targeting,
+                       "scale_prob": 1.0,
+                       "history": 1.0 - randomness - targeting}
         self.stop_criteria = stop_criteria
         self.segs = 0
         self.process = process
-        #print start_point, parent
 
 
-    def next_point(self, current_point, parameters):
+    def next_point(self, current_point):
         """Returns the next point depending
         on the growth method and the previous point.
         """
@@ -42,27 +41,25 @@ class SectionGrower(object):
 
         hist_point = self.history()
 
-        targeting = parameters["targeting"]
-        randomness = parameters["randomness"]
-        hist = parameters["history"]
+        targeting = self.params["targeting"]
+        randomness = self.params["randomness"]
+        hist = self.params["history"]
 
         new_point = list([current_point[0] +
-                          targeting * parameters["direction"][0] +
+                          targeting * self.params["direction"][0] +
                           randomness * random_point[0] +
                           hist * hist_point[0],
                           current_point[1] +
-                          targeting * parameters["direction"][1] +
+                          targeting * self.params["direction"][1] +
                           randomness * random_point[1] +
                           hist * hist_point[1],
                           current_point[2] +
-                          targeting * parameters["direction"][2] +
+                          targeting * self.params["direction"][2] +
                           randomness * random_point[2] +
                           hist * hist_point[2]])
 
         #new_point = list(np.add(current_point[:3], targeting * parameters["direction"]))
-
         #new_point = list(np.add(new_point, randomness * random_point))
-
         #new_point = list(np.add(new_point, (1. - exploration - exploitation) * hist_point))
 
         return new_point
@@ -83,7 +80,7 @@ class SectionGrower(object):
         If False the growth stops.
         """
         crit = self.stop_criteria["bif_term"]
-        scale = self.parameters["scale_prob"]
+        scale = self.params["scale_prob"]
 
         currd = np.linalg.norm(np.subtract(self.points3D[-1], crit["ref"]))
 
@@ -122,12 +119,12 @@ class SectionGrower(object):
         '''
         from scipy import stats
         self.points3D.append(self.points3D[0])
-        prob_function = stats.expon(loc=0, scale=self.parameters["scale_prob"])
+        prob_function = stats.expon(loc=0, scale=self.params["scale_prob"])
 
         while self.check_stop_ph(prob_function):
 
             curr_point = self.points3D[-1]
-            point = self.next_point(curr_point, self.parameters)
+            point = self.next_point(curr_point)
             self.points3D.append(np.array(point))
             self.segs = self.segs + 1
 
@@ -141,16 +138,12 @@ class SectionGrower(object):
         '''Creates a section with the selected parameters
            until at least one stop criterion is fulfilled.
         '''
-        from scipy import stats
-
         self.points3D.append(np.array(self.points3D[0]))
-
-        prob_function = stats.expon(loc=0, scale=self.parameters["scale_prob"])
 
         while self.check_stop_num_seg():
 
             curr_point = self.points3D[-1]
-            point = self.next_point(curr_point, self.parameters)
+            point = self.next_point(curr_point)
             self.points3D.append(np.array(point))
             self.segs = self.segs + 1
 

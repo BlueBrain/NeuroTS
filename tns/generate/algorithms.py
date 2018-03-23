@@ -83,7 +83,8 @@ def grow_trunks(grower):
             tree_list.append(TreeGrower(grower.neuron,
                                         initial_direction=tree_direction,
                                         initial_point=p,
-                                        parameters=params))
+                                        parameters=params,
+                                        distributions=distr))
 
     grower.trunks = tree_list
 

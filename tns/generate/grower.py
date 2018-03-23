@@ -46,7 +46,7 @@ class Grower(object):
         algorithms.grow_soma(self, interpolation=None)
 
         for tree in self.trunks:
-            algorithms.grow_neurite(self, tree)
+            tree.run()
 
 
     def diametrize(self):
