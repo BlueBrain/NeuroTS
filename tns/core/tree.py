@@ -77,7 +77,6 @@ class TreeGrower(object):
         '''Operates the tree growth according to the selected algorithm.
         '''
         grow_meth = growth_algorithms[self.params["method"]]
-        print "Tree of type ", self.type, " growing with selected: ", grow_meth
 
         GRower = grow_meth(input_data=self.distr,
                            bif_method=self.params["branching_method"],

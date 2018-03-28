@@ -110,7 +110,7 @@ class TMDGrower(object):
 
 
 class BasicGrower(object):
-    """TMD Grower class"""
+    """Basic Grower class"""
     def __init__(self,
                  input_data,
                  bif_method,
@@ -127,7 +127,6 @@ class BasicGrower(object):
         """
         self.bif_method = bif_methods[bif_method]
         self.growth_method = growth_method
-        print "Basic Section is growing with selected: ", growth_method
         self.start_point = start_point
 
 
