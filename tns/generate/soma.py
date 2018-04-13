@@ -3,6 +3,7 @@ TNS class : Soma
 '''
 import numpy as np
 
+
 class SomaGrower(object):
     """Soma class"""
 
@@ -17,22 +18,20 @@ class SomaGrower(object):
         self.radius = radius
         self.center = initial_point
 
-
     def point_from_trunk_direction(self, phi, theta):
         '''Returns the direction of the unit vector and a point
         on the soma surface depending on the theta, phi angles.
         theta corresponds to the angle on the x-y plane.
         phi corresponds to the angle diversion on the z-axis.
         '''
-        point_on_soma = [self.center[0] + self.radius * \
+        point_on_soma = [self.center[0] + self.radius *
                          np.cos(phi) * np.sin(theta),
-                         self.center[1] + self.radius * \
+                         self.center[1] + self.radius *
                          np.sin(phi) * np.sin(theta),
-                         self.center[2] + self.radius * \
+                         self.center[2] + self.radius *
                          np.cos(theta)]
 
         return point_on_soma
-
 
     def orientation_from_point(self, point):
         '''Returns the unit vector that corresponds to the orientation
@@ -42,14 +41,12 @@ class SomaGrower(object):
 
         return point_on_soma / np.linalg.norm(point_on_soma)
 
-
     def contour_point(self, point):
         '''Keeps the c-y coordinates of the input point
         but replaces the third (z) coordinate with the equivalent
         soma-z in order to create a contour at the soma level.
         '''
         return [point[0], point[1], self.center[2]]
-
 
     def add_points_from_trunk_angles(self, trunk_angles, z_angles):
         """Generates a sequence of points in the circumference of
@@ -58,21 +55,20 @@ class SomaGrower(object):
         while z_angles correspond to the equivalent z-direction.
         """
         sortIDs = np.argsort(trunk_angles)
-        angle_norm = 2.*np.pi / len(trunk_angles)
+        angle_norm = 2. * np.pi / len(trunk_angles)
         new_points3D = []
 
-        for i,theta in enumerate(np.array(trunk_angles)[sortIDs]):
+        for i, theta in enumerate(np.array(trunk_angles)[sortIDs]):
 
             phi = np.array(z_angles)[sortIDs][i]
             ang = (i + 1) * angle_norm
             point = self.point_from_trunk_direction(theta + ang, phi)
 
             new_points3D.append(point)
-    
+
         self.points3D.extend(new_points3D)
 
         return new_points3D
-
 
     def add_points_from_orientations(self, vectors):
         """Generates a sequence of points in the circumference of
@@ -92,7 +88,6 @@ class SomaGrower(object):
 
         return new_points3D
 
-
     def interpolate(self, points3D, interpolation=3):
         """Finds the convex hull from a list of points
         and returns a number of interpolation points that belong
@@ -104,7 +99,7 @@ class SomaGrower(object):
 
         fail_msg = 'Warning! Convex hull failed. Original points were saved instead'
 
-        if len(points3D)>3:
+        if len(points3D) > 3:
             hull = ConvexHull(points3D)
             selected = np.array(points3D)[hull.vertices]
             if len(selected) > interpolation:
@@ -114,11 +109,10 @@ class SomaGrower(object):
                 return points3D.tolist()
             else:
                 print fail_msg
-                return interpolation*points3D.tolist()
+                return interpolation * points3D.tolist()
         else:
             print fail_msg
-            return interpolation*points3D.tolist()
-
+            return interpolation * points3D.tolist()
 
     def generate_neuron_soma_points3D(self, interpolation=3):
         """Generates a soma from a list of points3D,
@@ -134,4 +128,4 @@ class SomaGrower(object):
         if interpolation is None:
             return contour
         else:
-            return self.interpolate(np.array(contour), interpolation=interpolation)
+            return self.interpolate(contour, interpolation=interpolation)

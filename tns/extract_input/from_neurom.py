@@ -2,6 +2,7 @@ import neurom as nm
 from neurom import stats
 import numpy as np
 
+
 def transform_distr(opt_distr):
     if opt_distr.type == 'norm':
         return {"norm": {"mean": opt_distr.params[0],
@@ -11,7 +12,8 @@ def transform_distr(opt_distr):
                             "max": opt_distr.params[1] + opt_distr.params[0]}}
     elif opt_distr.type == 'expon':
         return {"expon": {"loc": opt_distr.params[0],
-                          "lambda": 1./opt_distr.params[1]}}
+                          "lambda": 1. / opt_distr.params[1]}}
+
 
 def soma_data(pop):
     # Extract soma size as a normal distribution
@@ -34,7 +36,7 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE):
     return {"trunk": {"orientation_deviation": {"data":
                                                 {"bins": (bins[1:] + bins[:-1]) / 2.,
                                                  "weights": heights}},
-                      "azimuth": {"uniform": {"min":np.pi, "max":0.0}}}}
+                      "azimuth": {"uniform": {"min": np.pi, "max": 0.0}}}}
 
 
 def radial_density_neurite(pop, neurite_type=nm.BASAL_DENDRITE):
@@ -60,4 +62,3 @@ def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE):
 
     return {"num_trees": {"data": {"bins": bins[:-1],
                                    "weights": heights}}}
-

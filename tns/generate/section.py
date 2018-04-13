@@ -6,6 +6,7 @@ from tns.morphmath.sample import ph_prob
 class SectionGrower(object):
     '''Class for the section
     '''
+
     def __init__(self,
                  parent,
                  children,
@@ -14,15 +15,15 @@ class SectionGrower(object):
                  randomness,
                  targeting,
                  process,
-                 stop_criteria={"num_seg":100}):
-        '''A section is a list of points in 4D space (x, y, x, r) 
-        that are sequentially connected to each other. This process 
+                 stop_criteria={"num_seg": 100}):
+        '''A section is a list of points in 4D space (x, y, x, r)
+        that are sequentially connected to each other. This process
         generates a tubular morphology that resembles a random walk.
         '''
         self.parent = parent
+        self.direction = direction
         self.children = children
         self.points3D = [np.array(start_point[:3])]
-        self.direction = direction
         self.params = {"direction": np.array(direction),
                        "randomness": randomness,
                        "targeting": targeting,
@@ -31,7 +32,6 @@ class SectionGrower(object):
         self.stop_criteria = stop_criteria
         self.segs = 0
         self.process = process
-
 
     def next_point(self, current_point):
         """Returns the next point depending
@@ -64,7 +64,6 @@ class SectionGrower(object):
 
         return new_point
 
-
     def check_stop_num_seg(self):
         """Checks if any num_seg criteria is fullfiled.
         If it is it returns False and the growth stops.
@@ -73,7 +72,6 @@ class SectionGrower(object):
             return True
         else:
             return False
-
 
     def check_stop_ph(self, prob_function):
         """Checks if any of bif_term criteria is fullfiled.
@@ -97,7 +95,6 @@ class SectionGrower(object):
         else:
             return True
 
-
     def history(self, memory=5):
         '''Returns a combination of the sections history
         '''
@@ -105,20 +102,18 @@ class SectionGrower(object):
 
         for i in xrange(1, min(memory, len(self.points3D))):
 
-            hist = np.add(hist, np.exp(1.-i) * (self.points3D[-i] - self.points3D[-i - 1]))
+            hist = np.add(hist, np.exp(1. - i) * (self.points3D[-i] - self.points3D[-i - 1]))
 
         if np.linalg.norm(hist) != 0.0:
             return hist / np.linalg.norm(hist)
         else:
             return hist
 
-
     def generate(self):
         '''Creates a section with the selected parameters
            until at least one stop criterion is fulfilled.
         '''
         from scipy import stats
-        self.points3D.append(self.points3D[0])
         prob_function = stats.expon(loc=0, scale=self.params["scale_prob"])
 
         while self.check_stop_ph(prob_function):
@@ -132,7 +127,6 @@ class SectionGrower(object):
             return 'terminate'
         else:
             return 'bifurcate'
-
 
     def generate_nseg(self):
         '''Creates a section with the selected parameters
@@ -151,7 +145,6 @@ class SectionGrower(object):
             return 'terminate'
         else:
             return 'bifurcate'
-
 
     def get_current_direction(self):
 

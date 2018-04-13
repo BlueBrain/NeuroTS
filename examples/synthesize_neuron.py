@@ -1,33 +1,28 @@
 import tns
-import tmd
-import view
 
-# Select output_path to save results
-output_path = './Results/'
-# Select a name for the synthesized neuron
-output_name = 'TestNeuron'
 
-# Extract distributions from cells in input directory
-filename = './TNS/test_data/bio/'
-distr = tns.extract_input.distributions(filename, diameter_model=True)
+def run():
+    # Select output_path to save results
+    # Select a name for the synthesized neuron
+    output_name = 'TestNeuron'
 
-# Generate default parameters dictionary
-params = tns.extract_input.parameters(neurite_types=['basal', 'apical'])
+    # Extract distributions from cells in input directory
+    filename = './../test_data/bio/'
+    distr = tns.extract_input.distributions(filename, diameter_model=True)
 
-# Initialize a neuron
-N = tns.Grower(input_distributions=distr, input_parameters=params, name=output_name)
+    # Generate default parameters dictionary
+    params = tns.extract_input.parameters(neurite_types=['basal', 'apical'])
 
-# Grow your neuron
-N.grow()
+    # Initialize a neuron
+    grower = tns.NeuronGrower(input_distributions=distr, input_parameters=params, name=output_name)
 
-# Correct the diameters of your neuron
-N.diametrize()
+    # Grow your neuron
+    grower.grow()
 
-# Save your neuron to the selected output path
-N.save(output_path=output_path)
+    # Correct the diameters of your neuron
+    grower.diametrize()
 
-# Load the generated neuron
-n = tmd.io.load_neuron(output_path + output_name + '.h5')
+    grower.neuron.write_swc('synthesized_neuron.swc')
 
-# View your generated neuron
-view.view.neuron(n)
+
+run()

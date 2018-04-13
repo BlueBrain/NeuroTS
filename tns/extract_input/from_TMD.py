@@ -12,6 +12,6 @@ def persistent_homology_angles(pop, threshold=2, neurite_type='basals'):
 
     # Keep only the trees whose number of terminations is above the threshold
     # Saves the list of persistence diagrams for the selected neurite_type
-    phs = list(np.array(ph_ang)[np.where(np.array([len(p) for p in ph_ang] ) > threshold)[0]])
+    phs = list(np.array(ph_ang)[np.where(np.array([len(p) for p in ph_ang]) > threshold)[0]])
 
     return {"persistence_diagram": phs}

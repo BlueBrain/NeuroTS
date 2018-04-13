@@ -7,7 +7,9 @@ from tns.morphmath import random_tree as rd
 from tns.morphmath import rotation
 import section
 from algorithms import basicgrower, tmdgrower
+from enum import Enum
 
+from morphio import PointLevel, SectionType
 
 growth_algorithms = {'tmd': tmdgrower.TMDAlgo,
                      'tmd_apical': tmdgrower.TMDApicalAlgo,
@@ -16,11 +18,12 @@ growth_algorithms = {'tmd': tmdgrower.TMDAlgo,
 
 class TreeGrower(object):
     """Tree class"""
+
     def __init__(self,
                  neuron,
                  initial_direction,
                  initial_point,
-                 parameters, 
+                 parameters,
                  distributions):
         """TNS Tree Object
 
@@ -34,79 +37,64 @@ class TreeGrower(object):
         self.neuron = neuron
         self.direction = initial_direction
         self.point = list(initial_point)
-        self.type = parameters["tree_type"] # 2: axon, 3: basal, 4: apical, 5: other
+        self.type = parameters["tree_type"]  # 2: axon, 3: basal, 4: apical, 5: other
         self.params = parameters
         self.distr = distributions
+        self.active_sections = set()
+        grow_meth = growth_algorithms[self.params["growth_method"]]
 
+        self.growth_algo = grow_meth(input_data=self.distr,
+                                     bif_method=self.params["branching_method"],
+                                     start_point=self.point)
 
-    def add_first_section(self, num_sec, stop, process='major'):
-        """Creates the first section of the tree in the neuron
-        extracting all the required information.
-        num_sec: the expected number of sections to be grown
-        stop: defines the stop criterion
-        process: assumed to be major since it starts from soma
-        """
-        # The first point of the tree is always connected to the soma, so parent=0
-        # children is 2 if expected number of sections is more than 1.
+        stop, num_sec = self.growth_algo.initialize()
 
-        self.add_section(parent=0, direction=self.direction,
-                         start_point=np.array(self.point),
-                         stop=stop, process=process,
+        self.add_section(parent=-1,
+                         direction=self.direction,
+                         start_point=list(self.point),
+                         stop=copy.deepcopy(stop),
                          children=2 if num_sec > 1 else 0)
-
 
     def add_section(self, parent, direction, start_point, stop, process=None, children=0):
         """Generates a section from the parent section "act"
         from all the required information. The section is
         added to the neuron.sections and activated.
         """
-        self.neuron.sections.append(section.SectionGrower(parent=parent,
-                                                          start_point=start_point,
-                                                          direction=direction,
-                                                          randomness=self.params["randomness"],
-                                                          targeting=self.params["targeting"],
-                                                          children=children,
-                                                          process=process,
-                                                          stop_criteria=copy.deepcopy(stop)))
+        self.active_sections.add(section.SectionGrower(parent=parent,
+                                                       start_point=start_point,
+                                                       direction=direction,
+                                                       randomness=self.params["randomness"],
+                                                       targeting=self.params["targeting"],
+                                                       children=children,
+                                                       process=process,
+                                                       stop_criteria=copy.deepcopy(stop)))
 
+    def end(self):
+        return not bool(self.active_sections)
 
-    def run(self):
+    def next(self):
         '''Operates the tree growth according to the selected algorithm.
         '''
-        grow_meth = growth_algorithms[self.params["growth_method"]]
 
-        growth_algo = grow_meth(input_data=self.distr,
-                                parameters=self.params,
-                                start_point=self.point)
+        for section_grower in self.active_sections.copy():
+            # the current section_grower is generated
+            # In here the stop criterion can be modified accordingly
+            state = self.growth_algo.extend(section_grower)
 
-        stop, num_sec = growth_algo.first_section()
-        self.add_first_section(num_sec=num_sec, stop=stop)
-        active_sections = [len(self.neuron.sections) - 1] # The last available section in the neuron
+            section_id = self.neuron.append_section(
+                section_grower.parent,
+                PointLevel(np.array(section_grower.points3D).tolist(),
+                           [self.params['radius'] * 2] * len(section_grower.points3D)),
+                SectionType(self.params['tree_type']))
 
-        while active_sections:
+            if state == 'bifurcate':
+                # the current section_grower bifurcates
+                # Returns two section_grower dictionaries: (S1, S2)
+                for child_section in self.growth_algo.bifurcate(section_grower):
+                    self.add_section(parent=section_id, **child_section)
+                self.active_sections.remove(section_grower)
 
-            active_sections.sort(reverse=True)
-            currentID = active_sections.pop()
-            currentSec = self.neuron.sections[currentID]
-            self.neuron.add_group([len(self.neuron.points), self.type, currentSec.parent])
-
-            # the current section is generated
-            state = growth_algo.extend(currentSec) # In here the stop criterion can be modified accordingly
-            #print state, len(active_sections)
-
-            self.neuron.add_points_without_radius(currentSec.points3D, self.params['radius'])
-
-            if state=='bifurcate':
-            # the current section bifurcates
-            # Returns two section dictionaries: (S1, S2)
-                s1, s2 = growth_algo.bifurcate(currentSec)
-
-                self.add_section(parent=currentID, **s1)
-                active_sections.append(len(self.neuron.sections) - 1)
-
-                self.add_section(parent=currentID, **s2)
-                active_sections.append(len(self.neuron.sections) - 1)
-
-            elif state=='terminate':
-            # the current section terminates
-                growth_algo.terminate(currentSec)
+            elif state == 'terminate':
+                # the current section_grower terminates
+                self.growth_algo.terminate(section_grower)
+                self.active_sections.remove(section_grower)

@@ -5,25 +5,20 @@ import from_TMD
 import from_neurom
 import from_diameter
 
-# Define the neurom neurite_types
-neurom_types = {'basal': nm.BASAL_DENDRITE,
-                'apical': nm.APICAL_DENDRITE,
-                'axon': nm.AXON}
-
 
 def default_keys():
     '''Returns the important keys for the distribution extraction'''
-    return {'soma':{},
-            'basal':{},
-            'apical':{},
-            'axon':{}}
+    return {'soma': {},
+            'basal': {},
+            'apical': {},
+            'axon': {}}
 
 
 def distributions(filepath, neurite_types=None, threshold_sec=2, diameter_model=False):
     '''Extracts the input distributions from an input population
     defined by a directory of swc or h5 files
     threshold_sec: defines the minimum accepted number of terminations
-    diameter_model: defines if the diameter model will be extracted   
+    diameter_model: defines if the diameter model will be extracted
     '''
     # Assume all neurite_types will be extracted if neurite_types is None
     if neurite_types is None:
@@ -33,16 +28,24 @@ def distributions(filepath, neurite_types=None, threshold_sec=2, diameter_model=
     pop_nm = nm.load_neurons(filepath)
 
     input_distributions = default_keys()
+    print("input_distributions: {}".format(input_distributions))
     input_distributions['soma'].update(from_neurom.soma_data(pop_nm))
+
+    # Define the neurom neurite_types
+    neurom_types = {'basal': nm.BASAL_DENDRITE,
+                    'apical': nm.APICAL_DENDRITE,
+                    'axon': nm.AXON}
 
     def fill_input_distributions(input_distr, neurite_type):
         '''Helping function to avoid code duplication'''
         nm_type = neurom_types[neurite_type]
         input_distr[neurite_type].update(from_neurom.trunk_neurite(pop_nm, nm_type))
         input_distr[neurite_type].update(from_neurom.number_neurites(pop_nm, nm_type))
-        input_distr[neurite_type].update(from_TMD.persistent_homology_angles(pop_tmd,
-                                                                             threshold=threshold_sec,
-                                                                             neurite_type=neurite_type))
+        print(dir(pop_tmd))
+        input_distr[neurite_type].update(
+            from_TMD.persistent_homology_angles(pop_tmd,
+                                                threshold=threshold_sec,
+                                                neurite_type=neurite_type))
 
     for ntype in neurite_types:
         fill_input_distributions(input_distributions, ntype)
@@ -54,49 +57,49 @@ def distributions(filepath, neurite_types=None, threshold_sec=2, diameter_model=
     return input_distributions
 
 
-def parameters(origin=(0.,0.,0.), neurite_types=None, method='trunk'):
-    '''Returns a default set of input parameters to be used as input for synthesis.
-    This is just an example function, the parameters should then be modified by the user.
+def parameters(name="Test_neuron", origin=(0., 0., 0.), neurite_types=['basal', 'apical', 'axon'], method='trunk'):
+    '''Returns a default set of input parameters
+       to be used as input for synthesis.
     '''
     # Assume all neurite_types will be extracted if neurite_types is None
     if neurite_types is None:
         neurite_types = ['basal', 'apical', 'axon']
 
     # Set up required fields
-    input_parameters = {'basal':{},
-                        'apical':{},
-                        'axon':{}}
+    input_parameters = {'basal': {},
+                        'apical': {},
+                        'axon': {}}
 
     input_parameters["origin"] = origin
 
-    if method=='trunk':
+    if method == 'trunk':
         branching = 'random'
-    elif method=='tmd':
+    elif method == 'tmd':
         branching = 'bio_oriented'
 
-    parameters_default = {"randomness":0.15,
-                          "targeting":0.12,
-                          "radius":0.3,
-                          "orientation":None,
+    parameters_default = {"randomness": 0.15,
+                          "targeting": 0.12,
+                          "radius": 0.3,
+                          "orientation": None,
                           "growth_method": method,
-                          "branching_method":branching,}
+                          "branching_method": branching, }
 
     if 'basal' in neurite_types:
         input_parameters["basal"].update(parameters_default)
-        input_parameters["basal"].update({"tree_type":3})
+        input_parameters["basal"].update({"tree_type": 3})
 
     if 'apical' in neurite_types:
         input_parameters["apical"].update(parameters_default)
         input_parameters["apical"].update({"apical_distance": 0.0,
-                                           "tree_type":4,
-                                           "orientation":[(0.,1.,0.)],})
-        if method=='tmd':
+                                           "tree_type": 4,
+                                           "orientation": [(0., 1., 0.)], })
+        if method == 'tmd':
             input_parameters["apical"]["growth_method"] = 'tmd_apical'
 
     if 'axon' in neurite_types:
         input_parameters["axon"].update(parameters_default)
-        input_parameters["axon"].update({"tree_type":2,
-                                          "orientation":[(0.,-1.,0.)],})
+        input_parameters["axon"].update({"tree_type": 2,
+                                         "orientation": [(0., -1., 0.)], })
 
     input_parameters['grow_types'] = neurite_types
 
