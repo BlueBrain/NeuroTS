@@ -11,6 +11,6 @@
 
 
 from tns import extract_input
-from tns.generate.grower import Grower
+from tns.generate.grower import NeuronGrower
 from tns import core
 import version

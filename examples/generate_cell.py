@@ -5,12 +5,12 @@ filename = './test_data/bio/'
 distr = tns.extract_input.distributions(filename)
 
 # Generate default parameters dictionary
-params = tns.extract_input.parameters(neurite_types=['basal'])
+params = tns.extract_input.parameters(neurite_types=['basal', 'apical'], method='tmd')
 
 # Initialize a neuron
-N = tns.Grower(input_distributions=distr, input_parameters=params, name='Neuron')
+N = tns.NeuronGrower(input_distributions=distr, input_parameters=params, name='NeuronTest')
 
 # Grow your neuron
 N.grow()
 # Save your neuron
-N.save(output_path='./local/')
+N.save(output_path='../local/Results/')

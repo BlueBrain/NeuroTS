@@ -1,34 +1,51 @@
-# Module to extract morphometrics and TMD from a set of tree-shaped cells.
+# Module to extract morphometrics and TMD-input from a set of tree-shaped cells.
+import tmd
+import neurom as nm
+import from_TMD
+import from_neurom
+import from_diameter
+
+# Define the neurom neurite_types
+neurom_types = {'basal': nm.BASAL_DENDRITE,
+                'apical': nm.APICAL_DENDRITE,
+                'axon': nm.AXON}
+
+
 def default_keys():
     '''Returns the important keys for the distribution extraction'''
-    return {'basal':{},
+    return {'soma':{},
+            'basal':{},
             'apical':{},
             'axon':{}}
 
 
-def distributions(filepath, neurite_types=['basal', 'apical', 'axon'], threshold_sections=2, diameter_model=False):
+def distributions(filepath, neurite_types=None, threshold_sec=2, diameter_model=False):
     '''Extracts the input distributions from an input population
-       defined by a directory of swc or h5 files
+    defined by a directory of swc or h5 files
+    threshold_sec: defines the minimum accepted number of terminations
+    diameter_model: defines if the diameter model will be extracted   
     '''
-    import from_TMD
-    import from_neurom
-    import tmd
-    import neurom as nm
+    # Assume all neurite_types will be extracted if neurite_types is None
+    if neurite_types is None:
+        neurite_types = ['basal', 'apical', 'axon']
 
-    pop_ntn = tmd.io.load_population(filepath)
+    pop_tmd = tmd.io.load_population(filepath)
     pop_nm = nm.load_neurons(filepath)
 
     input_distributions = default_keys()
+    input_distributions['soma'].update(from_neurom.soma_data(pop_nm))
 
-    from_neurom.soma_data(pop_nm, input_distributions)
-    from_neurom.number_neurites_data(pop_nm, input_distributions)
-    from_neurom.trunk_data(pop_nm, input_distributions)
-    if 'basal' in neurite_types:
-        from_TMD.ph_basal(pop_ntn, input_distributions, threshold=threshold_sections)
-    if 'apical' in neurite_types:
-        from_TMD.ph_apical(pop_ntn, input_distributions, threshold=threshold_sections)
-    if 'axon' in neurite_types:
-        from_TMD.ph_axon(pop_ntn, input_distributions, threshold=threshold_sections)
+    def fill_input_distributions(input_distr, neurite_type):
+        '''Helping function to avoid code duplication'''
+        nm_type = neurom_types[neurite_type]
+        input_distr[neurite_type].update(from_neurom.trunk_neurite(pop_nm, nm_type))
+        input_distr[neurite_type].update(from_neurom.number_neurites(pop_nm, nm_type))
+        input_distr[neurite_type].update(from_TMD.persistent_homology_angles(pop_tmd,
+                                                                             threshold=threshold_sec,
+                                                                             neurite_type=neurite_type))
+
+    for ntype in neurite_types:
+        fill_input_distributions(input_distributions, ntype)
 
     if diameter_model:
         import from_diameter
@@ -37,60 +54,60 @@ def distributions(filepath, neurite_types=['basal', 'apical', 'axon'], threshold
     return input_distributions
 
 
-def parameters(name="Test_neuron", origin=(0.,0.,0.), neurite_types=['basal', 'apical', 'axon'], method='basic'):
-    '''Returns a default set of input parameters
-       to be used as input for synthesis.
+def parameters(origin=(0.,0.,0.), neurite_types=None, method='trunk'):
+    '''Returns a default set of input parameters to be used as input for synthesis.
+    This is just an example function, the parameters should then be modified by the user.
     '''
-    # Set up required fields
+    # Assume all neurite_types will be extracted if neurite_types is None
+    if neurite_types is None:
+        neurite_types = ['basal', 'apical', 'axon']
 
-    input_parameters = default_keys()
+    # Set up required fields
+    input_parameters = {'basal':{},
+                        'apical':{},
+                        'axon':{}}
+
     input_parameters["origin"] = origin
 
-    if method=='basic':
-        gmethod = 'trunk'
+    if method=='trunk':
         branching = 'random'
-    else:
-        gmethod = 'ph_angles'
+    elif method=='tmd':
         branching = 'bio_oriented'
 
-    parameters_default = {"apical_distance": None,
-                          "randomness":0.15,
+    parameters_default = {"randomness":0.15,
                           "targeting":0.12,
                           "radius":0.3,
                           "orientation":None,
-                          "growth_method": gmethod,
-                          "method": method,}
+                          "growth_method": method,
+                          "branching_method":branching,}
 
     if 'basal' in neurite_types:
         input_parameters["basal"].update(parameters_default)
-        input_parameters["basal"].update({"tree_type":3,
-                                          "branching_method": branching,})
+        input_parameters["basal"].update({"tree_type":3})
 
     if 'apical' in neurite_types:
         input_parameters["apical"].update(parameters_default)
         input_parameters["apical"].update({"apical_distance": 0.0,
                                            "tree_type":4,
-                                           "orientation":[(0.,1.,0.)],
-                                           "branching_method": branching,})
+                                           "orientation":[(0.,1.,0.)],})
+        if method=='tmd':
+            input_parameters["apical"]["growth_method"] = 'tmd_apical'
 
     if 'axon' in neurite_types:
         input_parameters["axon"].update(parameters_default)
         input_parameters["axon"].update({"tree_type":2,
-                                          "orientation":[(0.,-1.,0.)],
-                                          "branching_method": branching,})
+                                          "orientation":[(0.,-1.,0.)],})
 
     input_parameters['grow_types'] = neurite_types
 
     return input_parameters
 
 
-def diameter_distributions(filepath, distributions=None):
-    '''Extracts the input distributions from an input population
+def diameter_distributions(filepath):
+    '''Extracts the input diameter distributions from an input population
        defined by a directory of swc or h5 files
     '''
     import os
-    import from_diameter
-    import neurom as nm
 
     if os.path.isdir(filepath):
         pop_nm = nm.load_neurons(filepath)
@@ -99,11 +116,6 @@ def diameter_distributions(filepath, distributions=None):
         neu_nm = nm.load_neuron(filepath)
         model = from_diameter.model(neu_nm)
     else:
-        return "No directory or file found that matches the selected filepath!"
+        raise IOError("No directory or file found that matches the selected filepath!")
 
-    if distributions is None:
-        distributions = {}
-
-    distributions["diameter_model"] = model
-
-    return distributions
+    return {"diameter_model": model}
