@@ -23,5 +23,6 @@ virtualenv test_syn
 # Installation of modules required for TNS input
 ```bash
 git clone ssh://bbpcode.epfl.ch/molecularsystems/TNS
-pip install ./TNS --process-dependency-links
+pip install --upgrade pip
+pip install ./TNS --process-dependency-links --index-url  https://bbpteam.epfl.ch/repository/devpi/bbprelman/dev/+simple/
 ```

@@ -20,7 +20,6 @@ config = {
         'numpy>=1.8.0'
     ],
     'dependency_links': [
-        'git+ssh://git@github.com/lidakanari/NeuroM.git@synthesis_stats#egg=neurom-1.4.7',
         'git+ssh://bbpcode.epfl.ch/molecularsystems/TMD#egg=tmd-1.0.0',
         'git+ssh://git@github.com/bluebrain/morphio#egg=morphio-0.9.4',
     ],
