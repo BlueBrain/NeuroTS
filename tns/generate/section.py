@@ -24,8 +24,7 @@ class SectionGrower(object):
         self.direction = direction
         self.children = children
         self.points3D = [np.array(start_point[:3])]
-        self.params = {"direction": np.array(direction),
-                       "randomness": randomness,
+        self.params = {"randomness": randomness,
                        "targeting": targeting,
                        "scale_prob": 1.0,
                        "history": 1.0 - randomness - targeting}
