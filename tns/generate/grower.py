@@ -13,15 +13,13 @@ bifurcation_methods = ['symmetric', 'bio_oriented', 'directional', 'bio_smoothed
 
 class NeuronGrower(object):
     """
-    A Grower object is a container for a Neuron, encoded in the (groups, points)
-    structure, a set of input distributions that store the data consumed by the algorithms
-    and the user-selected parameters. The name of the neuron defines the filename
-    in which the generated neuron can be saved in.
+    A Grower object is a container for a Neuron, encoded in the (groups, points) structure,
+    as a morphIO Morphology object. A set of input distributions that store the data
+    consumed by the algorithms and the user-selected parameters are also stored.
     """
 
-    def __init__(self, input_parameters, input_distributions, name='Neuron'):
+    def __init__(self, input_parameters, input_distributions):
         """TNS NeuronGrower
-        neuron: Obj neuron where groups and points are stored
         input_parameters: the user-defined parameters
         input_distributions: distributions extracted from biological data
         """
@@ -55,16 +53,14 @@ class NeuronGrower(object):
             self.next()
         return self.neuron
 
-    def diametrize(self):
-        """Corrects the diameters of the neuron saved in the Grower.
-        The neuron can either be loaded from a file by calling G.neuron.load(filename)
-        or it can be generate by calling the G.grow() method.
-        The Grower should be initialized with a distribution
-        that includes a diameter_model.
-        To extract a diameter model from a file, call extract_input.diameter_distributions(file)
+    def diametrize(self, model=None):
+        """Corrects the diameters of the neuron according to a model
+        passed as 'diameter_model' in the input_distributions.
+        To extract a diameter model from a file,
+        call extract_input.diameter_distributions(file)
         """
-
-        model = self.input_distributions['diameter_model']
+        if model is None:
+            model = self.input_distributions['diameter_model']
         diametrizer.correct_diameters(self.neuron, model=model)
 
     # Functions not intended to be accessible by the user

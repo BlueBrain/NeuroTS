@@ -15,7 +15,7 @@ def run():
 
     # Initialize a neuron
     N = tns.NeuronGrower(input_distributions=distr,
-                         input_parameters=params, name='NeuronTest')
+                         input_parameters=params)
 
     # Grow your neuron
     neuron = N.grow()

@@ -95,6 +95,7 @@ def parameters(name="Test_neuron", origin=(0., 0., 0.), neurite_types=['basal', 
                                            "orientation": [(0., 1., 0.)], })
         if method == 'tmd':
             input_parameters["apical"]["growth_method"] = 'tmd_apical'
+            input_parameters["apical"]["branching_method"] = 'directional'
 
     if 'axon' in neurite_types:
         input_parameters["axon"].update(parameters_default)
