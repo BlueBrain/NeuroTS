@@ -46,21 +46,17 @@ class SectionGrower(object):
         hist = self.params["history"]
 
         new_point = list([current_point[0] +
-                          targeting * self.params["direction"][0] +
+                          targeting * self.direction[0] +
                           randomness * random_point[0] +
                           hist * hist_point[0],
                           current_point[1] +
-                          targeting * self.params["direction"][1] +
+                          targeting * self.direction[1] +
                           randomness * random_point[1] +
                           hist * hist_point[1],
                           current_point[2] +
-                          targeting * self.params["direction"][2] +
+                          targeting * self.direction[2] +
                           randomness * random_point[2] +
                           hist * hist_point[2]])
-
-        #new_point = list(np.add(current_point[:3], targeting * parameters["direction"]))
-        #new_point = list(np.add(new_point, randomness * random_point))
-        #new_point = list(np.add(new_point, (1. - exploration - exploitation) * hist_point))
 
         return new_point
 
