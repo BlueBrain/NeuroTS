@@ -1,15 +1,16 @@
 '''
 TNS class : Tree
 '''
-import numpy as np
 import copy
-from tns.morphmath import random_tree as rd
-from tns.morphmath import rotation
-import section
-from algorithms import basicgrower, tmdgrower
 from enum import Enum
 
+import numpy as np
 from morphio import PointLevel, SectionType
+
+from tns.generate.algorithms import basicgrower, tmdgrower
+from tns.generate.section import SectionGrower
+from tns.morphmath import random_tree as rd
+from tns.morphmath import rotation
 
 growth_algorithms = {'tmd': tmdgrower.TMDAlgo,
                      'tmd_apical': tmdgrower.TMDApicalAlgo,
@@ -49,7 +50,7 @@ class TreeGrower(object):
 
         stop, num_sec = self.growth_algo.initialize()
 
-        self.add_section(parent=-1,
+        self.add_section(parent=None,
                          direction=self.direction,
                          start_point=list(self.point),
                          stop=copy.deepcopy(stop),
@@ -60,14 +61,14 @@ class TreeGrower(object):
         from all the required information. The section is
         added to the neuron.sections and activated.
         """
-        self.active_sections.add(section.SectionGrower(parent=parent,
-                                                       start_point=start_point,
-                                                       direction=direction,
-                                                       randomness=self.params["randomness"],
-                                                       targeting=self.params["targeting"],
-                                                       children=children,
-                                                       process=process,
-                                                       stop_criteria=copy.deepcopy(stop)))
+        self.active_sections.add(SectionGrower(parent=parent,
+                                               start_point=start_point,
+                                               direction=direction,
+                                               randomness=self.params["randomness"],
+                                               targeting=self.params["targeting"],
+                                               children=children,
+                                               process=process,
+                                               stop_criteria=copy.deepcopy(stop)))
 
     def end(self):
         return not bool(self.active_sections)
@@ -81,7 +82,7 @@ class TreeGrower(object):
             # In here the stop criterion can be modified accordingly
             state = self.growth_algo.extend(section_grower)
 
-            section_id = self.neuron.append_section(
+            section = self.neuron.append_section(
                 section_grower.parent,
                 PointLevel(np.array(section_grower.points3D).tolist(),
                            [self.params['radius'] * 2] * len(section_grower.points3D)),
@@ -91,7 +92,7 @@ class TreeGrower(object):
                 # the current section_grower bifurcates
                 # Returns two section_grower dictionaries: (S1, S2)
                 for child_section in self.growth_algo.bifurcate(section_grower):
-                    self.add_section(parent=section_id, **child_section)
+                    self.add_section(parent=section, **child_section)
                 self.active_sections.remove(section_grower)
 
             elif state == 'terminate':
