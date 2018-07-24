@@ -96,8 +96,42 @@ class TMDApicalAlgo(TMDAlgo):
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
         """
-        sections = super(TMDApicalAlgo, self).bifurcate(currentSec)
-        for section in sections:
-            section['process'] = 'testapical'
+        self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
+        ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
 
-        return sections
+        current_rd = np.linalg.norm(np.subtract(currentSec.points3D[-1], self.start_point))
+
+        if currentSec.process=='major':
+            dir1, dir2 = bif_methods['directional'](currentSec.direction, angles=ang)
+            if current_rd <= self.params['apical_distance']:
+                process1 = 'major'
+                process2 = 'secondary'
+            else:
+                process1 = 'secondary'
+                process2 = 'secondary'
+        else:
+            dir1, dir2 = self.bif_method(currentSec.direction, angles=ang)
+            process1 = 'secondary'
+            process2 = 'secondary'
+
+        start_point = np.array(currentSec.points3D[-1])
+
+        stop1 = {"bif_term": {"ref": self.start_point[:3],
+                              "bif": self.bif[0] if self.bif else np.inf,
+                              "term": round_num(currentSec.stop_criteria["bif_term"]["term"])}}
+
+        stop2 = {"bif_term": {"ref": self.start_point[:3],
+                              "bif": self.bif[0] if self.bif else np.inf,
+                              "term": round_num(self.bt_all[currentSec.stop_criteria["bif_term"]["bif"]])}}
+
+        s1 = {'direction': dir1,
+              'start_point': start_point,
+              'stop':stop1,
+              'process': process1}
+
+        s2 = {'direction': dir2,
+              'start_point': start_point,
+              'stop':stop2,
+              'process': process2}
+
+        return s1, s2
