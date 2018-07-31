@@ -45,7 +45,7 @@ class TreeGrower(object):
         grow_meth = growth_algorithms[self.params["growth_method"]]
 
         self.growth_algo = grow_meth(input_data=self.distr,
-                                     bif_method=self.params["branching_method"],
+                                     params=self.params,
                                      start_point=self.point)
 
         stop, num_sec = self.growth_algo.initialize()
@@ -54,6 +54,7 @@ class TreeGrower(object):
                          direction=self.direction,
                          start_point=list(self.point),
                          stop=copy.deepcopy(stop),
+                         process='major',
                          children=2 if num_sec > 1 else 0)
 
     def add_section(self, parent, direction, start_point, stop, process=None, children=0):

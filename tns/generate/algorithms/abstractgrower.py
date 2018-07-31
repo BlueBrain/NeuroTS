@@ -11,11 +11,12 @@ class AbstractAlgo(object):
     @abc.abstractmethod
     def __init__(self,
                  input_data,
-                 bif_method,
+                 params,
                  start_point):
         """Abstract TreeGrower Algorithm initialization.
         input_data: dictionary in which data used by the algorithm are stored
-        bif_method: bifurcation method, select from: bio_oriented, symmetric, directional
+        params: parameters needed for growth, it should include the bif_method
+        bifurcation method, select from: bio_oriented, symmetric, directional
         """
 
     @abc.abstractmethod

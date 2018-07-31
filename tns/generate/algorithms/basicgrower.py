@@ -9,13 +9,15 @@ class TrunkAlgo(AbstractAlgo):
 
     def __init__(self,
                  input_data,
-                 bif_method,
+                 params,
                  start_point):
         """
         input_data: saves all the data required for the growth
-        bif_method: selects the bifurcation method used for the growth
+        params: parameters needed for growth, it should include the bif_method
+        bifurcation method, select from: bio_oriented, symmetric, directional
         """
-        self.bif_method = bif_methods[bif_method]
+        self.bif_method = bif_methods[params["branching_method"]]
+        self.params = params
         self.input_data = input_data
         self.start_point = start_point
 

@@ -71,8 +71,8 @@ def get_bif_bio_smoothed(direction, angles):
     '''Input: init_phi, init_theta, dphi, dtheta.
     '''
     def smoothing(ang):
-        if np.abs(ang) > np.pi/2.:
-            return ang/2
+        if np.abs(ang) > np.pi:
+            return np.abs(ang)/2
         else:
             return ang
 
@@ -100,7 +100,7 @@ def get_bif_directional(direction, angles):
     dir1 = rt.vector_from_spherical(phi, theta)
     dir2 = rt.vector_from_spherical(phi - phi1, theta - theta1)
 
-    return (np.array(dir1), np.array(dir2))
+    return (np.array(direction), np.array(dir2))
 
 
 def get_bif_soma_repulsion(direction, angles, soma, curr_point):

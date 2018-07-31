@@ -1,7 +1,7 @@
 import numpy as np
 from tns.morphmath import random_tree as rd
 from tns.morphmath.sample import ph_prob
-
+from scipy import stats
 
 class SectionGrower(object):
     '''Class for the section
@@ -76,6 +76,8 @@ class SectionGrower(object):
         scale = self.params["scale_prob"]
 
         currd = np.linalg.norm(np.subtract(self.points3D[-1], crit["ref"]))
+        # compute expected path length for a given target radial distance
+        # pathtarget = self.segs > 1.3 * np.abs(crit["bif"] - crit["term"])
 
         # Ensure that the section has at least two points
         if len(self.points3D) < 2:
@@ -87,6 +89,14 @@ class SectionGrower(object):
         elif ph_prob(prob_function, crit["term"] - currd):
             self.children = 0.
             return False
+        # Checks in too long path length is generated
+        # elif pathtarget:
+        #    # If target bif smaller
+        #    if crit["bif"] <= crit["term"]:
+        #        self.children = 2.
+        #    else:
+        #        self.children = 0.
+        #    return False
         else:
             return True
 
@@ -108,7 +118,6 @@ class SectionGrower(object):
         '''Creates a section with the selected parameters
            until at least one stop criterion is fulfilled.
         '''
-        from scipy import stats
         prob_function = stats.expon(loc=0, scale=self.params["scale_prob"])
 
         while self.check_stop_ph(prob_function):
