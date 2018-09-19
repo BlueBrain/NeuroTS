@@ -24,20 +24,24 @@ def vector_from_spherical(phi, theta):
     return x, y, z
 
 
-def rotation_around_axis(direction, angle):
+def rotation_around_axis(axis, angle):
     """Returns a normalized vector rotated
-    around the selected direction by an angle.
+    around the selected axis by an angle.
     """
-    d = np.array(direction, dtype=np.float64)
-    d /= np.linalg.norm(d)
+    d = np.array(axis, dtype=np.float) / np.linalg.norm(axis)
 
-    eye = np.eye(3, dtype=np.float64)
-    ddt = np.outer(d, d)
-    skew = np.array([[    0,  d[2],  -d[1]],
-                     [-d[2],     0,  d[0]],
-                     [d[1], -d[0],    0]], dtype=np.float64)
+    sn = np.sin(angle)
+    cs = np.cos(angle)
 
-    mtx = ddt + np.cos(angle) * (eye - ddt) + np.sin(angle) * skew
+    eye = np.eye(3, dtype=np.float)
+    #ddt = np.outer(d, d)
+    skew = np.array([[    0,  -d[2],   d[1]],
+                     [ d[2],     0,   -d[0]],
+                     [-d[1],   d[0],     0]], dtype=np.float)
+
+    #mtx = ddt + cs * (eye - ddt) + sn * skew
+    #mtx = cs * eye + sn * skew + (1. - cs) * ddt
+    mtx = eye + sn * skew + (1. - cs) * np.linalg.matrix_power(skew, 2)
     return mtx
 
 
@@ -49,3 +53,10 @@ def angle3D(v1, v2):
         return math.sqrt(dotproduct(v, v))
     return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
 
+
+def rotate_vector(vec, axis, angle):
+    """Rotates the input vector vec
+       by a selected angle
+       around a specific axis.
+    """
+    return np.dot(rotation_around_axis(axis, angle), vec)
