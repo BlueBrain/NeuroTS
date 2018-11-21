@@ -3,6 +3,10 @@ import numpy as np
 from neurom.core import Tree
 from neurom import morphmath
 
+default_model = {'Rall_ratio': 3./2.,
+                 'siblings_ratio': 1./3.}
+
+
 def section_mean_taper(s):
     initial_diam = min(s.points[:,3])
 
@@ -123,6 +127,9 @@ def model(neuron):
                             "term_max_diam": [c for c in chain(*term_max_diam)],
                             "trunk": max_diam,
                             "trunk_taper": tr_taper}
+
+        values[typee-1].update(default_model)
+
     return values
 
 
@@ -161,4 +168,7 @@ def population_model(neurons):
                             "term_max_diam": [c for c in chain(*term_max_diam)],
                             "trunk": max_diam,
                             "trunk_taper": tr_taper}
+
+        values[typee-1].update(default_model)
+
     return values

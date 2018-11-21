@@ -14,7 +14,7 @@ def default_keys():
             'axon': {}}
 
 
-def distributions(filepath, neurite_types=None, threshold_sec=2, diameter_model=False):
+def distributions(filepath, neurite_types=None, threshold_sec=2, diameter_model=False, feature='radial_distances'):
     '''Extracts the input distributions from an input population
     defined by a directory of swc or h5 files
     threshold_sec: defines the minimum accepted number of terminations
@@ -45,7 +45,8 @@ def distributions(filepath, neurite_types=None, threshold_sec=2, diameter_model=
         input_distr[neurite_type].update(
             from_TMD.persistent_homology_angles(pop_tmd,
                                                 threshold=threshold_sec,
-                                                neurite_type=neurite_type))
+                                                neurite_type=neurite_type, 
+                                                feature=feature))
 
     for ntype in neurite_types:
         fill_input_distributions(input_distributions, ntype)

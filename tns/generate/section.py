@@ -15,7 +15,7 @@ class SectionGrower(object):
                  randomness,
                  targeting,
                  process,
-                 stop_criteria={"num_seg": 100}):
+                 stop_criteria):
         '''A section is a list of points in 4D space (x, y, x, r)
         that are sequentially connected to each other. This process
         generates a tubular morphology that resembles a random walk.
@@ -29,7 +29,6 @@ class SectionGrower(object):
                        "scale_prob": 1.0,
                        "history": 1.0 - randomness - targeting}
         self.stop_criteria = stop_criteria
-        self.segs = 0
         self.process = process
 
     def next_point(self, current_point):
@@ -59,46 +58,11 @@ class SectionGrower(object):
 
         return new_point
 
-    def check_stop_num_seg(self):
+    def check_stop(self):
         """Checks if any num_seg criteria is fullfiled.
         If it is it returns False and the growth stops.
         """
-        if self.segs < self.stop_criteria["num_seg"]:
-            return True
-        else:
-            return False
-
-    def check_stop_ph(self, prob_function):
-        """Checks if any of bif_term criteria is fullfiled.
-        If False the growth stops.
-        """
-        crit = self.stop_criteria["bif_term"]
-        scale = self.params["scale_prob"]
-
-        currd = np.linalg.norm(np.subtract(self.points3D[-1], crit["ref"]))
-        # compute expected path length for a given target radial distance
-        # pathtarget = self.segs > 1.3 * np.abs(crit["bif"] - crit["term"])
-
-        # Ensure that the section has at least two points
-        if len(self.points3D) < 2:
-            return True
-
-        if ph_prob(prob_function, crit["bif"] - currd):
-            self.children = 2.
-            return False
-        elif ph_prob(prob_function, crit["term"] - currd):
-            self.children = 0.
-            return False
-        # Checks in too long path length is generated
-        # elif pathtarget:
-        #    # If target bif smaller
-        #    if crit["bif"] <= crit["term"]:
-        #        self.children = 2.
-        #    else:
-        #        self.children = 0.
-        #    return False
-        else:
-            return True
+        return len(self.points3D) < self.stop_criteria["num_seg"]
 
     def history(self, memory=5):
         '''Returns a combination of the sections history
@@ -106,7 +70,6 @@ class SectionGrower(object):
         hist = np.array([0., 0., 0.])
 
         for i in xrange(1, min(memory, len(self.points3D))):
-
             hist = np.add(hist, np.exp(1. - i) * (self.points3D[-i] - self.points3D[-i - 1]))
 
         if np.linalg.norm(hist) != 0.0:
@@ -114,36 +77,31 @@ class SectionGrower(object):
         else:
             return hist
 
-    def generate(self):
-        '''Creates a section with the selected parameters
-           until at least one stop criterion is fulfilled.
+    def next(self):
+        '''Creates one point and returns the next state.
+           bifurcate, terminate or continue.
         '''
-        prob_function = stats.expon(loc=0, scale=self.params["scale_prob"])
+        curr_point = self.points3D[-1]
+        point = self.next_point(curr_point)
+        self.points3D.append(np.array(point))
 
-        while self.check_stop_ph(prob_function):
-
-            curr_point = self.points3D[-1]
-            point = self.next_point(curr_point)
-            self.points3D.append(np.array(point))
-            self.segs = self.segs + 1
-
-        if self.children == 0:
+        if self.check_stop():
+            return 'continue'
+        elif self.children == 0:
             return 'terminate'
         else:
             return 'bifurcate'
 
-    def generate_nseg(self):
+    def generate(self):
         '''Creates a section with the selected parameters
            until at least one stop criterion is fulfilled.
         '''
-        self.points3D.append(np.array(self.points3D[0]))
 
-        while self.check_stop_num_seg():
+        while self.check_stop():
 
             curr_point = self.points3D[-1]
             point = self.next_point(curr_point)
             self.points3D.append(np.array(point))
-            self.segs = self.segs + 1
 
         if self.children == 0:
             return 'terminate'
@@ -151,11 +109,131 @@ class SectionGrower(object):
             return 'bifurcate'
 
     def get_current_direction(self):
+        return self.history(memory=10)
 
-        vect = np.subtract([self.points3D[-1][0], self.points3D[-1][1], self.points3D[-1][2]],
-                           [self.points3D[0][0], self.points3D[0][1], self.points3D[0][2]])
 
-        if np.linalg.norm(vect) != 0.0:
-            return vect / np.linalg.norm(vect)
+class SectionGrowerTMD(SectionGrower):
+    '''Class for the section
+    '''
+    def __init__(self,
+                 parent,
+                 children,
+                 start_point,
+                 direction,
+                 randomness,
+                 targeting,
+                 process,
+                 stop_criteria):
+        '''A section is a list of points in 4D space (x, y, x, r)
+        that are sequentially connected to each other. This process
+        generates a tubular morphology that resembles a random walk.
+        '''
+        super(SectionGrowerTMD, self).__init__(parent,
+                                            children,
+                                            start_point,
+                                            direction,
+                                            randomness,
+                                            targeting,
+                                            process,
+                                            stop_criteria)
+
+        self.prob_function = stats.expon(loc=0, scale=self.params["scale_prob"])
+
+    def check_stop(self):
+        """Checks if any of bif_term criteria is fullfiled.
+        If False the growth stops.
+        """
+        crit = self.stop_criteria["bif_term"]
+
+        currd = np.linalg.norm(np.subtract(self.points3D[-1], crit["ref"]))
+        # Ensure that the section has at least two points
+        if len(self.points3D) < 2:
+            return True
+
+        if ph_prob(self.prob_function, crit["bif"] - currd):
+            self.children = 2.
+            return False
+        elif ph_prob(self.prob_function, crit["term"] - currd):
+            self.children = 0.
+            return False
         else:
-            return vect
+            return True
+
+
+class SectionGrowerPath(SectionGrower):
+    '''Class for the section
+    '''
+    def __init__(self,
+                 parent,
+                 children,
+                 start_point,
+                 direction,
+                 randomness,
+                 targeting,
+                 process,
+                 stop_criteria):
+        '''A section is a list of points in 4D space (x, y, x, r)
+        that are sequentially connected to each other. This process
+        generates a tubular morphology that resembles a random walk.
+        '''
+        super(SectionGrowerPath, self).__init__(parent,
+                                                children,
+                                                start_point,
+                                                direction,
+                                                randomness,
+                                                targeting,
+                                                process,
+                                                stop_criteria)
+
+        self.prob_function = stats.expon(loc=0, scale=self.params["scale_prob"])
+        self.pathlength = 0 if parent is None else self.stop_criteria['bif_term']['ref']
+
+    def check_stop(self):
+        """Checks if any of bif_term criteria is fullfiled.
+        If False the growth stops.
+        """
+        crit = self.stop_criteria["bif_term"]
+
+        if len(self.points3D) < 2:
+            return True
+        if ph_prob(self.prob_function, crit["bif"] - self.pathlength):
+            self.children = 2.
+            return False
+        elif ph_prob(self.prob_function, crit["term"] - self.pathlength):
+            self.children = 0.
+            return False
+        else:
+            return True
+
+    def next(self):
+        '''Creates one point and returns the next state.
+           bifurcate, terminate or continue.
+        '''
+        curr_point = self.points3D[-1]
+        point = self.next_point(curr_point)
+        self.points3D.append(np.array(point))
+        self.pathlength = self.pathlength + np.linalg.norm(np.subtract(curr_point, point))
+
+        if self.check_stop():
+            return 'continue'
+        elif self.children == 0:
+            return 'terminate'
+        else:
+            return 'bifurcate'
+
+    def generate(self):
+        '''Creates a section with the selected parameters
+           until at least one stop criterion is fulfilled.
+        '''
+
+        while self.check_stop():
+            curr_point = self.points3D[-1]
+            point = self.next_point(curr_point)
+            self.points3D.append(np.array(point))
+            self.pathlength = self.pathlength + np.linalg.norm(np.subtract(curr_point, point))
+
+        if self.children == 0:
+            return 'terminate'
+        else:
+            return 'bifurcate'
+

@@ -38,7 +38,7 @@ class NeuronGrower(object):
             if grower.end():
                 self.active_neurites.remove(grower)
             else:
-                grower.next()
+                grower.next_point()
 
     def grow(self):
         """Generates a neuron according to the input_parameters
