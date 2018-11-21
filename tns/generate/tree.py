@@ -94,6 +94,17 @@ class TreeGrower(object):
         ordered_list = np.argsort([ss.stop_criteria['bif_term']['bif'] for ss in secs])
         return np.copy(secs)[ordered_list]
 
+    def append_section(self, section):
+        '''Append section to the MorphIO neuron'''
+        if section.parent:
+            append_fun = section.parent.append_section
+        else:
+            append_fun = self.neuron.append_root_section
+
+        return append_fun(PointLevel(np.array(section.points3D).tolist(),
+                                     [self.params['radius'] * 2] * len(section.points3D)),
+                          SectionType(self.params['tree_type']))
+
     def next(self):
         '''Operates the tree growth according to the selected algorithm.
         '''
@@ -104,11 +115,7 @@ class TreeGrower(object):
             # In here the stop criterion can be modified accordingly
             state = self.growth_algo.extend(section_grower)
 
-            section = self.neuron.append_section(
-                section_grower.parent,
-                PointLevel(np.array(section_grower.points3D).tolist(),
-                           [self.params['radius'] * 2] * len(section_grower.points3D)),
-                SectionType(self.params['tree_type']))
+            section = self.append_section(section_grower)
 
             if state == 'bifurcate':
                 # the current section_grower bifurcates
@@ -133,12 +140,7 @@ class TreeGrower(object):
             state = self.growth_algo.extend(section_grower)
 
             if state != 'continue':
-
-                section = self.neuron.append_section(
-                    section_grower.parent,
-                    PointLevel(np.array(section_grower.points3D).tolist(),
-                               [self.params['radius'] * 2] * len(section_grower.points3D)),
-                    SectionType(self.params['tree_type']))
+                section = self.append_section(section_grower)
 
                 if state == 'bifurcate':
                     # the current section_grower bifurcates

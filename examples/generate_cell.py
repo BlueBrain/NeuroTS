@@ -1,12 +1,13 @@
 import os
 import tns
 
+from tns.extract_input import distributions
 
 def run():
     # Extract distributions from cells in input directory
     dir_path = os.path.dirname(os.path.realpath(__file__))
     filename = os.path.join(dir_path, '../test_data/bio/')
-    distr = tns.extract_input.distributions(filename)
+    distr = distributions(filename)
 
     # Generate default parameters dictionary
     params = tns.extract_input.parameters(
