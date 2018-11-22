@@ -6,6 +6,7 @@ from tns.morphmath import sample
 from tns.basic import round_num
 from tns.generate.algorithms.common import init_ph_angles, bif_methods
 from tns.generate.algorithms.abstractgrower import AbstractAlgo
+from tns.morphmath.utils import norm
 
 
 class TMDAlgo(AbstractAlgo):
@@ -104,7 +105,7 @@ class TMDAlgo(AbstractAlgo):
         """
         self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
         ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
-        dir1, dir2 = self.bif_method(currentSec.get_current_direction(), angles=ang)
+        dir1, dir2 = self.bif_method(currentSec.latest_directions[-1], angles=ang)
         start_point = np.array(currentSec.points3D[-1])
 
         stop1, stop2 = self.get_stop_criteria(currentSec)
@@ -156,7 +157,7 @@ class TMDApicalAlgo(TMDAlgo):
         self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
         ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
 
-        current_rd = np.linalg.norm(np.subtract(currentSec.points3D[-1], self.start_point))
+        current_rd = norm(np.subtract(currentSec.points3D[-1], self.start_point))
 
         if currentSec.process=='major':
             dir1, dir2 = bif_methods['directional'](currentSec.direction, angles=ang)
@@ -208,7 +209,7 @@ class TMDGradientAlgo(TMDAlgo):
                 process1 = 'secondary'
                 process2 = 'secondary'
         else:
-            dir1, dir2 = self.bif_method(currentSec.get_current_direction(), angles=ang)
+            dir1, dir2 = self.bif_method(currentSec.latest_directions[-1], angles=ang)
             process1 = 'secondary'
             process2 = 'secondary'
 

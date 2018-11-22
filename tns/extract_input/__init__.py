@@ -28,7 +28,6 @@ def distributions(filepath, neurite_types=None, threshold_sec=2, diameter_model=
     pop_nm = nm.load_neurons(filepath)
 
     input_distributions = default_keys()
-    print("input_distributions: {}".format(input_distributions))
     input_distributions['soma'].update(from_neurom.soma_data(pop_nm))
 
     # Define the neurom neurite_types
@@ -41,7 +40,6 @@ def distributions(filepath, neurite_types=None, threshold_sec=2, diameter_model=
         nm_type = neurom_types[neurite_type]
         input_distr[neurite_type].update(from_neurom.trunk_neurite(pop_nm, nm_type))
         input_distr[neurite_type].update(from_neurom.number_neurites(pop_nm, nm_type))
-        print(dir(pop_tmd))
         input_distr[neurite_type].update(
             from_TMD.persistent_homology_angles(pop_tmd,
                                                 threshold=threshold_sec,

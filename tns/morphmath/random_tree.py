@@ -1,8 +1,7 @@
 from numpy import random
 import numpy as np
 import rotation as rt
-
-#---------------------------- Random point generation ------------------------#
+from tns.morphmath.utils import norm
 
 def get_random_point(D=1.0):
     '''
@@ -10,17 +9,16 @@ def get_random_point(D=1.0):
     The distance between the produced point and (0,0,0)
     is given by the value D.
     '''
+    phi = np.random.uniform(0., 2. * np.pi)
+    theta = np.arccos(np.random.uniform(-1.0, 1.0))
 
-    zeta0 = random.uniform(0,1)
-    theta0 = np.arccos(2*(zeta0-0.5))
-    phi0 = random.uniform(0,2*np.pi)
+    sn_theta = np.sin(theta)
 
-    x = D*np.sin(theta0)*np.cos(phi0)
-    y = D*np.sin(theta0)*np.sin(phi0)
+    x = D * np.cos(phi) * sn_theta
+    y = D * np.sin(phi) * sn_theta
+    z = D * np.cos(theta)
 
-    z = D*np.cos(theta0)
-
-    return np.array([x, y, z])
+    return np.array((x, y, z))
 
 
 def get_bif_random():

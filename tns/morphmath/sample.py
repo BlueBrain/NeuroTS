@@ -113,15 +113,3 @@ def ph(phs):
     """
     index = np.random.choice(len(phs))
     return phs[index]
-
-
-def ph_prob(prob_function, distance):
-    """Returns a True / False to modify
-    the current state (growing). The change
-    ia assumed with an exponential probability.
-    If True the current behavior will change.
-    """ 
-    prob_current = 1. - prob_function.cdf(distance)
-
-    return np.random.choice([True, False],
-                            p=[prob_current, 1.0 - prob_current])

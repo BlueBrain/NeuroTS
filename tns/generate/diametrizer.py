@@ -2,6 +2,8 @@ import numpy as np
 
 from collections import deque
 from morphio import SectionType
+from tns.morphmath.utils import norm
+from numpy.linalg import norm as vectorial_norm
 
 
 def sample(data, size=None):
@@ -14,7 +16,7 @@ def fill_sec_diameters(neuron, section, taper, max_diam):
        with an increasing tapering according
        to the biological model (taper, max_diam).
     """
-    segment_lenghts = np.linalg.norm(np.diff(section.points[::-1], axis=0), axis=1)
+    segment_lenghts = vectorial_norm(np.diff(section.points[::-1], axis=0), axis=1)
     cum_segment_lengths = np.cumsum(np.append([0], segment_lenghts))
     diameters = cum_segment_lengths * taper + section.diameters[-1]
     last_allowed_diameter = np.where(diameters < max_diam)[0][-1]

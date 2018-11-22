@@ -2,6 +2,7 @@
 TNS class : Soma
 '''
 import numpy as np
+from tns.morphmath.utils import norm
 
 
 class SomaGrower(object):
@@ -39,7 +40,7 @@ class SomaGrower(object):
         '''
         point_on_soma = np.subtract(np.array(point), np.array(self.center))
 
-        return point_on_soma / np.linalg.norm(point_on_soma)
+        return point_on_soma / norm(point_on_soma)
 
     def contour_point(self, point):
         '''Keeps the c-y coordinates of the input point

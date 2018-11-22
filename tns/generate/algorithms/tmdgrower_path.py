@@ -65,7 +65,7 @@ class TMDAlgoPath(TMDAlgo):
         self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
 
         ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
-        dir1, dir2 = self.bif_method(currentSec.get_current_direction(), angles=ang)
+        dir1, dir2 = self.bif_method(currentSec.latest_directions[-1], angles=ang)
 
         start_point = np.array(currentSec.points3D[-1])
 
@@ -105,7 +105,7 @@ class TMDApicalAlgoPath(TMDAlgoPath):
                 process1 = 'secondary'
                 process2 = 'secondary'
         else:
-            dir1, dir2 = self.bif_method(currentSec.get_current_direction(), angles=ang)
+            dir1, dir2 = self.bif_method(currentSec.latest_directions[-1], angles=ang)
             process1 = 'secondary'
             process2 = 'secondary'
 
@@ -147,7 +147,7 @@ class TMDGradientAlgoPath(TMDAlgoPath):
                 process1 = 'secondary'
                 process2 = 'secondary'
         else:
-            dir1, dir2 = self.bif_method(currentSec.get_current_direction(), angles=ang)
+            dir1, dir2 = self.bif_method(currentSec.latest_directions[-1], angles=ang)
             process1 = 'secondary'
             process2 = 'secondary'
 
