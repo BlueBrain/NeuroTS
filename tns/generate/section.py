@@ -1,6 +1,5 @@
 import numpy as np
 from tns.morphmath.random_tree import get_random_point
-from scipy import stats
 from tns.morphmath.utils import norm
 from numpy.linalg import norm as vectorial_norm
 
@@ -14,16 +13,8 @@ WEIGHTS = np.exp(-np.arange(MEMORY))
 class SectionGrower(object):
     '''Class for the section
     '''
-
-    def __init__(self,
-                 parent,
-                 children,
-                 start_point,
-                 direction,
-                 randomness,
-                 targeting,
-                 process,
-                 stop_criteria):
+    def __init__(self, parent, children, start_point, direction,
+                 randomness, targeting, process, stop_criteria):
         '''A section is a list of points in 4D space (x, y, x, r)
         that are sequentially connected to each other. This process
         generates a tubular morphology that resembles a random walk.
@@ -48,7 +39,8 @@ class SectionGrower(object):
                     self.params["randomness"] * get_random_point() + \
                     self.params["history"] * self.history()
         self.latest_directions.append(direction)
-        return current_point + direction
+        next_point = current_point + direction
+        return next_point
 
     def check_stop(self):
         """Checks if any num_seg criteria is fullfiled.
@@ -92,37 +84,23 @@ class SectionGrower(object):
             curr_point = self.points3D[-1]
             point = self.next_point(curr_point)
             self.points3D.append(np.array(point))
+            self.post_next_point()
 
         if self.children == 0:
             return 'terminate'
 
         return 'bifurcate'
 
+    def post_next_point(self):
+        '''A function that can be overriden in derived class
+        to perform actions after self.next_point has been called'''
 
-class SectionGrowerTMD(SectionGrower):
-    '''Class for the section
-    '''
-    def __init__(self,
-                 parent,
-                 children,
-                 start_point,
-                 direction,
-                 randomness,
-                 targeting,
-                 process,
-                 stop_criteria):
-        '''A derived class of SectionGrower with a different stopping condition.
-        Probabilities of bifurcating and stopping are proportional
-        exp(-distance/scale)'''
-        super(SectionGrowerTMD, self).__init__(parent,
-                                            children,
-                                            start_point,
-                                            direction,
-                                            randomness,
-                                            targeting,
-                                            process,
-                                            stop_criteria)
 
+class SectionGrowerExponentialProba(SectionGrower):
+    '''Abstract class where the bifurcation and termination probability
+    follow a exponentially decreasing probability
+
+    The parameter that follows the exponential must be defined in the derived class'''
 
     def check_stop(self):
         '''Probabilities of bifurcating and stopping are proportional
@@ -134,98 +112,42 @@ class SectionGrowerTMD(SectionGrower):
         crit = self.stop_criteria["bif_term"]
         scale = self.params["scale_prob"]
 
-        currd = norm(np.subtract(self.points3D[-1], crit["ref"]))
+        val = self.get_val()
 
-        if np.random.random() < np.exp(-(crit["bif"] - currd) / scale):
+        if np.random.random() < np.exp(-(crit["bif"] - val) / scale):
             self.children = 2.
             return False
 
-        if np.random.random() < np.exp(-(crit["term"] - currd)  / scale):
+        if np.random.random() < np.exp(-(crit["term"] - val)  / scale):
             self.children = 0.
             return False
 
         return True
 
+    def get_val(self):
+        raise NotImplementedError('Attempt to use abstract class')
 
-class SectionGrowerPath(SectionGrower):
+class SectionGrowerTMD(SectionGrowerExponentialProba):
+    def get_val(self):
+        return norm(np.subtract(self.points3D[-1], self.stop_criteria["bif_term"]["ref"]))
+
+
+class SectionGrowerPath(SectionGrowerExponentialProba):
     '''Class for the section
     '''
-    def __init__(self,
-                 parent,
-                 children,
-                 start_point,
-                 direction,
-                 randomness,
-                 targeting,
-                 process,
-                 stop_criteria):
+    def __init__(self, parent, children, start_point, direction,
+                 randomness, targeting, process, stop_criteria):
         '''A section is a list of points in 4D space (x, y, x, r)
         that are sequentially connected to each other. This process
         generates a tubular morphology that resembles a random walk.
         '''
-        super(SectionGrowerPath, self).__init__(parent,
-                                                children,
-                                                start_point,
-                                                direction,
-                                                randomness,
-                                                targeting,
-                                                process,
-                                                stop_criteria)
+        super(SectionGrowerPath, self).__init__(parent, children, start_point, direction,
+                                                randomness, targeting, process, stop_criteria)
 
-        self.prob_function = stats.expon(loc=0, scale=self.params["scale_prob"])
         self.pathlength = 0 if parent is None else self.stop_criteria['bif_term']['ref']
 
+    def get_val(self):
+        return self.pathlength
 
-    def check_stop(self):
-        '''Probabilities of bifurcating and stopping are proportional
-        exp(-distance/scale)'''
-
-        if len(self.points3D) < 2:
-            return True
-
-        crit = self.stop_criteria["bif_term"]
-        scale = self.params["scale_prob"]
-
-        if np.random.random() < np.exp(-(crit["bif"] - self.pathlength) / scale):
-            self.children = 2.
-            return False
-
-        if np.random.random() < np.exp(-(crit["term"] - self.pathlength)  / scale):
-            self.children = 0.
-            return False
-
-        return True
-
-    def next(self):
-        '''Creates one point and returns the next state.
-           bifurcate, terminate or continue.
-        '''
-        curr_point = self.points3D[-1]
-        point = self.next_point(curr_point)
-        self.points3D.append(np.array(point))
-        self.pathlength = self.pathlength + norm(np.subtract(curr_point, point))
-
-        if self.check_stop():
-            return 'continue'
-
-        if self.children == 0:
-            return 'terminate'
-
-        return 'bifurcate'
-
-    def generate(self):
-        '''Creates a section with the selected parameters
-           until at least one stop criterion is fulfilled.
-        '''
-        self.points3D.append(np.array(self.points3D[0]))
-
-        while self.check_stop():
-            curr_point = self.points3D[-1]
-            point = self.next_point(curr_point)
-            self.points3D.append(np.array(point))
-            self.pathlength = self.pathlength + np.linalg.norm(np.subtract(curr_point, point))
-
-        if self.children == 0:
-            return 'terminate'
-
-        return 'bifurcate'
+    def post_next_point(self):
+            self.pathlength += norm(self.latest_directions[-1])
