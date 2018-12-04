@@ -81,7 +81,8 @@ def parameters(name="Test_neuron", origin=(0., 0., 0.), neurite_types=['basal', 
                           "radius": 0.3,
                           "orientation": None,
                           "growth_method": method,
-                          "branching_method": branching, }
+                          "branching_method": branching,
+                          "modify":None}
 
     if 'basal' in neurite_types:
         input_parameters["basal"].update(parameters_default)

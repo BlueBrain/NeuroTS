@@ -25,6 +25,9 @@ class TMDAlgo(AbstractAlgo):
         self.bif_method = bif_methods[params["branching_method"]]
         self.params = params
         self.ph_angles = sample.ph(input_data["persistence_diagram"])
+        if params['modify']:
+            self.ph_angles = params['modify']['funct'](self.ph_angles,
+                                                       **params['modify']['kwargs'])
         self.start_point = start_point
         self.bif = None
         self.term = None
