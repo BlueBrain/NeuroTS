@@ -15,7 +15,7 @@ from tns.morphmath import rotation
 growth_algorithms = {'tmd': tmdgrower.TMDAlgo,
                      'tmd_apical': tmdgrower.TMDApicalAlgo,
                      'tmd_gradient': tmdgrower.TMDGradientAlgo,
-                     'tmd-path': tmdgrower_path.TMDAlgoPath,
+                     'tmd_path': tmdgrower_path.TMDAlgoPath,
                      'tmd_apical_path': tmdgrower_path.TMDApicalAlgoPath,
                      'tmd_gradient_path': tmdgrower_path.TMDGradientAlgoPath,
                      'trunk': basicgrower.TrunkAlgo}
@@ -23,7 +23,7 @@ growth_algorithms = {'tmd': tmdgrower.TMDAlgo,
 section_growers = {'tmd': SectionGrowerTMD,
                    'tmd_apical': SectionGrowerTMD,
                    'tmd_gradient': SectionGrowerTMD,
-                   'tmd-path': SectionGrowerPath,
+                   'tmd_path': SectionGrowerPath,
                    'tmd_apical_path':SectionGrowerPath,
                    'tmd_gradient_path': SectionGrowerPath,
                    'trunk': SectionGrower}

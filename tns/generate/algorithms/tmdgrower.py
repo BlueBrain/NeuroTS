@@ -108,7 +108,7 @@ class TMDAlgo(AbstractAlgo):
         """
         self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
         ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
-        dir1, dir2 = self.bif_method(currentSec.latest_directions[-1], angles=ang)
+        dir1, dir2 = self.bif_method(currentSec.history(), angles=ang)
         start_point = np.array(currentSec.points3D[-1])
 
         stop1, stop2 = self.get_stop_criteria(currentSec)
@@ -152,6 +152,17 @@ class TMDAlgo(AbstractAlgo):
 class TMDApicalAlgo(TMDAlgo):
     """TreeGrower of TMD apical growth"""
 
+    def initialize(self):
+        """
+        TMD basic grower of an apical tree
+        Initializes the tree grower and
+        computes the apical distance using the input barcode.
+        """
+        from tmd.Topology.analysis import find_apical_point_distance
+        stop, num_sec = super(TMDApicalAlgo, self).initialize()
+        self.params['apical_distance'] = find_apical_point_distance(self.ph_angles)
+        return stop, num_sec
+
     def bifurcate(self, currentSec):
         """When the section bifurcates two new sections need to be created.
         This method computes from the current state the data required for the
@@ -190,7 +201,7 @@ class TMDApicalAlgo(TMDAlgo):
 
         return s1, s2
 
-class TMDGradientAlgo(TMDAlgo):
+class TMDGradientAlgo(TMDApicalAlgo):
     """TreeGrower of TMD apical growth"""
 
     def bifurcate(self, currentSec):
@@ -212,7 +223,7 @@ class TMDGradientAlgo(TMDAlgo):
                 process1 = 'secondary'
                 process2 = 'secondary'
         else:
-            dir1, dir2 = self.bif_method(currentSec.latest_directions[-1], angles=ang)
+            dir1, dir2 = self.bif_method(currentSec.history(), angles=ang)
             process1 = 'secondary'
             process2 = 'secondary'
 
@@ -223,7 +234,7 @@ class TMDGradientAlgo(TMDAlgo):
             if difference > self.params['bias_length'] and difference != np.inf:
                 direction1 = (1.0 - self.params['bias']) * np.array(input_dir)
                 direction2 = self.params['bias'] * np.array(currentSec.direction)
-                direct = np.add(direction1, direction2).tolist()
+                direct = np.add(direction1, direction2)
                 return 'major', direct
             else:
                 return process, input_dir

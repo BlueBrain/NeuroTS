@@ -65,7 +65,7 @@ class TMDAlgoPath(TMDAlgo):
         self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
 
         ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
-        dir1, dir2 = self.bif_method(currentSec.latest_directions[-1], angles=ang)
+        dir1, dir2 = self.bif_method(currentSec.history(), angles=ang)
 
         start_point = np.array(currentSec.points3D[-1])
 
@@ -86,6 +86,17 @@ class TMDAlgoPath(TMDAlgo):
 class TMDApicalAlgoPath(TMDAlgoPath):
     """TreeGrower of TMD apical growth"""
 
+    def initialize(self):
+        """
+        TMD basic grower of an apical tree based on path distance
+        Initializes the tree grower and
+        computes the apical distance using the input barcode.
+        """
+        from tmd.Topology.analysis import find_apical_point_distance
+        stop, num_sec = super(TMDApicalAlgoPath, self).initialize()
+        self.params['apical_distance'] = find_apical_point_distance(self.ph_angles)
+        return stop, num_sec
+
     def bifurcate(self, currentSec):
         """When the section bifurcates two new sections need to be created.
         This method computes from the current state the data required for the
@@ -93,19 +104,18 @@ class TMDApicalAlgoPath(TMDAlgoPath):
         """
         self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
         ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
-
-        current_rd = np.linalg.norm(np.subtract(currentSec.points3D[-1], self.start_point))
+        current_pd = currentSec.pathlength
 
         if currentSec.process=='major':
             dir1, dir2 = bif_methods['directional'](currentSec.direction, angles=ang)
-            if current_rd <= self.params['apical_distance']:
+            if current_pd <= self.params['apical_distance']:
                 process1 = 'major'
                 process2 = 'secondary'
             else:
                 process1 = 'secondary'
                 process2 = 'secondary'
         else:
-            dir1, dir2 = self.bif_method(currentSec.latest_directions[-1], angles=ang)
+            dir1, dir2 = self.bif_method(currentSec.history(), angles=ang)
             process1 = 'secondary'
             process2 = 'secondary'
 
@@ -126,7 +136,7 @@ class TMDApicalAlgoPath(TMDAlgoPath):
         return s1, s2
 
 
-class TMDGradientAlgoPath(TMDAlgoPath):
+class TMDGradientAlgoPath(TMDApicalAlgoPath):
     """TreeGrower of TMD apical growth"""
 
     def bifurcate(self, currentSec):
@@ -136,18 +146,18 @@ class TMDGradientAlgoPath(TMDAlgoPath):
         """
         self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
         ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
-        current_rd = np.linalg.norm(np.subtract(currentSec.points3D[-1], self.start_point))
+        current_pd = currentSec.pathlength
 
         if currentSec.process=='major':
             dir1, dir2 = bif_methods['directional'](currentSec.direction, angles=ang)
-            if current_rd <= self.params['apical_distance']:
+            if current_pd <= self.params['apical_distance']:
                 process1 = 'major'
                 process2 = 'secondary'
             else:
                 process1 = 'secondary'
                 process2 = 'secondary'
         else:
-            dir1, dir2 = self.bif_method(currentSec.latest_directions[-1], angles=ang)
+            dir1, dir2 = self.bif_method(currentSec.history(), angles=ang)
             process1 = 'secondary'
             process2 = 'secondary'
 
@@ -158,7 +168,7 @@ class TMDGradientAlgoPath(TMDAlgoPath):
             if difference > self.params['bias_length']:
                 direction1 = (1.0 - self.params['bias']) * np.array(input_dir)
                 direction2 = self.params['bias'] * np.array(currentSec.direction)
-                direct = np.add(direction1, direction2).tolist()
+                direct = np.add(direction1, direction2)
                 return 'major', direct
             else:
                 return process, input_dir

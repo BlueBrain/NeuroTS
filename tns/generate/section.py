@@ -5,10 +5,9 @@ from numpy.linalg import norm as vectorial_norm
 
 from collections import deque
 
-MEMORY = 4
+MEMORY = 5
 
-WEIGHTS = np.exp(-np.arange(MEMORY))
-
+WEIGHTS = np.exp(np.arange(1, MEMORY + 1) - MEMORY) # Memory decreases with distance from current point
 
 class SectionGrower(object):
     '''Class for the section
@@ -38,7 +37,8 @@ class SectionGrower(object):
         direction = self.params["targeting"] * self.direction + \
                     self.params["randomness"] * get_random_point() + \
                     self.params["history"] * self.history()
-        self.latest_directions.append(direction)
+
+        self.latest_directions.append(direction/vectorial_norm(direction))
         next_point = current_point + direction
         return next_point
 
@@ -53,11 +53,15 @@ class SectionGrower(object):
         '''
         n_points = min(MEMORY, len(self.points3D)-1)
 
-        hist = np.dot(WEIGHTS[:n_points][::-1], self.latest_directions)
+        if n_points == 0:
+            return np.zeros(3)
+
+        hist = np.dot(WEIGHTS[MEMORY - n_points:], self.latest_directions)
         distance = vectorial_norm(hist)
 
         if distance > 0:
             hist /= distance
+
         return hist
 
     def next(self):
