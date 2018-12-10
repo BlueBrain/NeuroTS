@@ -5,7 +5,10 @@ from setuptools import setup
 from setuptools import find_packages
 import pip
 
+VERSION = '0.0.1'
+
 config = {
+    'version': VERSION,
     'description': 'TNS: synthesis of artificial neurons using their topological profiles package',
     'author': 'Lida Kanari',
     'url': 'https://bitbucket.org/bbp_lida/morphsynthesis',
@@ -30,5 +33,6 @@ config = {
     'name': 'tns',
     'include_package_data': True,
 }
+
 
 setup(**config)
