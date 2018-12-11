@@ -10,6 +10,4 @@
 """
 
 
-from tns import extract_input
 from tns.generate.grower import NeuronGrower
-import version

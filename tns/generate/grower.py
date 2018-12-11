@@ -3,7 +3,7 @@ TNS class : Grower object that contains the grower functionality.
 '''
 import numpy as np
 from tns.morphmath import sample
-import diametrizer
+from tns.generate.diametrizer import correct_diameters
 
 from morphio.mut import Morphology
 from tns.generate.soma import SomaGrower
@@ -61,7 +61,7 @@ class NeuronGrower(object):
         """
         if model is None:
             model = self.input_distributions['diameter_model']
-        diametrizer.correct_diameters(self.neuron, model=model)
+        correct_diameters(self.neuron, model=model)
 
     # Functions not intended to be accessible by the user
 

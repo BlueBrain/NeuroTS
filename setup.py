@@ -6,6 +6,7 @@ from setuptools import find_packages
 import imp
 import pip
 
+
 VERSION = imp.load_source("tns.version", "tns/version.py").VERSION
 
 config = {

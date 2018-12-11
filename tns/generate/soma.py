@@ -106,13 +106,13 @@ class SomaGrower(object):
             if len(selected) > interpolation:
                 return selected.tolist()
             elif len(points3D) > interpolation:
-                print fail_msg
+                print(fail_msg)
                 return points3D.tolist()
             else:
-                print fail_msg
+                print(fail_msg)
                 return interpolation * points3D.tolist()
         else:
-            print fail_msg
+            print(fail_msg)
             return interpolation * points3D.tolist()
 
     def generate_neuron_soma_points3D(self, interpolation=3):

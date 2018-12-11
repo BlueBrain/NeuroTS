@@ -1,9 +1,9 @@
 # Module to extract morphometrics and TMD-input from a set of tree-shaped cells.
 import tmd
 import neurom as nm
-import from_TMD
-import from_neurom
-import from_diameter
+from tns.extract_input.from_TMD import persistent_homology_angles
+from tns.extract_input.from_neurom import soma_data, trunk_neurite, number_neurites
+from tns.extract_input.from_diameter import population_model, model
 
 
 def default_keys():
@@ -41,17 +41,16 @@ def distributions(filepath, neurite_types=None, threshold_sec=2, diameter_model=
         input_distr[neurite_type].update(from_neurom.trunk_neurite(pop_nm, nm_type))
         input_distr[neurite_type].update(from_neurom.number_neurites(pop_nm, nm_type))
         input_distr[neurite_type].update(
-            from_TMD.persistent_homology_angles(pop_tmd,
+            persistent_homology_angles(pop_tmd,
                                                 threshold=threshold_sec,
-                                                neurite_type=neurite_type, 
+                                                neurite_type=neurite_type,
                                                 feature=feature))
 
     for ntype in neurite_types:
         fill_input_distributions(input_distributions, ntype)
 
     if diameter_model:
-        import from_diameter
-        input_distributions["diameter_model"] = from_diameter.population_model(pop_nm)
+        input_distributions["diameter_model"] = population_model(pop_nm)
 
     return input_distributions
 
@@ -115,10 +114,10 @@ def diameter_distributions(filepath):
 
     if os.path.isdir(filepath):
         pop_nm = nm.load_neurons(filepath)
-        model = from_diameter.population_model(pop_nm)
+        model = population_model(pop_nm)
     elif os.path.isfile(filepath):
         neu_nm = nm.load_neuron(filepath)
-        model = from_diameter.model(neu_nm)
+        model = model(neu_nm)
     else:
         raise IOError("No directory or file found that matches the selected filepath!")
 
