@@ -21,13 +21,12 @@ config = {
         'tmd>=1.0.0',
         'enum34>=1.0.4',
         'scipy>=0.13.3',
-        'numpy>=1.8.0'
-        'morphio<=2.0.0'
+        'numpy>=1.8.0',
+        'morphio<=2.0.0',
     ],
     'dependency_links': [
         'git+ssh://bbpcode.epfl.ch/molecularsystems/TMD#egg=tmd-1.0.0',
     ],
-    'extras_require': {},
     'packages': find_packages(),
     'license': 'BSD',
     'scripts': [],
