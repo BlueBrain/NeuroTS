@@ -1,7 +1,7 @@
-from numpy import random
+'''Definition of bifurcation functionality'''
+
 import numpy as np
-from tns.morphmath.rotation import rotate_vector
-from tns.morphmath.utils import norm
+import tns.morphmath.rotation as rt
 
 
 def get_random_point(D=1.0):
@@ -44,14 +44,10 @@ def get_bif_symmetric(direction, angles):
     phi1 = angles[2] / 2.
     theta1 = angles[3] / 2.
 
-    # phi, theta = rt.spherical_from_vector(direction)
-    # dir1 = rt.vector_from_spherical(phi + phi1, theta + theta1)
-    # dir2 = rt.vector_from_spherical(phi - phi1, theta - theta1)
-
-    dir1 = rotate_vector(direction, [0, 0, 1], phi1)
-    dir1 = rotate_vector(dir1, [1, 0, 0], theta1)
-    dir2 = rotate_vector(direction, [0, 0, 1], - phi1)
-    dir2 = rotate_vector(dir2, [1, 0, 0], - theta1)
+    dir1 = rt.rotate_vector(direction, [0, 0, 1], phi1)
+    dir1 = rt.rotate_vector(dir1, [1, 0, 0], theta1)
+    dir2 = rt.rotate_vector(direction, [0, 0, 1], - phi1)
+    dir2 = rt.rotate_vector(dir2, [1, 0, 0], - theta1)
 
     return (np.array(dir1), np.array(dir2))
 
@@ -64,37 +60,12 @@ def get_bif_bio_oriented(direction, angles):
     phi1 = angles[2]
     theta1 = angles[3]
 
-    # phi, theta = rt.spherical_from_vector(direction)
-    # dir1 = rt.vector_from_spherical(phi - phi0, theta - theta0)
-    # dir2 = rt.vector_from_spherical(phi - phi0 - phi1, theta - theta0 - theta1)
-
-    dir1 = rotate_vector(direction, [0, 0, 1], phi0)
-    dir1 = rotate_vector(dir1, [1, 0, 0], theta0)
-    dir2 = rotate_vector(dir1, [0, 0, 1], phi1)
-    dir2 = rotate_vector(dir2, [1, 0, 0], theta1)
+    dir1 = rt.rotate_vector(direction, [0, 0, 1], phi0)
+    dir1 = rt.rotate_vector(dir1, [1, 0, 0], theta0)
+    dir2 = rt.rotate_vector(dir1, [0, 0, 1], phi1)
+    dir2 = rt.rotate_vector(dir2, [1, 0, 0], theta1)
 
     return (np.array(dir1), np.array(dir2))
-
-
-# def get_bif_bio_smoothed(direction, angles):
-#    '''Input: init_phi, init_theta, dphi, dtheta.
-#    '''
-#    def smoothing(ang):
-#        if np.abs(ang) > np.pi:
-#            return np.abs(ang)/2
-#        else:
-#            return ang
-
-#    phi0 = np.abs(smoothing(angles[0]))
-#    theta0 = smoothing(angles[1])
-#    phi1 = smoothing(angles[2])
-#    theta1 = smoothing(angles[3])
-
-#    phi, theta = rt.spherical_from_vector(direction)
-#    dir1 = rt.vector_from_spherical(phi - phi0, theta - theta0)
-#    dir2 = rt.vector_from_spherical(phi - phi0 - phi1, theta - theta0 - theta1)
-
-#    return (np.array(dir1), np.array(dir2))
 
 
 def get_bif_directional(direction, angles):
@@ -105,29 +76,7 @@ def get_bif_directional(direction, angles):
     phi1 = angles[2]
     theta1 = angles[3]
 
-    # phi, theta = rt.spherical_from_vector(direction)
-    # dir1 = rt.vector_from_spherical(phi, theta)
-    # dir2 = rt.vector_from_spherical(phi - phi1, theta - theta1)
-
-    dir2 = rotate_vector(direction, [0, 0, 1], phi1)
-    dir2 = rotate_vector(dir2, [1, 0, 0], theta1)
+    dir2 = rt.rotate_vector(direction, [0, 0, 1], phi1)
+    dir2 = rt.rotate_vector(dir2, [1, 0, 0], theta1)
 
     return (np.array(direction), np.array(dir2))
-
-
-# def get_bif_soma_repulsion(direction, angles, soma, curr_point):
-#    '''Input: init_phi, init_theta, dphi, dtheta.
-#    '''
-#    phi0 = angles[2]
-#    theta0 = angles[3]
-
-    # phi, theta = rt.spherical_from_vector(np.subtract(curr_point, soma))
-    # dir1 = rt.vector_from_spherical(phi + phi0, theta + theta0)
-    # dir2 = rt.vector_from_spherical(phi - phi0, theta - theta0)
-
-#    dir1 = rotate_vector(direction, [0,0,1], phi0)
-#    dir1 = rotate_vector(dir1, [1,0,0], theta0)
-#    dir2 = rotate_vector(dir1, [0,0,1], phi1)
-#    dir2 = rotate_vector(dir2, [1,0,0], theta1)
-
-#    return (np.array(dir1), np.array(dir2))

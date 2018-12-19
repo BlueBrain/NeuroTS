@@ -1,5 +1,7 @@
-import tmd
+'''Extracts the distributions associated with TMD module'''
+
 import numpy as np
+import tmd
 
 
 def persistent_homology_angles(pop, threshold=2, neurite_type='basals', feature='radial_distances'):

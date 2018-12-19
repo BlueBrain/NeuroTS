@@ -1,7 +1,9 @@
 """Basic class for TreeGrower Algorithms"""
 
-from abstractgrower import AbstractAlgo
-from common import bif_methods
+import numpy as np
+
+from tns.generate.algorithms.abstractgrower import AbstractAlgo
+from tns.generate.algorithms.common import bif_methods
 
 
 class TrunkAlgo(AbstractAlgo):
@@ -16,6 +18,7 @@ class TrunkAlgo(AbstractAlgo):
         params: parameters needed for growth, it should include the bif_method
         bifurcation method, select from: bio_oriented, symmetric, directional
         """
+        super(TrunkAlgo, self).__init__(input_data, params, start_point)
         self.bif_method = bif_methods[params["branching_method"]]
         self.params = params
         self.input_data = input_data

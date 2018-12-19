@@ -1,7 +1,9 @@
 '''
 TNS class : Soma
 '''
+from __future__ import print_function
 import numpy as np
+
 from tns.morphmath.utils import norm
 
 
@@ -86,18 +88,19 @@ class SomaGrower(object):
 
         return new_points3D
 
-    def interpolate(self, points3D, interpolation=3):
+    @staticmethod
+    def interpolate(points3D, interpolation=3):
         """Finds the convex hull from a list of points
         and returns a number of interpolation points that belong
         on this convex hull.
         interpolation: sets the minimum number of points to be generated.
         points: initial set of points
         """
-        from scipy.spatial import ConvexHull
+        from scipy.spatial import ConvexHull  # pylint: disable=no-name-in-module
 
         fail_msg = 'Warning! Convex hull failed. Original points were saved instead'
 
-        if len(points3D) > 3:
+        if len(points3D) > interpolation:
             hull = ConvexHull(points3D)
             selected = np.array(points3D)[hull.vertices]
             if len(selected) > interpolation:
@@ -105,12 +108,10 @@ class SomaGrower(object):
             elif len(points3D) > interpolation:
                 print(fail_msg)
                 return points3D.tolist()
-            else:
-                print(fail_msg)
-                return interpolation * points3D.tolist()
-        else:
             print(fail_msg)
             return interpolation * points3D.tolist()
+        print(fail_msg)
+        return interpolation * points3D.tolist()
 
     def generate_neuron_soma_points3D(self, interpolation=3):
         """Generates a soma from a list of points3D,
@@ -125,5 +126,4 @@ class SomaGrower(object):
 
         if interpolation is None:
             return contour
-        else:
-            return self.interpolate(contour, interpolation=interpolation)
+        return self.interpolate(contour, interpolation=interpolation)

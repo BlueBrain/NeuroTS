@@ -2,26 +2,24 @@
 
 import numpy as np
 
-from tns.morphmath import sample
 from tns.basic import round_num
-from tns.generate.algorithms.common import init_ph_angles, bif_methods
 from tns.generate.algorithms.abstractgrower import AbstractAlgo
+from tns.generate.algorithms.common import bif_methods, init_ph_angles
+from tns.morphmath import sample
 from tns.morphmath.utils import norm
 
 
 class TMDAlgo(AbstractAlgo):
     """TreeGrower of TMD basic growth"""
 
-    def __init__(self,
-                 input_data,
-                 params,
-                 start_point):
+    def __init__(self, input_data, params, start_point):
         """
         TMD basic grower
         input_data: saves all the data required for the growth
         params: parameters needed for growth, it should include the bif_method
         bifurcation method, select from: bio_oriented, symmetric, directional
         """
+        super(TMDAlgo, self).__init__(input_data, params, start_point)
         self.bif_method = bif_methods[params["branching_method"]]
         self.params = params
         self.ph_angles = sample.ph(input_data["persistence_diagram"])
@@ -234,14 +232,14 @@ class TMDGradientAlgo(TMDApicalAlgo):
         start_point = np.array(currentSec.points3D[-1])
 
         def majorize_process(stop, process, input_dir):
+            '''Currates the non-major processes to apply a gradient to large components'''
             difference = np.abs(stop["bif_term"]["bif"] - stop["bif_term"]["term"])
             if difference > self.params['bias_length'] and difference != np.inf:
                 direction1 = (1.0 - self.params['bias']) * np.array(input_dir)
                 direction2 = self.params['bias'] * np.array(currentSec.direction)
                 direct = np.add(direction1, direction2)
                 return 'major', direct
-            else:
-                return process, input_dir
+            return process, input_dir
 
         stop1, stop2 = self.get_stop_criteria(currentSec)
 

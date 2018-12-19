@@ -1,3 +1,5 @@
+'''Util functions useful for general purposes'''
+
 from numpy import sqrt
 
 

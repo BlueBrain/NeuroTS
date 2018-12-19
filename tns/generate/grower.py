@@ -1,12 +1,11 @@
 '''
 TNS class : Grower object that contains the grower functionality.
 '''
-import numpy as np
-from tns.morphmath import sample
-from tns.generate.diametrizer import correct_diameters
-
+# pylint: disable=import-error
 from morphio.mut import Morphology
+# from tns.generate.diametrizer import correct_diameters
 from tns.generate.soma import SomaGrower
+from tns.morphmath import sample
 
 bifurcation_methods = ['symmetric', 'bio_oriented', 'directional', 'bio_smoothed', ]
 
@@ -31,6 +30,8 @@ class NeuronGrower(object):
         # A list of trees with the corresponding orientations
         # and initial points on the soma surface will be initialized.
         self.active_neurites = set()
+        self.soma = SomaGrower(initial_point=self.input_parameters["origin"],
+                               radius=sample.soma_size(self.input_distributions))
 
     def next(self):
         '''Call the "next" method of each neurite grower'''
@@ -59,9 +60,9 @@ class NeuronGrower(object):
         To extract a diameter model from a file,
         call extract_input.diameter_distributions(file)
         """
-        if model is None:
-            model = self.input_distributions['diameter_model']
-        correct_diameters(self.neuron, model=model)
+        # if model is None:
+        #    model = self.input_distributions['diameter_model']
+        # correct_diameters(self.neuron, model=model)
 
     # Functions not intended to be accessible by the user
 
@@ -73,7 +74,7 @@ class NeuronGrower(object):
         'from_space': generates orientations depending on spatial input (not implemented yet).
         '''
 
-        if type(orientation) is list:  # Gets major orientations externally
+        if isinstance(orientation, list):  # Gets major orientations externally
             if len(orientation) >= n_trees:
                 pts = self.soma.add_points_from_orientations(orientation[:n_trees])
             else:
@@ -95,7 +96,7 @@ class NeuronGrower(object):
         as parameters['type']['orientation'] or it is randomly chosen according to the
         biological distribution of trunks on the soma surface if 'orientation' is None.
         """
-        from tree import TreeGrower
+        from tns.generate.tree import TreeGrower
 
         for type_of_tree in self.input_parameters['grow_types']:
 
@@ -123,9 +124,6 @@ class NeuronGrower(object):
         """Generates a soma based on the input_distributions. The coordinates
         of the soma contour are retrieved from the trunks.
         """
-        self.soma = SomaGrower(initial_point=self.input_parameters["origin"],
-                               radius=sample.soma_size(self.input_distributions))
-
         self._grow_trunks()
 
         self.neuron.soma.points = self.soma.generate_neuron_soma_points3D(

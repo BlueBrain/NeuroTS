@@ -1,3 +1,5 @@
+"""Functionality used by multiple algorithms"""
+
 import numpy as np
 from tns.morphmath import random_tree as rd
 from tns.basic import round_num

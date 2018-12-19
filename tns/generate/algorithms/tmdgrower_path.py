@@ -2,9 +2,8 @@
 
 import numpy as np
 
-from tns.morphmath import sample
 from tns.basic import round_num
-from tns.generate.algorithms.common import init_ph_angles, bif_methods
+from tns.generate.algorithms.common import bif_methods, init_ph_angles
 from tns.generate.algorithms.tmdgrower import TMDAlgo
 
 
@@ -164,6 +163,7 @@ class TMDGradientAlgoPath(TMDApicalAlgoPath):
             process2 = 'secondary'
 
         def majorize_process(stop, process, input_dir):
+            '''Currates the non-major processes to apply a gradient to large components'''
             difference = np.abs(stop["bif_term"]["bif"] - stop["bif_term"]["term"])
             if difference == np.inf:
                 difference = np.abs(stop["bif_term"]["term"] - currentSec.pathlength)
@@ -172,8 +172,7 @@ class TMDGradientAlgoPath(TMDApicalAlgoPath):
                 direction2 = self.params['bias'] * np.array(currentSec.direction)
                 direct = np.add(direction1, direction2)
                 return 'major', direct
-            else:
-                return process, input_dir
+            return process, input_dir
 
         stop1, stop2 = self.get_stop_criteria(currentSec)
 

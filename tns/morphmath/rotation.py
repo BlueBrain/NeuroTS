@@ -1,5 +1,8 @@
-import numpy as np
+'''Definition of basic rotation functionality'''
+
 import math
+
+import numpy as np
 
 
 def spherical_from_vector(vect):
@@ -49,9 +52,11 @@ def rotation_around_axis(axis, angle):
 def angle3D(v1, v2):
     """Returns the angle between v1, v2"""
     def dotproduct(v1, v2):
+        '''Returns product between vectors'''
         return sum((a * b) for a, b in zip(v1, v2))
 
     def length(v):
+        '''Returns length of vector'''
         return math.sqrt(dotproduct(v, v))
     return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
 

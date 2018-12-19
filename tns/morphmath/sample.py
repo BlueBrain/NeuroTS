@@ -1,7 +1,11 @@
+'''Definition of distributions to sample from'''
+
 import numpy as np
 
 
 class Distr(object):
+    '''Class of custom distributions
+    '''
 
     def __init__(self, params):
         """Object of statistical distribution
@@ -9,7 +13,8 @@ class Distr(object):
         self.type = params.keys()[0]
         self.params = params[self.type]
 
-    def norm(self, params):
+    @staticmethod
+    def norm(params):
         """Returns loc, scale
         as expected from scipy
         from mean, std data
@@ -17,7 +22,8 @@ class Distr(object):
         return {"loc": params["mean"],
                 "scale": params["std"]}
 
-    def uniform(self, params):
+    @staticmethod
+    def uniform(params):
         """Returns loc, scale
         as expected from scipy
         from min, max of a uniform
@@ -25,7 +31,8 @@ class Distr(object):
         return {'loc': params['min'],
                 'scale': params['max'] - params['min']}
 
-    def expon(self, params):
+    @staticmethod
+    def expon(params):
         """Returns loc, scale
         as expected from scipy
         from mean, std data
@@ -92,7 +99,7 @@ def trunk_angles(distrib, N):
     and the input distribution.
     """
     trunks_d = Distr(distrib['trunk']['orientation_deviation'])
-    angles = [trunks_d.sample() for i in xrange(N - 1)]
+    angles = [trunks_d.sample() for _ in range(N - 1)]
     angles = angles + [sum(angles)]
     return angles
 
@@ -103,7 +110,7 @@ def azimuth_angles(distrib, N):
     and the input distribution.
     """
     trunks_d = Distr(d_transform(distrib['trunk']['azimuth'], np.cos))
-    angles = [np.arccos(trunks_d.sample()) for i in xrange(N)]
+    angles = [np.arccos(trunks_d.sample()) for _ in range(N)]
     return angles
 
 

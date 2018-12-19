@@ -1,9 +1,14 @@
-import numpy as np
-from tns.morphmath.random_tree import get_random_point
-from tns.morphmath.utils import norm
-from numpy.linalg import norm as vectorial_norm
+'''
+TNS section grower class.
+'''
 
 from collections import deque
+
+import numpy as np
+from numpy.linalg import norm as vectorial_norm
+
+from tns.morphmath.random_tree import get_random_point
+from tns.morphmath.utils import norm
 
 MEMORY = 5
 
@@ -12,7 +17,7 @@ WEIGHTS = np.exp(np.arange(1, MEMORY + 1) - MEMORY)
 
 
 class SectionGrower(object):
-    '''Class for the section
+    '''Class for the section growth
     '''
 
     def __init__(self, parent, children, start_point, direction,
@@ -118,16 +123,20 @@ class SectionGrowerExponentialProba(SectionGrower):
         return True
 
     def get_val(self):
+        '''Placeholder for any function'''
         raise NotImplementedError('Attempt to use abstract class')
 
 
 class SectionGrowerTMD(SectionGrowerExponentialProba):
+    '''Class for the TMD section growth
+    '''
     def get_val(self):
+        '''Returns radial distance'''
         return norm(np.subtract(self.points3D[-1], self.stop_criteria["bif_term"]["ref"]))
 
 
 class SectionGrowerPath(SectionGrowerExponentialProba):
-    '''Class for the section
+    '''Class for the TMD path based section growth
     '''
 
     def __init__(self, parent, children, start_point, direction,
@@ -142,7 +151,9 @@ class SectionGrowerPath(SectionGrowerExponentialProba):
         self.pathlength = 0 if parent is None else self.stop_criteria['bif_term']['ref']
 
     def get_val(self):
+        '''Returns path distance'''
         return self.pathlength
 
     def post_next_point(self):
+        '''Increases the path distance'''
         self.pathlength += norm(self.latest_directions[-1])

@@ -1,4 +1,4 @@
-# A file to store basic functionality needed in different modules.
+''' A file to store general basic functionality needed in different modules.'''
 import numpy as np
 
 

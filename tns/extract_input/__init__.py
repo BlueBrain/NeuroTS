@@ -1,6 +1,7 @@
-# Module to extract morphometrics and TMD-input from a set of tree-shaped cells.
-import tmd
+''' Module to extract morphometrics and TMD-input from a set of tree-shaped cells.'''
+
 import neurom as nm
+import tmd
 from tns.extract_input.from_TMD import persistent_homology_angles
 from tns.extract_input.from_neurom import soma_data, trunk_neurite, number_neurites
 from tns.extract_input.from_diameter import population_model, model
@@ -29,7 +30,7 @@ def distributions(filepath, neurite_types=None, threshold_sec=2,
     pop_nm = nm.load_neurons(filepath)
 
     input_distributions = default_keys()
-    input_distributions['soma'].update(from_neurom.soma_data(pop_nm))
+    input_distributions['soma'].update(soma_data(pop_nm))
 
     # Define the neurom neurite_types
     neurom_types = {'basal': nm.BASAL_DENDRITE,
@@ -39,8 +40,8 @@ def distributions(filepath, neurite_types=None, threshold_sec=2,
     def fill_input_distributions(input_distr, neurite_type):
         '''Helping function to avoid code duplication'''
         nm_type = neurom_types[neurite_type]
-        input_distr[neurite_type].update(from_neurom.trunk_neurite(pop_nm, nm_type))
-        input_distr[neurite_type].update(from_neurom.number_neurites(pop_nm, nm_type))
+        input_distr[neurite_type].update(trunk_neurite(pop_nm, nm_type))
+        input_distr[neurite_type].update(number_neurites(pop_nm, nm_type))
         input_distr[neurite_type].update(
             persistent_homology_angles(pop_tmd,
                                        threshold=threshold_sec,
@@ -56,8 +57,7 @@ def distributions(filepath, neurite_types=None, threshold_sec=2,
     return input_distributions
 
 
-def parameters(name="Test_neuron", origin=(0., 0., 0.),
-               neurite_types=['basal', 'apical', 'axon'], method='trunk'):
+def parameters(origin=(0., 0., 0.), method='trunk', neurite_types=None):
     '''Returns a default set of input parameters
        to be used as input for synthesis.
     '''
@@ -116,11 +116,11 @@ def diameter_distributions(filepath):
 
     if os.path.isdir(filepath):
         pop_nm = nm.load_neurons(filepath)
-        model = population_model(pop_nm)
+        d_model = population_model(pop_nm)
     elif os.path.isfile(filepath):
         neu_nm = nm.load_neuron(filepath)
-        model = model(neu_nm)
+        d_model = model(neu_nm)
     else:
         raise IOError("No directory or file found that matches the selected filepath!")
 
-    return {"diameter_model": model}
+    return {"diameter_model": d_model}

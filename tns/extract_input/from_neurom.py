@@ -1,9 +1,12 @@
+'''Extracts the distributions associated with NeuroM module'''
+
 import neurom as nm
 from neurom import stats
 import numpy as np
 
 
 def transform_distr(opt_distr):
+    '''Transforms distributions'''
     if opt_distr.type == 'norm':
         return {"norm": {"mean": opt_distr.params[0],
                          "std": opt_distr.params[1]}}
@@ -13,9 +16,11 @@ def transform_distr(opt_distr):
     elif opt_distr.type == 'expon':
         return {"expon": {"loc": opt_distr.params[0],
                           "lambda": 1. / opt_distr.params[1]}}
+    return None
 
 
 def soma_data(pop):
+    '''Extract soma size'''
     # Extract soma size as a normal distribution
     # Returns a dictionary with the soma information
     soma_size = nm.get('soma_radii', pop)
@@ -39,20 +44,8 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE):
                       "azimuth": {"uniform": {"min": np.pi, "max": 0.0}}}}
 
 
-def radial_density_neurite(pop, neurite_type=nm.BASAL_DENDRITE):
-    # Extract the radial distribution of sections density.
-
-    # Termination radial density of neurite type.
-    term_radial_dist = nm.get('section_term_radial_distances', pop, neurite_type=neurite_type)
-
-    # Bifurcation radial density of neurite type.
-    bif_radial_dist = nm.get('section_bif_radial_distances', pop, neurite_type=neurite_type)
-
-    return {"term_density": {"data": term_radial_dist},
-            "bif_density": {"data": bif_radial_dist}}
-
-
 def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE):
+    '''Extracts the number of trees for a specific tree type'''
     # Extract number of neurites as a precise distribution
     # The output is given in integer numbers which are
     # the permitted values for the number of trees.

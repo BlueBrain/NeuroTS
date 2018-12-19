@@ -2,15 +2,13 @@
 TNS class : Tree
 '''
 import copy
-from enum import Enum
 
 import numpy as np
-from morphio import PointLevel, SectionType
 
+from morphio import PointLevel, SectionType
 from tns.generate.algorithms import basicgrower, tmdgrower, tmdgrower_path
-from tns.generate.section import SectionGrower, SectionGrowerTMD, SectionGrowerPath
-from tns.morphmath import random_tree as rd
-from tns.morphmath import rotation
+from tns.generate.section import (SectionGrower, SectionGrowerPath,
+                                  SectionGrowerTMD)
 
 growth_algorithms = {'tmd': tmdgrower.TMDAlgo,
                      'tmd_apical': tmdgrower.TMDApicalAlgo,
@@ -86,12 +84,17 @@ class TreeGrower(object):
                                             stop_criteria=copy.deepcopy(stop)))
 
     def end(self):
+        '''Ends the growth'''
         return not bool(self.active_sections)
 
-    def order_per_process(self, secs):
+    @staticmethod
+    def order_per_process(secs):
+        '''Orders sections according to process type, major first'''
         return np.copy(secs)[np.argsort([ss.process for ss in secs])]
 
-    def order_per_bif(self, secs):
+    @staticmethod
+    def order_per_bif(secs):
+        '''Orders sections according to bifurcation times'''
         ordered_list = np.argsort([ss.stop_criteria['bif_term']['bif'] for ss in secs])
         return np.copy(secs)[ordered_list]
 
