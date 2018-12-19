@@ -1,6 +1,6 @@
 from numpy import random
 import numpy as np
-import rotation as rt
+from tns.morphmath.rotation import rotate_vector
 from tns.morphmath.utils import norm
 
 
@@ -48,10 +48,10 @@ def get_bif_symmetric(direction, angles):
     # dir1 = rt.vector_from_spherical(phi + phi1, theta + theta1)
     # dir2 = rt.vector_from_spherical(phi - phi1, theta - theta1)
 
-    dir1 = rt.rotate_vector(direction, [0, 0, 1], phi1)
-    dir1 = rt.rotate_vector(dir1, [1, 0, 0], theta1)
-    dir2 = rt.rotate_vector(direction, [0, 0, 1], - phi1)
-    dir2 = rt.rotate_vector(dir2, [1, 0, 0], - theta1)
+    dir1 = rotate_vector(direction, [0, 0, 1], phi1)
+    dir1 = rotate_vector(dir1, [1, 0, 0], theta1)
+    dir2 = rotate_vector(direction, [0, 0, 1], - phi1)
+    dir2 = rotate_vector(dir2, [1, 0, 0], - theta1)
 
     return (np.array(dir1), np.array(dir2))
 
@@ -68,10 +68,10 @@ def get_bif_bio_oriented(direction, angles):
     # dir1 = rt.vector_from_spherical(phi - phi0, theta - theta0)
     # dir2 = rt.vector_from_spherical(phi - phi0 - phi1, theta - theta0 - theta1)
 
-    dir1 = rt.rotate_vector(direction, [0, 0, 1], phi0)
-    dir1 = rt.rotate_vector(dir1, [1, 0, 0], theta0)
-    dir2 = rt.rotate_vector(dir1, [0, 0, 1], phi1)
-    dir2 = rt.rotate_vector(dir2, [1, 0, 0], theta1)
+    dir1 = rotate_vector(direction, [0, 0, 1], phi0)
+    dir1 = rotate_vector(dir1, [1, 0, 0], theta0)
+    dir2 = rotate_vector(dir1, [0, 0, 1], phi1)
+    dir2 = rotate_vector(dir2, [1, 0, 0], theta1)
 
     return (np.array(dir1), np.array(dir2))
 
@@ -109,8 +109,8 @@ def get_bif_directional(direction, angles):
     # dir1 = rt.vector_from_spherical(phi, theta)
     # dir2 = rt.vector_from_spherical(phi - phi1, theta - theta1)
 
-    dir2 = rt.rotate_vector(direction, [0, 0, 1], phi1)
-    dir2 = rt.rotate_vector(dir2, [1, 0, 0], theta1)
+    dir2 = rotate_vector(direction, [0, 0, 1], phi1)
+    dir2 = rotate_vector(dir2, [1, 0, 0], theta1)
 
     return (np.array(direction), np.array(dir2))
 
@@ -125,9 +125,9 @@ def get_bif_directional(direction, angles):
     # dir1 = rt.vector_from_spherical(phi + phi0, theta + theta0)
     # dir2 = rt.vector_from_spherical(phi - phi0, theta - theta0)
 
-#    dir1 = rt.rotate_vector(direction, [0,0,1], phi0)
-#    dir1 = rt.rotate_vector(dir1, [1,0,0], theta0)
-#    dir2 = rt.rotate_vector(dir1, [0,0,1], phi1)
-#    dir2 = rt.rotate_vector(dir2, [1,0,0], theta1)
+#    dir1 = rotate_vector(direction, [0,0,1], phi0)
+#    dir1 = rotate_vector(dir1, [1,0,0], theta0)
+#    dir2 = rotate_vector(dir1, [0,0,1], phi1)
+#    dir2 = rotate_vector(dir2, [1,0,0], theta1)
 
 #    return (np.array(dir1), np.array(dir2))
