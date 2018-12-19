@@ -14,7 +14,8 @@ def default_keys():
             'axon': {}}
 
 
-def distributions(filepath, neurite_types=None, threshold_sec=2, diameter_model=False, feature='radial_distances'):
+def distributions(filepath, neurite_types=None, threshold_sec=2,
+                  diameter_model=False, feature='radial_distances'):
     '''Extracts the input distributions from an input population
     defined by a directory of swc or h5 files
     threshold_sec: defines the minimum accepted number of terminations
@@ -42,9 +43,9 @@ def distributions(filepath, neurite_types=None, threshold_sec=2, diameter_model=
         input_distr[neurite_type].update(from_neurom.number_neurites(pop_nm, nm_type))
         input_distr[neurite_type].update(
             persistent_homology_angles(pop_tmd,
-                                                threshold=threshold_sec,
-                                                neurite_type=neurite_type,
-                                                feature=feature))
+                                       threshold=threshold_sec,
+                                       neurite_type=neurite_type,
+                                       feature=feature))
 
     for ntype in neurite_types:
         fill_input_distributions(input_distributions, ntype)
@@ -55,7 +56,8 @@ def distributions(filepath, neurite_types=None, threshold_sec=2, diameter_model=
     return input_distributions
 
 
-def parameters(name="Test_neuron", origin=(0., 0., 0.), neurite_types=['basal', 'apical', 'axon'], method='trunk'):
+def parameters(name="Test_neuron", origin=(0., 0., 0.),
+               neurite_types=['basal', 'apical', 'axon'], method='trunk'):
     '''Returns a default set of input parameters
        to be used as input for synthesis.
     '''
@@ -81,7 +83,7 @@ def parameters(name="Test_neuron", origin=(0., 0., 0.), neurite_types=['basal', 
                           "orientation": None,
                           "growth_method": method,
                           "branching_method": branching,
-                          "modify":None}
+                          "modify": None}
 
     if 'basal' in neurite_types:
         input_parameters["basal"].update(parameters_default)

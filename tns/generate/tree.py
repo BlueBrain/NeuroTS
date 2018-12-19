@@ -24,9 +24,10 @@ section_growers = {'tmd': SectionGrowerTMD,
                    'tmd_apical': SectionGrowerTMD,
                    'tmd_gradient': SectionGrowerTMD,
                    'tmd_path': SectionGrowerPath,
-                   'tmd_apical_path':SectionGrowerPath,
+                   'tmd_apical_path': SectionGrowerPath,
                    'tmd_gradient_path': SectionGrowerPath,
                    'trunk': SectionGrower}
+
 
 class TreeGrower(object):
     """Tree class"""
@@ -110,7 +111,7 @@ class TreeGrower(object):
         '''
         ordered_sections = self.order_per_process(self.active_sections)
 
-        for section_grower in ordered_sections:#self.active_sections.copy():
+        for section_grower in ordered_sections:  # self.active_sections.copy():
             # the current section_grower is generated
             # In here the stop criterion can be modified accordingly
             state = self.growth_algo.extend(section_grower)
@@ -134,7 +135,8 @@ class TreeGrower(object):
         '''
         ordered_sections = self.order_per_bif(self.active_sections)
 
-        for section_grower in ordered_sections:#np.copy(self.active_sections):#self.active_sections.copy():
+        # np.copy(self.active_sections):#self.active_sections.copy():
+        for section_grower in ordered_sections:
             # the current section_grower is generated
             # In here the stop criterion can be modified accordingly
             state = self.growth_algo.extend(section_grower)

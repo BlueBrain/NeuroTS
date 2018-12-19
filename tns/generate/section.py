@@ -7,11 +7,14 @@ from collections import deque
 
 MEMORY = 5
 
-WEIGHTS = np.exp(np.arange(1, MEMORY + 1) - MEMORY) # Memory decreases with distance from current point
+# Memory decreases with distance from current point
+WEIGHTS = np.exp(np.arange(1, MEMORY + 1) - MEMORY)
+
 
 class SectionGrower(object):
     '''Class for the section
     '''
+
     def __init__(self, parent, children, start_point, direction,
                  randomness, targeting, process, stop_criteria):
         '''A section is a list of points in 4D space (x, y, x, r)
@@ -35,10 +38,10 @@ class SectionGrower(object):
         on the growth method and the previous point.
         """
         direction = self.params["targeting"] * self.direction + \
-                    self.params["randomness"] * get_random_point() + \
-                    self.params["history"] * self.history()
+            self.params["randomness"] * get_random_point() + \
+            self.params["history"] * self.history()
 
-        self.latest_directions.append(direction/vectorial_norm(direction))
+        self.latest_directions.append(direction / vectorial_norm(direction))
         next_point = current_point + direction
         return next_point
 
@@ -51,7 +54,7 @@ class SectionGrower(object):
     def history(self):
         '''Returns a combination of the sections history
         '''
-        n_points = min(MEMORY, len(self.points3D)-1)
+        n_points = min(MEMORY, len(self.points3D) - 1)
 
         if n_points == 0:
             return np.zeros(3)
@@ -122,7 +125,7 @@ class SectionGrowerExponentialProba(SectionGrower):
             self.children = 2.
             return False
 
-        if np.random.random() < np.exp(-(crit["term"] - val)  / scale):
+        if np.random.random() < np.exp(-(crit["term"] - val) / scale):
             self.children = 0.
             return False
 
@@ -130,6 +133,7 @@ class SectionGrowerExponentialProba(SectionGrower):
 
     def get_val(self):
         raise NotImplementedError('Attempt to use abstract class')
+
 
 class SectionGrowerTMD(SectionGrowerExponentialProba):
     def get_val(self):
@@ -139,6 +143,7 @@ class SectionGrowerTMD(SectionGrowerExponentialProba):
 class SectionGrowerPath(SectionGrowerExponentialProba):
     '''Class for the section
     '''
+
     def __init__(self, parent, children, start_point, direction,
                  randomness, targeting, process, stop_criteria):
         '''A section is a list of points in 4D space (x, y, x, r)
@@ -154,4 +159,4 @@ class SectionGrowerPath(SectionGrowerExponentialProba):
         return self.pathlength
 
     def post_next_point(self):
-            self.pathlength += norm(self.latest_directions[-1])
+        self.pathlength += norm(self.latest_directions[-1])

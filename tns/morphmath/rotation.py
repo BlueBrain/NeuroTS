@@ -1,6 +1,7 @@
 import numpy as np
 import math
 
+
 def spherical_from_vector(vect):
     """Returns the spherical coordinates
     of a vector: phi, theta
@@ -34,13 +35,13 @@ def rotation_around_axis(axis, angle):
     cs = np.cos(angle)
 
     eye = np.eye(3, dtype=np.float)
-    #ddt = np.outer(d, d)
-    skew = np.array([[    0,  -d[2],   d[1]],
-                     [ d[2],     0,   -d[0]],
-                     [-d[1],   d[0],     0]], dtype=np.float)
+    # ddt = np.outer(d, d)
+    skew = np.array([[0, -d[2], d[1]],
+                     [d[2], 0, -d[0]],
+                     [-d[1], d[0], 0]], dtype=np.float)
 
-    #mtx = ddt + cs * (eye - ddt) + sn * skew
-    #mtx = cs * eye + sn * skew + (1. - cs) * ddt
+    # mtx = ddt + cs * (eye - ddt) + sn * skew
+    # mtx = cs * eye + sn * skew + (1. - cs) * ddt
     mtx = eye + sn * skew + (1. - cs) * np.linalg.matrix_power(skew, 2)
     return mtx
 
@@ -48,7 +49,8 @@ def rotation_around_axis(axis, angle):
 def angle3D(v1, v2):
     """Returns the angle between v1, v2"""
     def dotproduct(v1, v2):
-        return sum((a*b) for a, b in zip(v1, v2))
+        return sum((a * b) for a, b in zip(v1, v2))
+
     def length(v):
         return math.sqrt(dotproduct(v, v))
     return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))

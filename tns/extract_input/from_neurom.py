@@ -19,7 +19,7 @@ def soma_data(pop):
     # Extract soma size as a normal distribution
     # Returns a dictionary with the soma information
     soma_size = nm.get('soma_radii', pop)
-    ss = stats.fit(soma_size,  distribution='norm')
+    ss = stats.fit(soma_size, distribution='norm')
 
     return {"size": transform_distr(ss)}
 

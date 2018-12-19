@@ -23,7 +23,7 @@ class Distr(object):
         from min, max of a uniform
         """
         return {'loc': params['min'],
-         'scale': params['max'] - params['min']}
+                'scale': params['max'] - params['min']}
 
     def expon(self, params):
         """Returns loc, scale
@@ -31,7 +31,7 @@ class Distr(object):
         from mean, std data
         """
         return {"loc": params["loc"],
-                "scale": 1./params["lambda"]}
+                "scale": 1. / params["lambda"]}
 
     def sample(self):
         """Returns a value according to
@@ -92,7 +92,7 @@ def trunk_angles(distrib, N):
     and the input distribution.
     """
     trunks_d = Distr(distrib['trunk']['orientation_deviation'])
-    angles = [ trunks_d.sample() for i in xrange(N - 1) ]
+    angles = [trunks_d.sample() for i in xrange(N - 1)]
     angles = angles + [sum(angles)]
     return angles
 
@@ -103,7 +103,7 @@ def azimuth_angles(distrib, N):
     and the input distribution.
     """
     trunks_d = Distr(d_transform(distrib['trunk']['azimuth'], np.cos))
-    angles = [ np.arccos(trunks_d.sample()) for i in xrange(N) ]
+    angles = [np.arccos(trunks_d.sample()) for i in xrange(N)]
     return angles
 
 

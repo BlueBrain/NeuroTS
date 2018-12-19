@@ -45,7 +45,7 @@ class TMDAlgo(AbstractAlgo):
         current_length = np.abs(stop["term"] - stop["bif"])
         target_length = np.abs(currentTR - currentBF)
 
-        if not self.bif or target_length==np.inf:
+        if not self.bif or target_length == np.inf:
             return np.inf
         if target_length <= current_length:
             return currentBF
@@ -77,7 +77,8 @@ class TMDAlgo(AbstractAlgo):
 
         stop2 = {"bif_term": {"ref": self.start_point[:3],
                               "bif": b2,
-                              "term": round_num(self.bt_all[currentSec.stop_criteria["bif_term"]["bif"]])}}
+                              "term": round_num(
+                                  self.bt_all[currentSec.stop_criteria["bif_term"]["bif"]])}}
 
         return (stop1, stop2)
 
@@ -115,12 +116,12 @@ class TMDAlgo(AbstractAlgo):
 
         s1 = {'direction': dir1,
               'start_point': start_point,
-              'stop':stop1,
+              'stop': stop1,
               'process': currentSec.process}
 
         s2 = {'direction': dir2,
               'start_point': start_point,
-              'stop':stop2,
+              'stop': stop2,
               'process': currentSec.process}
 
         return s1, s2
@@ -130,8 +131,8 @@ class TMDAlgo(AbstractAlgo):
         must be removed from the TMD grower
         """
         self.term.remove(currentSec.stop_criteria["bif_term"]["term"])
-        #print 'B: ', currentSec.stop_criteria["bif_term"]["bif"],
-        #print ' & removed T: ', currentSec.stop_criteria["bif_term"]["term"]
+        # print 'B: ', currentSec.stop_criteria["bif_term"]["bif"],
+        # print ' & removed T: ', currentSec.stop_criteria["bif_term"]["term"]
 
     def extend(self, currentSec):
         """Definition of stop criterion for the growth of the current section.
@@ -139,12 +140,14 @@ class TMDAlgo(AbstractAlgo):
         bif_term = currentSec.stop_criteria["bif_term"]
 
         if bif_term["bif"] not in self.bif and bif_term["bif"] != np.inf:
-            currentSec.stop_criteria["bif_term"]["bif"] = self.curate_bif(currentSec.stop_criteria["bif_term"],
-                                                                          self.bif[0] if self.bif else np.inf,
-                                                                          round_num(bif_term["term"]))
+            currentSec.stop_criteria["bif_term"]["bif"] = self.curate_bif(
+                currentSec.stop_criteria["bif_term"],
+                self.bif[0] if self.bif else np.inf,
+                round_num(bif_term["term"]))
 
         if bif_term["term"] not in self.term and bif_term["term"] != np.inf:
-            currentSec.stop_criteria["bif_term"]["term"] = np.min(self.term) if self.term else np.inf
+            currentSec.stop_criteria["bif_term"]["term"] = np.min(
+                self.term) if self.term else np.inf
 
         return currentSec.next()
 
@@ -173,7 +176,7 @@ class TMDApicalAlgo(TMDAlgo):
 
         current_rd = norm(np.subtract(currentSec.points3D[-1], self.start_point))
 
-        if currentSec.process=='major':
+        if currentSec.process == 'major':
             dir1, dir2 = bif_methods['directional'](currentSec.direction, angles=ang)
             if current_rd <= self.params['apical_distance']:
                 process1 = 'major'
@@ -191,15 +194,16 @@ class TMDApicalAlgo(TMDAlgo):
 
         s1 = {'direction': dir1,
               'start_point': start_point,
-              'stop':stop1,
-              'process':process1}
+              'stop': stop1,
+              'process': process1}
 
         s2 = {'direction': dir2,
               'start_point': start_point,
-              'stop':stop2,
+              'stop': stop2,
               'process': process2}
 
         return s1, s2
+
 
 class TMDGradientAlgo(TMDApicalAlgo):
     """TreeGrower of TMD apical growth"""
@@ -214,7 +218,7 @@ class TMDGradientAlgo(TMDApicalAlgo):
 
         current_rd = np.linalg.norm(np.subtract(currentSec.points3D[-1], self.start_point))
 
-        if currentSec.process=='major':
+        if currentSec.process == 'major':
             dir1, dir2 = bif_methods['directional'](currentSec.direction, angles=ang)
             if current_rd <= self.params['apical_distance']:
                 process1 = 'major'
@@ -249,12 +253,12 @@ class TMDGradientAlgo(TMDApicalAlgo):
 
         s1 = {'direction': dir1,
               'start_point': start_point,
-              'stop':stop1,
-              'process':process1}
+              'stop': stop1,
+              'process': process1}
 
         s2 = {'direction': dir2,
               'start_point': start_point,
-              'stop':stop2,
+              'stop': stop2,
               'process': process2}
 
         return s1, s2

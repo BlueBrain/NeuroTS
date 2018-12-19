@@ -25,12 +25,9 @@ class SomaGrower(object):
         theta corresponds to the angle on the x-y plane.
         phi corresponds to the angle diversion on the z-axis.
         '''
-        point_on_soma = [self.center[0] + self.radius *
-                         np.cos(phi) * np.sin(theta),
-                         self.center[1] + self.radius *
-                         np.sin(phi) * np.sin(theta),
-                         self.center[2] + self.radius *
-                         np.cos(theta)]
+        point_on_soma = [self.center[0] + self.radius * np.cos(phi) * np.sin(theta),
+                         self.center[1] + self.radius * np.sin(phi) * np.sin(theta),
+                         self.center[2] + self.radius * np.cos(theta)]
 
         return point_on_soma
 

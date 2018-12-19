@@ -53,7 +53,8 @@ class TMDAlgoPath(TMDAlgo):
 
         stop2 = {"bif_term": {"ref": currentSec.pathlength,
                               "bif": b2,
-                              "term": round_num(self.bt_all[currentSec.stop_criteria["bif_term"]["bif"]])}}
+                              "term": round_num(
+                                  self.bt_all[currentSec.stop_criteria["bif_term"]["bif"]])}}
 
         return (stop1, stop2)
 
@@ -73,15 +74,16 @@ class TMDAlgoPath(TMDAlgo):
 
         s1 = {'direction': dir1,
               'start_point': start_point,
-              'stop':stop1,
+              'stop': stop1,
               'process': currentSec.process}
 
         s2 = {'direction': dir2,
               'start_point': start_point,
-              'stop':stop2,
+              'stop': stop2,
               'process': currentSec.process}
 
         return s1, s2
+
 
 class TMDApicalAlgoPath(TMDAlgoPath):
     """TreeGrower of TMD apical growth"""
@@ -106,7 +108,7 @@ class TMDApicalAlgoPath(TMDAlgoPath):
         ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
         current_pd = currentSec.pathlength
 
-        if currentSec.process=='major':
+        if currentSec.process == 'major':
             dir1, dir2 = bif_methods['directional'](currentSec.direction, angles=ang)
             if current_pd <= self.params['apical_distance']:
                 process1 = 'major'
@@ -125,12 +127,12 @@ class TMDApicalAlgoPath(TMDAlgoPath):
 
         s1 = {'direction': dir1,
               'start_point': start_point,
-              'stop':stop1,
-              'process':process1}
+              'stop': stop1,
+              'process': process1}
 
         s2 = {'direction': dir2,
               'start_point': start_point,
-              'stop':stop2,
+              'stop': stop2,
               'process': process2}
 
         return s1, s2
@@ -148,7 +150,7 @@ class TMDGradientAlgoPath(TMDApicalAlgoPath):
         ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
         current_pd = currentSec.pathlength
 
-        if currentSec.process=='major':
+        if currentSec.process == 'major':
             dir1, dir2 = bif_methods['directional'](currentSec.direction, angles=ang)
             if current_pd <= self.params['apical_distance']:
                 process1 = 'major'
@@ -183,12 +185,12 @@ class TMDGradientAlgoPath(TMDApicalAlgoPath):
 
         s1 = {'direction': dir1,
               'start_point': start_point,
-              'stop':stop1,
-              'process':process1}
+              'stop': stop1,
+              'process': process1}
 
         s2 = {'direction': dir2,
               'start_point': start_point,
-              'stop':stop2,
+              'stop': stop2,
               'process': process2}
 
         return s1, s2
