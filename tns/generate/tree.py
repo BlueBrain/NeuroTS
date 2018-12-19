@@ -106,30 +106,6 @@ class TreeGrower(object):
                                      [self.params['radius'] * 2] * len(section.points3D)),
                           SectionType(self.params['tree_type']))
 
-    def next(self):
-        '''Operates the tree growth according to the selected algorithm.
-        '''
-        ordered_sections = self.order_per_process(self.active_sections)
-
-        for section_grower in ordered_sections:  # self.active_sections.copy():
-            # the current section_grower is generated
-            # In here the stop criterion can be modified accordingly
-            state = self.growth_algo.extend(section_grower)
-
-            section = self.append_section(section_grower)
-
-            if state == 'bifurcate':
-                # the current section_grower bifurcates
-                # Returns two section_grower dictionaries: (S1, S2)
-                for child_section in self.growth_algo.bifurcate(section_grower):
-                    self.add_section(parent=section, **child_section)
-                self.active_sections.remove(section_grower)
-
-            elif state == 'terminate':
-                # the current section_grower terminates
-                self.growth_algo.terminate(section_grower)
-                self.active_sections.remove(section_grower)
-
     def next_point(self):
         '''Operates the tree growth according to the selected algorithm.
         '''

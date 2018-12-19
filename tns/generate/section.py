@@ -74,24 +74,10 @@ class SectionGrower(object):
         curr_point = self.points3D[-1]
         point = self.next_point(curr_point)
         self.points3D.append(np.array(point))
+        self.post_next_point()
 
         if self.check_stop():
             return 'continue'
-
-        if self.children == 0:
-            return 'terminate'
-
-        return 'bifurcate'
-
-    def generate(self):
-        '''Creates a section with the selected parameters
-           until at least one stop criterion is fulfilled.
-        '''
-        while self.check_stop():
-            curr_point = self.points3D[-1]
-            point = self.next_point(curr_point)
-            self.points3D.append(np.array(point))
-            self.post_next_point()
 
         if self.children == 0:
             return 'terminate'
