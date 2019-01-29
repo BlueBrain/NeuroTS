@@ -43,3 +43,44 @@ def test_trunk_distr():
     assert_dict_equal(trunkBAS, target_trunkBAS)
     assert_dict_equal(trunkAP, target_trunkAPIC)
 
+import os
+from numpy.testing import assert_equal
+import tns.extract_input as test_module
+import numpy as np
+from numpy.testing import assert_array_almost_equal, assert_array_equal
+
+
+
+import json
+class NeuromJSON(json.JSONEncoder):
+    '''JSON encoder that handles numpy types
+
+    In python3, numpy.dtypes don't serialize to correctly, so a custom converter
+    is needed.
+    '''
+
+    def default(self, o):  # pylint: disable=method-hidden
+        if isinstance(o, np.floating):
+            return float(o)
+        elif isinstance(o, np.integer):
+            return int(o)
+        elif isinstance(o, np.ndarray):
+            return o.tolist()
+        return json.JSONEncoder.default(self, o)
+
+
+def test_distributions():
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    filename = os.path.join(dir_path, '../test_data/bio/')
+    distr = test_module.distributions(filename)
+
+    assert_equal(set(distr.keys()), {'soma', 'basal', 'apical', 'axon'})
+    assert_equal(distr['basal']['num_trees'],
+                 {'data': {'bins': [4, 5, 6, 7, 8, 9], 'weights': [1, 0, 0, 0, 0, 1]}})
+
+def test_parameters():
+    params = test_module.parameters(
+        neurite_types=['basal', 'apical'], method='tmd')
+
+    assert_equal(params,
+    {'basal': {'randomness': 0.15, 'targeting': 0.12, 'radius': 0.3, 'orientation': None, 'growth_method': 'tmd', 'branching_method': 'bio_oriented', 'modify': None, 'tree_type': 3}, 'apical': {'randomness': 0.15, 'targeting': 0.12, 'radius': 0.3, 'orientation': [(0.0, 1.0, 0.0)], 'growth_method': 'tmd_apical', 'branching_method': 'directional', 'modify': None, 'apical_distance': 0.0, 'tree_type': 4}, 'axon': {}, 'origin': (0.0, 0.0, 0.0), 'grow_types': ['basal', 'apical']})

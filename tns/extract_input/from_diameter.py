@@ -56,7 +56,7 @@ def model(neuron):
         term_diam = [terminal_diam(tree)
                      for tree in iter_neurites(neuron, filt=is_type(neurite_type))]
         trunk_diam = [2. * np.max(get('segment_radii', tree))
-                    for tree in iter_neurites(neuron, filt=is_type(neurite_type))]
+                      for tree in iter_neurites(neuron, filt=is_type(neurite_type))]
 
         values[typee - 1] = {"taper": [c for c in chain(*taper)],
                              "term": [c for c in chain(*term_diam)],

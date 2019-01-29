@@ -54,5 +54,6 @@ def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE):
     heights, bins = np.histogram(nneurites, bins=np.arange(np.min(nneurites),
                                                            np.max(nneurites) + 2))
 
+    # pylint: disable=no-member
     return {"num_trees": {"data": {"bins": bins[:-1].tolist(),
                                    "weights": heights.tolist()}}}

@@ -2,6 +2,8 @@
 
 import numpy as np
 
+from scipy import stats
+
 
 class Distr(object):
     '''Class of custom distributions
@@ -44,7 +46,6 @@ class Distr(object):
         """Returns a value according to
         the statistical distribution
         """
-        from scipy import stats
 
         if self.type == "data":
             w = np.array(self.params["weights"], dtype=np.float)

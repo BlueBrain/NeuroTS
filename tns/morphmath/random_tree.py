@@ -10,6 +10,7 @@ def get_random_point(D=1.0):
     The distance between the produced point and (0,0,0)
     is given by the value D.
     '''
+    # pylint: disable=assignment-from-no-return
     phi = np.random.uniform(0., 2. * np.pi)
     theta = np.arccos(np.random.uniform(-1.0, 1.0))
 

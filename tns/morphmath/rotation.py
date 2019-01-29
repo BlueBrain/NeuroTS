@@ -12,6 +12,7 @@ def spherical_from_vector(vect):
     x, y, z = vect
 
     phi = np.arctan2(y, x)
+    # pylint: disable=assignment-from-no-return
     theta = np.arccos(z / np.linalg.norm(vect))
 
     return phi, theta
@@ -51,14 +52,10 @@ def rotation_around_axis(axis, angle):
 
 def angle3D(v1, v2):
     """Returns the angle between v1, v2"""
-    def dotproduct(v1, v2):
-        '''Returns product between vectors'''
-        return sum((a * b) for a, b in zip(v1, v2))
+    v1 = np.array(v1)
+    v2 = np.array(v2)
 
-    def length(v):
-        '''Returns length of vector'''
-        return math.sqrt(dotproduct(v, v))
-    return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
+    return math.acos(v1.dot(v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)))
 
 
 def rotate_vector(vec, axis, angle):

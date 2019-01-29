@@ -1,6 +1,6 @@
 import morphio, neurom, tmd
 
-from tns import extract_input 
+from tns import extract_input
 
 from tns.generate.diametrizer import diametrize_constant_all, diametrize_constant, diametrize_smoothing, diametrize_from_tips, diametrize_from_root
 

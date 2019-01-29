@@ -37,6 +37,7 @@ class SomaGrower(object):
         '''Returns the unit vector that corresponds to the orientation
         of a point on the soma surface.
         '''
+        # pylint: disable=assignment-from-no-return
         point_on_soma = np.subtract(np.array(point), np.array(self.center))
 
         return point_on_soma / norm(point_on_soma)

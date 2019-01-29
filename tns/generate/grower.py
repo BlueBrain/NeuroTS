@@ -6,6 +6,7 @@ from morphio.mut import Morphology
 # from tns.generate.diametrizer import correct_diameters
 from tns.generate.soma import SomaGrower
 from tns.morphmath import sample
+from tns.generate.tree import TreeGrower
 
 bifurcation_methods = ['symmetric', 'bio_oriented', 'directional', 'bio_smoothed', ]
 
@@ -29,13 +30,13 @@ class NeuronGrower(object):
 
         # A list of trees with the corresponding orientations
         # and initial points on the soma surface will be initialized.
-        self.active_neurites = set()
+        self.active_neurites = list()
         self.soma = SomaGrower(initial_point=self.input_parameters["origin"],
                                radius=sample.soma_size(self.input_distributions))
 
     def next(self):
         '''Call the "next" method of each neurite grower'''
-        for grower in self.active_neurites.copy():
+        for grower in list(self.active_neurites):
             if grower.end():
                 self.active_neurites.remove(grower)
             else:
@@ -96,10 +97,8 @@ class NeuronGrower(object):
         as parameters['type']['orientation'] or it is randomly chosen according to the
         biological distribution of trunks on the soma surface if 'orientation' is None.
         """
-        from tns.generate.tree import TreeGrower
 
         for type_of_tree in self.input_parameters['grow_types']:
-
             # Easier to access distributions
             params = self.input_parameters[type_of_tree]
             distr = self.input_distributions[type_of_tree]
@@ -114,11 +113,12 @@ class NeuronGrower(object):
             # with a direction and initial_point
             for p in points:
                 tree_direction = self.soma.orientation_from_point(p)
-                self.active_neurites.add(TreeGrower(self.neuron,
-                                                    initial_direction=tree_direction,
-                                                    initial_point=p,
-                                                    parameters=params,
-                                                    distributions=distr))
+                obj = TreeGrower(self.neuron,
+                                 initial_direction=tree_direction,
+                                 initial_point=p,
+                                 parameters=params,
+                                 distributions=distr)
+                self.active_neurites.append(obj)
 
     def _grow_soma(self, interpolation=None):
         """Generates a soma based on the input_distributions. The coordinates
