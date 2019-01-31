@@ -29,18 +29,19 @@ def soma_data(pop):
     return {"size": transform_distr(ss)}
 
 
-def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE):
+def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30):
     '''Extracts the trunk data for a specific tree type'''
 
     angles = [nm.get('trunk_angles', neuron, neurite_type=neurite_type) for neuron in pop]
     angles = [i for a in angles for i in a]
-    heights, bins = np.histogram(angles, bins=30)
+    heights, bins = np.histogram(angles, bins=bins)
 
     # Extract trunk relative orientations to reshample
+    actual_bins = (bins[1:] + bins[:-1]) / 2.
 
     return {"trunk": {"orientation_deviation": {"data":
-                                                {"bins": (bins[1:] + bins[:-1]) / 2.,
-                                                 "weights": heights}},
+                                                {"bins": actual_bins.tolist(),
+                                                 "weights": heights.tolist()}},
                       "azimuth": {"uniform": {"min": np.pi, "max": 0.0}}}}
 
 
@@ -53,5 +54,5 @@ def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE):
     heights, bins = np.histogram(nneurites, bins=np.arange(np.min(nneurites),
                                                            np.max(nneurites) + 2))
 
-    return {"num_trees": {"data": {"bins": bins[:-1],
-                                   "weights": heights}}}
+    return {"num_trees": {"data": {"bins": bins[:-1].tolist(),
+                                   "weights": heights.tolist()}}}
