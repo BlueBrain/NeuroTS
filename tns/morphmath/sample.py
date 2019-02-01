@@ -10,7 +10,7 @@ class Distr(object):
     def __init__(self, params):
         """Object of statistical distribution
         """
-        self.type = params.keys()[0]
+        self.type = next(iter(params.keys()))
         self.params = params[self.type]
 
     @staticmethod

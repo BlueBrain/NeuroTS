@@ -40,8 +40,8 @@ def merger(sect, model_all, status, rall_ratio):
 def taper_section_diam(section, initial_diam, taper, min_diam=0.07):
     '''Corrects the diameters of a section'''
     taps = taper / len(section.diameters)
-    section.diameters = np.array([initial_diam * ( 1 - i * taps) 
-                                  if initial_diam * ( 1 - i * taps) > min_diam
+    section.diameters = np.array([initial_diam * (1 - i * taps)
+                                  if initial_diam * (1 - i * taps) > min_diam
                                   else min_diam for i in range(len(section.diameters))],
                                   dtype=np.float32)
 
@@ -50,10 +50,11 @@ def smooth_section_diam(section, min_diam=0.07):
     '''Corrects the diameters of a section by smoothing between initial and final diameters'''
     initial_diam = section.diameters[0]
     taps = (np.max(section.diameters) - np.min(section.diameters)) / len(section.diameters)
-    section.diameters = np.array([initial_diam * ( 1 - i * taps) 
-                                  if initial_diam * ( 1 - i * taps) > min_diam
+    section.diameters = np.array([initial_diam * (1 - i * taps)
+                                  if initial_diam * (1 - i * taps) > min_diam
                                   else min_diam for i in range(len(section.diameters))],
                                   dtype=np.float32)
+
 
 def diametrize_from_root(neuron, model_all):
     '''Corrects the diameters of a morphio-neuron according to the model.
@@ -77,7 +78,7 @@ def diametrize_from_root(neuron, model_all):
                     new_diam = d1 * siblings_ratio
                 else:
                     new_diam = d1
-            except:
+            except:  # noqa
                 # This applies only to first tree section
                 new_diam = sample(model['trunk'])
 
