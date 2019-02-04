@@ -10,8 +10,7 @@ def run():
     distr = distributions(filename)
 
     # Generate default parameters dictionary
-    params = tns.extract_input.parameters(
-        neurite_types=['basal', 'apical'], method='tmd')
+    params = tns.extract_input.parameters(neurite_types=['basal', 'apical'], method='tmd')
 
     # Initialize a neuron
     N = tns.NeuronGrower(input_distributions=distr,

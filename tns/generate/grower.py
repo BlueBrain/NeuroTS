@@ -1,6 +1,7 @@
 '''
 TNS class : Grower object that contains the grower functionality.
 '''
+import numpy as np
 # pylint: disable=import-error
 from morphio.mut import Morphology
 # from tns.generate.diametrizer import correct_diameters
@@ -105,6 +106,10 @@ class NeuronGrower(object):
 
             # Sample the number of trees depending on the tree type
             n_trees = sample.n_neurites(distr["num_trees"])
+            if type_of_tree == 'basal' and n_trees < 2:
+                raise Exception('There should be at least 2 basal dendrites (got {})'.format(
+                    n_trees))
+
             orientation = params['orientation']
             # Clean up orientation options in converting function
             points = self._convert_orientation2points(orientation, n_trees, distr)
@@ -126,6 +131,11 @@ class NeuronGrower(object):
         """
         self._grow_trunks()
 
-        self.neuron.soma.points = self.soma.generate_neuron_soma_points3D(
-            interpolation=interpolation).tolist()
-        self.neuron.soma.diameters = [0] * len(self.neuron.soma.points)
+        points = self.soma.points3D
+        if len(points) == 2:
+            self.neuron.soma.points = [np.mean(points, axis=0)]
+            self.neuron.soma.diameters = [np.linalg.norm(points[0] - points[1])]
+        else:
+            self.neuron.soma.points = self.soma.generate_neuron_soma_points3D(
+                interpolation=interpolation).tolist()
+            self.neuron.soma.diameters = [0] * len(self.neuron.soma.points)

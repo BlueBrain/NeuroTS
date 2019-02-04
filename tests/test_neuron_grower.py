@@ -4,14 +4,39 @@ from os.path import join
 from nose.tools import assert_equal
 import numpy as np
 from numpy.testing import assert_array_equal, assert_array_almost_equal
+from mock import patch
 
 import morphio
 
 from tns.extract_input import distributions
+from tns.generate.grower import NeuronGrower
 
 import tns
 
 _path = os.path.dirname(os.path.abspath(__file__))
+
+
+def test_grow_soma():
+    g = NeuronGrower({'origin': [0,0,0]},
+                     {'soma': {'size': {"norm": {"mean": 9, "std": 3}}}})
+
+    with patch.object(g, '_grow_trunks'):
+        # 2 neurite case
+        g.soma.points3D = np.array([[0,0,0], [1,1,1]])
+        g._grow_soma()
+        assert_array_equal(g.neuron.soma.points, [[0.5, 0.5, 0.5]])
+        assert_array_almost_equal(g.neuron.soma.diameters,  [1.732051])
+
+        # normal case
+        g.soma.points3D = np.array([[0,0,0], [1,0,0], [0,1,1], [1,0,0]])
+        g._grow_soma()
+        assert_array_equal(g.neuron.soma.points,
+                           [[0., 0., 0.],
+                            [1., 0., 0.],
+                            [0., 1., 0.],
+                            [1., 0., 0.]])
+        assert_array_equal(g.neuron.soma.diameters,  [0,0,0,0])
+
 
 def test_neuron_grower():
     np.random.seed(0)
