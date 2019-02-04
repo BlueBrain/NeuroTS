@@ -118,9 +118,6 @@ class SectionGrowerExponentialProba(SectionGrower):
         if len(self.points3D) < 2:
             return True
 
-        crit = self.stop_criteria["bif_term"]
-        scale = self.params["scale_prob"]
-
         val = self.get_val()
 
         if self._check(val, "bif"):
