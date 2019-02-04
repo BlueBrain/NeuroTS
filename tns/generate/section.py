@@ -100,6 +100,17 @@ class SectionGrowerExponentialProba(SectionGrower):
 
     The parameter that follows the exponential must be defined in the derived class'''
 
+    def _check(self, value, which):
+        crit = self.stop_criteria["bif_term"]
+        scale = self.params["scale_prob"]
+        assert scale > 0
+        x = crit[which] - value
+        if x < 0:
+            # no need to exponentiate, the comparison below automatically resolves to `True`
+            return True
+        else:
+            return np.random.random() < np.exp(-x)
+
     def check_stop(self):
         '''Probabilities of bifurcating and stopping are proportional
         exp(-distance/scale)'''
@@ -112,11 +123,11 @@ class SectionGrowerExponentialProba(SectionGrower):
 
         val = self.get_val()
 
-        if np.random.random() < np.exp(-(crit["bif"] - val) / scale):
+        if self._check(val, "bif"):
             self.children = 2.
             return False
 
-        if np.random.random() < np.exp(-(crit["term"] - val) / scale):
+        if self._check(val, "term"):
             self.children = 0.
             return False
 
