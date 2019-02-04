@@ -21,7 +21,6 @@ setup(
         'enum34>=1.0.4',
         'scipy>=0.13.3',
         'numpy>=1.8.0',
-        'tmd==2.0.3',
     ],
     packages=find_packages(),
     license='BSD',
