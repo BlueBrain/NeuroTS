@@ -1,13 +1,12 @@
 """ Distribution configuration for morphsynthesis
 """
-import os
-from setuptools import setup
-from setuptools import find_packages
 import imp
-import pip
+
+from setuptools import find_packages, setup
 
 
 VERSION = imp.load_source("tns.version", "tns/version.py").VERSION
+
 
 setup(
     version= VERSION,
