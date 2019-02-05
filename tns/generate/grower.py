@@ -134,7 +134,8 @@ class NeuronGrower(object):
         points = self.soma.points3D
         if len(points) == 2:
             self.neuron.soma.points = [np.mean(points, axis=0)]
-            self.neuron.soma.diameters = [np.linalg.norm(points[0] - points[1])]
+            self.neuron.soma.diameters = [
+                np.linalg.norm(np.array(points[0]) - np.asarray(points[1]))]
         else:
             self.neuron.soma.points = self.soma.generate_neuron_soma_points3D(
                 interpolation=interpolation).tolist()

@@ -22,13 +22,13 @@ def test_grow_soma():
 
     with patch.object(g, '_grow_trunks'):
         # 2 neurite case
-        g.soma.points3D = np.array([[0,0,0], [1,1,1]])
+        g.soma.points3D = [[0,0,0], [1,1,1]]
         g._grow_soma()
         assert_array_equal(g.neuron.soma.points, [[0.5, 0.5, 0.5]])
         assert_array_almost_equal(g.neuron.soma.diameters,  [1.732051])
 
         # normal case
-        g.soma.points3D = np.array([[0,0,0], [1,0,0], [0,1,1], [1,0,0]])
+        g.soma.points3D = [[0,0,0], [1,0,0], [0,1,1], [1,0,0]]
         g._grow_soma()
         assert_array_equal(g.neuron.soma.points,
                            [[0., 0., 0.],
