@@ -1,7 +1,5 @@
-'''Give a diameter to synthesized cells'''
-from collections import deque
+''' Models to create diameters of synthesized cells '''
 import numpy as np
-
 from morphio import SectionType
 
 dict_of_types = {SectionType.apical_dendrite: 4,
@@ -14,52 +12,76 @@ def sample(data):
     return np.random.choice(data)
 
 
+def section_lengths(section):
+    """Computes all segment lengths within section"""
+    return np.linalg.norm(section.points[1:] - section.points[:-1], axis=1)
+
+
+def redefine_diameter_section(section, diam_ind, diam_new):
+    """Hack to replace one diameter at index diam_ind with value diam_new"""
+    section.diameters = np.array(section.diameters.tolist()[:diam_ind] +
+                        [diam_new] + section.diameters.tolist()[diam_ind + 1:])
+    if len(section.points) != len(section.diameters):
+        raise Exception('Mismatch in dimensions of diameters.')
+
+
 def bifurcator(initial_diam, num_children, rall_ratio, siblings_ratio):
     '''Returns the computed bifurcation diameter'''
     # pylint: disable=assignment-from-no-return
-    reduction_factor = np.power(1. + (num_children - 1) * np.power(
-        siblings_ratio, rall_ratio), 1. / rall_ratio)
+    reduction_factor = np.power(1. + (num_children - 1) * np.power(siblings_ratio,
+                                                                   rall_ratio), 1. / rall_ratio)
     return initial_diam / reduction_factor
 
 
-# pylint: disable=unused-argument
-def merger(sect, model_all, status, rall_ratio):
+def merger(section, trunk, rall_ratio):
     '''Returns the computed bifurcation diameter'''
-    # if alltrue(status[[ch.id for ch in sect.children]]):
-    #     diameters_children = []
-    #     for ch in sect.children:
-    #         diameters_children.append(ch.diameters[0])
+    # pylint: disable=assignment-from-no-return
+    # diameters[0] is the duplicate point
+    diameters_children = [ch.diameters[1] for ch in section.children]
+    parent_d = np.power(np.sum([np.power(d, rall_ratio)
+                                for d in diameters_children]), 1. / rall_ratio)
 
-    #     parent_d = np.power(np.sum([np.power(d, rall_ratio)
-    #                                 for d in diameters_children]), 1. / rall_ratio)
-
-    #     if parent_d <= np.max(model['trunk']):
-    #         sect.diameters[-1] = parent_d
-    #     else:
-    #         sect.diameters[-1] = np.max(diameters_children)
-    #     return True  # Action completed, to remove from active sections
-    # else:
-    #     return False  # Action not completed, to keep in active sections
-    return True
+    diam_val = parent_d if parent_d <= trunk else np.max(diameters_children)
+    redefine_diameter_section(section, len(section.diameters) - 1, diam_val)
 
 
-def taper_section_diam(section, initial_diam, taper, min_diam=0.07):
+def taper_section_diam(section, initial_diam, taper, min_diam=0.07, max_diam=100.):
     '''Corrects the diameters of a section'''
-    taps = taper / len(section.diameters)
-    section.diameters = np.array([initial_diam * (1 - i * taps)
-                                  if initial_diam * (1 - i * taps) > min_diam
-                                  else min_diam for i in range(len(section.diameters))],
-                                 dtype=np.float32)
+    diams = [initial_diam]
+    if section.is_root:
+        range_ = range(1, len(section.diameters))
+    else:
+        range_ = range(0, len(section.diameters) - 1)
+
+    # lengths of each segments will be used for scaling of tapering
+    lengths = section_lengths(section)
+    taps = taper / np.sum(lengths)
+
+    for i in range_:
+        new_diam = initial_diam * (1 - np.sum(lengths[:i]) * taps)
+        if new_diam >= max_diam:
+            diams.append(max_diam)
+        elif new_diam <= min_diam:
+            diams.append(min_diam)
+        else:
+            diams.append(new_diam)
+
+    section.diameters = np.array(diams, dtype=np.float32)
 
 
 def smooth_section_diam(section, min_diam=0.07):
     '''Corrects the diameters of a section by smoothing between initial and final diameters'''
-    initial_diam = section.diameters[0]
-    taps = (np.max(section.diameters) - np.min(section.diameters)) / len(section.diameters)
-    section.diameters = np.array([initial_diam * (1 - i * taps)
-                                  if initial_diam * (1 - i * taps) > min_diam
-                                  else min_diam for i in range(len(section.diameters))],
-                                 dtype=np.float32)
+    def sec_mean_taper(sec):
+        """Returns the mean tapering of section"""
+        min_diam = min(sec.diameters)
+        lengths = [np.linalg.norm(i) for i in section.points[1:] - section.points[:-1]]
+        di_li = np.sum([(sec.diameters[i] + sec.diameters[i + 1]) / 2. * lengths[i]
+                        for i in range(len(sec.points) - 1)])
+        return (di_li - min_diam * np.sum(lengths)) / np.sum(lengths)
+
+    taper = sec_mean_taper(section)
+    taper_section_diam(section, section.diameters[0], taper, min_diam=min_diam,
+                       max_diam=np.max(section.diameters))
 
 
 def diametrize_from_root(neuron, model_all):
@@ -67,94 +89,110 @@ def diametrize_from_root(neuron, model_all):
        Starts from the root and moves towards the tips.
     '''
     roots = neuron.root_sections
+    status = {s: False for s in neuron.sections}
 
     for r in roots:
         model = model_all[dict_of_types[r.type]]
-        siblings_ratio = model['siblings_ratio']
-        for s in r.iter():
-            try:
-                # When not first section of the tree
-                par = s.parent
-                children = np.array(par.children)
-                childrenID = np.where(children == s)[0][0]
-                d1 = bifurcator(par.diameters[-1], len(children),
-                                rall_ratio=model['Rall_ratio'],
-                                siblings_ratio=siblings_ratio)
-                if childrenID:
-                    new_diam = d1 * siblings_ratio
-                else:
-                    new_diam = d1
-            except:  # noqa, pylint: disable=bare-except
-                # This applies only to first tree section
-                new_diam = sample(model['trunk'])
+        taper = sample(model['trunk_taper'])
+        taper_section_diam(r, sample(model['trunk']), taper=taper,
+                           min_diam=np.min(model['term']),
+                           max_diam=sample(model['trunk']))
+    active = roots
+    while active:
+        section = active.pop()
+        model = model_all[dict_of_types[section.type]]
 
-            taper_section_diam(s, new_diam, taper=sample(model['taper']),
-                               min_diam=np.min(model['term']))
+        taper = sample(model['taper'])
+
+        if section.is_root:
+            taper = sample(model['trunk_taper'])
+            taper_section_diam(section, sample(model['trunk']), taper=taper,
+                               min_diam=np.min(model['term']),
+                               max_diam=sample(model['trunk']))
+        else:
+            taper_section_diam(section, section.diameters[0], taper=taper,
+                               min_diam=np.min(model['term']),
+                               max_diam=sample(model['trunk']))
+
+        status[section.id] = True  # Tapering of section complete.
+
+        if section.is_root or status[section.parent.id]:
+            children = np.array(section.children)
+            if len(children) > 1:
+                d1 = bifurcator(section.diameters[-1], len(children),
+                                rall_ratio=model['Rall_ratio'],
+                                siblings_ratio=model['siblings_ratio'])
+
+                for i, ch in enumerate(children):
+                    if i == 0:
+                        new_diam = d1
+                    else:
+                        new_diam = d1 * model['siblings_ratio']
+
+                    redefine_diameter_section(ch, 0, new_diam)
+                    active.append(ch)
+
+    for sec in neuron.iter():
+        if not sec.is_root:  # if section is not root replace diameter with parent
+            # Ensures duplicate points consistency. First point will be removed while writen.
+            redefine_diameter_section(sec, 0, sec.parent.diameters[-1])
 
 
 def diametrize_from_tips(neuron, model_all):
     '''Corrects the diameters of a morphio-neuron according to the model.
        Starts from the tips and moves towards the root.
     '''
-    tips = [s for s in neuron.iter() if len(s.children) == 0]
+    tips = [s for s in neuron.iter() if not s.children]
+    status = {s: False for s in neuron.sections}
 
-    for t in tips:
-        model = model_all[t.type]
-        t.diameters[-1] = sample(model['term'])
+    for tip in tips:
+        term = sample(model_all[tip.type]['term'])
+        redefine_diameter_section(tip, len(tip.diameters) - 1, term)
 
-    active = deque(tips)
-
+    active = tips
     while active:
         section = active.pop()
         model = model_all[section.type]
+        taper = sample(model['taper'])
+        init_diam = section.diameters[-1] + taper / np.sum(section_lengths(section))
 
-        status = s = None
+        if section.is_root:
+            taper = sample(model['trunk_taper'])
+        taper_section_diam(section, init_diam, taper=taper, min_diam=np.min(model['term']),
+                           max_diam=sample(model['trunk']))
+        status[section.id] = True  # Tapering of section complete.
 
-        if section.children:
-            # Assign a new diameter to the last point if section is not terminal
-            state = merger(section, model_all, status, model['Rall_ratio'])
-        else:
-            # Assign a new diameter to the last point if section is terminal
-            state = True
+        if not section.is_root:
+            par = section.parent
+            if np.alltrue([status[ch.id] for ch in par.children]):
+                # Assign a new diameter to the last point if section is not terminal
+                merger(par, np.random.choice(model['trunk']), model['Rall_ratio'])
+                active.append(par)
 
-        # Fill in the section with new diameters, only when all children are processed.
-        if state:
-            # Taper within a section
-            taper = - sample(model['taper'])
-            init_diam = section.diameters[-1] + taper
-            taper_section_diam(s, init_diam, taper=taper,
-                               min_diam=np.min(model['term']))
+    for sec in neuron.iter():
+        if not sec.is_root:  # if section is not root replace diameter with parent
+            # Ensures duplicate points consistency. First point will be removed while writen.
+            redefine_diameter_section(sec, 0, sec.parent.diameters[-1])
 
 
-def diametrize_constant(neuron):
-    '''Corrects the diameters of a morphio-neuron according to the model'''
+def diametrize_constant_per_section(neuron):
+    '''Corrects the diameters of a morphio-neuron to make them constant per section'''
+    for sec in neuron.iter():
+        mean_diam = np.mean(sec.diameters)
+        sec.diameters = mean_diam * np.ones(len(sec.diameters))
+
+
+def diametrize_constant_per_neurite(neuron):
+    '''Corrects the diameters of a morphio-neuron to make them constant per neurite'''
     roots = neuron.root_sections
 
-    for r in roots:
-        for s in r.iter():
-            mean_diam = np.mean(s.diameters)
-            s.diameters = mean_diam * np.ones(len(s.diameters))
+    for root in roots:
+        mean_diam = np.mean(np.hstack([sec.diameters for sec in root.iter()]))
+        for sec in root.iter():
+            sec.diameters = mean_diam * np.ones(len(sec.diameters))
 
 
-def diametrize_constant_all(neuron):
-    '''Corrects the diameters of a morphio-neuron according to the model'''
-    # roots = neuron.root_sections
-    # diams = []
-
-    # for r in roots:
-    #     for s in r.iter():
-    #         diams = diams + s.diameters.tolist()
-
-    # mean_diam = np.mean(diams)
-
-    # for r in roots:
-    #     for s in r.iter():
-    #         s.diameters = mean_diam * np.ones(len(s.diameters))
-
-
-def diametrize_smoothing(neuron, model_all):
-    '''Corrects the diameters of a morphio-neuron according to the model'''
-
-    for r in neuron.root_sections:
-        for s in r.iter():
-            smooth_section_diam(s)
+def diametrize_smoothing(neuron):
+    '''Corrects the diameters of a morphio-neuron, by smoothing them within each section'''
+    for sec in neuron.iter():
+        smooth_section_diam(sec)
