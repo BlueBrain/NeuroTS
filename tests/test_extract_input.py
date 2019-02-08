@@ -2,14 +2,19 @@ from nose import tools as nt
 from nose.tools import assert_dict_equal
 import neurom
 import numpy as np
-from numpy.testing import assert_array_almost_equal
+from numpy.testing import assert_array_almost_equal, assert_array_equal, assert_equal
 from tns import extract_input
 import os
+import json
+import tns.extract_input as test_module
+
 
 _path = os.path.dirname(os.path.abspath(__file__))
 POP_PATH = os.path.join(_path, '../test_data/bio/')
+NEU_PATH = os.path.join(_path, '../test_data/diam_simple.swc')
 
 POPUL = neurom.load_neurons(POP_PATH)
+NEU = neurom.load_neurons(NEU_PATH)
 
 def test_num_trees():
     target_numBAS = {'num_trees': {'data': {'bins': [4, 5, 6, 7, 8, 9],
@@ -18,8 +23,8 @@ def test_num_trees():
 
     numBAS = extract_input.from_neurom.number_neurites(POPUL)
     numAX = extract_input.from_neurom.number_neurites(POPUL, neurite_type=neurom.AXON)
-    assert_dict_equal(numBAS, target_numBAS)
-    assert_dict_equal(numAX, target_numAX)
+    assert_equal(numBAS, target_numBAS)
+    assert_equal(numAX, target_numAX)
 
 def test_trunk_distr():
     target_trunkBAS = {'trunk':
@@ -40,18 +45,19 @@ def test_trunk_distr():
 
     trunkAP = extract_input.from_neurom.trunk_neurite(POPUL, neurite_type=neurom.APICAL_DENDRITE, bins=1)
     trunkBAS = extract_input.from_neurom.trunk_neurite(POPUL, bins=10)
-    assert_dict_equal(trunkBAS, target_trunkBAS)
-    assert_dict_equal(trunkAP, target_trunkAPIC)
+    assert_equal(trunkBAS, target_trunkBAS)
+    assert_equal(trunkAP, target_trunkAPIC)
 
-import os
-from numpy.testing import assert_equal
-import tns.extract_input as test_module
-import numpy as np
-from numpy.testing import assert_array_almost_equal, assert_array_equal
+def test_diameter_extract():
+    model0 =  {3: {'Rall_ratio': 0.6666666666666666,
+                   'siblings_ratio': 1.0,
+                   'taper': [0.24000000000000005, 0.1],
+                   'term': [2.0, 2.0],
+                   'trunk': [3.9],
+                   'trunk_taper': [0.3000000000000001]}}
+    assert_equal(model0, extract_input.from_diameter.model(NEU))
 
 
-
-import json
 class NeuromJSON(json.JSONEncoder):
     '''JSON encoder that handles numpy types
 

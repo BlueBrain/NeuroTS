@@ -40,8 +40,8 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30):
     actual_bins = (bins[1:] + bins[:-1]) / 2.
 
     return {"trunk": {"orientation_deviation": {"data":
-                                                {"bins": actual_bins.tolist(),
-                                                 "weights": heights.tolist()}},
+                                                {"bins": actual_bins,
+                                                 "weights": heights}},
                       "azimuth": {"uniform": {"min": np.pi, "max": 0.0}}}}
 
 
@@ -51,9 +51,15 @@ def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE):
     # The output is given in integer numbers which are
     # the permitted values for the number of trees.
     nneurites = nm.get('number_of_neurites', pop, neurite_type=neurite_type)
+    # Clean the data from single basal trees cells
+    if neurite_type == nm.BASAL_DENDRITE and len(np.where(nneurites == 1)[0]) > 0:
+        nneurites[np.where(nneurites == 1)[0]] = 2
+        print("Warning, input population includes cells with single basal trees! " +
+              "The distribution has been altered to include 2 basals minimum.")
+
     heights, bins = np.histogram(nneurites, bins=np.arange(np.min(nneurites),
                                                            np.max(nneurites) + 2))
 
     # pylint: disable=no-member
-    return {"num_trees": {"data": {"bins": bins[:-1].tolist(),
-                                   "weights": heights.tolist()}}}
+    return {"num_trees": {"data": {"bins": bins[:-1],
+                                   "weights": heights}}}
