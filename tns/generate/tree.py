@@ -35,7 +35,8 @@ class TreeGrower(object):
                  initial_direction,
                  initial_point,
                  parameters,
-                 distributions):
+                 distributions,
+                 context=None):
         """TNS Tree Object
 
         Parameters:
@@ -44,6 +45,7 @@ class TreeGrower(object):
             initial_point: 3D vector that defines the starting point of the tree
             parameters including: tree_type, radius, randomness, targeting, apical_distance
             tree_type: an integer indicating the type (choose from 2, 3, 4, 5)
+            context: an object containing contextual information
         """
         self.neuron = neuron
         self.direction = initial_direction
@@ -52,11 +54,13 @@ class TreeGrower(object):
         self.params = parameters
         self.distr = distributions
         self.active_sections = list()
+        self.context = context
         grow_meth = growth_algorithms[self.params["growth_method"]]
 
         self.growth_algo = grow_meth(input_data=self.distr,
                                      params=self.params,
-                                     start_point=self.point)
+                                     start_point=self.point,
+                                     context=context)
 
         stop, num_sec = self.growth_algo.initialize()
 
@@ -81,7 +85,8 @@ class TreeGrower(object):
                                             targeting=self.params["targeting"],
                                             children=children,
                                             process=process,
-                                            stop_criteria=copy.deepcopy(stop)))
+                                            stop_criteria=copy.deepcopy(stop),
+                                            context=self.context))
 
     def end(self):
         '''Ends the growth'''

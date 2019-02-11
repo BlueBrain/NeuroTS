@@ -10,7 +10,7 @@ from tns.morphmath.utils import norm
 class SomaGrower(object):
     """Soma class"""
 
-    def __init__(self, initial_point, radius=1.0):
+    def __init__(self, initial_point, radius=1.0, context=None):
         """TNS Soma Object
 
         Parameters:
@@ -18,6 +18,7 @@ class SomaGrower(object):
         The (x, y, z, d)-coordinates of the x-y surface trace of the soma.
         """
         self.points3D = []
+        self.context = context  # for future, hypothetical use
         self.radius = radius
         self.center = initial_point
 

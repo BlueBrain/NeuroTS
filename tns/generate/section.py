@@ -21,7 +21,7 @@ class SectionGrower(object):
     '''
 
     def __init__(self, parent, children, start_point, direction,
-                 randomness, targeting, process, stop_criteria):
+                 randomness, targeting, process, stop_criteria, context=None):
         '''A section is a list of points in 4D space (x, y, x, r)
         that are sequentially connected to each other. This process
         generates a tubular morphology that resembles a random walk.
@@ -37,6 +37,7 @@ class SectionGrower(object):
         self.stop_criteria = stop_criteria
         self.process = process
         self.latest_directions = deque(maxlen=MEMORY)
+        self.context = context
 
     def next_point(self, current_point):
         """Returns the next point depending
@@ -148,13 +149,14 @@ class SectionGrowerPath(SectionGrowerExponentialProba):
     '''
 
     def __init__(self, parent, children, start_point, direction,
-                 randomness, targeting, process, stop_criteria):
+                 randomness, targeting, process, stop_criteria, context=None):
         '''A section is a list of points in 4D space (x, y, x, r)
         that are sequentially connected to each other. This process
         generates a tubular morphology that resembles a random walk.
         '''
         super(SectionGrowerPath, self).__init__(parent, children, start_point, direction,
-                                                randomness, targeting, process, stop_criteria)
+                                                randomness, targeting, process, stop_criteria,
+                                                context)
 
         self.pathlength = 0 if parent is None else self.stop_criteria['bif_term']['ref']
 

@@ -12,11 +12,13 @@ class AbstractAlgo(object):
     def __init__(self,
                  input_data,
                  params,
-                 start_point):
+                 start_point,
+                 context=None):
         """Abstract TreeGrower Algorithm initialization.
         input_data: dictionary in which data used by the algorithm are stored
         params: parameters needed for growth, it should include the bif_method
         bifurcation method, select from: bio_oriented, symmetric, directional
+        context: an object containing contextual information
         """
 
     @abc.abstractmethod

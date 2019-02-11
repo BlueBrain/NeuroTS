@@ -12,12 +12,13 @@ from tns.morphmath.utils import norm
 class TMDAlgo(AbstractAlgo):
     """TreeGrower of TMD basic growth"""
 
-    def __init__(self, input_data, params, start_point):
+    def __init__(self, input_data, params, start_point, context=None):
         """
         TMD basic grower
         input_data: saves all the data required for the growth
         params: parameters needed for growth, it should include the bif_method
         bifurcation method, select from: bio_oriented, symmetric, directional
+        context: an object containing contextual information
         """
         super(TMDAlgo, self).__init__(input_data, params, start_point)
         self.bif_method = bif_methods[params["branching_method"]]

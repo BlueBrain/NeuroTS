@@ -19,12 +19,14 @@ class NeuronGrower(object):
     consumed by the algorithms and the user-selected parameters are also stored.
     """
 
-    def __init__(self, input_parameters, input_distributions):
+    def __init__(self, input_parameters, input_distributions, context=None):
         """TNS NeuronGrower
         input_parameters: the user-defined parameters
         input_distributions: distributions extracted from biological data
+        context: an object containing contextual information
         """
         self.neuron = Morphology()
+        self.context = context
 
         self.input_parameters = input_parameters
         self.input_distributions = input_distributions
@@ -33,7 +35,8 @@ class NeuronGrower(object):
         # and initial points on the soma surface will be initialized.
         self.active_neurites = list()
         self.soma = SomaGrower(initial_point=self.input_parameters["origin"],
-                               radius=sample.soma_size(self.input_distributions))
+                               radius=sample.soma_size(self.input_distributions),
+                               context=context)
 
     def next(self):
         '''Call the "next" method of each neurite grower'''
@@ -122,7 +125,8 @@ class NeuronGrower(object):
                                  initial_direction=tree_direction,
                                  initial_point=p,
                                  parameters=params,
-                                 distributions=distr)
+                                 distributions=distr,
+                                 context=self.context)
                 self.active_neurites.append(obj)
 
     def _grow_soma(self, interpolation=None):
