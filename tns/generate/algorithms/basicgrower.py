@@ -20,11 +20,8 @@ class TrunkAlgo(AbstractAlgo):
         bifurcation method, select from: bio_oriented, symmetric, directional
         context: an object containing contextual information
         """
-        super(TrunkAlgo, self).__init__(input_data, params, start_point)
+        super(TrunkAlgo, self).__init__(input_data, params, start_point, context)
         self.bif_method = bif_methods[params["branching_method"]]
-        self.params = params
-        self.input_data = input_data
-        self.start_point = start_point
 
     def initialize(self):
         """Generates the data to be used for the initialization

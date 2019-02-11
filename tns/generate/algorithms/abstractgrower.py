@@ -8,18 +8,17 @@ class AbstractAlgo(object):
     # meta class is used to define other classes
     __metaclass__ = abc.ABCMeta
 
-    @abc.abstractmethod
-    def __init__(self,
-                 input_data,
-                 params,
-                 start_point,
-                 context=None):
-        """Abstract TreeGrower Algorithm initialization.
+    def __init__(self, input_data, params, start_point, context):
+        """TreeGrower Algorithm initialization.
         input_data: dictionary in which data used by the algorithm are stored
         params: parameters needed for growth, it should include the bif_method
         bifurcation method, select from: bio_oriented, symmetric, directional
         context: an object containing contextual information
         """
+        self.context = context
+        self.input_data = input_data
+        self.params = params
+        self.start_point = start_point
 
     @abc.abstractmethod
     def initialize(self):
