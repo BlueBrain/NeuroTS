@@ -1,10 +1,14 @@
 '''
 TNS class : Soma
 '''
-from __future__ import print_function
+import logging
+
 import numpy as np
 
 from tns.morphmath.utils import norm
+
+
+L = logging.getLogger()
 
 
 class SomaGrower(object):
@@ -108,11 +112,11 @@ class SomaGrower(object):
             if len(selected) > interpolation:
                 return selected.tolist()
             elif len(points3D) > interpolation:
-                print(fail_msg)
+                L.warning(fail_msg)
                 return points3D.tolist()
-            print(fail_msg)
+            L.warning(fail_msg)
             return interpolation * points3D.tolist()
-        print(fail_msg)
+        L.warning(fail_msg)
         return interpolation * points3D.tolist()
 
     def generate_neuron_soma_points3D(self, interpolation=3):
