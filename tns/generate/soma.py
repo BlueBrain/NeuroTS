@@ -94,8 +94,7 @@ class SomaGrower(object):
 
         return new_points3D
 
-    @staticmethod
-    def interpolate(points3D, interpolation=3):
+    def interpolate(self, points3D, interpolation=10):
         """Finds the convex hull from a list of points
         and returns a number of interpolation points that belong
         on this convex hull.
@@ -104,22 +103,29 @@ class SomaGrower(object):
         """
         from scipy.spatial import ConvexHull  # pylint: disable=no-name-in-module
 
-        fail_msg = 'Warning! Convex hull failed. Original points were saved instead'
+        class TNSError(Exception):
+            '''Raises TNS error'''
 
-        if len(points3D) > interpolation:
-            hull = ConvexHull(points3D)
-            selected = np.array(points3D)[hull.vertices]
-            if len(selected) > interpolation:
-                return selected.tolist()
-            elif len(points3D) > interpolation:
-                L.warning(fail_msg)
-                return points3D.tolist()
-            L.warning(fail_msg)
-            return interpolation * points3D.tolist()
-        L.warning(fail_msg)
-        return interpolation * points3D.tolist()
+        interpolation = np.max([3, interpolation])  # soma must have at least 3 points
 
-    def generate_neuron_soma_points3D(self, interpolation=3):
+        if len(points3D) >= interpolation:
+            points_to_interpolate = points3D
+        else:
+            # Adds points from circle circumference to the soma points.
+            angles = 2 * np.pi * np.random.rand(interpolation - len(points3D))
+            x = self.radius * np.sin(angles) + self.center[0]
+            y = self.radius * np.cos(angles) + self.center[1]
+            z = np.full_like(angles, self.center[2])
+            points_to_interpolate = points3D + [[i, j, k] for i, j, k in zip(x, y, z)]
+
+        hull = ConvexHull(np.array(points_to_interpolate)[:, :2])
+        selected = np.array(points_to_interpolate)[hull.vertices]
+        if len(selected) >= 3:
+            return selected.tolist()
+        else:
+            raise TNSError('Warning! Convex hull failed, contour soma generation failed.')
+
+    def build(self, method='contour'):
         """Generates a soma from a list of points3D,
         in the circumference of a circle of radius R.
         The points will be saved into the neuron object and
@@ -127,9 +133,29 @@ class SomaGrower(object):
         If interpolation is selected points will be generated
         until the expected number of soma points is reached.
         """
-        # Soma 3D points as a contour to be saved in neuron.
-        contour = np.array([self.contour_point(p) for p in self.points3D])
+        if method == 'contour':
+            return self.contour_soma()
+        elif method == 'one_point':
+            return self.one_point_soma()
+        else:
+            return self.original_soma()
 
-        if interpolation is None:
-            return contour
-        return self.interpolate(contour, interpolation=interpolation)
+    def one_point_soma(self):
+        """Generates a single point soma, representing a sphere
+           including the center and the diameter.
+        """
+        soma_points = [self.center]
+        soma_diameters = [self.radius]
+        return soma_points, soma_diameters
+
+    def contour_soma(self):
+        """Generates a contour soma, that consists of all soma points.
+           The contour must contain at least three points.
+        """
+        contour = [self.contour_point(p) for p in self.points3D]
+        soma_pts = self.interpolate(contour)
+        return soma_pts, np.zeros(len(soma_pts))
+
+    def original_soma(self):
+        """Returns the original somata points"""
+        return self.points3D, np.zeros(len(self.points3D))

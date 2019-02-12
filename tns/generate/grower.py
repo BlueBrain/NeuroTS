@@ -1,10 +1,7 @@
 '''
 TNS class : Grower object that contains the grower functionality.
 '''
-import numpy as np
-# pylint: disable=import-error
-from morphio.mut import Morphology
-# from tns.generate.diametrizer import correct_diameters
+from morphio.mut import Morphology  # pylint: disable=import-error
 from tns.generate.soma import SomaGrower
 from tns.morphmath import sample
 from tns.generate.tree import TreeGrower
@@ -54,7 +51,7 @@ class NeuronGrower(object):
 
         Returns the grown neuron
         """
-        self._grow_soma(interpolation=None)
+        self._grow_soma()
         while self.active_neurites:
             self.next()
         return self.neuron
@@ -129,18 +126,12 @@ class NeuronGrower(object):
                                  context=self.context)
                 self.active_neurites.append(obj)
 
-    def _grow_soma(self, interpolation=None):
+    def _grow_soma(self, soma_type='contour'):
         """Generates a soma based on the input_distributions. The coordinates
         of the soma contour are retrieved from the trunks.
         """
         self._grow_trunks()
 
-        points = self.soma.points3D
-        if len(points) == 2:
-            self.neuron.soma.points = [np.mean(points, axis=0)]
-            self.neuron.soma.diameters = [
-                np.linalg.norm(np.array(points[0]) - np.asarray(points[1]))]
-        else:
-            self.neuron.soma.points = self.soma.generate_neuron_soma_points3D(
-                interpolation=interpolation).tolist()
-            self.neuron.soma.diameters = [0] * len(self.neuron.soma.points)
+        points, diameters = self.soma.build(soma_type)
+        self.neuron.soma.points = points
+        self.neuron.soma.diameters = diameters
