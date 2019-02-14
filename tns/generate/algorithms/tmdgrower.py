@@ -20,7 +20,7 @@ class TMDAlgo(AbstractAlgo):
         bifurcation method, select from: bio_oriented, symmetric, directional
         context: an object containing contextual information
         """
-        super(TMDAlgo, self).__init__(input_data, params, start_point)
+        super(TMDAlgo, self).__init__(input_data, params, start_point, context)
         self.bif_method = bif_methods[params["branching_method"]]
         self.params = params
         self.ph_angles = sample.ph(input_data["persistence_diagram"])
