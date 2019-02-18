@@ -64,11 +64,11 @@ class SomaGrower(object):
         angle_norm = 2. * np.pi / len(trunk_angles)
         new_points3D = []
 
-        for i, theta in enumerate(np.array(trunk_angles)[sortIDs]):
+        for i, phi in enumerate(np.array(trunk_angles)[sortIDs]):
 
-            phi = np.array(z_angles)[sortIDs][i]
+            theta = np.array(z_angles)[sortIDs][i]
             ang = (i + 1) * angle_norm
-            point = self.point_from_trunk_direction(theta + ang, phi)
+            point = self.point_from_trunk_direction(phi + ang, theta)
 
             new_points3D.append(point)
 

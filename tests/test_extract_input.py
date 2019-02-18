@@ -76,8 +76,7 @@ class NeuromJSON(json.JSONEncoder):
 
 
 def test_distributions():
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    filename = os.path.join(dir_path, '../test_data/bio/')
+    filename = os.path.join(_path, '../test_data/bio/')
     distr = test_module.distributions(filename)
 
     assert_equal(set(distr.keys()), {'soma', 'basal', 'apical', 'axon'})

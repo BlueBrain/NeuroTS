@@ -4,7 +4,7 @@ import neurom as nm
 import tmd
 from tns.extract_input.from_TMD import persistent_homology_angles
 from tns.extract_input.from_neurom import soma_data, trunk_neurite, number_neurites
-from tns.extract_input.from_diameter import population_model, model
+from tns.extract_input import from_diameter
 
 
 def default_keys():
@@ -16,11 +16,14 @@ def default_keys():
 
 
 def distributions(filepath, neurite_types=None, threshold_sec=2,
-                  diameter_model=False, feature='radial_distances'):
+                  diameter_input_morph=False, feature='radial_distances'):
     '''Extracts the input distributions from an input population
     defined by a directory of swc or h5 files
     threshold_sec: defines the minimum accepted number of terminations
-    diameter_model: defines if the diameter model will be extracted
+    diameter_input_morph: if provided it will be used for the generation
+                          of diameter model
+    feature: defines the TMD feature that will be used to extract the
+             persistence barcode: radial_distances, path_distances
     '''
     # Assume all neurite_types will be extracted if neurite_types is None
     if neurite_types is None:
@@ -51,8 +54,12 @@ def distributions(filepath, neurite_types=None, threshold_sec=2,
     for ntype in neurite_types:
         fill_input_distributions(input_distributions, ntype)
 
-    if diameter_model:
-        input_distributions["diameter_model"] = population_model(pop_nm)
+    # In order to create diameter model an exemplar morphology is required
+    # This is provided by diameter_input_morph
+    if diameter_input_morph:
+        neu_exemplar = nm.load_neuron(diameter_input_morph)
+        input_distributions["diameter"] = from_diameter.model(neu_exemplar)
+        input_distributions["diameter"]["method"] = 'M5'  # By default, diametrize from_tips
 
     return input_distributions
 
@@ -74,7 +81,7 @@ def parameters(origin=(0., 0., 0.), method='trunk', neurite_types=None):
 
     if method == 'trunk':
         branching = 'random'
-    elif method == 'tmd':
+    elif method == 'tmd' or method == 'tmd_path':
         branching = 'bio_oriented'
 
     parameters_default = {"randomness": 0.15,
@@ -93,10 +100,12 @@ def parameters(origin=(0., 0., 0.), method='trunk', neurite_types=None):
         input_parameters["apical"].update(parameters_default)
         input_parameters["apical"].update({"apical_distance": 0.0,
                                            "tree_type": 4,
+                                           "branching_method": "directional",
                                            "orientation": [(0., 1., 0.)], })
         if method == 'tmd':
             input_parameters["apical"]["growth_method"] = 'tmd_apical'
-            input_parameters["apical"]["branching_method"] = 'directional'
+        if method == 'tmd_path':
+            input_parameters["apical"]["growth_method"] = 'tmd_apical_path'
 
     if 'axon' in neurite_types:
         input_parameters["axon"].update(parameters_default)
@@ -106,21 +115,3 @@ def parameters(origin=(0., 0., 0.), method='trunk', neurite_types=None):
     input_parameters['grow_types'] = neurite_types
 
     return input_parameters
-
-
-def diameter_distributions(filepath):
-    '''Extracts the input diameter distributions from an input population
-       defined by a directory of swc or h5 files
-    '''
-    import os
-
-    if os.path.isdir(filepath):
-        pop_nm = nm.load_neurons(filepath)
-        d_model = population_model(pop_nm)
-    elif os.path.isfile(filepath):
-        neu_nm = nm.load_neuron(filepath)
-        d_model = model(neu_nm)
-    else:
-        raise IOError("No directory or file found that matches the selected filepath!")
-
-    return {"diameter_model": d_model}

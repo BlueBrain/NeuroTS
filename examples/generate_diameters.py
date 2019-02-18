@@ -2,27 +2,28 @@ import morphio, neurom, tmd
 
 from tns import extract_input
 
-from tns.generate.diametrizer import diametrize_constant_all, diametrize_constant, diametrize_smoothing, diametrize_from_tips, diametrize_from_root
+from tns.generate import diametrizer
 
 k0 = neurom.load_neuron('./Input_cells/C060114A5.h5')
 model0 = extract_input.from_diameter.model(k0)
 
 n0 = morphio.mut.Morphology('./Output_cells/C060114A5.h5')
-diametrize_constant(n0)
-n0.write('test_algo1.asc')
+diametrizer.build(n0, diam_method='M1')  # Constant diameters per neurite
+n0.write('M1_cell.asc')
 
 n0 = morphio.mut.Morphology('./Output_cells/C060114A5.h5')
-diametrize_constant_all(n0)
-n0.write('test_algo2.asc')
+diametrizer.build(n0, diam_method='M2')  # Constant diameters per section
+n0.write('M2_cell.asc')
 
 n0 = morphio.mut.Morphology('./Output_cells/C060114A5.h5')
-diametrize_smoothing(n0)
-n0.write('test_algo3.asc')
+diametrizer.build(n0, diam_method='M3')  # Smooth input diameters
+n0.write('M3_cell.asc')
 
 n0 = morphio.mut.Morphology('./Output_cells/C060114A5.h5')
-diametrize_from_tips(n0, model0)
-n0.write('test_algo4.asc')
+diametrizer.build(n0, diam_method='M4')  # Fix diameters from root
+n0.write('M4_cell.asc')
 
 n0 = morphio.mut.Morphology('./Output_cells/C060114A5.h5')
-diametrize_from_root(n0, model0)
-n0.write('test_algo5.asc')
+diametrizer.build(n0, diam_method='M5')  # Fix diameters from tips
+n0.write('M5_cell.asc')
+

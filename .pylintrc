@@ -12,7 +12,7 @@ max-args=10
 # with leading underscore
 ignored-argument-names=_.*
 # Maximum number of locals for function / method body
-max-locals=15
+max-locals=17
 # Maximum number of return / yield for function / method body
 max-returns=6
 # Maximum number of branch for function / method body
