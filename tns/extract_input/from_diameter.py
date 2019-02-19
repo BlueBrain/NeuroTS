@@ -8,6 +8,8 @@ from neurom.core import Tree, iter_neurites
 from neurom.core.types import tree_type_checker as is_type
 from neurom.morphmath import segment_length, segment_radius
 
+from tns.morphio_utils import NEUROM_TYPE_TO_STR
+
 default_model = {'Rall_ratio': 2. / 3.,
                  'siblings_ratio': 1.}
 
@@ -50,11 +52,7 @@ def model(neuron):
 
     values = {}
 
-    types_to_process = {tree.type.value: tree.type for tree in neuron.neurites}
-
-    for typee in types_to_process:
-
-        neurite_type = types_to_process[typee]
+    for neurite_type in set(tree.type for tree in neuron.neurites):
         taper = [section_taper(tree) for tree in iter_neurites(neuron,
                                                                filt=is_type(neurite_type))]
         trunk_taper = np.array([section_trunk_taper(tree)
@@ -70,12 +68,13 @@ def model(neuron):
         trunk_diam = [2. * np.max(get('segment_radii', tree))
                       for tree in iter_neurites(neuron, filt=is_type(neurite_type))]
 
-        values[typee - 1] = {"taper": taper_c,
+        key = NEUROM_TYPE_TO_STR[neurite_type]
+        values[key] = {"taper": taper_c,
                              "term": [c for c in chain(*term_diam)],
                              "trunk": trunk_diam,
                              "trunk_taper": trunk_taper}
 
-        values[typee - 1].update(default_model)
+        values[key].update(default_model)
 
     return values
 

@@ -13,18 +13,18 @@ NEU_PATH1 = os.path.join(_path, '../test_data/diam_simple.swc')
 NEU_PATH2 = os.path.join(_path, '../test_data/simple.swc')
 NEU_PATH3 = os.path.join(_path, '../test_data/diam_simple_axon.swc')
 
-MODEL = {3: {'Rall_ratio': 2./3.,
-             'siblings_ratio': 1.0,
-             'taper': [0.1],
-             'term':  [0.6],
-             'trunk': [4., 3.],
-             'trunk_taper': [0.6]},
-         2: {'Rall_ratio': 2./3.,
-             'siblings_ratio': 1.0,
-             'taper': [0.1],
-             'term':  [0.6],
-             'trunk': [4., 3.],
-             'trunk_taper': [0.6]}}
+MODEL = {'basal': {'Rall_ratio': 2./3.,
+                   'siblings_ratio': 1.0,
+                   'taper': [0.1],
+                   'term':  [0.6],
+                   'trunk': [4., 3.],
+                   'trunk_taper': [0.6]},
+         'axon': {'Rall_ratio': 2./3.,
+                  'siblings_ratio': 1.0,
+                  'taper': [0.1],
+                  'term':  [0.6],
+                  'trunk': [4., 3.],
+                  'trunk_taper': [0.6]}}
 
 def test_sample():
     assert(diametrizer.sample([0.]) == 0.)

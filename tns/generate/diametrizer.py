@@ -1,6 +1,6 @@
 ''' Models to create diameters of synthesized cells '''
 import numpy as np
-from tns.morphio_utils import DICT_OF_TYPES, STR_TO_TYPES
+from tns.morphio_utils import STR_TO_TYPES, TYPE_TO_STR
 from tns.morphio_utils import section_filter, root_section_filter
 
 
@@ -112,7 +112,7 @@ def diametrize_from_root(neuron, model_all, neurite_type=None):
     '''
     for r in root_section_filter(neuron, tree_type=neurite_type):
 
-        model = model_all[DICT_OF_TYPES[r.type]]  # Selected by the root type.
+        model = model_all[TYPE_TO_STR[r.type]]  # Selected by the root type.
         trunk_diam = sample(model['trunk'])
         min_diam = np.min(model['term'])
         status = {s.id: False for s in r.iter()}
@@ -157,8 +157,7 @@ def diametrize_from_tips(neuron, model_all, neurite_type=None):
        Starts from the tips and moves towards the root.
     '''
     for r in root_section_filter(neuron, tree_type=neurite_type):
-
-        model = model_all[DICT_OF_TYPES[r.type]]  # Selected by the root type.
+        model = model_all[TYPE_TO_STR[r.type]]  # Selected by the root type.
         trunk_diam = sample(model['trunk'])
         min_diam = np.min(model['term'])
         tips = [s for s in r.iter() if not s.children]

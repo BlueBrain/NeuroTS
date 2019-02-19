@@ -1,13 +1,21 @@
 ''' Models to create diameters of synthesized cells '''
+from neurom import NeuriteType
 from morphio import SectionType
-
-DICT_OF_TYPES = {SectionType.apical_dendrite: 4,
-                 SectionType.basal_dendrite: 3,
-                 SectionType.axon: 2}
 
 STR_TO_TYPES = {'apical': SectionType.apical_dendrite,
                 'basal': SectionType.basal_dendrite,
                 'axon': SectionType.axon}
+
+TYPE_TO_STR = {SectionType.apical_dendrite: 'apical',
+               SectionType.basal_dendrite: 'basal',
+               SectionType.axon: 'axon',
+               SectionType.soma: 'soma'}
+
+
+NEUROM_TYPE_TO_STR = {NeuriteType.apical_dendrite: 'apical',
+                      NeuriteType.basal_dendrite: 'basal',
+                      NeuriteType.soma: 'soma',
+                      NeuriteType.axon: 'axon'}
 
 
 def section_filter(neuron, tree_type=None):
