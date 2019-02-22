@@ -6,7 +6,7 @@ import logging
 import numpy as np
 
 from tns.morphmath.utils import norm
-
+from tns.utils import TNSError
 
 L = logging.getLogger()
 
@@ -102,9 +102,6 @@ class SomaGrower(object):
         points: initial set of points
         """
         from scipy.spatial import ConvexHull  # pylint: disable=no-name-in-module
-
-        class TNSError(Exception):
-            '''Raises TNS error'''
 
         interpolation = np.max([3, interpolation])  # soma must have at least 3 points
 

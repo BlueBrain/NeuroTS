@@ -49,13 +49,18 @@ def test_trunk_distr():
     assert_equal(trunkAP, target_trunkAPIC)
 
 def test_diameter_extract():
-    assert_equal(extract_input.from_diameter.model(NEU),
-                 {'basal': {'Rall_ratio': 0.6666666666666666,
-                        'siblings_ratio': 1.0,
-                        'taper': [0.24000000000000005, 0.1],
-                        'term': [2.0, 2.0],
-                        'trunk': [3.9],
-                        'trunk_taper': [0.3000000000000001]}})
+    res = extract_input.from_diameter.model(NEU)
+    assert_equal(set(res.keys()), {'basal'})
+    expected = {'Rall_ratio': 1.5,
+                'siblings_ratio': 1.0,
+                'taper': [0.24, 0.1],
+                'term': [2.0, 2.0],
+                'trunk': [3.9],
+                'trunk_taper': [0.30]}
+
+    assert_equal(res['basal'].keys(), expected.keys())
+    for key in expected.keys():
+        assert_array_almost_equal(res['basal'][key], expected[key])
 
 
 class NeuromJSON(json.JSONEncoder):

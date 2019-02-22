@@ -9,8 +9,9 @@ from neurom.core.types import tree_type_checker as is_type
 from neurom.morphmath import segment_length, segment_radius
 
 from tns.morphio_utils import NEUROM_TYPE_TO_STR
+from tns.utils import _check
 
-default_model = {'Rall_ratio': 2. / 3.,
+default_model = {'Rall_ratio': 3. / 2.,
                  'siblings_ratio': 1.}
 
 
@@ -26,7 +27,9 @@ def section_mean_taper(s):
 
 def terminal_diam(tree):
     """Returns the model for the terminations"""
-    term_diam = [2. * t.points[-1, 3] for t in Tree.ileaf(next(tree.iter_sections()))]
+    mean_diam = np.mean(tree.points[:, 3])
+    term_diam = [2. * t.points[-1, 3] for t in Tree.ileaf(next(tree.iter_sections()))
+                 if t.points[-1, 3] < 1.2 * mean_diam]
 
     return term_diam
 
@@ -46,71 +49,34 @@ def section_trunk_taper(tree):
     return section_mean_taper(next(tree.iter_sections()))
 
 
-def model(neuron):
-    """Measures the statistical properties of a neuron's
-       diameters and outputs a diameter_model"""
-
+def model(input_object):
+    """Measures the statistical properties of an input_object's
+       diameters and outputs a diameter_model
+       Input can be a population of neurons, or a single neuron.
+    """
     values = {}
 
-    for neurite_type in set(tree.type for tree in neuron.neurites):
-        taper = [section_taper(tree) for tree in iter_neurites(neuron,
-                                                               filt=is_type(neurite_type))]
-        trunk_taper = np.array([section_trunk_taper(tree)
-                                for tree in iter_neurites(neuron,
-                                                          filt=is_type(neurite_type))])
+    for neurite_type in set(tree.type for tree in input_object.neurites):
+
+        neurites = list(iter_neurites(input_object, filt=is_type(neurite_type)))
+
+        taper = [section_taper(tree) for tree in neurites]
+        trunk_taper = np.array([section_trunk_taper(tree) for tree in neurites])
         taper_c = np.array(list(chain(*taper)))
         # Keep only positive, non-zero taper rates
-        taper_c = taper_c[np.where(taper_c > 0)[0]]
-        trunk_taper = trunk_taper[np.where(trunk_taper > 0.0)[0]]
-
-        term_diam = [terminal_diam(tree)
-                     for tree in iter_neurites(neuron, filt=is_type(neurite_type))]
-        trunk_diam = [2. * np.max(get('segment_radii', tree))
-                      for tree in iter_neurites(neuron, filt=is_type(neurite_type))]
+        taper_c = taper_c[np.where(taper_c > 0.00001)[0]]
+        trunk_taper = trunk_taper[np.where(trunk_taper >= 0.0)[0]]
+        term_diam = [terminal_diam(tree) for tree in neurites]
+        trunk_diam = [2. * np.max(get('segment_radii', tree)) for tree in neurites]
 
         key = NEUROM_TYPE_TO_STR[neurite_type]
+
         values[key] = {"taper": taper_c,
-                             "term": [c for c in chain(*term_diam)],
-                             "trunk": trunk_diam,
-                             "trunk_taper": trunk_taper}
+                       "term": [c for c in chain(*term_diam)],
+                       "trunk": trunk_diam,
+                       "trunk_taper": trunk_taper}
 
+        _check(values[key])
         values[key].update(default_model)
-
-    return values
-
-
-def get_taper(neurons, neurite_type):
-    '''get taper'''
-    return [section_taper(tree) for tree in iter_neurites(neurons, filt=is_type(neurite_type))]
-
-
-def get_term_diam(neurons, neurite_type):
-    '''get term'''
-    return [terminal_diam(tree)
-            for tree in iter_neurites(neurons, filt=is_type(neurite_type))]
-
-
-def population_model(neurons):
-    """Measures the statistical properties of a neuron's
-       diameters and outputs a diameter_model"""
-
-    values = {}
-
-    types_to_process = {tree.type.value: tree.type for tree in neurons.neurites}
-
-    for typee in types_to_process:
-
-        neurite_type = types_to_process[typee]
-
-        values[typee - 1] = {
-            "taper": [c for c in chain(*get_taper(neurons, neurite_type))],
-            "term": [c for c in chain(*get_term_diam(neurons, neurite_type))],
-            "trunk": [
-                2. * np.max(get('segment_radii', tree))
-                for tree in iter_neurites(neurons, filt=is_type(neurite_type))
-            ]
-        }
-
-        values[typee - 1].update(default_model)
 
     return values
