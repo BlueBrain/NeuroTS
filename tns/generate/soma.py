@@ -5,8 +5,8 @@ import logging
 
 import numpy as np
 
-from tns.morphmath.utils import norm
 from tns.utils import TNSError
+from tns.morphmath.utils import norm
 
 L = logging.getLogger()
 

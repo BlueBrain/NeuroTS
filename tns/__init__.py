@@ -10,4 +10,5 @@
 """
 
 
+from tns.utils import TNSError
 from tns.generate.grower import NeuronGrower

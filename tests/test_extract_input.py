@@ -1,20 +1,23 @@
 from nose import tools as nt
 from nose.tools import assert_dict_equal
 import neurom
+from neurom import load_neurons
 import numpy as np
-from numpy.testing import assert_array_almost_equal, assert_array_equal, assert_equal
+from numpy.testing import assert_array_almost_equal, assert_array_equal, assert_equal, assert_raises
 from tns import extract_input
 import os
 import json
+
+from tns import TNSError
 import tns.extract_input as test_module
 
 
-_path = os.path.dirname(os.path.abspath(__file__))
-POP_PATH = os.path.join(_path, '../test_data/bio/')
-NEU_PATH = os.path.join(_path, '../test_data/diam_simple.swc')
+_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'test_data')
+POP_PATH = os.path.join(_PATH, 'bio/')
+NEU_PATH = os.path.join(_PATH, 'diam_simple.swc')
 
-POPUL = neurom.load_neurons(POP_PATH)
-NEU = neurom.load_neurons(NEU_PATH)
+POPUL = load_neurons(POP_PATH)
+NEU = load_neurons(NEU_PATH)
 
 def test_num_trees():
     target_numBAS = {'num_trees': {'data': {'bins': [4, 5, 6, 7, 8, 9],
@@ -62,6 +65,10 @@ def test_diameter_extract():
     for key in expected.keys():
         assert_array_almost_equal(res['basal'][key], expected[key])
 
+    assert_raises(TNSError, extract_input.from_diameter.model,
+                  load_neurons(os.path.join(_PATH, 'simple.swc')))
+
+
 
 class NeuromJSON(json.JSONEncoder):
     '''JSON encoder that handles numpy types
@@ -81,7 +88,7 @@ class NeuromJSON(json.JSONEncoder):
 
 
 def test_distributions():
-    filename = os.path.join(_path, '../test_data/bio/')
+    filename = os.path.join(_PATH, 'bio/')
     distr = test_module.distributions(filename)
 
     assert_equal(set(distr.keys()), {'soma', 'basal', 'apical', 'axon'})
