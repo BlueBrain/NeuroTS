@@ -17,7 +17,7 @@ setup(
         'matplotlib>=1.3.1',
         'morphio>=2.0.0',
         'neurom>=1.4.7',
-        'tmd>=2.0.3',
+        'tmd>=2.0.4',
         'enum34>=1.0.4',
         'scipy>=0.13.3',
         'numpy>=1.15.0',

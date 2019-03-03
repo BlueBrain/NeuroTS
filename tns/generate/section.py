@@ -37,6 +37,7 @@ class SectionGrower(object):
         self.stop_criteria = stop_criteria
         self.process = process
         self.latest_directions = deque(maxlen=MEMORY)
+        self.latest_directions_normed = deque(maxlen=MEMORY)
         self.context = context
 
     def next_point(self, current_point):
@@ -47,9 +48,8 @@ class SectionGrower(object):
             self.params["randomness"] * get_random_point() + \
             self.params["history"] * self.history()
 
-        self.latest_directions.append(direction / vectorial_norm(direction))
         next_point = current_point + direction
-        return next_point
+        return next_point, direction
 
     def check_stop(self):
         """Checks if any num_seg criteria is fullfiled.
@@ -65,7 +65,7 @@ class SectionGrower(object):
         if n_points == 0:
             return np.zeros(3)
 
-        hist = np.dot(WEIGHTS[MEMORY - n_points:], self.latest_directions)
+        hist = np.dot(WEIGHTS[MEMORY - n_points:], self.latest_directions_normed)
         distance = vectorial_norm(hist)
 
         if distance > 0:
@@ -78,7 +78,9 @@ class SectionGrower(object):
            bifurcate, terminate or continue.
         '''
         curr_point = self.points3D[-1]
-        point = self.next_point(curr_point)
+        point, direction = self.next_point(curr_point)
+        self.latest_directions.append(direction)
+        self.latest_directions_normed.append(direction / vectorial_norm(direction))
         self.points3D.append(np.array(point))
         self.post_next_point()
 
