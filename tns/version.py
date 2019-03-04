@@ -1,2 +1,2 @@
 """ tns version """
-VERSION = "1.0.8.dev0"
+VERSION = "1.0.8"
