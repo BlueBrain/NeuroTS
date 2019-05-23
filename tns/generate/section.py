@@ -29,7 +29,7 @@ class SectionGrower(object):
         self.parent = parent
         self.direction = direction
         self.children = children
-        self.points3D = [np.array(start_point[:3])]
+        self.points = [np.array(start_point[:3])]
         self.params = {"randomness": randomness,
                        "targeting": targeting,
                        "scale_prob": 1.0,
@@ -55,12 +55,12 @@ class SectionGrower(object):
         """Checks if any num_seg criteria is fullfiled.
         If it is it returns False and the growth stops.
         """
-        return len(self.points3D) < self.stop_criteria["num_seg"]
+        return len(self.points) < self.stop_criteria["num_seg"]
 
     def history(self):
         '''Returns a combination of the sections history
         '''
-        n_points = min(MEMORY, len(self.points3D) - 1)
+        n_points = min(MEMORY, len(self.points) - 1)
 
         if n_points == 0:
             return np.zeros(3)
@@ -77,11 +77,11 @@ class SectionGrower(object):
         '''Creates one point and returns the next state.
            bifurcate, terminate or continue.
         '''
-        curr_point = self.points3D[-1]
+        curr_point = self.points[-1]
         point, direction = self.next_point(curr_point)
         self.latest_directions.append(direction)
         self.latest_directions_normed.append(direction / vectorial_norm(direction))
-        self.points3D.append(np.array(point))
+        self.points.append(point)
         self.post_next_point()
 
         if self.check_stop():
@@ -118,7 +118,7 @@ class SectionGrowerExponentialProba(SectionGrower):
         '''Probabilities of bifurcating and stopping are proportional
         exp(-distance/scale)'''
 
-        if len(self.points3D) < 2:
+        if len(self.points) < 2:
             return True
 
         val = self.get_val()
@@ -143,7 +143,7 @@ class SectionGrowerTMD(SectionGrowerExponentialProba):
     '''
     def get_val(self):
         '''Returns radial distance'''
-        return norm(np.subtract(self.points3D[-1], self.stop_criteria["bif_term"]["ref"]))
+        return norm(np.subtract(self.points[-1], self.stop_criteria["bif_term"]["ref"]))
 
 
 class SectionGrowerPath(SectionGrowerExponentialProba):

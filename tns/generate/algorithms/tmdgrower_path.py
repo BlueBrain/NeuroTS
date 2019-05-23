@@ -67,7 +67,7 @@ class TMDAlgoPath(TMDAlgo):
         ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
         dir1, dir2 = self.bif_method(currentSec.history(), angles=ang)
 
-        start_point = np.array(currentSec.points3D[-1])
+        start_point = np.array(currentSec.points[-1])
 
         stop1, stop2 = self.get_stop_criteria(currentSec)
 
@@ -120,7 +120,7 @@ class TMDApicalAlgoPath(TMDAlgoPath):
             process1 = 'secondary'
             process2 = 'secondary'
 
-        start_point = np.array(currentSec.points3D[-1])
+        start_point = np.array(currentSec.points[-1])
 
         stop1, stop2 = self.get_stop_criteria(currentSec)
 
@@ -180,7 +180,7 @@ class TMDGradientAlgoPath(TMDApicalAlgoPath):
             process1, dir1 = majorize_process(stop1, process1, dir1)
         process2, dir2 = majorize_process(stop2, process2, dir2)
 
-        start_point = np.array(currentSec.points3D[-1])
+        start_point = np.array(currentSec.points[-1])
 
         s1 = {'direction': dir1,
               'start_point': start_point,

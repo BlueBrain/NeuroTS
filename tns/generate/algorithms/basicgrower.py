@@ -39,7 +39,7 @@ class TrunkAlgo(AbstractAlgo):
         generation of two new sections and returns the corresponding dictionaries.
         """
         dir1, dir2 = self.bif_method()
-        start_point = np.array(currentSec.points3D[-1])
+        start_point = np.array(currentSec.points[-1])
         stop = currentSec.stop_criteria
 
         children = 0

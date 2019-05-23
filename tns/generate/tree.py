@@ -110,8 +110,8 @@ class TreeGrower(object):
         else:
             append_fun = self.neuron.append_root_section
 
-        return append_fun(PointLevel(np.array(section.points3D).tolist(),
-                                     [self.params['radius'] * 2] * len(section.points3D)),
+        return append_fun(PointLevel(np.array(section.points).tolist(),
+                                     [self.params['radius'] * 2] * len(section.points)),
                           SectionType(self.params['tree_type']))
 
     def next_point(self):

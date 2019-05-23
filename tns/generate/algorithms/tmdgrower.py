@@ -109,7 +109,7 @@ class TMDAlgo(AbstractAlgo):
         self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
         ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
         dir1, dir2 = self.bif_method(currentSec.history(), angles=ang)
-        start_point = np.array(currentSec.points3D[-1])
+        start_point = np.array(currentSec.points[-1])
 
         stop1, stop2 = self.get_stop_criteria(currentSec)
 
@@ -173,7 +173,7 @@ class TMDApicalAlgo(TMDAlgo):
         self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
         ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
 
-        current_rd = norm(np.subtract(currentSec.points3D[-1], self.start_point))
+        current_rd = norm(np.subtract(currentSec.points[-1], self.start_point))
 
         if currentSec.process == 'major':
             dir1, dir2 = bif_methods['directional'](currentSec.direction, angles=ang)
@@ -188,7 +188,7 @@ class TMDApicalAlgo(TMDAlgo):
             process1 = 'secondary'
             process2 = 'secondary'
 
-        start_point = np.array(currentSec.points3D[-1])
+        start_point = np.array(currentSec.points[-1])
         stop1, stop2 = self.get_stop_criteria(currentSec)
 
         s1 = {'direction': dir1,
@@ -215,7 +215,7 @@ class TMDGradientAlgo(TMDApicalAlgo):
         self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
         ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
 
-        current_rd = np.linalg.norm(np.subtract(currentSec.points3D[-1], self.start_point))
+        current_rd = np.linalg.norm(np.subtract(currentSec.points[-1], self.start_point))
 
         if currentSec.process == 'major':
             dir1, dir2 = bif_methods['directional'](currentSec.direction, angles=ang)
@@ -230,7 +230,7 @@ class TMDGradientAlgo(TMDApicalAlgo):
             process1 = 'secondary'
             process2 = 'secondary'
 
-        start_point = np.array(currentSec.points3D[-1])
+        start_point = np.array(currentSec.points[-1])
 
         def majorize_process(stop, process, input_dir):
             '''Currates the non-major processes to apply a gradient to large components'''
@@ -248,7 +248,7 @@ class TMDGradientAlgo(TMDApicalAlgo):
             process1, dir1 = majorize_process(stop1, process1, dir1)
         process2, dir2 = majorize_process(stop2, process2, dir2)
 
-        start_point = np.array(currentSec.points3D[-1])
+        start_point = np.array(currentSec.points[-1])
 
         s1 = {'direction': dir1,
               'start_point': start_point,
