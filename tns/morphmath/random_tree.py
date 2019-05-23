@@ -2,25 +2,7 @@
 
 import numpy as np
 import tns.morphmath.rotation as rt
-
-
-def get_random_point(D=1.0):
-    '''
-    Get 3-d coordinates of a new random point.
-    The distance between the produced point and (0,0,0)
-    is given by the value D.
-    '''
-    # pylint: disable=assignment-from-no-return
-    phi = np.random.uniform(0., 2. * np.pi)
-    theta = np.arccos(np.random.uniform(-1.0, 1.0))
-
-    sn_theta = np.sin(theta)
-
-    x = D * np.cos(phi) * sn_theta
-    y = D * np.sin(phi) * sn_theta
-    z = D * np.cos(theta)
-
-    return np.array((x, y, z))
+from tns.morphmath.utils import get_random_point
 
 
 def get_bif_random():

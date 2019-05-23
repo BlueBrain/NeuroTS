@@ -1,9 +1,11 @@
 """Basic class for TreeGrower Algorithms"""
-
+import logging
 import numpy as np
 
 from tns.generate.algorithms.abstractgrower import AbstractAlgo
 from tns.generate.algorithms.common import bif_methods
+
+logger = logging.getLogger(__name__)
 
 
 class TrunkAlgo(AbstractAlgo):

@@ -7,8 +7,7 @@ from collections import deque
 import numpy as np
 from numpy.linalg import norm as vectorial_norm
 
-from tns.morphmath.random_tree import get_random_point
-from tns.morphmath.utils import norm
+from tns.morphmath.utils import get_random_point, norm
 
 MEMORY = 5
 
