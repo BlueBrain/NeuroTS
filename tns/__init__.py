@@ -6,7 +6,7 @@
     Ecole Polytechnique Federale de Lausanne
     Blue Brain Project
 
-    (c) 2017-2018. All rights reserved.
+    (c) 2017-2019. All rights reserved.
 """
 
 

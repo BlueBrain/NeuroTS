@@ -11,7 +11,9 @@ import json
 import os
 from os.path import join
 import numpy as np
+from scipy.spatial.distance import cdist
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
+from nose.tools import assert_raises
 
 from tns.generate.grower import NeuronGrower
 import tmd
@@ -98,7 +100,12 @@ def test_radial_grower():
     # Load with TMD and extract radial persistence
     n0 = tmd.io.load_neuron('test_output_neuron.h5')
     persistence_radial0 = tmd.methods.get_persistence_diagram(n0.apical[0])
-    assert_array_almost_equal(tmd.analysis.sort_ph(persistence_radial0),  persistence_radial)
+    # compute distances between points
+    distances = np.min(cdist(np.array(tmd.analysis.sort_ph(persistence_radial0)), persistence_radial), axis=0)
+    # We compare distances between expected and generated peristence as it is more stable to check.
+    # This comparison does not depend on ordering of the points
+    # and ensures that the points of the original persistence are consistently generated.
+    assert_array_almost_equal(distances, np.zeros(len(distances)), decimal=0.1)
     assert_almost_equal(0.1*np.max(persistence_radial0[-1]), 0.1*789, decimal=1)
     assert_almost_equal(len(persistence_radial0), 30)
     os.remove('test_output_neuron.h5')
@@ -110,13 +117,26 @@ def test_path_grower():
 
     with open(join(_path, 'bio_path_params.json')) as f:
         params = json.load(f)
+
+    assert_raises(TypeError, NeuronGrower, input_distributions=distributions, input_parameters=params)
+
+    # Modify the filtration metric from 'radial' to 'path' to create a path-based tree
+    for tree_type in params["grow_types"]:
+        distributions[tree_type]["filtration_metric"] = "path_distances"
+
     n = NeuronGrower(input_distributions=distributions,
-                     input_parameters=params).grow()
+                         input_parameters=params).grow()
+
     n.write('test_output_neuron.h5')
     # Load with TMD and extract path persistence
     n0 = tmd.io.load_neuron('test_output_neuron.h5')
-    persistence_path0 = tmd.methods.get_persistence_diagram(n0.apical[0], feature='path_distances_2')
-    assert_array_almost_equal(tmd.analysis.sort_ph(persistence_path0), persistence_path)
+    persistence_path0 = tmd.methods.get_persistence_diagram(n0.apical[0], feature='path_distances')
+    # compute distances between points
+    distances = np.min(cdist(np.array(tmd.analysis.sort_ph(persistence_path0)), persistence_path), axis=0)
+    # We compare distances between expected and generated peristence as it is more stable to check.
+    # This comparison does not depend on ordering of the points
+    # and ensures that the points of the original persistence are consistently generated.
+    assert_array_almost_equal(distances, np.zeros(len(distances)), decimal=0.1)
     assert_almost_equal(0.1*np.max(persistence_path0[-1]), 0.1*789, decimal=1)
     assert_almost_equal(len(persistence_path0), 30)
     os.remove('test_output_neuron.h5')

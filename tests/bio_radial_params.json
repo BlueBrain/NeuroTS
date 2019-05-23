@@ -1,4 +1,5 @@
-{"basal": {"randomness": 0.0,
+{"basal": {"metric":"radial_distances",
+           "randomness": 0.0,
            "targeting": 0.2,
            "radius": 0.3,
            "orientation": null,
@@ -6,7 +7,8 @@
            "branching_method": "bio_oriented",
            "modify": null,
            "tree_type": 3},
-"apical": {"randomness": 0.0,
+"apical": {"metric":"radial_distances",
+           "randomness": 0.0,
            "targeting": 0.2,
            "radius": 0.3,
            "orientation": [
