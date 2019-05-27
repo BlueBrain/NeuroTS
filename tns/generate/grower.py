@@ -29,6 +29,14 @@ class NeuronGrower(object):
         self.input_parameters = input_parameters
         self.input_distributions = input_distributions
 
+        # Consistency check between parameters and distributions
+        for tree_type in self.input_parameters['grow_types']:
+            metric1 = self.input_parameters[tree_type]['metric']
+            metric2 = self.input_distributions[tree_type]['filtration_metric']
+            if metric1 != metric2:
+                raise TypeError('Metric of parameters and distributions is inconsistent:' +
+                                ' {} != {}'.format(metric1, metric2))
+
         # A list of trees with the corresponding orientations
         # and initial points on the soma surface will be initialized.
         self.active_neurites = list()

@@ -61,7 +61,7 @@ def test_diameter_extract():
                 'trunk': [3.9],
                 'trunk_taper': [0.30]}
 
-    assert_equal(res['basal'].keys(), expected.keys())
+    assert_equal(set(res['basal'].keys()), set(expected.keys()))
     for key in expected.keys():
         assert_array_almost_equal(res['basal'][key], expected[key])
 
@@ -69,35 +69,21 @@ def test_diameter_extract():
                   load_neurons(os.path.join(_PATH, 'simple.swc')))
 
 
-
-class NeuromJSON(json.JSONEncoder):
-    '''JSON encoder that handles numpy types
-
-    In python3, numpy.dtypes don't serialize to correctly, so a custom converter
-    is needed.
-    '''
-
-    def default(self, o):  # pylint: disable=method-hidden
-        if isinstance(o, np.floating):
-            return float(o)
-        elif isinstance(o, np.integer):
-            return int(o)
-        elif isinstance(o, np.ndarray):
-            return o.tolist()
-        return json.JSONEncoder.default(self, o)
-
-
 def test_distributions():
     filename = os.path.join(_PATH, 'bio/')
     distr = test_module.distributions(filename)
-
     assert_equal(set(distr.keys()), {'soma', 'basal', 'apical', 'axon'})
     assert_equal(distr['basal']['num_trees'],
                  {'data': {'bins': [4, 5, 6, 7, 8, 9], 'weights': [1, 0, 0, 0, 0, 1]}})
+    assert_equal(distr['basal']['filtration_metric'], 'radial_distances')
+    distr = test_module.distributions(filename, feature='path_distances')
+    assert_equal(distr['basal']['filtration_metric'], 'path_distances')
 
 def test_parameters():
     params = test_module.parameters(
         neurite_types=['basal', 'apical'], method='tmd')
 
     assert_equal(params,
-    {'basal': {'randomness': 0.15, 'targeting': 0.12, 'radius': 0.3, 'orientation': None, 'growth_method': 'tmd', 'branching_method': 'bio_oriented', 'modify': None, 'tree_type': 3}, 'apical': {'randomness': 0.15, 'targeting': 0.12, 'radius': 0.3, 'orientation': [(0.0, 1.0, 0.0)], 'growth_method': 'tmd_apical', 'branching_method': 'directional', 'modify': None, 'apical_distance': 0.0, 'tree_type': 4}, 'axon': {}, 'origin': (0.0, 0.0, 0.0), 'grow_types': ['basal', 'apical']})
+    {'basal': {'randomness': 0.15, 'targeting': 0.12, 'radius': 0.3, 'orientation': None, 'growth_method': 'tmd', 'branching_method': 'bio_oriented', 'modify': None, 'tree_type': 3, 'metric': 'radial_distances'},
+     'apical': {'randomness': 0.15, 'targeting': 0.12, 'radius': 0.3, 'orientation': [(0.0, 1.0, 0.0)], 'growth_method': 'tmd_apical', 'branching_method': 'directional', 'modify': None, 'apical_distance': 0.0, 'tree_type': 4, 'metric': 'radial_distances'},
+     'axon': {}, 'origin': (0.0, 0.0, 0.0), 'grow_types': ['basal', 'apical']})

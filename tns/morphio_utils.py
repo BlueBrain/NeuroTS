@@ -17,6 +17,11 @@ NEUROM_TYPE_TO_STR = {NeuriteType.apical_dendrite: 'apical',
                       NeuriteType.soma: 'soma',
                       NeuriteType.axon: 'axon'}
 
+STR_TO_NEUROM_TYPES = {'apical': NeuriteType.apical_dendrite,
+                       'basal': NeuriteType.basal_dendrite,
+                       'soma': NeuriteType.soma,
+                       'axon': NeuriteType.axon}
+
 
 def section_filter(neuron, tree_type=None):
     '''Filters all sections according to type.'''

@@ -9,7 +9,6 @@ from numpy.testing import assert_array_equal
 from numpy.testing import assert_almost_equal
 
 from tns.utils import TNSError
-from tns import NeuronGrower
 from tns.generate.soma import SomaGrower
 from tns import NeuronGrower
 from numpy.testing import assert_array_equal, assert_array_almost_equal
@@ -205,7 +204,7 @@ def test_interpolate_exception():
 def test_interpolate_from_neuron():
     np.random.seed(0)
 
-    g = NeuronGrower({'origin': [0,0,0]},
+    g = NeuronGrower({'origin': [0,0,0], 'grow_types':[]},
                      {'soma': {'size': {"norm": {"mean": 6, "std": 0}}}})
 
     g.soma.points = [[0, 0, 0], [1, 0, 0], [0, 1, 1], [1, 0, 0]]
@@ -226,7 +225,7 @@ def test_interpolate_from_neuron():
 
 def test_interpolate_from_neuron_2():
     np.random.seed(0)
-    g = NeuronGrower({'origin': [0,0,0]},
+    g = NeuronGrower({'origin': [0,0,0], 'grow_types':[]},
                      {'soma': {'size': {"norm": {"mean": 6, "std": 3}}}})
 
     g.soma.points = [[0, 0, 0], [1, 0, 0], [0, 1, 1], [1, 0, 0]]
@@ -252,7 +251,7 @@ def test_original_soma():
 
 def test_grow_soma_types():
     np.random.seed(0)
-    g = NeuronGrower({'origin': [0, 0, 0]},
+    g = NeuronGrower({'origin': [0, 0, 0], 'grow_types':[]},
                      {'soma': {'size': {"norm": {"mean": 6, "std": 3}}}})
 
     with patch.object(g, '_grow_trunks'):

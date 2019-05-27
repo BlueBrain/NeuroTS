@@ -21,6 +21,7 @@ setup(
         'enum34>=1.0.4',
         'scipy>=0.13.3',
         'numpy>=1.15.0',
+        'jsonschema>=3.0.1',
     ],
     packages=find_packages(),
     license='BSD',
