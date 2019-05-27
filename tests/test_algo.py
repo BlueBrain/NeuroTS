@@ -11,7 +11,7 @@ from tns.generate.algorithms.tmdgrower import (TMDAlgo, TMDApicalAlgo,
 from tns.generate.algorithms.tmdgrower_path import TMDAlgoPath, TMDApicalAlgoPath, TMDGradientAlgoPath
 from tns.generate.section import SectionGrower, SectionGrowerPath
 
-_PATH = os.path.dirname(os.path.abspath(__file__))
+_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 
 def _setup_test(Algo, Grower):

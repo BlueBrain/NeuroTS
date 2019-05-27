@@ -30,7 +30,7 @@ class TrunkAlgo(AbstractAlgo):
         of the first section to be grown. Saves the extracted
         input data into the corresponding structures.
         """
-        stop = {"num_seg": 100}  # A section of 100 segements will be generated
+        stop = {"num_seg": self.params['num_seg']}
         num_sec = 1  # A single section per tree will be generated
 
         return stop, num_sec
@@ -65,10 +65,9 @@ class TrunkAlgo(AbstractAlgo):
         """When the growth of a section is terminated the "term"
         must be removed from the TMD grower
         """
-        # print 'Terminated: ', currentSec.parent
 
     def extend(self, currentSec):
-        """Definition of stop criterion for the growth of the current section.
-        """
-        # print 'Continues now: ', currentSec.parent
-        return currentSec.generate_nseg()
+        '''Creates a section with the selected parameters
+           until at least one stop criterion is fulfilled.
+        '''
+        return currentSec.next()

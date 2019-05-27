@@ -15,7 +15,7 @@ from numpy.testing import assert_array_equal, assert_array_almost_equal
 from mock import patch
 
 
-_path = os.path.dirname(os.path.abspath(__file__))
+_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 
 def test_constructor():
@@ -80,7 +80,7 @@ def test_orientation_from_point_exception():
 
 
 def test_contour_point():
-    
+
     soma = SomaGrower((1., 2., 3.), 2.0)
 
     point = [4., 5., 6.]
@@ -93,7 +93,7 @@ def test_contour_point():
 
 
 def test_add_points_from_trunk_angles():
-    
+
     soma = SomaGrower((1., 2., 3.), 2.0)
 
     trunk_angle_deviations = [0.1, 0.1, 0.1]
@@ -140,7 +140,7 @@ def test_build():
 
 
 def test_one_point_soma():
-    
+
     soma = SomaGrower((1., 2., 3.), 2.0)
 
     soma_points, soma_diameters = soma.one_point_soma()

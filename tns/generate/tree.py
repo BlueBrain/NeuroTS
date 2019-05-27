@@ -61,7 +61,6 @@ class TreeGrower(object):
                                      params=self.params,
                                      start_point=self.point,
                                      context=context)
-
         stop, num_sec = self.growth_algo.initialize()
 
         _ = self.add_section(parent=None,
@@ -120,9 +119,13 @@ class TreeGrower(object):
     def next_point(self):
         '''Operates the tree growth according to the selected algorithm.
         '''
-        ordered_sections = self.order_per_bif(self.active_sections)
+        if not isinstance(self.growth_algo, basicgrower.TrunkAlgo):
+            ordered_sections = self.order_per_bif(self.active_sections)
+        else:
+            # TrunkAlgo does not keep track of the bifurcations so it is not
+            # possible to order per bifurcation
+            ordered_sections = np.copy(self.active_sections)
 
-        # np.copy(self.active_sections):#self.active_sections.copy():
         for section_grower in ordered_sections:
             # the current section_grower is generated
             # In here the stop criterion can be modified accordingly

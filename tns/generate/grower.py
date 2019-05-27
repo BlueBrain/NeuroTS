@@ -31,8 +31,8 @@ class NeuronGrower(object):
 
         # Consistency check between parameters and distributions
         for tree_type in self.input_parameters['grow_types']:
-            metric1 = self.input_parameters[tree_type]['metric']
-            metric2 = self.input_distributions[tree_type]['filtration_metric']
+            metric1 = self.input_parameters[tree_type].get('metric')
+            metric2 = self.input_distributions[tree_type].get('filtration_metric')
             if metric1 != metric2:
                 raise TypeError('Metric of parameters and distributions is inconsistent:' +
                                 ' {} != {}'.format(metric1, metric2))

@@ -3,7 +3,7 @@ import os
 
 from jsonschema import validate
 
-_PATH = os.path.dirname(os.path.abspath(__file__))
+_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 def test_json_schema():
 
