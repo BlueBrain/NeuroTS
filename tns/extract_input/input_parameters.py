@@ -1,5 +1,8 @@
 """Input parameters functions"""
 
+tmd_algos = ('tmd', 'tmd_path', 'tmd_gradient', 'tmd_gradient_path',
+             'tmd_apical', 'tmd_apical_path')
+
 
 def parameters(origin=(0., 0., 0.),
                method='trunk',
@@ -21,10 +24,10 @@ def parameters(origin=(0., 0., 0.),
         ret = dict()
         if method == 'trunk':
             branching = 'random'
-        elif method in {'tmd', 'tmd_path'}:
+        elif method in tmd_algos:
             branching = 'bio_oriented'
         else:
-            raise KeyError('Method not recognized! Please select trunk, tmd or tmd_path.')
+            raise KeyError('Method not recognized! Please select from: {}.'.format(tmd_algos))
 
         ret.update({"randomness": 0.15,
                     "targeting": 0.12,
