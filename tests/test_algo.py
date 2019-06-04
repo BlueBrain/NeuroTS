@@ -26,7 +26,7 @@ def _setup_test(Algo, Grower):
     np.random.seed(42)
     algo = Algo(distributions, parameters, [0, 0, 1])
 
-    grower = Grower(None, None, [1.1,0.,0.], [2, 2, 2], 0.2, 0.3, 'major',
+    grower = Grower(None, None, [1.1,0.,0.], [0.57735, 0.57735, 0.57735], 0.2, 0.3, 'major',
                            {'bif_term': {'bif': 9.7747, 'ref': [0, 0, 1], 'term': 159.798}})
     return algo, grower
 
@@ -72,13 +72,13 @@ def test_TMDApicalAlgo():
 
     s1, s2 = algo.bifurcate(grower)
     _assert_dict_or_array(s1,
-                          {'direction': [2., 2., 2.],
+                          {'direction': [0.57735, 0.57735, 0.57735],
                            'process': 'secondary',
                            'start_point': [1.1, 0. , 0. ],
                            'stop': {'bif_term': {'bif': 18.5246, 'ref': [0, 0, 1], 'term': 159.798}}})
 
     _assert_dict_or_array(s2,
-                          {'direction': np.array([0.704878, 1.874423, 2.826603]),
+                          {'direction': np.array([0.203481, 0.541099, 0.81597]),
                            'process': 'secondary',
                            'start_point': [1.1, 0. , 0. ],
                            'stop': {'bif_term': {'bif': 18.5246, 'ref': [0, 0, 1], 'term': 124.8796}}})
@@ -95,13 +95,13 @@ def test_TMDGradientAlgo():
 
     s1, s2 = algo.bifurcate(grower)
     _assert_dict_or_array(s1,
-                          {'direction': [2., 2., 2.],
+                          {'direction': [0.57735, 0.57735, 0.57735],
                            'process': 'major',
                            'start_point': [1.1, 0. , 0. ],
                            'stop': {'bif_term': {'bif': 18.5246, 'ref': [0, 0, 1], 'term': 159.798}}})
 
     _assert_dict_or_array(s2,
-                          {'direction': np.array([1.352439, 1.937212, 2.413301]),
+                          {'direction': np.array([0.390416, 0.559225, 0.69666 ]),
                            'process': 'major',
                            'start_point': [1.1, 0. , 0. ],
                            'stop': {'bif_term': {'bif': 18.5246, 'ref': [0, 0, 1], 'term': 124.8796}}})
@@ -138,13 +138,13 @@ def test_TMDApicalAlgoPath():
 
     s1, s2 = algo.bifurcate(grower)
     _assert_dict_or_array(s1,
-                          {'direction': [2., 2., 2.],
+                          {'direction': [0.57735, 0.57735, 0.57735],
                            'process': 'major',
                            'start_point': [1.1, 0. , 0. ],
                            'stop': {'bif_term': {'bif': 18.5246, 'ref': 0, 'term': 159.798}}})
 
     _assert_dict_or_array(s2,
-                          {'direction': np.array([0.704878, 1.874423, 2.826603]),
+                          {'direction': np.array([0.20348076, 0.54109933, 0.81597003]),
                            'process': 'secondary',
                            'start_point': [1.1, 0. , 0. ],
                            'stop': {'bif_term': {'bif': 18.5246, 'ref': 0, 'term': 124.8796}}})
@@ -161,13 +161,13 @@ def test_TMDGradientAlgoPath():
 
     s1, s2 = algo.bifurcate(grower)
     _assert_dict_or_array(s1,
-                          {'direction': [2., 2., 2.],
+                          {'direction': [0.57735, 0.57735, 0.57735],
                            'process': 'major',
                            'start_point': [1.1, 0. , 0. ],
                            'stop': {'bif_term': {'bif': 18.5246, 'ref': 0, 'term': 159.798}}})
 
     _assert_dict_or_array(s2,
-                          {'direction': np.array([1.352439, 1.937212, 2.413301]),
+                          {'direction': np.array([0.390416, 0.559225, 0.69666 ]),
                            'process': 'major',
                            'start_point': [1.1, 0. , 0. ],
                            'stop': {'bif_term': {'bif': 18.5246, 'ref': 0, 'term': 124.8796}}})

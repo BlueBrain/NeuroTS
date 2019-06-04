@@ -64,12 +64,12 @@ class TreeGrower(object):
 
         stop, num_sec = self.growth_algo.initialize()
 
-        self.add_section(parent=None,
-                         direction=self.direction,
-                         start_point=list(self.point),
-                         stop=copy.deepcopy(stop),
-                         process='major',
-                         children=2 if num_sec > 1 else 0)
+        _ = self.add_section(parent=None,
+                             direction=self.direction,
+                             start_point=list(self.point),
+                             stop=copy.deepcopy(stop),
+                             process='major',
+                             children=2 if num_sec > 1 else 0)
 
     def add_section(self, parent, direction, start_point, stop, process=None, children=0):
         """Generates a section from the parent section "act"
@@ -78,15 +78,18 @@ class TreeGrower(object):
         """
         SGrower = section_growers[self.params['growth_method']]
 
-        self.active_sections.append(SGrower(parent=parent,
-                                            start_point=start_point,
-                                            direction=direction,
-                                            randomness=self.params["randomness"],
-                                            targeting=self.params["targeting"],
-                                            children=children,
-                                            process=process,
-                                            stop_criteria=copy.deepcopy(stop),
-                                            context=self.context))
+        sec_grower = SGrower(parent=parent,
+                             start_point=start_point,
+                             direction=direction,
+                             randomness=self.params["randomness"],
+                             targeting=self.params["targeting"],
+                             children=children,
+                             process=process,
+                             stop_criteria=copy.deepcopy(stop),
+                             context=self.context)
+
+        self.active_sections.append(sec_grower)
+        return sec_grower
 
     def end(self):
         '''Ends the growth'''
@@ -129,10 +132,16 @@ class TreeGrower(object):
                 section = self.append_section(section_grower)
 
                 if state == 'bifurcate':
+                    # Save the final normed direction of parent
+                    latest = section_grower.latest_directions_normed[-1]
+                    latest_un = section_grower.latest_directions[-1]
                     # the current section_grower bifurcates
                     # Returns two section_grower dictionaries: (S1, S2)
                     for child_section in self.growth_algo.bifurcate(section_grower):
-                        self.add_section(parent=section, **child_section)
+                        child = self.add_section(parent=section, **child_section)
+                        # Copy the final normed direction of parent to all children
+                        child.latest_directions_normed.append(latest)
+                        child.latest_directions.append(latest_un)
                     self.active_sections.remove(section_grower)
 
                 elif state == 'terminate':

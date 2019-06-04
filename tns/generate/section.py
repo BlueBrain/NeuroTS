@@ -26,7 +26,8 @@ class SectionGrower(object):
         generates a tubular morphology that resembles a random walk.
         '''
         self.parent = parent
-        self.direction = direction
+        assert not np.isclose(vectorial_norm(direction), 0.0), 'Nan direction not recognized'
+        self.direction = direction / vectorial_norm(direction)
         self.children = children
         self.points = [np.array(start_point[:3])]
         self.params = {"randomness": randomness,
@@ -59,7 +60,7 @@ class SectionGrower(object):
     def history(self):
         '''Returns a combination of the sections history
         '''
-        n_points = min(MEMORY, len(self.points) - 1)
+        n_points = len(self.latest_directions_normed)
 
         if n_points == 0:
             return np.zeros(3)
@@ -67,7 +68,7 @@ class SectionGrower(object):
         hist = np.dot(WEIGHTS[MEMORY - n_points:], self.latest_directions_normed)
         distance = vectorial_norm(hist)
 
-        if distance > 0:
+        if not np.isclose(distance, 0.0):
             hist /= distance
 
         return hist

@@ -13,7 +13,7 @@ def test_MEMORY_WEIGHTS():
 
 def test_SectionGrower():
     # Create basic section for testing purposes
-    s = section.SectionGrower(None, None, [0.,0.,0.], None, 0.0, 0.0, None, None)
+    s = section.SectionGrower(None, None, [0.,0.,0.], [0., 1., 0.], 0.0, 0.0, None, None)
     # Test trivial history is zeros.
     assert_array_almost_equal(s.history(), np.zeros(3))
     # Test history of one point.
