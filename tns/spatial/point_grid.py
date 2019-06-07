@@ -71,6 +71,8 @@ class PointGrid(object):
         self._inv_dl = 1. / voxel_width
 
         self.data = np.empty((0, 3), dtype=np.float)
+        self.data_cell_ids = np.empty((0, 3), dtype=np.uintp)
+
         self._n_points = 0
 
         self.store = {}
@@ -121,6 +123,7 @@ class PointGrid(object):
             self.store[ijk].add(i + index_offset)
 
         self.data = np.vstack((self.data, points))
+        self.data_cell_ids = np.vstack((self.data_cell_ids, cells_ijk))
         self._n_points = self._number_of_indices()
 
     def _point_to_ijk(self, point):
@@ -130,7 +133,7 @@ class PointGrid(object):
 
     def upper_level_from_radius(self, radius):
         """ Get the level that includes the radius """
-        return int(np.ceil(2. * radius) * self._inv_dl)
+        return int(np.ceil(2. * radius * self._inv_dl))
 
     def _level_query(self, point, radius, levels):
         """ Get the points in the neighborhood cell defined by the level
@@ -141,10 +144,12 @@ class PointGrid(object):
         for level in levels:
             for i, j, k in shell_neighborhood(level):
                 new_ijk = (i_c + i, j_c + j, k_c + k)
-                if new_ijk in self.store:
-                    for point_id in self.store[new_ijk]:
-                        if squared_distance(point, self.data[point_id]) < squared_radius:
-                            yield point_id
+                if new_ijk not in self.store:
+                    continue
+                for point_id in self.store[new_ijk]:
+                    sq_dist = squared_distance(point, self.data[point_id])
+                    if sq_dist < squared_radius:
+                        yield point_id
 
     def ball_query(self, point, radius):
         """ Retreive all the points in the sphere (point, radius)
@@ -214,7 +219,7 @@ class PointGrid(object):
     def remove(self, point_id):
         """ Remove a point from the grid if it exists
         """
-        ijk = self._point_to_ijk(self.data[point_id])
+        ijk = tuple(self.data_cell_ids[point_id])
 
         point_set = self.store[ijk]
         point_set.remove(point_id)
