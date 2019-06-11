@@ -66,12 +66,12 @@ class TreeGrower(object):
 
         _ = self.add_section(parent=None,
                              direction=self.direction,
-                             start_point=list(self.point),
+                             first_point=list(self.point),
                              stop=copy.deepcopy(stop),
                              process='major',
                              children=2 if num_sec > 1 else 0)
 
-    def add_section(self, parent, direction, start_point, stop, process=None, children=0):
+    def add_section(self, parent, direction, first_point, stop, process=None, children=0):
         """Generates a section from the parent section "act"
         from all the required information. The section is
         added to the neuron.sections and activated.
@@ -79,7 +79,7 @@ class TreeGrower(object):
         SGrower = section_growers[self.params['growth_method']]
 
         sec_grower = SGrower(parent=parent,
-                             start_point=start_point,
+                             first_point=first_point,
                              direction=direction,
                              randomness=self.params["randomness"],
                              targeting=self.params["targeting"],

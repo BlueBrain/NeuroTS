@@ -3,11 +3,9 @@ TNS section grower class.
 '''
 
 from collections import deque
-
 import numpy as np
-from numpy.linalg import norm as vectorial_norm
-
-from tns.morphmath.utils import get_random_point, norm
+from numpy.linalg import norm as vectorial_norm  # vectorial_norm used for array of vectors
+from tns.morphmath.utils import get_random_point, norm  # norm used for single vectors
 
 MEMORY = 5
 
@@ -19,7 +17,7 @@ class SectionGrower(object):
     '''Class for the section growth
     '''
 
-    def __init__(self, parent, children, start_point, direction,
+    def __init__(self, parent, children, first_point, direction,
                  randomness, targeting, process, stop_criteria, context=None):
         '''A section is a list of points in 4D space (x, y, x, r)
         that are sequentially connected to each other. This process
@@ -29,7 +27,7 @@ class SectionGrower(object):
         assert not np.isclose(vectorial_norm(direction), 0.0), 'Nan direction not recognized'
         self.direction = direction / vectorial_norm(direction)
         self.children = children
-        self.points = [np.array(start_point[:3])]
+        self.points = [np.array(first_point[:3])]
         self.params = {"randomness": randomness,
                        "targeting": targeting,
                        "scale_prob": 1.0,
@@ -150,13 +148,13 @@ class SectionGrowerPath(SectionGrowerExponentialProba):
     '''Class for the TMD path based section growth
     '''
 
-    def __init__(self, parent, children, start_point, direction,
+    def __init__(self, parent, children, first_point, direction,
                  randomness, targeting, process, stop_criteria, context=None):
         '''A section is a list of points in 4D space (x, y, x, r)
         that are sequentially connected to each other. This process
         generates a tubular morphology that resembles a random walk.
         '''
-        super(SectionGrowerPath, self).__init__(parent, children, start_point, direction,
+        super(SectionGrowerPath, self).__init__(parent, children, first_point, direction,
                                                 randomness, targeting, process, stop_criteria,
                                                 context)
 

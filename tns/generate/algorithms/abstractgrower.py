@@ -1,6 +1,7 @@
 """Abstract class for TreeGrower Algorithms"""
 
 import abc
+import copy
 
 
 class AbstractAlgo(object):
@@ -16,8 +17,8 @@ class AbstractAlgo(object):
         context: an object containing contextual information
         """
         self.context = context
-        self.input_data = input_data
-        self.params = params
+        self.input_data = copy.deepcopy(input_data)
+        self.params = copy.deepcopy(params)
         self.start_point = start_point
 
     @abc.abstractmethod

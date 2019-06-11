@@ -24,5 +24,7 @@ def get_random_point(D=1.0):
 
 
 def norm(vect):
-    '''A faster norm than numpy.linalg.norm'''
+    '''A faster norm than numpy.linalg.norm
+       This will be used for single vectors.
+    '''
     return sqrt(vect[0] * vect[0] + vect[1] * vect[1] + vect[2] * vect[2])

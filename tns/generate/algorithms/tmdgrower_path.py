@@ -2,13 +2,28 @@
 
 import numpy as np
 
-from tns.basic import round_num
 from tns.generate.algorithms.common import bif_methods, init_ph_angles
 from tns.generate.algorithms.tmdgrower import TMDAlgo
+from tns.morphmath.utils import norm
 
 
 class TMDAlgoPath(TMDAlgo):
     """TreeGrower of TMD path dependent growth"""
+
+    def metric_ref(self, section):
+        """Returns the metric reference, here path distance reference,
+           or zero if no section is provided as input.
+        """
+        # Function to return reference for path distance
+        if section:
+            return section.pathlength
+        return 0.0
+
+    def metric(self, section):
+        """Returns the metric at the current position, here path distance
+        """
+        # Function to return path distance
+        return section.pathlength
 
     def initialize(self):
         """Generates the data to be used for the initialization
@@ -29,59 +44,6 @@ class TMDAlgoPath(TMDAlgo):
         num_sec = len(self.ph_angles)
 
         return stop, num_sec
-
-    def get_stop_criteria(self, currentSec):
-        """Returns stop1 and stop2 that are the commonly
-           shared stop criteria for all TMDPath algorithms.
-           stop[bif_term] = {ref: the current path distance
-                             bif: the smallest appropriate bifurcation path length
-                             term: the appropriate termination path length
-                            }
-        """
-        currentBF = self.bif[0] if len(self.bif) > 1 else np.inf
-
-        b1 = self.curate_bif(currentSec.stop_criteria["bif_term"], currentBF,
-                             round_num(currentSec.stop_criteria["bif_term"]["term"]))
-
-        stop1 = {"bif_term": {"ref": currentSec.pathlength,
-                              "bif": b1,
-                              "term": round_num(currentSec.stop_criteria["bif_term"]["term"])}}
-
-        b2 = self.curate_bif(currentSec.stop_criteria["bif_term"], currentBF,
-                             round_num(self.bt_all[currentSec.stop_criteria["bif_term"]["bif"]]))
-
-        stop2 = {"bif_term": {"ref": currentSec.pathlength,
-                              "bif": b2,
-                              "term": round_num(
-                                  self.bt_all[currentSec.stop_criteria["bif_term"]["bif"]])}}
-
-        return (stop1, stop2)
-
-    def bifurcate(self, currentSec):
-        """When the section bifurcates two new sections need to be created.
-        This method computes from the current state the data required for the
-        generation of two new sections and returns the corresponding dictionaries.
-        """
-        self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
-
-        ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
-        dir1, dir2 = self.bif_method(currentSec.history(), angles=ang)
-
-        start_point = np.array(currentSec.points[-1])
-
-        stop1, stop2 = self.get_stop_criteria(currentSec)
-
-        s1 = {'direction': dir1,
-              'start_point': start_point,
-              'stop': stop1,
-              'process': currentSec.process}
-
-        s2 = {'direction': dir2,
-              'start_point': start_point,
-              'stop': stop2,
-              'process': currentSec.process}
-
-        return s1, s2
 
 
 class TMDApicalAlgoPath(TMDAlgoPath):
@@ -105,7 +67,7 @@ class TMDApicalAlgoPath(TMDAlgoPath):
         """
         self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
         ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
-        current_pd = currentSec.pathlength
+        current_pd = self.metric(currentSec)
 
         if currentSec.process == 'major':
             dir1, dir2 = bif_methods['directional'](currentSec.direction, angles=ang)
@@ -120,17 +82,17 @@ class TMDApicalAlgoPath(TMDAlgoPath):
             process1 = 'secondary'
             process2 = 'secondary'
 
-        start_point = np.array(currentSec.points[-1])
+        first_point = np.array(currentSec.points[-1])
 
         stop1, stop2 = self.get_stop_criteria(currentSec)
 
         s1 = {'direction': dir1,
-              'start_point': start_point,
+              'first_point': first_point,
               'stop': stop1,
               'process': process1}
 
         s2 = {'direction': dir2,
-              'start_point': start_point,
+              'first_point': first_point,
               'stop': stop2,
               'process': process2}
 
@@ -147,7 +109,7 @@ class TMDGradientAlgoPath(TMDApicalAlgoPath):
         """
         self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
         ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
-        current_pd = currentSec.pathlength
+        current_pd = self.metric(currentSec)
 
         if currentSec.process == 'major':
             dir1, dir2 = bif_methods['directional'](currentSec.direction, angles=ang)
@@ -165,30 +127,31 @@ class TMDGradientAlgoPath(TMDApicalAlgoPath):
         def majorize_process(stop, process, input_dir):
             '''Currates the non-major processes to apply a gradient to large components'''
             difference = np.abs(stop["bif_term"]["bif"] - stop["bif_term"]["term"])
-            if difference == np.inf:
-                difference = np.abs(stop["bif_term"]["term"] - currentSec.pathlength)
+            if np.isinf(difference):
+                difference = np.abs(stop["bif_term"]["term"] - self.metric(currentSec))
             if difference > self.params['bias_length']:
                 direction1 = (1.0 - self.params['bias']) * np.array(input_dir)
                 direction2 = self.params['bias'] * np.array(currentSec.direction)
                 direct = np.add(direction1, direction2)
-                return 'major', direct
+                return 'major', direct / norm(direct)
             return process, input_dir
 
         stop1, stop2 = self.get_stop_criteria(currentSec)
 
         if process1 != 'major':
             process1, dir1 = majorize_process(stop1, process1, dir1)
-        process2, dir2 = majorize_process(stop2, process2, dir2)
+        if process2 != 'major':
+            process2, dir2 = majorize_process(stop2, process2, dir2)
 
-        start_point = np.array(currentSec.points[-1])
+        first_point = np.array(currentSec.points[-1])
 
         s1 = {'direction': dir1,
-              'start_point': start_point,
+              'first_point': first_point,
               'stop': stop1,
               'process': process1}
 
         s2 = {'direction': dir2,
-              'start_point': start_point,
+              'first_point': first_point,
               'stop': stop2,
               'process': process2}
 
