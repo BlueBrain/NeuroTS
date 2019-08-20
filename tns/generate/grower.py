@@ -1,6 +1,7 @@
 '''
 TNS class : Grower object that contains the grower functionality.
 '''
+import copy
 from morphio.mut import Morphology  # pylint: disable=import-error
 from tns.generate.soma import SomaGrower
 from tns.morphmath import sample
@@ -26,8 +27,8 @@ class NeuronGrower(object):
         self.neuron = Morphology()
         self.context = context
 
-        self.input_parameters = input_parameters
-        self.input_distributions = input_distributions
+        self.input_parameters = copy.deepcopy(input_parameters)
+        self.input_distributions = copy.deepcopy(input_distributions)
 
         # Consistency check between parameters and distributions
         for tree_type in self.input_parameters['grow_types']:

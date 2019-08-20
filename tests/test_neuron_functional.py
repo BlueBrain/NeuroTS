@@ -13,8 +13,8 @@ from os.path import join
 import numpy as np
 from scipy.spatial.distance import cdist
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
-from nose.tools import assert_raises, assert_equal, ok_
-from morphio import Morphology
+from nose.tools import assert_raises, ok_
+from morph_tool import diff
 from tns.generate.grower import NeuronGrower
 from .utils import setup_tempdir
 import tmd
@@ -65,9 +65,7 @@ def _test_full(feature, distributions, parameters, ref_cell, ref_persistence_dia
             assert_close_persistent_diagram(actual_persistence_diagram,
                                             expected_persistence_diagram)
 
-        assert_equal(Morphology(out_neuron),
-                     Morphology(os.path.join(_path, ref_cell)))
-
+        ok_(not diff(out_neuron, os.path.join(_path, ref_cell)))
 
 
 def test_wrong_filtration():
