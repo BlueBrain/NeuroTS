@@ -37,9 +37,9 @@ class TMDAlgoPath(TMDAlgo):
         self.angles = angles
         self.bt_all = bt_all
 
-        stop = {"bif_term": {"ref": 0,
-                             "bif": self.bif[0],
-                             "term": self.term[-1]}}
+        stop = {"TMD": {"ref": 0,
+                        "bif": self.bif[0],
+                        "term": self.term[-1]}}
 
         num_sec = len(self.ph_angles)
 
@@ -65,8 +65,8 @@ class TMDApicalAlgoPath(TMDAlgoPath):
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
         """
-        self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
-        ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
+        self.bif.remove(currentSec.stop_criteria["TMD"]["bif"])
+        ang = self.angles[currentSec.stop_criteria["TMD"]["bif"]]
         current_pd = self.metric(currentSec)
 
         if currentSec.process == 'major':
@@ -107,8 +107,8 @@ class TMDGradientAlgoPath(TMDApicalAlgoPath):
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
         """
-        self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
-        ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
+        self.bif.remove(currentSec.stop_criteria["TMD"]["bif"])
+        ang = self.angles[currentSec.stop_criteria["TMD"]["bif"]]
         current_pd = self.metric(currentSec)
 
         if currentSec.process == 'major':
@@ -126,9 +126,9 @@ class TMDGradientAlgoPath(TMDApicalAlgoPath):
 
         def majorize_process(stop, process, input_dir):
             '''Currates the non-major processes to apply a gradient to large components'''
-            difference = np.abs(stop["bif_term"]["bif"] - stop["bif_term"]["term"])
+            difference = np.abs(stop["TMD"]["bif"] - stop["TMD"]["term"])
             if np.isinf(difference):
-                difference = np.abs(stop["bif_term"]["term"] - self.metric(currentSec))
+                difference = np.abs(stop["TMD"]["term"] - self.metric(currentSec))
             if difference > self.params['bias_length']:
                 direction1 = (1.0 - self.params['bias']) * np.array(input_dir)
                 direction2 = self.params['bias'] * np.array(currentSec.direction)

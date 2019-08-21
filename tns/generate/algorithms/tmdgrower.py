@@ -53,7 +53,7 @@ class TMDAlgo(AbstractAlgo):
            is smaller than current one.
            If there are no bif left or if the bif is largest than the current
            termination target the np.inf is returned instead.
-        currentSec.stop_criteria["bif_term"]
+        currentSec.stop_criteria["TMD"]
         '''
         # Compute length of current section
         current_length = np.abs(stop["term"] - stop["bif"])
@@ -61,7 +61,7 @@ class TMDAlgo(AbstractAlgo):
         target_length = np.abs(target_bif - target_term)
 
         # There are no bifurcations to check
-        if not self.bif or np.isinf(target_length):
+        if not self.bif or np.isinf(target_bif):
             return np.inf
         # If child length smaller than parent
         if target_length <= current_length:
@@ -77,27 +77,27 @@ class TMDAlgo(AbstractAlgo):
     def get_stop_criteria(self, currentSec):
         """Returns stop1 and stop2 that are the commonly
            shared stop criteria for all TMDPath algorithms.
-           stop[bif_term] = {ref: the current path distance
+           stop["TMD"] = {ref: the current path distance
                              bif: the smallest appropriate bifurcation path length
                              term: the appropriate termination path length
                             }
         """
-        target_bif = self.bif[0] if len(self.bif) > 1 else np.inf
+        target_bif = self.bif[0] if len(self.bif) > 0 else np.inf
 
-        b1 = self.curate_bif(currentSec.stop_criteria["bif_term"], target_bif,
-                             round_num(currentSec.stop_criteria["bif_term"]["term"]))
+        b1 = self.curate_bif(currentSec.stop_criteria["TMD"], target_bif,
+                             round_num(currentSec.stop_criteria["TMD"]["term"]))
 
-        stop1 = {"bif_term": {"ref": self.metric_ref(currentSec),
+        stop1 = {"TMD": {"ref": self.metric_ref(currentSec),
                               "bif": b1,
-                              "term": round_num(currentSec.stop_criteria["bif_term"]["term"])}}
+                              "term": round_num(currentSec.stop_criteria["TMD"]["term"])}}
 
-        b2 = self.curate_bif(currentSec.stop_criteria["bif_term"], target_bif,
-                             round_num(self.bt_all[currentSec.stop_criteria["bif_term"]["bif"]]))
+        b2 = self.curate_bif(currentSec.stop_criteria["TMD"], target_bif,
+                             round_num(self.bt_all[currentSec.stop_criteria["TMD"]["bif"]]))
 
-        stop2 = {"bif_term": {"ref": self.metric_ref(currentSec),
+        stop2 = {"TMD": {"ref": self.metric_ref(currentSec),
                               "bif": b2,
                               "term": round_num(
-                                  self.bt_all[currentSec.stop_criteria["bif_term"]["bif"]])}}
+                                  self.bt_all[currentSec.stop_criteria["TMD"]["bif"]])}}
 
         return (stop1, stop2)
 
@@ -113,9 +113,9 @@ class TMDAlgo(AbstractAlgo):
         self.angles = angles
         self.bt_all = bt_all
 
-        stop = {"bif_term": {"ref": self.metric_ref(None),
-                             "bif": self.bif[0],
-                             "term": self.term[-1]}}
+        stop = {"TMD": {"ref": self.metric_ref(None),
+                        "bif": self.bif[0],
+                        "term": self.term[-1]}}
 
         num_sec = len(self.ph_angles)
 
@@ -126,8 +126,8 @@ class TMDAlgo(AbstractAlgo):
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
         """
-        self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
-        ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
+        self.bif.remove(currentSec.stop_criteria["TMD"]["bif"])
+        ang = self.angles[currentSec.stop_criteria["TMD"]["bif"]]
         dir1, dir2 = self.bif_method(currentSec.history(), angles=ang)
         first_point = np.array(currentSec.points[-1])
 
@@ -149,26 +149,24 @@ class TMDAlgo(AbstractAlgo):
         """When the growth of a section is terminated the "term"
         must be removed from the TMD grower
         """
-        self.term.remove(currentSec.stop_criteria["bif_term"]["term"])
-        # print 'B: ', currentSec.stop_criteria["bif_term"]["bif"],
-        # print ' & removed T: ', currentSec.stop_criteria["bif_term"]["term"]
+        self.term.remove(currentSec.stop_criteria["TMD"]["term"])
 
     def extend(self, currentSec):
         """Definition of stop criterion for the growth of the current section.
         """
-        bif_term = currentSec.stop_criteria["bif_term"]
+        criteriaTMD = currentSec.stop_criteria["TMD"]
 
         # First we check that the current termination has not been used
-        if bif_term["term"] not in self.term and not np.isinf(bif_term["term"]):
-            currentSec.stop_criteria["bif_term"]["term"] = np.min(
+        if criteriaTMD["term"] not in self.term and not np.isinf(criteriaTMD["term"]):
+            currentSec.stop_criteria["TMD"]["term"] = np.min(
                 self.term) if self.term else np.inf
 
         # Then we check that the current bifurcation has not been used
-        if bif_term["bif"] not in self.bif and not np.isinf(bif_term["bif"]):
-            currentSec.stop_criteria["bif_term"]["bif"] = self.curate_bif(
-                currentSec.stop_criteria["bif_term"],
+        if criteriaTMD["bif"] not in self.bif and not np.isinf(criteriaTMD["bif"]):
+            currentSec.stop_criteria["TMD"]["bif"] = self.curate_bif(
+                currentSec.stop_criteria["TMD"],
                 self.bif[0] if self.bif else np.inf,
-                round_num(bif_term["term"]))
+                round_num(criteriaTMD["term"]))
 
         return currentSec.next()
 
@@ -192,8 +190,8 @@ class TMDApicalAlgo(TMDAlgo):
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
         """
-        self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
-        ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
+        self.bif.remove(currentSec.stop_criteria["TMD"]["bif"])
+        ang = self.angles[currentSec.stop_criteria["TMD"]["bif"]]
 
         current_rd = self.metric(currentSec)
 
@@ -234,8 +232,8 @@ class TMDGradientAlgo(TMDApicalAlgo):
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
         """
-        self.bif.remove(currentSec.stop_criteria["bif_term"]["bif"])
-        ang = self.angles[currentSec.stop_criteria["bif_term"]["bif"]]
+        self.bif.remove(currentSec.stop_criteria["TMD"]["bif"])
+        ang = self.angles[currentSec.stop_criteria["TMD"]["bif"]]
 
         current_rd = self.metric(currentSec)
 
@@ -254,9 +252,9 @@ class TMDGradientAlgo(TMDApicalAlgo):
 
         def majorize_process(stop, process, input_dir):
             '''Currates the non-major processes to apply a gradient to large components'''
-            difference = np.abs(stop["bif_term"]["bif"] - stop["bif_term"]["term"])
+            difference = np.abs(stop["TMD"]["bif"] - stop["TMD"]["term"])
             if difference == np.inf:
-                difference = np.abs(stop["bif_term"]["term"] - self.metric(currentSec))
+                difference = np.abs(stop["TMD"]["term"] - self.metric(currentSec))
             if difference > self.params['bias_length'] and difference != np.inf:
                 direction1 = (1.0 - self.params['bias']) * np.array(input_dir)
                 direction2 = self.params['bias'] * np.array(currentSec.direction)

@@ -9,6 +9,8 @@ from tns.morphmath.utils import get_random_point, norm  # norm used for single v
 
 MEMORY = 5
 
+LAMDA = 1.0
+
 # Memory decreases with distance from current point
 WEIGHTS = np.exp(np.arange(1, MEMORY + 1) - MEMORY)
 
@@ -30,7 +32,7 @@ class SectionGrower(object):
         self.points = [np.array(first_point[:3])]
         self.params = {"randomness": randomness,
                        "targeting": targeting,
-                       "scale_prob": 1.0,
+                       "scale_prob": LAMDA,
                        "history": 1.0 - randomness - targeting}
         self.stop_criteria = stop_criteria
         self.process = process
@@ -97,24 +99,25 @@ class SectionGrower(object):
 
 class SectionGrowerExponentialProba(SectionGrower):
     '''Abstract class where the bifurcation and termination probability
-    follow a exponentially decreasing probability
+       follow a exponentially decreasing probability
+       The parameter lamda defines the slope of the exponential.
 
     The parameter that follows the exponential must be defined in the derived class'''
 
     def _check(self, value, which):
-        crit = self.stop_criteria["bif_term"]
-        scale = self.params["scale_prob"]
-        assert scale > 0
+        crit = self.stop_criteria["TMD"]
+        lamda = self.params["scale_prob"]
+        assert lamda > 0
         x = crit[which] - value
         if x < 0:
             # no need to exponentiate, the comparison below automatically resolves to `True`
             return True
-        else:
-            return np.random.random() < np.exp(-x)
+        # Check if close enough to exp( distance * lamda)
+        return np.random.random() < np.exp(-x * lamda)
 
     def check_stop(self):
         '''Probabilities of bifurcating and stopping are proportional
-        exp(-distance/scale)'''
+        exp(-distance * lamda)'''
 
         if len(self.points) < 2:
             return True
@@ -141,7 +144,7 @@ class SectionGrowerTMD(SectionGrowerExponentialProba):
     '''
     def get_val(self):
         '''Returns radial distance'''
-        return norm(np.subtract(self.points[-1], self.stop_criteria["bif_term"]["ref"]))
+        return norm(np.subtract(self.points[-1], self.stop_criteria["TMD"]["ref"]))
 
 
 class SectionGrowerPath(SectionGrowerExponentialProba):
@@ -158,7 +161,7 @@ class SectionGrowerPath(SectionGrowerExponentialProba):
                                                 randomness, targeting, process, stop_criteria,
                                                 context)
 
-        self.pathlength = 0 if parent is None else self.stop_criteria['bif_term']['ref']
+        self.pathlength = 0 if parent is None else self.stop_criteria["TMD"]['ref']
 
     def get_val(self):
         '''Returns path distance'''

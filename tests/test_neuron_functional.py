@@ -50,7 +50,7 @@ def _test_full(feature, distributions, parameters, ref_cell, ref_persistence_dia
     n = NeuronGrower(input_distributions=distributions, input_parameters=params).grow()
 
     with setup_tempdir('test_grower', cleanup=False) as folder:
-        out_neuron = os.path.join(folder, 'test_output_neuron.h5')
+        out_neuron = os.path.join(folder, 'test_output_neuron_.h5')
         n.write(out_neuron)
 
         if ref_persistence_diagram is not None:
@@ -90,7 +90,6 @@ def test_radial_grower():
                'radial_grower.h5',
                'bio_radial_persistence_diagram.json')
 
-
 def test_path_grower():
     '''test tmd_path and tmd_apical_path'''
     _test_full('path_distances',
@@ -99,7 +98,6 @@ def test_path_grower():
                'path_grower.h5',
                'bio_path_persistence_diagram.json')
 
-
 def test_gradient_radial_grower():
     '''test tmd_gradient'''
     _test_full('radial_distances',
@@ -107,7 +105,6 @@ def test_gradient_radial_grower():
                'bio_gradient_radial_params.json',
                'gradient_radial_grower.h5',
                'gradient_radial_persistence_diagram.json')
-
 
 def test_gradient_path_grower():
     '''test tmd_path'''
