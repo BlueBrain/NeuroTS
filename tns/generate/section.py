@@ -105,10 +105,10 @@ class SectionGrowerExponentialProba(SectionGrower):
     The parameter that follows the exponential must be defined in the derived class'''
 
     def _check(self, value, which):
-        crit = self.stop_criteria["TMD"]
+        crit = getattr(self.stop_criteria["TMD"], which)
         lamda = self.params["scale_prob"]
         assert lamda > 0
-        x = crit[which] - value
+        x = crit - value
         if x < 0:
             # no need to exponentiate, the comparison below automatically resolves to `True`
             return True
@@ -144,7 +144,7 @@ class SectionGrowerTMD(SectionGrowerExponentialProba):
     '''
     def get_val(self):
         '''Returns radial distance'''
-        return norm(np.subtract(self.points[-1], self.stop_criteria["TMD"]["ref"]))
+        return norm(np.subtract(self.points[-1], self.stop_criteria["TMD"].ref))
 
 
 class SectionGrowerPath(SectionGrowerExponentialProba):
@@ -161,7 +161,7 @@ class SectionGrowerPath(SectionGrowerExponentialProba):
                                                 randomness, targeting, process, stop_criteria,
                                                 context)
 
-        self.pathlength = 0 if parent is None else self.stop_criteria["TMD"]['ref']
+        self.pathlength = 0 if parent is None else self.stop_criteria["TMD"].ref
 
     def get_val(self):
         '''Returns path distance'''

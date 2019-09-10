@@ -1,12 +1,14 @@
 """Basic class for TreeGrower Algorithms"""
 
+import copy
 import numpy as np
 
-from tns.basic import round_num
 from tns.generate.algorithms.abstractgrower import AbstractAlgo
-from tns.generate.algorithms.common import bif_methods, init_ph_angles
+from tns.generate.algorithms.common import bif_methods
+from tns.generate.algorithms.common import TMDStop
 from tns.morphmath import sample
 from tns.morphmath.utils import norm
+from tns.generate.algorithms.barcode import Barcode
 
 
 class TMDAlgo(AbstractAlgo):
@@ -27,11 +29,9 @@ class TMDAlgo(AbstractAlgo):
         if params.get('modify'):
             self.ph_angles = params['modify']['funct'](self.ph_angles,
                                                        **params['modify']['kwargs'])
+
+        self.barcode = Barcode(list(self.ph_angles))
         self.start_point = start_point
-        self.bif = None
-        self.term = None
-        self.angles = None
-        self.bt_all = None
 
     def metric_ref(self, section):
         """Returns the metric reference, here radial distance reference.
@@ -47,7 +47,7 @@ class TMDAlgo(AbstractAlgo):
         # Function to return path distance
         return norm(np.subtract(section.points[-1], self.start_point))
 
-    def curate_bif(self, stop, target_bif, target_term):
+    def curate_bif(self, stop, target):
         '''Checks if selected bar is smaller than current bar length.
            Returns the smallest bifurcation for which the length of the bar
            is smaller than current one.
@@ -55,24 +55,28 @@ class TMDAlgo(AbstractAlgo):
            termination target the np.inf is returned instead.
         currentSec.stop_criteria["TMD"]
         '''
+        target_stop = copy.deepcopy(target)
         # Compute length of current section
-        current_length = np.abs(stop["term"] - stop["bif"])
+        current_length = stop.child_length()
         # Compute target length of children
-        target_length = np.abs(target_bif - target_term)
+        target_length = target_stop.child_length()
 
         # There are no bifurcations to check
-        if not self.bif or np.isinf(target_bif):
-            return np.inf
+        if not self.barcode.bifs or np.isinf(target_stop.bif):
+            target_stop.update_bif(None, np.inf)
+            return target_stop
         # If child length smaller than parent
         if target_length <= current_length:
-            return target_bif
+            return target_stop
         # Else find the next bif for which child length
         # is smaller than parent
-        for b in self.bif:
-            target_length = np.abs(target_term - b)
+        for bar_id, bar_bif in self.barcode.bifs.items():
+            target_length = np.abs(target_stop.term - bar_bif)
             if target_length <= current_length:
-                return b
-        return np.inf
+                target_stop.update_bif(bar_id, bar_bif)
+                return target_stop
+        target_stop.update_bif(None, np.inf)
+        return target_stop
 
     def get_stop_criteria(self, currentSec):
         """Returns stop1 and stop2 that are the commonly
@@ -82,22 +86,26 @@ class TMDAlgo(AbstractAlgo):
                              term: the appropriate termination path length
                             }
         """
-        target_bif = self.bif[0] if len(self.bif) > 0 else np.inf
+        current_tmd = copy.deepcopy(currentSec.stop_criteria["TMD"])
+        bif_id, bif = self.barcode.min_bif()
 
-        b1 = self.curate_bif(currentSec.stop_criteria["TMD"], target_bif,
-                             round_num(currentSec.stop_criteria["TMD"]["term"]))
+        target_stop = TMDStop(ref=self.metric_ref(currentSec),
+                              bif_id=bif_id,
+                              bif=bif,
+                              term_id=current_tmd.term_id,
+                              term=current_tmd.term)
 
-        stop1 = {"TMD": {"ref": self.metric_ref(currentSec),
-                              "bif": b1,
-                              "term": round_num(currentSec.stop_criteria["TMD"]["term"])}}
+        target_stop1 = self.curate_bif(currentSec.stop_criteria["TMD"], target_stop)
+        stop1 = {"TMD": target_stop1}
 
-        b2 = self.curate_bif(currentSec.stop_criteria["TMD"], target_bif,
-                             round_num(self.bt_all[currentSec.stop_criteria["TMD"]["bif"]]))
+        target_stop = TMDStop(ref=self.metric_ref(currentSec),
+                              bif_id=bif_id,
+                              bif=bif,
+                              term_id=current_tmd.bif_id,
+                              term=self.barcode.terms[current_tmd.bif_id])
 
-        stop2 = {"TMD": {"ref": self.metric_ref(currentSec),
-                              "bif": b2,
-                              "term": round_num(
-                                  self.bt_all[currentSec.stop_criteria["TMD"]["bif"]])}}
+        target_stop2 = self.curate_bif(currentSec.stop_criteria["TMD"], target_stop)
+        stop2 = {"TMD": target_stop2}
 
         return (stop1, stop2)
 
@@ -106,16 +114,14 @@ class TMDAlgo(AbstractAlgo):
         of the first section to be grown. Saves the extracted
         input data into the corresponding structures.
         """
-        bif, term, angles, bt_all = init_ph_angles(self.ph_angles)
-
-        self.bif = bif
-        self.term = term
-        self.angles = angles
-        self.bt_all = bt_all
-
-        stop = {"TMD": {"ref": self.metric_ref(None),
-                        "bif": self.bif[0],
-                        "term": self.term[-1]}}
+        b0_id, b0 = self.barcode.min_bif()
+        t0_id, t0 = self.barcode.max_term()
+        stop = {"TMD": TMDStop(ref=self.metric_ref(None),
+                               bif_id=b0_id,
+                               bif=b0,
+                               term_id=t0_id,
+                               term=t0)
+                }
 
         num_sec = len(self.ph_angles)
 
@@ -126,8 +132,9 @@ class TMDAlgo(AbstractAlgo):
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
         """
-        self.bif.remove(currentSec.stop_criteria["TMD"]["bif"])
-        ang = self.angles[currentSec.stop_criteria["TMD"]["bif"]]
+        self.barcode.remove_bif(currentSec.stop_criteria["TMD"].bif_id)
+        ang = self.barcode.angles[currentSec.stop_criteria["TMD"].bif_id]
+
         dir1, dir2 = self.bif_method(currentSec.history(), angles=ang)
         first_point = np.array(currentSec.points[-1])
 
@@ -149,24 +156,23 @@ class TMDAlgo(AbstractAlgo):
         """When the growth of a section is terminated the "term"
         must be removed from the TMD grower
         """
-        self.term.remove(currentSec.stop_criteria["TMD"]["term"])
+        self.barcode.remove_term(currentSec.stop_criteria["TMD"].term_id)
 
     def extend(self, currentSec):
         """Definition of stop criterion for the growth of the current section.
         """
-        criteriaTMD = currentSec.stop_criteria["TMD"]
+        criteria_tmd = copy.deepcopy(currentSec.stop_criteria["TMD"])
 
         # First we check that the current termination has not been used
-        if criteriaTMD["term"] not in self.term and not np.isinf(criteriaTMD["term"]):
-            currentSec.stop_criteria["TMD"]["term"] = np.min(
-                self.term) if self.term else np.inf
+        if criteria_tmd.term_id not in self.barcode.terms:
+            criteria_tmd.update_term(*self.barcode.min_term())
 
         # Then we check that the current bifurcation has not been used
-        if criteriaTMD["bif"] not in self.bif and not np.isinf(criteriaTMD["bif"]):
-            currentSec.stop_criteria["TMD"]["bif"] = self.curate_bif(
-                currentSec.stop_criteria["TMD"],
-                self.bif[0] if self.bif else np.inf,
-                round_num(criteriaTMD["term"]))
+        if criteria_tmd.bif_id not in self.barcode.bifs and not np.isinf(criteria_tmd.bif):
+            criteria_tmd.update_bif(*self.barcode.min_bif())
+            criteria_tmd = self.curate_bif(currentSec.stop_criteria["TMD"], criteria_tmd)
+
+        currentSec.stop_criteria["TMD"] = criteria_tmd
 
         return currentSec.next()
 
@@ -190,8 +196,8 @@ class TMDApicalAlgo(TMDAlgo):
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
         """
-        self.bif.remove(currentSec.stop_criteria["TMD"]["bif"])
-        ang = self.angles[currentSec.stop_criteria["TMD"]["bif"]]
+        self.barcode.remove_bif(currentSec.stop_criteria["TMD"].bif_id)
+        ang = self.barcode.angles[currentSec.stop_criteria["TMD"].bif_id]
 
         current_rd = self.metric(currentSec)
 
@@ -232,8 +238,8 @@ class TMDGradientAlgo(TMDApicalAlgo):
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
         """
-        self.bif.remove(currentSec.stop_criteria["TMD"]["bif"])
-        ang = self.angles[currentSec.stop_criteria["TMD"]["bif"]]
+        self.barcode.remove_bif(currentSec.stop_criteria["TMD"].bif_id)
+        ang = self.barcode.angles[currentSec.stop_criteria["TMD"].bif_id]
 
         current_rd = self.metric(currentSec)
 
@@ -252,9 +258,9 @@ class TMDGradientAlgo(TMDApicalAlgo):
 
         def majorize_process(stop, process, input_dir):
             '''Currates the non-major processes to apply a gradient to large components'''
-            difference = np.abs(stop["TMD"]["bif"] - stop["TMD"]["term"])
+            difference = np.abs(stop["TMD"].bif - stop["TMD"].term)
             if difference == np.inf:
-                difference = np.abs(stop["TMD"]["term"] - self.metric(currentSec))
+                difference = np.abs(stop["TMD"].term - self.metric(currentSec))
             if difference > self.params['bias_length'] and difference != np.inf:
                 direction1 = (1.0 - self.params['bias']) * np.array(input_dir)
                 direction2 = self.params['bias'] * np.array(currentSec.direction)

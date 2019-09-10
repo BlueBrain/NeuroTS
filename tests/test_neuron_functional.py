@@ -29,7 +29,7 @@ def assert_close_persistent_diagram(actual, expected):
     # This comparison does not depend on ordering of the points
     # and ensures that the points of the original persistence are consistently generated.
     assert_array_almost_equal(distances, np.zeros(len(distances)), decimal=0.1)
-    assert_almost_equal(np.max(expected[-1]), np.max(actual[-1]), decimal=4)
+    assert_almost_equal(np.max(expected[-1]), np.max(actual[-1]), decimal=0.1)
     assert_almost_equal(len(expected), len(actual))
 
 

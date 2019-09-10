@@ -3,6 +3,8 @@ from nose import tools as nt
 from tns.generate import section
 import numpy as np
 from numpy.testing import assert_array_almost_equal
+from tns.generate.algorithms.common import TMDStop
+from nose.tools import assert_raises
 
 
 EXPECTED_WEIGHTS = np.array([0.01831564, 0.04978707, 0.13533528, 0.36787944, 1.        ])
@@ -39,3 +41,10 @@ def test_SectionGrower():
     s.latest_directions.append([1., 1., 1.])
     s.latest_directions_normed.append([1., 1., 1.] / np.linalg.norm([1., 1., 1.]))
     assert_array_almost_equal(s.history(), np.array([0.41177931, 0.42484243, 0.80619272]))
+
+    tmd_stop = TMDStop(1, 26.3027, 0, 633.5966, 40.0)
+    # Check small section
+    s = section.SectionGrowerExponentialProba(None, None, [0.,0.,0.], [0., 1., 0.], 0.0, 0.0, tmd_stop, None)
+    # Check that the growth will continue for single point section
+    assert(s.check_stop())
+    assert_raises(NotImplementedError, s.get_val)
