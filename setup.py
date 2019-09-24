@@ -18,7 +18,7 @@ setup(
         'morphio>=2.2.0',
         'morph-tool>=0.1.12',
         'neurom>=1.4.7',
-        'tmd==2.0.4',
+        'tmd>=2.0.5',
         'enum34>=1.0.4',
         'scipy>=0.13.3',
         'numpy>=1.15.0',

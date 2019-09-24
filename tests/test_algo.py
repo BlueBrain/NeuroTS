@@ -6,6 +6,7 @@ import numpy as np
 from nose.tools import assert_dict_equal
 from numpy.testing import assert_array_almost_equal, assert_equal
 from tns.generate.algorithms.common import TMDStop
+from tns.morphmath import sample
 
 from tns.generate.algorithms.tmdgrower import (TMDAlgo, TMDApicalAlgo, TMDGradientAlgo)
 from tns.generate.section import SectionGrower, SectionGrowerPath
@@ -24,9 +25,11 @@ def _setup_test(Algo, Grower):
 
     np.random.seed(42)
     algo = Algo(distributions, parameters, [0, 0, 1])
+    seg_len = sample.Distr(parameters["step_size"])
 
     grower = Grower(None, None, [1.1,0.,0.], [0.57735, 0.57735, 0.57735], 0.2, 0.3, 'major',
-                           {'TMD': TMDStop(bif_id=1, bif=9.7747, term_id=0, term=159.798, ref=0.0)})
+                           {'TMD': TMDStop(bif_id=1, bif=9.7747, term_id=0, term=159.798, ref=0.0)},
+                           seg_len, 0.0)
     return algo, grower
 
 

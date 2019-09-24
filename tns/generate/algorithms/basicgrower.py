@@ -35,14 +35,14 @@ class TrunkAlgo(AbstractAlgo):
 
         return stop, num_sec
 
-    def bifurcate(self, currentSec):
+    def bifurcate(self, current_section):
         """When the section bifurcates two new sections are created.
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
         """
         dir1, dir2 = self.bif_method()
-        start_point = np.array(currentSec.points[-1])
-        stop = currentSec.stop_criteria
+        start_point = np.array(current_section.last_point)
+        stop = current_section.stop_criteria
 
         children = 0
         # print currentSec.parent, self.growth_method
@@ -50,24 +50,24 @@ class TrunkAlgo(AbstractAlgo):
         s1 = {'direction': dir1,
               'start_point': start_point,
               'stop': stop,
-              'process': currentSec.process,
+              'process': current_section.process,
               'children': children}
 
         s2 = {'direction': dir2,
               'start_point': start_point,
               'stop': stop,
-              'process': currentSec.process,
+              'process': current_section.process,
               'children': children}
 
         return s1, s2
 
-    def terminate(self, currentSec):
+    def terminate(self, current_section):
         """When the growth of a section is terminated the "term"
         must be removed from the TMD grower
         """
 
-    def extend(self, currentSec):
+    def extend(self, current_section):
         '''Creates a section with the selected parameters
            until at least one stop criterion is fulfilled.
         '''
-        return currentSec.next()
+        return current_section.next()

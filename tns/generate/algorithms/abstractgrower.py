@@ -28,19 +28,19 @@ class AbstractAlgo(object):
         """
 
     @abc.abstractmethod
-    def bifurcate(self, currentSec):
+    def bifurcate(self, current_section):
         """When the section bifurcates two new sections need to be created.
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
         """
 
     @abc.abstractmethod
-    def terminate(self, currentSec):
+    def terminate(self, current_section):
         """When the growth of a section is terminated the "term"
         must be removed from the TMD grower
         """
 
     @abc.abstractmethod
-    def extend(self, currentSec):
+    def extend(self, current_section):
         """Definition of stop criterion for the growth of the current section.
         """

@@ -48,7 +48,7 @@ def test_TMDStop():
     assert_equal(tmd_stop.term, 633.5966)
     assert_equal(tmd_stop.ref, 10.)
     assert_equal(tmd_stop.child_length(), 607.2939)
-    assert_equal(tmd_stop.expected_length(), 16.3027)
+    assert_equal(tmd_stop.expected_termination_length(), 623.5966)
     # Comparison should pass for same TMDstop
     assert(tmd_stop == TMDStop(1, 26.3027, 0, 633.5966, 10.0))
     # Comparison should fail for not same TMDstop
@@ -63,4 +63,3 @@ def test_TMDStop():
     tmd_stop.update_term(10, 110.)
     assert_equal(tmd_stop.term_id, 10)
     assert_equal(tmd_stop.term, 110.)
-

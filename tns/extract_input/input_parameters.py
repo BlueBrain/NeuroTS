@@ -35,6 +35,7 @@ def parameters(origin=(0., 0., 0.),
                     "growth_method": method,
                     "branching_method": branching,
                     "modify": None,
+                    "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
                     "metric": feature})
         ret.update(data)
         return ret
@@ -46,8 +47,7 @@ def parameters(origin=(0., 0., 0.),
         input_parameters["basal"] = merged_params({"tree_type": 3})
 
     if 'apical' in neurite_types:
-        input_parameters["apical"] = merged_params({"apical_distance": 0.0,
-                                                    "tree_type": 4,
+        input_parameters["apical"] = merged_params({"tree_type": 4,
                                                     "branching_method": "directional",
                                                     "orientation": [(0., 1., 0.)], })
         if method == 'tmd':

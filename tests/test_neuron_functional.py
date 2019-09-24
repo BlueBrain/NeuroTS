@@ -28,9 +28,9 @@ def assert_close_persistent_diagram(actual, expected):
     # We compare distances between expected and generated peristence as it is more stable to check.
     # This comparison does not depend on ordering of the points
     # and ensures that the points of the original persistence are consistently generated.
+    assert_almost_equal(len(expected), len(actual))
     assert_array_almost_equal(distances, np.zeros(len(distances)), decimal=0.1)
     assert_almost_equal(np.max(expected[-1]), np.max(actual[-1]), decimal=0.1)
-    assert_almost_equal(len(expected), len(actual))
 
 
 def _load_inputs(distributions, parameters):
@@ -52,12 +52,15 @@ def _test_full(feature, distributions, parameters, ref_cell, ref_persistence_dia
     with setup_tempdir('test_grower', cleanup=False) as folder:
         out_neuron = os.path.join(folder, 'test_output_neuron_.h5')
         n.write(out_neuron)
+        # For checking purposes, we can output the cells as swc
+        # n.write(ref_cell.replace('.h5', 'NEW.h5'))
 
         if ref_persistence_diagram is not None:
             # Load with TMD and extract radial persistence
             n0 = tmd.io.load_neuron(out_neuron)
 
             actual_persistence_diagram = tmd.methods.get_persistence_diagram(n0.apical[0], feature=feature)
+            # print(actual_persistence_diagram)
 
             with open(join(_path, ref_persistence_diagram)) as f:
                 expected_persistence_diagram = json.load(f)
@@ -85,7 +88,7 @@ def test_basic_grower():
 def test_path_grower():
     '''test tmd_path and tmd_apical_path'''
     _test_full('path_distances',
-               'bio_path_distribution.json',
+               'bio_distribution.json',
                'bio_path_params.json',
                'path_grower.h5',
                'bio_path_persistence_diagram.json')
@@ -93,10 +96,11 @@ def test_path_grower():
 def test_gradient_path_grower():
     '''test tmd_path'''
     _test_full('path_distances',
-              'bio_path_distribution.json',
+              'bio_distribution.json',
               'bio_gradient_path_params.json',
               'gradient_path_grower.h5',
               'gradient_path_persistence_diagram.json')
+
 
 def test_bio_rat_l5_tpc():
     _test_full('path_distances',

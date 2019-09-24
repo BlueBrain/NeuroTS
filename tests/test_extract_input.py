@@ -84,6 +84,12 @@ def test_parameters():
         neurite_types=['basal', 'apical'], method='tmd')
 
     assert_equal(params,
-    {'basal': {'randomness': 0.15, 'targeting': 0.12, 'radius': 0.3, 'orientation': None, 'growth_method': 'tmd', 'branching_method': 'bio_oriented', 'modify': None, 'tree_type': 3, 'metric': 'radial_distances'},
-     'apical': {'randomness': 0.15, 'targeting': 0.12, 'radius': 0.3, 'orientation': [(0.0, 1.0, 0.0)], 'growth_method': 'tmd_apical', 'branching_method': 'directional', 'modify': None, 'apical_distance': 0.0, 'tree_type': 4, 'metric': 'radial_distances'},
+    {'basal': {'randomness': 0.15, 'targeting': 0.12, 'radius': 0.3, 'orientation': None, 
+              'growth_method': 'tmd', 'branching_method': 'bio_oriented', 'modify': None,
+              "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
+              'tree_type': 3, 'metric': 'radial_distances'},
+     'apical': {'randomness': 0.15, 'targeting': 0.12, 'radius': 0.3, 'orientation': [(0.0, 1.0, 0.0)],
+                'growth_method': 'tmd_apical', 'branching_method': 'directional', 'modify': None,
+                "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
+                'tree_type': 4, 'metric': 'radial_distances'},
      'axon': {}, 'origin': (0.0, 0.0, 0.0), 'grow_types': ['basal', 'apical']})

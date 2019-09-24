@@ -2,6 +2,8 @@
 TNS class : Tree
 '''
 import copy
+import json
+import logging
 
 import numpy as np
 
@@ -9,6 +11,9 @@ from morphio import PointLevel, SectionType
 from tns.generate.algorithms import basicgrower, tmdgrower
 from tns.generate.section import (SectionGrower, SectionGrowerPath,
                                   SectionGrowerTMD)
+from tns.morphmath import sample
+
+L = logging.getLogger('tns')
 
 growth_algorithms = {'tmd': tmdgrower.TMDAlgo,
                      'tmd_apical': tmdgrower.TMDApicalAlgo,
@@ -36,7 +41,7 @@ class TreeGrower(object):
             neuron: Obj neuron where groups and points are stored
             initial_direction: 3D vector
             initial_point: 3D vector that defines the starting point of the tree
-            parameters including: tree_type, radius, randomness, targeting, apical_distance
+            parameters including: tree_type, radius, randomness, targeting.
             tree_type: an integer indicating the type (choose from 2, 3, 4, 5)
             context: an object containing contextual information
         """
@@ -56,14 +61,22 @@ class TreeGrower(object):
                                      context=context)
         stop, num_sec = self.growth_algo.initialize()
 
-        _ = self.add_section(parent=None,
-                             direction=self.direction,
-                             first_point=list(self.point),
-                             stop=copy.deepcopy(stop),
-                             process='major',
-                             children=2 if num_sec > 1 else 0)
+        # Creates the distribution from which the segment lengths
+        # To sample a new seg_len call self.seg_len.draw()
+        self.seg_length_distr = sample.Distr(self.params["step_size"])
 
-    def add_section(self, parent, direction, first_point, stop, process=None, children=0):
+        sec = self.add_section(parent=None,
+                               direction=self.direction,
+                               first_point=list(self.point),
+                               stop=copy.deepcopy(stop),
+                               process='major',
+                               pathlength=0.,
+                               children=2 if num_sec > 1 else 0)
+        # First section of the tree has at least one point.
+        sec.first_point()
+
+    def add_section(self, parent, direction, first_point, stop, pathlength,
+                    process=None, children=0):
         """Generates a section from the parent section "act"
         from all the required information. The section is
         added to the neuron.sections and activated.
@@ -78,6 +91,8 @@ class TreeGrower(object):
                              children=children,
                              process=process,
                              stop_criteria=copy.deepcopy(stop),
+                             step_size_distribution=self.seg_length_distr,
+                             pathlength=pathlength,
                              context=self.context)
 
         self.active_sections.append(sec_grower)
@@ -105,6 +120,13 @@ class TreeGrower(object):
         else:
             append_fun = self.neuron.append_root_section
 
+        if L.level == logging.DEBUG:
+            data = {"parent": section.parent.id if section.parent else None,
+                    "coord": np.vstack(section.points).tolist(),
+                    "radius": [self.params["radius"] * 2] * len(section.points),
+                    "type": int(SectionType(self.params["tree_type"]))}
+            L.debug("appended_data=%s", json.dumps(data))
+
         return append_fun(PointLevel(np.array(section.points).tolist(),
                                      [self.params['radius'] * 2] * len(section.points)),
                           SectionType(self.params['tree_type']))
@@ -129,15 +151,17 @@ class TreeGrower(object):
 
                 if state == 'bifurcate':
                     # Save the final normed direction of parent
-                    latest = section_grower.latest_directions_normed[-1]
-                    latest_un = section_grower.latest_directions[-1]
+                    latest = section_grower.latest_directions[-1]
                     # the current section_grower bifurcates
                     # Returns two section_grower dictionaries: (S1, S2)
                     for child_section in self.growth_algo.bifurcate(section_grower):
-                        child = self.add_section(parent=section, **child_section)
+                        child = self.add_section(parent=section,
+                                                 pathlength=section_grower.pathlength,
+                                                 **child_section)
                         # Copy the final normed direction of parent to all children
-                        child.latest_directions_normed.append(latest)
-                        child.latest_directions.append(latest_un)
+                        child.latest_directions.append(latest)
+                        # Generate the first point of the section
+                        child.first_point()
                     self.active_sections.remove(section_grower)
 
                 elif state == 'terminate':

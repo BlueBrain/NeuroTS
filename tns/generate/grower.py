@@ -44,11 +44,21 @@ class NeuronGrower(object):
         self.soma = SomaGrower(initial_point=self.input_parameters["origin"],
                                radius=sample.soma_size(self.input_distributions),
                                context=context)
+        # Create a list to expose apical points for each apical tree in the neuron,
+        # the user can call NeuronGrower.apical_points to get the 3D corrdinates
+        # for the apical point of each generated apical tree.
+        self.apical_points = list()
 
     def next(self):
         '''Call the "next" method of each neurite grower'''
         for grower in list(self.active_neurites):
             if grower.end():
+                # If tree is an apical, the apical points get appended at the end of growth
+                # This will ensure that for each apical tree the relevant apical point,
+                # as a set of 3D coordinates (x,y,z) will be exposed to the user.
+                if 'apical' in self.input_parameters['grow_types'] and \
+                   grower.type == self.input_parameters['apical']['tree_type']:
+                    self.apical_points.append(grower.growth_algo.apical_point)
                 self.active_neurites.remove(grower)
             else:
                 grower.next_point()

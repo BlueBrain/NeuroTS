@@ -14,6 +14,7 @@ class Distr(object):
         """
         self.type = next(iter(params.keys()))
         self.params = params[self.type]
+        self.set_distribution()
 
     @staticmethod
     def norm(params):
@@ -42,21 +43,39 @@ class Distr(object):
         return {"loc": params["loc"],
                 "scale": 1. / params["lambda"]}
 
-    def sample(self):
-        """Returns a value according to
-        the statistical distribution
+    def set_distribution(self):
+        """Returns a statistical distribution
+           according to input parameters
         """
-
-        if self.type == "data":
+        # If distribution is a statistical distribution
+        if self.type != "data":
+            fit = getattr(self, self.type)(self.params)
+            self.distribution = getattr(stats, self.type)(**fit)
+        # If distribution consists of data we reformat input
+        else:
             w = np.array(self.params["weights"], dtype=np.float)
             b = self.params["bins"]
-            return np.random.choice(b, p=w / np.sum(w))
+            self.distribution = {"bins": b, "weights": w / np.sum(w)}
 
-        fit = getattr(self, self.type)(self.params)
+    def draw(self):
+        """Returns a sampled number"""
+        if self.type == "data":
+            return np.random.choice(self.distribution["bins"],
+                                    p=self.distribution["weights"])
 
-        D = getattr(stats, self.type)(**fit)
+        return self.distribution.rvs()
 
-        return D.rvs()
+    def draw_positive(self):
+        """Returns a positive sampled number"""
+        if self.type == "data":
+            positives = np.where(self.distribution["bins"] > 0)
+            return np.random.choice(self.distribution["bins"][positives],
+                                    p=self.distribution["weights"][positives])
+
+        val = self.distribution.rvs()
+        while val <= 0:
+            val = self.distribution.rvs()
+        return val
 
 
 def d_transform(distr, funct):
@@ -78,7 +97,7 @@ def soma_size(distrib):
     plus some constraints.
     """
     soma_d = Distr(distrib['soma']['size'])
-    return soma_d.sample()
+    return soma_d.draw_positive()
 
 
 def n_neurites(distrib):
@@ -88,9 +107,7 @@ def n_neurites(distrib):
     It ensures the number will be an INT.
     """
     neurites_d = Distr(distrib)
-
-    numtrees = int(neurites_d.sample())
-
+    numtrees = int(neurites_d.draw())
     return numtrees
 
 
@@ -100,7 +117,7 @@ def trunk_angles(distrib, N):
     and the input distribution.
     """
     trunks_d = Distr(distrib['trunk']['orientation_deviation'])
-    angles = [trunks_d.sample() for _ in range(N - 1)]
+    angles = [trunks_d.draw() for _ in range(N - 1)]
     angles = angles + [sum(angles)]
     return angles
 
@@ -111,7 +128,7 @@ def azimuth_angles(distrib, N):
     and the input distribution.
     """
     trunks_d = Distr(d_transform(distrib['trunk']['azimuth'], np.cos))
-    angles = [np.arccos(trunks_d.sample()) for _ in range(N)]
+    angles = [np.arccos(trunks_d.draw()) for _ in range(N)]
     return angles
 
 

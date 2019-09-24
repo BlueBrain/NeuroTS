@@ -24,14 +24,15 @@ class TMDAlgo(AbstractAlgo):
         """
         super(TMDAlgo, self).__init__(input_data, params, start_point, context)
         self.bif_method = bif_methods[params["branching_method"]]
-        self.params = params
+        self.params = copy.deepcopy(params)
         self.ph_angles = sample.ph(input_data["persistence_diagram"])
         if params.get('modify'):
             self.ph_angles = params['modify']['funct'](self.ph_angles,
                                                        **params['modify']['kwargs'])
-
         self.barcode = Barcode(list(self.ph_angles))
         self.start_point = start_point
+        self.apical_point = None
+        self.apical_point_distance_from_soma = 0.0
 
     @staticmethod
     def metric_ref(section):
@@ -51,64 +52,54 @@ class TMDAlgo(AbstractAlgo):
         # Function to return path distance
         return section.pathlength
 
-    def curate_bif(self, stop, target):
-        '''Checks if selected bar is smaller than current bar length.
-           Returns the smallest bifurcation for which the length of the bar
-           is smaller than current one.
-           If there are no bif left or if the bif is largest than the current
-           termination target the np.inf is returned instead.
-        currentSec.stop_criteria["TMD"]
-        '''
-        target_stop = copy.deepcopy(target)
-        # Compute length of current section
-        current_length = stop.child_length()
-        # Compute target length of children
-        target_length = target_stop.child_length()
-
-        # There are no bifurcations to check
-        if not self.barcode.bifs or np.isinf(target_stop.bif):
-            target_stop.update_bif(None, np.inf)
-            return target_stop
-        # If child length smaller than parent
-        if target_length <= current_length:
-            return target_stop
-        # Else find the next bif for which child length
-        # is smaller than parent
-        for bar_id, bar_bif in self.barcode.bifs.items():
-            target_length = np.abs(target_stop.term - bar_bif)
-            if target_length <= current_length:
-                target_stop.update_bif(bar_id, bar_bif)
-                return target_stop
-        target_stop.update_bif(None, np.inf)
-        return target_stop
-
-    def get_stop_criteria(self, currentSec):
+    def get_stop_criteria(self, current_section):
         """Returns stop1 and stop2 that are the commonly
            shared stop criteria for all TMDPath algorithms.
            stop["TMD"] = {ref: the current path distance
-                             bif: the smallest appropriate bifurcation path length
-                             term: the appropriate termination path length
-                            }
+                          bif: the smallest appropriate bifurcation path length
+                          term: the appropriate termination path length
+                          }
         """
-        current_tmd = copy.deepcopy(currentSec.stop_criteria["TMD"])
-        bif_id, bif = self.barcode.min_bif()
+        # Ensure that reference is correctly assigned
+        current_section.stop_criteria["TMD"].ref = self.metric_ref(current_section)
+        # Copy the values for the parent stop TMD to use
+        parent_tmd = copy.deepcopy(current_section.stop_criteria["TMD"])
+        # Save the values of bifurcation for parent
+        parent_bif_id = parent_tmd.bif_id
+        parent_bif = parent_tmd.bif
+        # Define the current criterion, inherited from parent
+        current_tmd = copy.deepcopy(current_section.stop_criteria["TMD"])
 
-        target_stop = TMDStop(ref=self.metric_ref(currentSec),
-                              bif_id=bif_id,
-                              bif=bif,
-                              term_id=current_tmd.term_id,
-                              term=current_tmd.term)
-
-        target_stop1 = self.curate_bif(currentSec.stop_criteria["TMD"], target_stop)
+        # The termination remains the same, so it is always True that
+        # current_tmd.term <= parent_tmd.term
+        # We find the smallest bifurcation that fulfils requirements
+        # parent_tmd.ref <= current_tmd.bif <= parent_tmd.term
+        # Bifurcation is larger than current reference distance
+        bif_id, bif = self.barcode.min_bif(bif_above=parent_tmd.ref,
+                                           bif_below=parent_tmd.term)
+        # Update the bifurcation in the stop_criterion
+        current_tmd.update_bif(bif_id, bif)
+        # Ensure that criterion fulfils all requirements
+        # the term that corresponds to current_tmd.bif term_target
+        # term_target <= parent_tmd.term
+        # If not re-assign a new one, find the min bifurcation for which:
+        # term_target <= parent_tmd.term
+        target_stop1 = self.barcode.curate_stop_criterion(parent_tmd,
+                                                          current_tmd)
         stop1 = {"TMD": target_stop1}
+        # Find the termination that fulfils the requirement
+        # termination <= current termination
 
-        target_stop = TMDStop(ref=self.metric_ref(currentSec),
-                              bif_id=bif_id,
-                              bif=bif,
-                              term_id=current_tmd.bif_id,
-                              term=self.barcode.terms[current_tmd.bif_id])
+        # Use the current bifurcation to determine the respective termination
+        # Bifurcation should be larger than current reference distance
+        term_id, term = self.barcode.get_term_between(parent_bif_id,
+                                                      parent_bif,
+                                                      current_tmd.term)
+        current_tmd.update_term(term_id, term)
 
-        target_stop2 = self.curate_bif(currentSec.stop_criteria["TMD"], target_stop)
+        # Get a stop criterion that fulfils requirements
+        target_stop2 = self.barcode.curate_stop_criterion(parent_tmd,
+                                                          current_tmd)
         stop2 = {"TMD": target_stop2}
 
         return (stop1, stop2)
@@ -131,54 +122,64 @@ class TMDAlgo(AbstractAlgo):
 
         return stop, num_sec
 
-    def bifurcate(self, currentSec):
+    def bifurcate(self, current_section):
         """When the section bifurcates two new sections need to be created.
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
         """
-        self.barcode.remove_bif(currentSec.stop_criteria["TMD"].bif_id)
-        ang = self.barcode.angles[currentSec.stop_criteria["TMD"].bif_id]
+        self.barcode.remove_bif(current_section.stop_criteria["TMD"].bif_id)
+        ang = self.barcode.angles[current_section.stop_criteria["TMD"].bif_id]
 
-        dir1, dir2 = self.bif_method(currentSec.history(), angles=ang)
-        first_point = np.array(currentSec.points[-1])
+        dir1, dir2 = self.bif_method(current_section.history(), angles=ang)
+        first_point = np.array(current_section.last_point)
 
-        stop1, stop2 = self.get_stop_criteria(currentSec)
+        stop1, stop2 = self.get_stop_criteria(current_section)
 
         s1 = {'direction': dir1,
               'first_point': first_point,
               'stop': stop1,
-              'process': currentSec.process}
+              'process': current_section.process}
 
         s2 = {'direction': dir2,
               'first_point': first_point,
               'stop': stop2,
-              'process': currentSec.process}
+              'process': current_section.process}
 
         return s1, s2
 
-    def terminate(self, currentSec):
+    def terminate(self, current_section):
         """When the growth of a section is terminated the "term"
         must be removed from the TMD grower
         """
-        self.barcode.remove_term(currentSec.stop_criteria["TMD"].term_id)
+        self.barcode.remove_term(current_section.stop_criteria["TMD"].term_id)
 
-    def extend(self, currentSec):
+    def extend(self, current_section):
         """Definition of stop criterion for the growth of the current section.
         """
-        criteria_tmd = copy.deepcopy(currentSec.stop_criteria["TMD"])
+        criteria_tmd = copy.deepcopy(current_section.stop_criteria["TMD"])
+        maximum_target = current_section.stop_criteria["TMD"].term
+        reference = current_section.stop_criteria["TMD"].ref
 
-        # First we check that the current termination has not been used
-        if criteria_tmd.term_id not in self.barcode.terms:
-            criteria_tmd.update_term(*self.barcode.min_term())
-
-        # Then we check that the current bifurcation has not been used
+        # We check that the current bifurcation has not been used
         if criteria_tmd.bif_id not in self.barcode.bifs and not np.isinf(criteria_tmd.bif):
-            criteria_tmd.update_bif(*self.barcode.min_bif())
-            criteria_tmd = self.curate_bif(currentSec.stop_criteria["TMD"], criteria_tmd)
+            criteria_tmd.update_bif(*self.barcode.min_bif(bif_above=reference,
+                                                          bif_below=maximum_target))
+            criteria_tmd = self.barcode.curate_stop_criterion(criteria_tmd,
+                                                              criteria_tmd)
 
-        currentSec.stop_criteria["TMD"] = criteria_tmd
+        # We check that the current termination has not been used
+        if criteria_tmd.term_id not in self.barcode.terms:
+            # Termination must be larger that bifurcation
+            # unless if bifurcation is infinite
+            reference = criteria_tmd.bif if not np.isinf(criteria_tmd.bif) else criteria_tmd.ref
+            criteria_tmd.update_term(*self.barcode.min_term(term_above=reference,
+                                                            term_below=maximum_target))
+            criteria_tmd = self.barcode.curate_stop_criterion(criteria_tmd,
+                                                              criteria_tmd)
 
-        return currentSec.next()
+        current_section.stop_criteria["TMD"] = criteria_tmd
+
+        return current_section.next()
 
 
 class TMDApicalAlgo(TMDAlgo):
@@ -192,35 +193,35 @@ class TMDApicalAlgo(TMDAlgo):
         """
         from tmd.Topology.analysis import find_apical_point_distance
         stop, num_sec = super(TMDApicalAlgo, self).initialize()
-        self.params['apical_distance'] = find_apical_point_distance(self.ph_angles)
+        self.apical_point_distance_from_soma = find_apical_point_distance(self.ph_angles)
         return stop, num_sec
 
-    def bifurcate(self, currentSec):
+    def bifurcate(self, current_section):
         """When the section bifurcates two new sections need to be created.
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
         """
-        self.barcode.remove_bif(currentSec.stop_criteria["TMD"].bif_id)
-        ang = self.barcode.angles[currentSec.stop_criteria["TMD"].bif_id]
+        self.barcode.remove_bif(current_section.stop_criteria["TMD"].bif_id)
+        ang = self.barcode.angles[current_section.stop_criteria["TMD"].bif_id]
+        current_pd = self.metric(current_section)
+        first_point = np.array(current_section.last_point)
 
-        current_pd = self.metric(currentSec)
-
-        if currentSec.process == 'major':
-            dir1, dir2 = bif_methods['directional'](currentSec.direction, angles=ang)
-            if current_pd <= self.params['apical_distance']:
+        if current_section.process == 'major':
+            dir1, dir2 = bif_methods['directional'](current_section.direction, angles=ang)
+            if current_pd <= self.apical_point_distance_from_soma:
                 process1 = 'major'
                 process2 = 'secondary'
             else:
+                if self.apical_point is None:
+                    self.apical_point = first_point
                 process1 = 'secondary'
                 process2 = 'secondary'
         else:
-            dir1, dir2 = self.bif_method(currentSec.history(), angles=ang)
+            dir1, dir2 = self.bif_method(current_section.history(), angles=ang)
             process1 = 'secondary'
             process2 = 'secondary'
 
-        first_point = np.array(currentSec.points[-1])
-
-        stop1, stop2 = self.get_stop_criteria(currentSec)
+        stop1, stop2 = self.get_stop_criteria(current_section)
 
         s1 = {'direction': dir1,
               'first_point': first_point,
@@ -238,58 +239,31 @@ class TMDApicalAlgo(TMDAlgo):
 class TMDGradientAlgo(TMDApicalAlgo):
     """TreeGrower of TMD apical growth"""
 
-    def bifurcate(self, currentSec):
+    def _majorize_process(self, section, stop, process, input_dir):
+        '''Currates the non-major processes to apply a gradient to large components'''
+        difference = stop.expected_maximum_length()
+        if difference > self.params['bias_length']:
+            direction1 = (1.0 - self.params['bias']) * np.array(input_dir)
+            direction2 = self.params['bias'] * np.array(section.direction)
+            direct = np.add(direction1, direction2)
+            return 'major', direct / norm(direct)
+        return process, input_dir
+
+    def bifurcate(self, current_section):
         """When the section bifurcates two new sections need to be created.
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
         """
-        self.barcode.remove_bif(currentSec.stop_criteria["TMD"].bif_id)
-        ang = self.barcode.angles[currentSec.stop_criteria["TMD"].bif_id]
+        s1, s2 = super(TMDGradientAlgo, self).bifurcate(current_section)
 
-        current_pd = self.metric(currentSec)
-
-        if currentSec.process == 'major':
-            dir1, dir2 = bif_methods['directional'](currentSec.direction, angles=ang)
-            if current_pd <= self.params['apical_distance']:
-                process1 = 'major'
-                process2 = 'secondary'
-            else:
-                process1 = 'secondary'
-                process2 = 'secondary'
-        else:
-            dir1, dir2 = self.bif_method(currentSec.history(), angles=ang)
-            process1 = 'secondary'
-            process2 = 'secondary'
-
-        def majorize_process(stop, process, input_dir):
-            '''Currates the non-major processes to apply a gradient to large components'''
-            difference = np.abs(stop["TMD"].bif - stop["TMD"].term)
-            if np.isinf(difference):
-                difference = np.abs(stop["TMD"].term - self.metric(currentSec))
-            if difference > self.params['bias_length']:
-                direction1 = (1.0 - self.params['bias']) * np.array(input_dir)
-                direction2 = self.params['bias'] * np.array(currentSec.direction)
-                direct = np.add(direction1, direction2)
-                return 'major', direct / norm(direct)
-            return process, input_dir
-
-        stop1, stop2 = self.get_stop_criteria(currentSec)
-
-        if process1 != 'major':
-            process1, dir1 = majorize_process(stop1, process1, dir1)
-        if process2 != 'major':
-            process2, dir2 = majorize_process(stop2, process2, dir2)
-
-        first_point = np.array(currentSec.points[-1])
-
-        s1 = {'direction': dir1,
-              'first_point': first_point,
-              'stop': stop1,
-              'process': process1}
-
-        s2 = {'direction': dir2,
-              'first_point': first_point,
-              'stop': stop2,
-              'process': process2}
-
+        if s1['process'] != 'major':
+            s1['process'], s1['direction'] = self._majorize_process(current_section,
+                                                                    s1['stop']["TMD"],
+                                                                    s1['process'],
+                                                                    s1['direction'])
+        if s2['process'] != 'major':
+            s2['process'], s2['direction'] = self._majorize_process(current_section,
+                                                                    s2['stop']["TMD"],
+                                                                    s2['process'],
+                                                                    s2['direction'])
         return s1, s2
