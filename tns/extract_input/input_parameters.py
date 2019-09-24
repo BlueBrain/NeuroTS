@@ -1,7 +1,6 @@
 """Input parameters functions"""
 
-tmd_algos = ('tmd', 'tmd_path', 'tmd_gradient', 'tmd_gradient_path',
-             'tmd_apical', 'tmd_apical_path')
+tmd_algos = ('tmd', 'tmd_gradient', 'tmd_apical')
 
 
 def parameters(origin=(0., 0., 0.),
@@ -53,7 +52,5 @@ def parameters(origin=(0., 0., 0.),
                                                     "orientation": [(0., 1., 0.)], })
         if method == 'tmd':
             input_parameters["apical"]["growth_method"] = 'tmd_apical'
-        if method == 'tmd_path':
-            input_parameters["apical"]["growth_method"] = 'tmd_apical_path'
 
     return input_parameters

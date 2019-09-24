@@ -7,9 +7,7 @@ from nose.tools import assert_dict_equal
 from numpy.testing import assert_array_almost_equal, assert_equal
 from tns.generate.algorithms.common import TMDStop
 
-from tns.generate.algorithms.tmdgrower import (TMDAlgo, TMDApicalAlgo,
-                                               TMDGradientAlgo)
-from tns.generate.algorithms.tmdgrower_path import TMDAlgoPath, TMDApicalAlgoPath, TMDGradientAlgoPath
+from tns.generate.algorithms.tmdgrower import (TMDAlgo, TMDApicalAlgo, TMDGradientAlgo)
 from tns.generate.section import SectionGrower, SectionGrowerPath
 
 _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
@@ -28,7 +26,7 @@ def _setup_test(Algo, Grower):
     algo = Algo(distributions, parameters, [0, 0, 1])
 
     grower = Grower(None, None, [1.1,0.,0.], [0.57735, 0.57735, 0.57735], 0.2, 0.3, 'major',
-                           {'TMD': TMDStop(bif_id=1, bif=9.7747, term_id=0, term=159.798, ref=[0, 0, 1])})
+                           {'TMD': TMDStop(bif_id=1, bif=9.7747, term_id=0, term=159.798, ref=0.0)})
     return algo, grower
 
 
@@ -44,72 +42,7 @@ def _assert_dict_or_array(dict1, dict2):
 
 
 def test_TMDAlgo():
-    algo, grower = _setup_test(TMDAlgo, SectionGrower)
-
-    stop, num_sec = algo.initialize()
-    assert_dict_equal(stop, {'TMD': TMDStop(bif_id=1, bif=9.7747, term_id=0, term=159.798, ref=[0, 0, 1])})
-    assert_equal(num_sec, 10)
-
-    s1, s2 = algo.bifurcate(grower)
-    _assert_dict_or_array(s1,
-                          {'direction': [0., 0., 0.],
-                           'process': 'major',
-                           'first_point': [1.1, 0. , 0. ],
-                           'stop': {"TMD": TMDStop(bif_id=2, bif=18.5246, term_id=0, term=159.798, ref=[0, 0, 1])}})
-
-    _assert_dict_or_array(s2,
-                          {'direction': [0., 0., 0.],
-                           'process': 'major',
-                           'first_point': [1.1, 0. , 0. ],
-                           'stop': {"TMD": TMDStop(bif_id=2, bif=18.5246, term_id=1, term=124.8796, ref=[0, 0, 1])}})
-
-def test_TMDApicalAlgo():
-    algo, grower = _setup_test(TMDApicalAlgo, SectionGrower)
-
-    stop, num_sec = algo.initialize()
-    expected_stop = {"TMD": TMDStop(bif_id=1, bif=9.7747, term_id=0, term=159.798, ref=[0, 0, 1])}
-    assert_dict_equal(stop, expected_stop)
-    assert_equal(num_sec, 10)
-
-    s1, s2 = algo.bifurcate(grower)
-    _assert_dict_or_array(s1,
-                          {'direction': [0.57735, 0.57735, 0.57735],
-                           'process': 'secondary',
-                           'first_point': [1.1, 0. , 0. ],
-                           'stop': {"TMD": TMDStop(bif_id=2, bif=18.5246, term_id=0, term=159.798, ref=[0, 0, 1])}})
-
-    _assert_dict_or_array(s2,
-                          {'direction': np.array([0.203481, 0.541099, 0.81597]),
-                           'process': 'secondary',
-                           'first_point': [1.1, 0. , 0. ],
-                           'stop': {"TMD": TMDStop(bif_id=2, bif=18.5246, term_id=1, term=124.8796, ref=[0, 0, 1])}})
-
-
-
-def test_TMDGradientAlgo():
-    algo, grower = _setup_test(TMDGradientAlgo, SectionGrower)
-
-    stop, num_sec = algo.initialize()
-    expected_stop = {"TMD": TMDStop(bif_id=1, bif=9.7747, term_id=0, term=159.798, ref=[0, 0, 1])}
-    assert_dict_equal(stop, expected_stop)
-    assert_equal(num_sec, 10)
-
-    s1, s2 = algo.bifurcate(grower)
-    _assert_dict_or_array(s1,
-                          {'direction': [0.57735, 0.57735, 0.57735],
-                           'process': 'major',
-                           'first_point': [1.1, 0. , 0. ],
-                           'stop': {"TMD": TMDStop(bif_id=2, bif=18.5246, term_id=0, term=159.798, ref=[0, 0, 1])}})
-
-    _assert_dict_or_array(s2,
-                          {'direction': np.array([0.400454, 0.573604, 0.714573]),
-                           'process': 'major',
-                           'first_point': [1.1, 0. , 0. ],
-                           'stop': {"TMD": TMDStop(bif_id=2, bif=18.5246, term_id=1, term=124.8796, ref=[0, 0, 1])}})
-
-
-def test_TMDAlgoPath():
-    algo, grower = _setup_test(TMDAlgoPath, SectionGrowerPath)
+    algo, grower = _setup_test(TMDAlgo, SectionGrowerPath)
 
     stop, num_sec = algo.initialize()
     assert_dict_equal(stop, {"TMD": TMDStop(bif_id=1, bif=9.7747, term_id=0, term=159.798, ref=0.0)})
@@ -129,8 +62,8 @@ def test_TMDAlgoPath():
                            'stop': {"TMD": TMDStop(bif_id=2, bif=18.5246, term_id=1, term=124.8796, ref=0.0)}})
 
 
-def test_TMDApicalAlgoPath():
-    algo, grower = _setup_test(TMDApicalAlgoPath, SectionGrowerPath)
+def test_TMDApicalAlgo():
+    algo, grower = _setup_test(TMDApicalAlgo, SectionGrowerPath)
 
     stop, num_sec = algo.initialize()
     expected_stop = {"TMD": TMDStop(bif_id=1, bif=9.7747, term_id=0, term=159.798, ref=0.0)}
@@ -151,8 +84,8 @@ def test_TMDApicalAlgoPath():
                            'stop': {"TMD": TMDStop(bif_id=2, bif=18.5246, term_id=1, term=124.8796, ref=0.0)}})
 
 
-def test_TMDGradientAlgoPath():
-    algo, grower = _setup_test(TMDGradientAlgoPath, SectionGrowerPath)
+def test_TMDGradientAlgo():
+    algo, grower = _setup_test(TMDGradientAlgo, SectionGrowerPath)
 
     stop, num_sec = algo.initialize()
     expected_stop = {"TMD": TMDStop(bif_id=1, bif=9.7747, term_id=0, term=159.798, ref=0.0)}

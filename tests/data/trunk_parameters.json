@@ -1,5 +1,5 @@
 {"basal": {"randomness": 0.0,
-           "metric": "radial_distances",
+           "metric": "trunk_length",
            "targeting": 0.2,
            "radius": 0.3,
            "num_seg": 5,

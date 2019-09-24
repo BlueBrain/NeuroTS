@@ -3,7 +3,7 @@
         "apical_distance": 0.0,
         "branching_method": "directional",
         "growth_method": "tmd_apical",
-        "metric": "radial_distances",
+        "metric": "path_distances",
         "modify": null,
         "orientation": [
             [
@@ -21,7 +21,7 @@
     "basal": {
         "branching_method": "bio_oriented",
         "growth_method": "tmd",
-        "metric": "radial_distances",
+        "metric": "path_distances",
         "modify": null,
         "orientation": null,
         "radius": 0.3,

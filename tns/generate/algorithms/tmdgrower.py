@@ -33,19 +33,23 @@ class TMDAlgo(AbstractAlgo):
         self.barcode = Barcode(list(self.ph_angles))
         self.start_point = start_point
 
-    def metric_ref(self, section):
-        """Returns the metric reference, here radial distance reference.
-           Section is input for consistency with path distance
+    @staticmethod
+    def metric_ref(section):
+        """Returns the metric reference, here path distance reference,
+           or zero if no section is provided as input.
         """
-        # pylint: disable=unused-argument
         # Function to return reference for path distance
-        return self.start_point
+        if section:
+            return section.pathlength
+        return 0.0
 
-    def metric(self, section):
-        """Returns the metric at the current position, here radial distance
+    @staticmethod
+    def metric(section):
+        """Returns the metric at the current position,
+           here path distance, recorded in section
         """
         # Function to return path distance
-        return norm(np.subtract(section.points[-1], self.start_point))
+        return section.pathlength
 
     def curate_bif(self, stop, target):
         '''Checks if selected bar is smaller than current bar length.
@@ -182,7 +186,7 @@ class TMDApicalAlgo(TMDAlgo):
 
     def initialize(self):
         """
-        TMD basic grower of an apical tree
+        TMD basic grower of an apical tree based on path distance
         Initializes the tree grower and
         computes the apical distance using the input barcode.
         """
@@ -199,11 +203,11 @@ class TMDApicalAlgo(TMDAlgo):
         self.barcode.remove_bif(currentSec.stop_criteria["TMD"].bif_id)
         ang = self.barcode.angles[currentSec.stop_criteria["TMD"].bif_id]
 
-        current_rd = self.metric(currentSec)
+        current_pd = self.metric(currentSec)
 
         if currentSec.process == 'major':
             dir1, dir2 = bif_methods['directional'](currentSec.direction, angles=ang)
-            if current_rd <= self.params['apical_distance']:
+            if current_pd <= self.params['apical_distance']:
                 process1 = 'major'
                 process2 = 'secondary'
             else:
@@ -215,6 +219,7 @@ class TMDApicalAlgo(TMDAlgo):
             process2 = 'secondary'
 
         first_point = np.array(currentSec.points[-1])
+
         stop1, stop2 = self.get_stop_criteria(currentSec)
 
         s1 = {'direction': dir1,
@@ -241,11 +246,11 @@ class TMDGradientAlgo(TMDApicalAlgo):
         self.barcode.remove_bif(currentSec.stop_criteria["TMD"].bif_id)
         ang = self.barcode.angles[currentSec.stop_criteria["TMD"].bif_id]
 
-        current_rd = self.metric(currentSec)
+        current_pd = self.metric(currentSec)
 
         if currentSec.process == 'major':
             dir1, dir2 = bif_methods['directional'](currentSec.direction, angles=ang)
-            if current_rd <= self.params['apical_distance']:
+            if current_pd <= self.params['apical_distance']:
                 process1 = 'major'
                 process2 = 'secondary'
             else:
@@ -259,9 +264,9 @@ class TMDGradientAlgo(TMDApicalAlgo):
         def majorize_process(stop, process, input_dir):
             '''Currates the non-major processes to apply a gradient to large components'''
             difference = np.abs(stop["TMD"].bif - stop["TMD"].term)
-            if difference == np.inf:
+            if np.isinf(difference):
                 difference = np.abs(stop["TMD"].term - self.metric(currentSec))
-            if difference > self.params['bias_length'] and difference != np.inf:
+            if difference > self.params['bias_length']:
                 direction1 = (1.0 - self.params['bias']) * np.array(input_dir)
                 direction2 = self.params['bias'] * np.array(currentSec.direction)
                 direct = np.add(direction1, direction2)

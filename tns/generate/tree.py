@@ -6,25 +6,18 @@ import copy
 import numpy as np
 
 from morphio import PointLevel, SectionType
-from tns.generate.algorithms import basicgrower, tmdgrower, tmdgrower_path
+from tns.generate.algorithms import basicgrower, tmdgrower
 from tns.generate.section import (SectionGrower, SectionGrowerPath,
                                   SectionGrowerTMD)
 
 growth_algorithms = {'tmd': tmdgrower.TMDAlgo,
                      'tmd_apical': tmdgrower.TMDApicalAlgo,
                      'tmd_gradient': tmdgrower.TMDGradientAlgo,
-                     'tmd_path': tmdgrower_path.TMDAlgoPath,
-                     'tmd_apical_path': tmdgrower_path.TMDApicalAlgoPath,
-                     'tmd_gradient_path': tmdgrower_path.TMDGradientAlgoPath,
                      'trunk': basicgrower.TrunkAlgo}
 
-section_growers = {'tmd': SectionGrowerTMD,
-                   'tmd_apical': SectionGrowerTMD,
-                   'tmd_gradient': SectionGrowerTMD,
-                   'tmd_path': SectionGrowerPath,
-                   'tmd_apical_path': SectionGrowerPath,
-                   'tmd_gradient_path': SectionGrowerPath,
-                   'trunk': SectionGrower}
+section_growers = {'radial_distances': SectionGrowerTMD,
+                   'path_distances': SectionGrowerPath,
+                   'trunk_length': SectionGrower}
 
 
 class TreeGrower(object):
@@ -75,7 +68,7 @@ class TreeGrower(object):
         from all the required information. The section is
         added to the neuron.sections and activated.
         """
-        SGrower = section_growers[self.params['growth_method']]
+        SGrower = section_growers[self.params["metric"]]
 
         sec_grower = SGrower(parent=parent,
                              first_point=first_point,

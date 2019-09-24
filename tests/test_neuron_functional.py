@@ -77,18 +77,10 @@ def test_wrong_filtration():
 
 def test_basic_grower():
     _test_full('radial_distances',
-               'bio_radial_distribution.json',
+               'bio_trunk_distribution.json',
                'trunk_parameters.json',
                'test_trunk_grower.h5',
                None)
-
-def test_radial_grower():
-    '''Test tmd and tmd_apical'''
-    _test_full('radial_distances',
-               'bio_radial_distribution.json',
-               'bio_radial_params.json',
-               'radial_grower.h5',
-               'bio_radial_persistence_diagram.json')
 
 def test_path_grower():
     '''test tmd_path and tmd_apical_path'''
@@ -98,21 +90,13 @@ def test_path_grower():
                'path_grower.h5',
                'bio_path_persistence_diagram.json')
 
-def test_gradient_radial_grower():
-    '''test tmd_gradient'''
-    _test_full('radial_distances',
-               'bio_radial_distribution.json',
-               'bio_gradient_radial_params.json',
-               'gradient_radial_grower.h5',
-               'gradient_radial_persistence_diagram.json')
-
 def test_gradient_path_grower():
     '''test tmd_path'''
     _test_full('path_distances',
-               'bio_path_distribution.json',
-               'bio_gradient_path_params.json',
-               'gradient_path_grower.h5',
-               'gradient_path_persistence_diagram.json')
+              'bio_path_distribution.json',
+              'bio_gradient_path_params.json',
+              'gradient_path_grower.h5',
+              'gradient_path_persistence_diagram.json')
 
 def test_bio_rat_l5_tpc():
     _test_full('path_distances',

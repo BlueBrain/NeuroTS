@@ -1,0 +1,81 @@
+{
+    "apical": {
+        "filtration_metric": "trunk_length",
+        "num_trees": {
+            "data": {
+                "bins": [
+                    1
+                ],
+                "weights": [
+                    1
+                ]
+            }
+        },
+        "trunk": {
+            "azimuth": {
+                "uniform": {
+                    "max": 0.0,
+                    "min": 3.141592653589793
+                }
+            },
+            "orientation_deviation": {
+                "data": {
+                    "bins": [
+                        0.016666666666666663
+                    ],
+                    "weights": [
+                        1
+                    ]
+                }
+            }
+        }
+    },
+    "axon": {},
+    "basal": {
+        "filtration_metric": "trunk_length",
+        "num_trees": {
+            "data": {
+                "bins": [
+                    4
+                ],
+                "weights": [
+                    1
+                ]
+            }
+        },
+        "trunk": {
+            "azimuth": {
+                "uniform": {
+                    "max": 0.0,
+                    "min": 3.141592653589793
+                }
+            },
+            "orientation_deviation": {
+                "data": {
+                    "bins": [
+                        0.09586683335089932,
+                        0.39001954178950027,
+                        1.174426764292436,
+                        1.566630375543904,
+                        2.9393430149240416
+                    ],
+                    "weights": [
+                        4,
+                        3,
+                        1,
+                        1,
+                        2
+                    ]
+                }
+            }
+        }
+    },
+    "soma": {
+        "size": {
+            "norm": {
+                "mean": 9.024144162609812,
+                "std": 3.5462697985669935
+            }
+        }
+    }
+}
