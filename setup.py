@@ -15,10 +15,9 @@ setup(
     author_email='lida.kanari@epfl.ch',
     install_requires=[
         'matplotlib>=1.3.1',
-        'morphio>=2.2.0',
         'morph-tool>=0.1.12',
-        'neurom>=1.4.7',
         'tmd>=2.0.5',
+        'neurom @ git+https://git@github.com/BlueBrain/NeuroM.git@mut_morphio#egg=neurom-2.0.0',
         'enum34>=1.0.4',
         'scipy>=0.13.3',
         'numpy>=1.15.0',
