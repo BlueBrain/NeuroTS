@@ -2,13 +2,13 @@
 
 # from collections import namedtuple
 import numpy as np
-from tns.morphmath import random_tree as rd
+from tns.morphmath import bifurcation as _bif
 
 
-bif_methods = {'bio_oriented': rd.get_bif_bio_oriented,
-               'symmetric': rd.get_bif_symmetric,
-               'directional': rd.get_bif_directional,
-               'random': rd.get_bif_random}
+bif_methods = {'bio_oriented': _bif.bio_oriented,
+               'symmetric': _bif.symmetric,
+               'directional': _bif.directional,
+               'random': _bif.random}
 
 
 def checks_bif_term(ref, bif, term, target_length):
@@ -26,6 +26,14 @@ def checks_bif_term(ref, bif, term, target_length):
     bif_cond = 0 < bif - ref <= target_length
 
     return term_cond and bif_cond and term > bif
+
+
+def section_data(direction, first_point, stop_criteria, process_type):
+    """ Generates section data dictionary from arguments """
+    return {'direction': direction,
+            'first_point': first_point,
+            'stop': stop_criteria,
+            'process': process_type}
 
 
 class TMDStop(object):

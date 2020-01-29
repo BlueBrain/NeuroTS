@@ -6,6 +6,7 @@ import numpy as np
 from tns.generate.algorithms.abstractgrower import AbstractAlgo
 from tns.generate.algorithms.common import bif_methods
 from tns.generate.algorithms.common import TMDStop
+from tns.generate.algorithms.common import section_data
 from tns.morphmath import sample
 from tns.morphmath.utils import norm
 from tns.generate.algorithms.barcode import Barcode
@@ -135,17 +136,8 @@ class TMDAlgo(AbstractAlgo):
 
         stop1, stop2 = self.get_stop_criteria(current_section)
 
-        s1 = {'direction': dir1,
-              'first_point': first_point,
-              'stop': stop1,
-              'process': current_section.process}
-
-        s2 = {'direction': dir2,
-              'first_point': first_point,
-              'stop': stop2,
-              'process': current_section.process}
-
-        return s1, s2
+        return section_data(dir1, first_point, stop1, current_section.process), \
+               section_data(dir2, first_point, stop2, current_section.process)
 
     def terminate(self, current_section):
         """When the growth of a section is terminated the "term"
@@ -223,17 +215,8 @@ class TMDApicalAlgo(TMDAlgo):
 
         stop1, stop2 = self.get_stop_criteria(current_section)
 
-        s1 = {'direction': dir1,
-              'first_point': first_point,
-              'stop': stop1,
-              'process': process1}
-
-        s2 = {'direction': dir2,
-              'first_point': first_point,
-              'stop': stop2,
-              'process': process2}
-
-        return s1, s2
+        return section_data(dir1, first_point, stop1, process1), \
+               section_data(dir2, first_point, stop2, process2)
 
 
 class TMDGradientAlgo(TMDApicalAlgo):

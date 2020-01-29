@@ -5,7 +5,7 @@ import tns.morphmath.rotation as rt
 from tns.morphmath.utils import get_random_point
 
 
-def get_bif_random():
+def random():
     '''
     Get 3-d coordinates of a new random point.
     The distance between the produced point and (0,0,0)
@@ -17,7 +17,7 @@ def get_bif_random():
     return (np.array(dir1), np.array(dir2))
 
 
-def get_bif_symmetric(direction, angles):
+def symmetric(direction, angles):
     '''
     Get 3-d coordinates for two new directions
     at a selected angle.
@@ -35,7 +35,7 @@ def get_bif_symmetric(direction, angles):
     return (np.array(dir1), np.array(dir2))
 
 
-def get_bif_bio_oriented(direction, angles):
+def bio_oriented(direction, angles):
     '''Input: init_phi, init_theta, dphi, dtheta.
     '''
     phi0 = angles[0]
@@ -51,7 +51,7 @@ def get_bif_bio_oriented(direction, angles):
     return (np.array(dir1), np.array(dir2))
 
 
-def get_bif_directional(direction, angles):
+def directional(direction, angles):
     '''Input: init_phi, init_theta, dphi, dtheta.
     '''
     # phi0 = angles[0] #not used

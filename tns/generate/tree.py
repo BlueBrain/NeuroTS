@@ -4,16 +4,21 @@ TNS class : Tree
 import copy
 import json
 import logging
+from collections import namedtuple
 
 import numpy as np
 
 from morphio import PointLevel, SectionType
+from tns.utils import TNSError
 from tns.generate.algorithms import basicgrower, tmdgrower
 from tns.generate.section import (SectionGrower, SectionGrowerPath,
                                   SectionGrowerTMD)
 from tns.morphmath import sample
 
 L = logging.getLogger('tns')
+
+# LAMBDA: parameter that defines the slope of exponential probability
+LAMDA = 1.0
 
 growth_algorithms = {'tmd': tmdgrower.TMDAlgo,
                      'tmd_apical': tmdgrower.TMDApicalAlgo,
@@ -23,6 +28,42 @@ growth_algorithms = {'tmd': tmdgrower.TMDAlgo,
 section_growers = {'radial_distances': SectionGrowerTMD,
                    'path_distances': SectionGrowerPath,
                    'trunk_length': SectionGrower}
+
+
+# Section grower parameters
+SectionParameters = namedtuple('SectionParameters',
+                               ['randomness', 'targeting', 'scale_prob', 'history'])
+
+
+def _create_section_parameters(input_dict):
+    """ Create section parameters from input dictionary
+    Args:
+        input_dict: dict
+            Input dictionary with 'randomness' and 'targeting' entries
+
+    Returns:
+        SectionParameters namedtuple
+    """
+    randomness = np.clip(input_dict['randomness'], 0.0, 1.0)
+    targeting = np.clip(input_dict['targeting'], 0.0, 1.0)
+    history = np.clip(1.0 - randomness - targeting, 0.0, 1.0)
+
+    parameters = SectionParameters(
+        randomness=randomness,
+        targeting=targeting,
+        scale_prob=LAMDA,
+        history=history
+    )
+
+    try:
+        assert np.isclose(randomness + targeting + history, 1.0)
+        L.debug('Section Parameters: %s', parameters)
+        return parameters
+
+    except AssertionError:
+        msg = 'Parameters randomness, targeting and history do not sum to 1:\n{}'.format(parameters)
+        L.error(msg)
+        raise TNSError(msg)
 
 
 class TreeGrower(object):
@@ -61,6 +102,8 @@ class TreeGrower(object):
                                      context=context)
         stop, num_sec = self.growth_algo.initialize()
 
+        self._section_parameters = _create_section_parameters(parameters)
+
         # Creates the distribution from which the segment lengths
         # To sample a new seg_len call self.seg_len.draw()
         self.seg_length_distr = sample.Distr(self.params["step_size"])
@@ -86,8 +129,7 @@ class TreeGrower(object):
         sec_grower = SGrower(parent=parent,
                              first_point=first_point,
                              direction=direction,
-                             randomness=self.params["randomness"],
-                             targeting=self.params["targeting"],
+                             parameters=self._section_parameters,
                              children=children,
                              process=process,
                              stop_criteria=copy.deepcopy(stop),

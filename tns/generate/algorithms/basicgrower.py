@@ -4,6 +4,7 @@ import numpy as np
 
 from tns.generate.algorithms.abstractgrower import AbstractAlgo
 from tns.generate.algorithms.common import bif_methods
+from tns.generate.algorithms.common import section_data
 
 logger = logging.getLogger(__name__)
 
@@ -41,25 +42,11 @@ class TrunkAlgo(AbstractAlgo):
         generation of two new sections and returns the corresponding dictionaries.
         """
         dir1, dir2 = self.bif_method()
-        start_point = np.array(current_section.last_point)
+        first_point = np.array(current_section.last_point)
         stop = current_section.stop_criteria
 
-        children = 0
-        # print currentSec.parent, self.growth_method
-
-        s1 = {'direction': dir1,
-              'start_point': start_point,
-              'stop': stop,
-              'process': current_section.process,
-              'children': children}
-
-        s2 = {'direction': dir2,
-              'start_point': start_point,
-              'stop': stop,
-              'process': current_section.process,
-              'children': children}
-
-        return s1, s2
+        return section_data(dir1, first_point, stop, current_section.process), \
+               section_data(dir2, first_point, stop, current_section.process)
 
     def terminate(self, current_section):
         """When the growth of a section is terminated the "term"

@@ -9,8 +9,6 @@ from tns.morphmath.utils import get_random_point, norm  # norm used for single v
 
 MEMORY = 5
 
-LAMDA = 1.0
-
 # Memory decreases with distance from current point
 WEIGHTS = np.exp(np.arange(1, MEMORY + 1) - MEMORY)
 
@@ -19,9 +17,8 @@ class SectionGrower(object):
     '''Class for the section growth
     '''
     # pylint: disable-msg=too-many-arguments
-    def __init__(self, parent, children, first_point, direction,
-                 randomness, targeting, process, stop_criteria,
-                 step_size_distribution, pathlength, context=None):
+    def __init__(self, parent, children, first_point, direction, parameters,
+                 process, stop_criteria, step_size_distribution, pathlength, context=None):
         '''A section is a list of points in 4D space (x, y, x, r)
         that are sequentially connected to each other. This process
         generates a tubular morphology that resembles a random walk.
@@ -31,10 +28,9 @@ class SectionGrower(object):
         self.direction = direction / vectorial_norm(direction)
         self.children = children
         self.points = [np.array(first_point[:3])]
-        self.params = {"randomness": randomness,
-                       "targeting": targeting,
-                       "scale_prob": LAMDA,
-                       "history": 1.0 - randomness - targeting}
+
+        self.params = parameters
+
         self.stop_criteria = stop_criteria
         self.process = process
         self.latest_directions = deque(maxlen=MEMORY)
@@ -55,9 +51,9 @@ class SectionGrower(object):
         """Returns the next point depending
         on the growth method and the previous point.
         """
-        direction = self.params["targeting"] * self.direction + \
-            self.params["randomness"] * get_random_point() + \
-            self.params["history"] * self.history()
+        direction = self.params.targeting * self.direction + \
+            self.params.randomness * get_random_point() + \
+            self.params.history * self.history()
 
         direction = direction / vectorial_norm(direction)
         seg_length = self.step_size_distribution.draw_positive()
@@ -73,8 +69,8 @@ class SectionGrower(object):
         Warning! The growth process cannot terminate before this point,
         as a first point will always be added to an active section.
         """
-        direction = self.params["targeting"] * self.direction + \
-            self.params["history"] * self.history()
+        direction = self.params.targeting * self.direction + \
+            self.params.history * self.history()
 
         direction = direction / vectorial_norm(direction)
         seg_length = self.step_size_distribution.draw_positive()
@@ -139,7 +135,7 @@ class SectionGrowerExponentialProba(SectionGrower):
 
     def _check(self, value, which):
         crit = getattr(self.stop_criteria["TMD"], which)
-        lamda = self.params["scale_prob"]
+        lamda = self.params.scale_prob
         assert lamda > 0
         x = crit - value
         if x < 0:
