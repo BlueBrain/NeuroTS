@@ -18,7 +18,7 @@ def _append_dicts(*args):
 
 
 def distributions(filepath, neurite_types=('basal', 'apical', 'axon'), threshold_sec=2,
-                  diameter_input_morph=None, feature='radial_distances', diameter_model='M5'):
+                  diameter_input_morph=None, feature='path_distances', diameter_model='M5'):
     '''Extracts the input distributions from an input population
     defined by a directory of swc or h5 files
     threshold_sec: defines the minimum accepted number of terminations

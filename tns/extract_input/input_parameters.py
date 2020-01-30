@@ -6,7 +6,7 @@ tmd_algos = ('tmd', 'tmd_gradient', 'tmd_apical')
 def parameters(origin=(0., 0., 0.),
                method='trunk',
                neurite_types=('basal', 'apical', 'axon'),
-               feature='radial_distances'):
+               feature='path_distances'):
     '''Returns a default set of input parameters
        to be used as input for synthesis.
     '''
