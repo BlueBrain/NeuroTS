@@ -1,14 +1,14 @@
 import os
 import tns
-from tns import extract_input
+from tns import extract_input 
 def run():
     # Extract distributions from cells in input directory
     dir_path = os.path.dirname(os.path.realpath(__file__))
     filename = os.path.join(dir_path, '../test_data/bio/')
-    distr = extract_input.distributions(filename, feature='path_distances', diameter_model='M5')
+    distr = extract_input.distributions(filename, feature='path_distances')
     # Generate default parameters dictionary
     params = extract_input.parameters(neurite_types=['basal', 'apical'],
-                                          feature='path_distances', method='tmd', diameter_parameters='M5')
+                                          feature='path_distances', method='tmd')
 
     # Initialize a neuron
     N = tns.NeuronGrower(input_distributions=distr,

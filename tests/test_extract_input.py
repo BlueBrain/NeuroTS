@@ -77,12 +77,15 @@ def test_diameter_extract():
 def test_distributions():
     filename = os.path.join(_PATH, 'bio/')
     distr = test_module.distributions(filename, feature='radial_distances')
-    assert_equal(set(distr.keys()), {'soma', 'basal', 'apical', 'axon'})
+    assert_equal(set(distr.keys()), {'soma', 'basal', 'apical', 'axon', 'diameter'})
     assert_equal(distr['basal']['num_trees'],
                  {'data': {'bins': [4, 5, 6, 7, 8, 9], 'weights': [1, 0, 0, 0, 0, 1]}})
     assert_equal(distr['basal']['filtration_metric'], 'radial_distances')
     distr = test_module.distributions(filename, feature='path_distances')
     assert_equal(distr['basal']['filtration_metric'], 'path_distances')
+
+    distr = test_module.distributions(filename, feature='radial_distances', diameter_model=None)
+    assert_equal(set(distr.keys()), {'soma', 'basal', 'apical', 'axon', 'diameter'})
 
 def test_parameters():
     params = test_module.parameters(
@@ -97,7 +100,7 @@ def test_parameters():
                 'growth_method': 'tmd_apical', 'branching_method': 'directional', 'modify': None,
                 "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
                 'tree_type': 4, 'metric': 'radial_distances'},
-     'axon': {}, 'origin': (0.0, 0.0, 0.0), 'grow_types': ['basal', 'apical']})
+     'axon': {}, 'origin': (0.0, 0.0, 0.0), 'grow_types': ['basal', 'apical'], 'diameter_params': {'method': 'default'}})
 
     params_path = test_module.parameters(
         neurite_types=['basal', 'apical'], method='tmd')
@@ -111,4 +114,4 @@ def test_parameters():
                 'growth_method': 'tmd_apical', 'branching_method': 'directional', 'modify': None,
                 "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
                 'tree_type': 4, 'metric': 'path_distances'},
-     'axon': {}, 'origin': (0.0, 0.0, 0.0), 'grow_types': ['basal', 'apical']})
+     'axon': {}, 'origin': (0.0, 0.0, 0.0), 'grow_types': ['basal', 'apical'], 'diameter_params': {'method': 'default'}})

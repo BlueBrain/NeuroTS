@@ -77,11 +77,15 @@ def test_json_schema():
                                  }
                              }
                          }
-                     }
+                     },
+
+                     'diameter': {
+                         'type' : 'object',
+                         'additionalProperties': True,
+                         }
                  },
 
-
-                 'type' : 'object',
+                 'type': 'object',
                  'properties' : {
                      'soma' : {'type' : 'object',
                                'additionalProperties': False,
@@ -92,7 +96,8 @@ def test_json_schema():
                      'basal' : {'$ref': '#/definitions/dendrite'},
                      'apical' : {'$ref': '#/definitions/dendrite'},
                      'axon' : {'$ref': '#/definitions/dendrite'},
+                     'diameter': {'$ref': '#/definitions/diameter'},
                  },
-                 'required': ['soma', 'axon', 'basal', 'apical'],
+                 'required': ['soma', 'axon', 'basal', 'apical','diameter'],
                  'additionalProperties': False,
              })

@@ -75,7 +75,7 @@ def test_wrong_filtration():
     '''Test filtration metric inconsistency in distrib and params: path != radial'''
     distributions, parameters = _load_inputs(os.path.join(_path, 'bio_path_distribution.json'),
                                              os.path.join(_path, 'bio_radial_params.json'))
-    assert_raises(TypeError, NeuronGrower, parameters, distributions)
+    assert_raises(ValueError, NeuronGrower, parameters, distributions)
 
 
 def test_basic_grower():

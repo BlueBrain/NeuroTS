@@ -213,20 +213,33 @@ def diametrize_smoothing(neuron, neurite_type=None):
         smooth_section_diam(sec)
 
 
-def build(neuron, input_model=None, neurite_types=None, diam_method='M5'):
+def build(neuron, input_model=None, neurite_types=None, diam_method=None):
     '''Diametrize according to the selected method.
-       Save file formats in the selected output_path'''
-    methods = {'M1': diametrize_constant_per_neurite,
-               'M2': diametrize_constant_per_section,
-               'M3': diametrize_smoothing,
-               'M4': diametrize_from_root,
-               'M5': diametrize_from_tips}
+       if diam_method is a string matching the models below it will use an
+       internal diametrizer. If it a function is provided, it will use the
+       function to diametrize cells. This function should have the following
+       arguments: neuron, diameter model, type of neurite (str), and only update
+       the neuron object'''
 
     if neurite_types is None:
         neurite_types = ['apical', 'basal']
 
-    for tree_type in neurite_types:
-        if diam_method in ['M1', 'M2', 'M3']:
-            methods[diam_method](neuron, STR_TO_TYPES[tree_type])
-        else:
-            methods[diam_method](neuron, input_model, STR_TO_TYPES[tree_type])
+    if isinstance(diam_method, str):
+        methods = {'M1': diametrize_constant_per_neurite,
+                   'M2': diametrize_constant_per_section,
+                   'M3': diametrize_smoothing,
+                   'M4': diametrize_from_root,
+                   'M5': diametrize_from_tips}
+
+        for tree_type in neurite_types:
+            if diam_method in ['M1', 'M2', 'M3']:
+                methods[diam_method](neuron, STR_TO_TYPES[tree_type])
+            else:
+                methods[diam_method](neuron, input_model, STR_TO_TYPES[tree_type])
+
+    elif hasattr(diam_method, '__call__'):
+        for tree_type in neurite_types:
+            diam_method(neuron, input_model, tree_type)
+
+    else:
+        raise ValueError('Diameter method not understood, we got {}'.format(diam_method))

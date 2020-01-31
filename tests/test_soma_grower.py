@@ -204,8 +204,10 @@ def test_interpolate_exception():
 def test_interpolate_from_neuron():
     np.random.seed(0)
 
-    g = NeuronGrower({'origin': [0,0,0], 'grow_types':[]},
-                     {'soma': {'size': {"norm": {"mean": 6, "std": 0}}}})
+    g = NeuronGrower({'origin': [0,0,0], 'grow_types':[],
+                      'diameter_params': {'method': 'default'}},
+                     {'soma': {'size': {"norm": {"mean": 6, "std": 0}}},
+                      'diameter': {'method': 'default'}})
 
     g.soma.points = [[0, 0, 0], [1, 0, 0], [0, 1, 1], [1, 0, 0]]
 
@@ -225,8 +227,11 @@ def test_interpolate_from_neuron():
 
 def test_interpolate_from_neuron_2():
     np.random.seed(0)
-    g = NeuronGrower({'origin': [0,0,0], 'grow_types':[]},
-                     {'soma': {'size': {"norm": {"mean": 6, "std": 3}}}})
+    g = NeuronGrower({'origin': [0,0,0], 'grow_types':[],
+                      'diameter_params': {'method': 'default'}},
+                     {'soma': {'size': {"norm": {"mean": 6, "std": 3}}},
+                      'diameter': {'method': 'default'}})
+
 
     g.soma.points = [[0, 0, 0], [1, 0, 0], [0, 1, 1], [1, 0, 0]]
 
@@ -251,8 +256,11 @@ def test_original_soma():
 
 def test_grow_soma_types():
     np.random.seed(0)
-    g = NeuronGrower({'origin': [0, 0, 0], 'grow_types':[]},
-                     {'soma': {'size': {"norm": {"mean": 6, "std": 3}}}})
+    g = NeuronGrower({'origin': [0,0,0], 'grow_types':[],
+                      'diameter_params': {'method': 'default'}},
+                     {'soma': {'size': {"norm": {"mean": 6, "std": 3}}},
+                      'diameter': {'method': 'default'}})
+
 
     with patch.object(g, '_grow_trunks'):
         # test one soma point

@@ -4,9 +4,10 @@ tmd_algos = ('tmd', 'tmd_gradient', 'tmd_apical')
 
 
 def parameters(origin=(0., 0., 0.),
-               method='trunk',
+               method='tmd',
                neurite_types=('basal', 'apical', 'axon'),
-               feature='path_distances'):
+               feature='path_distances',
+               diameter_parameters=None):
     '''Returns a default set of input parameters
        to be used as input for synthesis.
     '''
@@ -52,5 +53,16 @@ def parameters(origin=(0., 0., 0.),
                                                     "orientation": [(0., 1., 0.)], })
         if method == 'tmd':
             input_parameters["apical"]["growth_method"] = 'tmd_apical'
+
+    input_parameters["diameter_params"] = {}
+    if diameter_parameters is None:
+        input_parameters["diameter_params"]['method'] = 'default'
+    elif isinstance(diameter_parameters, str):
+        input_parameters["diameter_params"]['method'] = diameter_parameters
+    elif isinstance(diameter_parameters, dict):
+        input_parameters["diameter_params"] = diameter_parameters
+        input_parameters["diameter_params"]['method'] = 'external'
+    else:
+        raise ValueError('Diameter params not understood, {}'.format(diameter_parameters))
 
     return input_parameters

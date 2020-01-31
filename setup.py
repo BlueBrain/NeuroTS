@@ -18,7 +18,7 @@ setup(
         'morph-tool>=0.1.12',
         'tmd>=2.0.5',
         'neurom @ git+https://git@github.com/BlueBrain/NeuroM.git@mut_morphio#egg=neurom-2.0.0',
-        'enum34>=1.0.4',
+        'enum-compat>=0.0.1',
         'scipy>=0.13.3',
         'numpy>=1.15.0',
         'jsonschema>=3.0.1',

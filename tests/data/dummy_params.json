@@ -1,5 +1,4 @@
-{
-    "apical": {
+{ "apical": {
         "branching_method": "directional",
         "growth_method": "tmd_apical",
         "metric": "path_distances",
@@ -38,5 +37,6 @@
         0.0,
         0.0,
         0.0
-    ]
+    ],
+"diameter_params": {"method": "default"}
 }
