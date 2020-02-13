@@ -4,6 +4,7 @@ TNS class : Grower object that contains the grower functionality.
 import copy
 import logging
 from morphio.mut import Morphology  # pylint: disable=import-error
+from neurom import load_neuron  # pylint: disable=import-error
 from tns.generate.soma import SomaGrower
 from tns.morphmath import sample
 from tns.generate.tree import TreeGrower
@@ -29,7 +30,7 @@ class NeuronGrower(object):
         context: an object containing contextual information
         extremal_diametrizer: diametrizer function for external diametrizer module
         """
-        self.neuron = Morphology()
+        self.neuron = load_neuron(Morphology())
         self.context = context
 
         self.input_parameters = copy.deepcopy(input_parameters)
@@ -178,7 +179,4 @@ class NeuronGrower(object):
         of the soma contour are retrieved from the trunks.
         """
         self._grow_trunks()
-
-        points, diameters = self.soma.build(soma_type)
-        self.neuron.soma.points = points
-        self.neuron.soma.diameters = diameters
+        self.neuron.soma.points = self.soma.build(soma_type)

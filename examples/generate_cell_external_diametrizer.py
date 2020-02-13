@@ -39,7 +39,7 @@ def run():
     # converts a morphio to neuromV2 neuron
     def external_diametrizer(neuron, model, neurite_type):
         config['neurite_types'] = [neurite_type, ]
-        return build_diameters.build(Neuron(neuron), model, config)
+        return build_diameters.build(neuron, model, config)
 
     # Initialize a neuron
     grower = tns.NeuronGrower(input_distributions=distr,

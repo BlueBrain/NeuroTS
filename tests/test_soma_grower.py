@@ -85,7 +85,7 @@ def test_contour_point():
 
     point = [4., 5., 6.]
 
-    expected = [4., 5. , 3.]
+    expected = [4., 5. , 3., 0.]
 
     result = soma.contour_point(point)
 
@@ -143,27 +143,23 @@ def test_one_point_soma():
 
     soma = SomaGrower((1., 2., 3.), 2.0)
 
-    soma_points, soma_diameters = soma.one_point_soma()
-
-    assert_array_equal(soma_points, [soma.center])
-    assert_array_equal(soma_diameters, [4.0])
+    soma_points = soma.one_point_soma()
+    assert_array_equal(soma_points, [list(soma.center) + [4.0,]])
 
 
 def test_contour_soma():
 
     soma = SomaGrower((1., 2., 3.), 2.0)
 
-    soma.points = [(3., 4., 1000000.)]
+    soma.points = [(3., 4., 1000000., 0.)]
 
-    expected_pts = np.array([[1., 2., 3.], [4., 5., 3.]])
+    expected_pts = np.array([[1., 2., 3., 0.], [4., 5., 3., 0.]])
 
     # bypass interpolate
     soma.interpolate = lambda c: expected_pts
 
-    soma_pts, diameters = soma.contour_soma()
-
+    soma_pts = soma.contour_soma()
     assert_array_almost_equal(soma_pts, expected_pts)
-    assert_allclose(diameters, 0.)
 
 
 def test_interpolate():
@@ -172,19 +168,19 @@ def test_interpolate():
 
     soma.center = np.asarray([0., 0., 0.], dtype=np.float)
 
-    soma.points = [[0, 0, 0], [1, 0, 0], [0, 1, 1], [1, 0, 0]]
+    soma.points = [[0, 0, 0, 0], [1, 0, 0, 0], [0, 1, 1, 0], [1, 0, 0, 0]]
 
     np.random.seed(0)
     assert_array_equal(soma.interpolate(soma.points, interpolation=4),
-                       [[0, 0, 0], [1, 0, 0], [0, 1, 1]])
+                       [[0, 0, 0, 0], [1, 0, 0, 0], [0, 1, 1, 0]])
 
     result = soma.interpolate(soma.points, interpolation=7)
 
-    expected = [[-1.8115102245941463, -5.720002684106964, 0.0],
-                [1.0, 0.0, 0.0],
-                [0.0, 1.0, 1.0],
-                [-5.857053738900479, -1.3018915083953513, 0.0],
-                [-3.6104565197299623, -4.792139785016648, 0.0]]
+    expected = [[-1.8115102245941463, -5.720002684106964, 0.0, 0.0],
+                [1.0, 0.0, 0.0, 0.0],
+                [0.0, 1.0, 1.0, 0.0],
+                [-5.857053738900479, -1.3018915083953513, 0.0, 0.0],
+                [-3.6104565197299623, -4.792139785016648, 0.0, 0.0]]
 
     assert_array_almost_equal(result, expected)
 
@@ -209,18 +205,18 @@ def test_interpolate_from_neuron():
                      {'soma': {'size': {"norm": {"mean": 6, "std": 0}}},
                       'diameter': {'method': 'default'}})
 
-    g.soma.points = [[0, 0, 0], [1, 0, 0], [0, 1, 1], [1, 0, 0]]
+    g.soma.points = [[0, 0, 0, 0], [1, 0, 0, 0], [0, 1, 1, 0], [1, 0, 0, 0]]
 
     assert_array_equal(g.soma.interpolate(g.soma.points, interpolation=4),
-                       [[0, 0, 0], [1, 0, 0], [0, 1, 1]])
+                       [[0, 0, 0, 0], [1, 0, 0, 0], [0, 1, 1, 0]])
 
     result = g.soma.interpolate(g.soma.points, interpolation=7)
 
-    expected = [[-1.8115102245941463, -5.720002684106964, 0.0],
-                [1.0, 0.0, 0.0],
-                [0.0, 1.0, 1.0],
-                [-5.857053738900479, -1.3018915083953513, 0.0],
-                [-3.6104565197299623, -4.792139785016648, 0.0]]
+    expected = [[-1.8115102245941463, -5.720002684106964, 0.0, 0.0],
+                [1.0, 0.0, 0.0, 0.0],
+                [0.0, 1.0, 1.0, 0.0],
+                [-5.857053738900479, -1.3018915083953513, 0.0, 0.0],
+                [-3.6104565197299623, -4.792139785016648, 0.0, 0.0]]
 
     assert_array_almost_equal(result, expected)
 
@@ -233,25 +229,25 @@ def test_interpolate_from_neuron_2():
                       'diameter': {'method': 'default'}})
 
 
-    g.soma.points = [[0, 0, 0], [1, 0, 0], [0, 1, 1], [1, 0, 0]]
+    g.soma.points = [[0, 0, 0, 0], [1, 0, 0, 0], [0, 1, 1, 0], [1, 0, 0, 0]]
 
     assert_array_equal(g.soma.interpolate(g.soma.points, interpolation=4),
-                       [[0,0,0], [1,0,0], [0,1,1]])
+                       [[0, 0, 0, 0], [1, 0, 0, 0], [0, 1, 1, 0]])
     assert_array_almost_equal(g.soma.interpolate(g.soma.points, interpolation=7),
-                       [[0.0, 1.0, 1.0], [-6.794973666551906, -9.018932499998446, 0.0],
-                        [-3.1424513796161775, -10.846096528033044, 0.0],
-                        [5.211388179030298, -10.017696532443242, 0.0],
-                        [1.0, 0.0, 0.0]])
+                       [[0.0, 1.0, 1.0, 0.0], 
+                        [-6.794973666551906, -9.018932499998446, 0.0, 0.0],
+                        [-3.1424513796161775, -10.846096528033044, 0.0, 0.0],
+                        [5.211388179030298, -10.017696532443242, 0.0, 0.0],
+                        [1.0, 0.0, 0.0, 0.0]])
 
 
 def test_original_soma():
 
     soma = SomaGrower((1., 2., 3.), 2.0)
 
-    points, diameters = soma.original_soma()
+    points = soma.original_soma()
 
     assert_equal(len(points), 0)
-    assert_equal(len(diameters), 0)
 
 
 def test_grow_soma_types():
@@ -265,27 +261,26 @@ def test_grow_soma_types():
     with patch.object(g, '_grow_trunks'):
         # test one soma point
         g._grow_soma(soma_type='one_point')
-        assert_array_equal(g.neuron.soma.points, [[0.0, 0.0, 0.0]])
-        assert_array_almost_equal(g.neuron.soma.diameters,  [22.584314])
+        assert_array_equal(g.neuron.soma.points,
+                           np.array([[0.0, 0.0, 0.0, 22.584314]], dtype=np.float32))
 
         # normal case
-        g.soma.points = [[0, 0, 0], [1, 0, 0], [0, 1, 1], [1, 0, 0]]
+        g.soma.points = [[0, 0, 0, 0], [1, 0, 0, 0], [0, 1, 1, 0], [1, 0, 0, 0]]
         g._grow_soma(soma_type='original')
         assert_array_equal(g.neuron.soma.points,
-                           [[0., 0., 0.],
-                            [1., 0., 0.],
-                            [0., 1., 1.],
-                            [1., 0., 0.]])
-        assert_array_equal(g.neuron.soma.diameters,  [0, 0, 0, 0])
+                           [[0., 0., 0., 0],
+                            [1., 0., 0., 0.],
+                            [0., 1., 1., 0.],
+                            [1., 0., 0., 0.]])
         g._grow_soma(soma_type='contour')
         assert_array_almost_equal(g.neuron.soma.points,
-                           [[ -7.10052,     8.7804,      0.       ],
-                            [ -8.961295,   -6.870808,    0.       ],
-                            [ -6.794974,   -9.018932,    0.       ],
-                            [ -3.1424513, -10.846097,    0.       ],
-                            [  4.315604,  -10.434959,    0.       ],
-                            [  5.211388,  -10.017696,    0.       ],
-                            [  1.,          0.,          0.       ]])
+                           [[ -7.10052,     8.7804,      0.,     0.],
+                            [ -8.961295,   -6.870808,    0.,     0.],
+                            [ -6.794974,   -9.018932,    0.,     0.],
+                            [ -3.1424513, -10.846097,    0.,     0.],
+                            [  4.315604,  -10.434959,    0.,     0.],
+                            [  5.211388,  -10.017696,    0.,     0.],
+                            [  1.,          0.,          0.,     0.]])
 
 
 def test_soma_grower():
