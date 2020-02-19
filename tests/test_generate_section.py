@@ -45,3 +45,15 @@ def test_SectionGrower():
     # Check that the growth will continue for single point section
     assert(s.check_stop())
     assert_raises(NotImplementedError, s.get_val)
+
+def test_history():
+    s = section.SectionGrower(None, None, [0.,0.,0.], [0., 1., 0.], 0.0, 0.0, None, None, SEG_LEN, 0.0)
+    assert_array_almost_equal(s.history(), np.array([0.,0.,0.]))
+    s.latest_directions = np.array([[0., 0., 0.]])
+    assert_array_almost_equal(s.history(), np.array([0.,0.,0.]))
+    s.latest_directions = np.array([[0., 1., 0.]])
+    assert_array_almost_equal(s.history(), np.array([0.,1.,0.]))
+    s.latest_directions = np.array([[0., 1., 0.], [0., 0., 1.]])
+    assert_array_almost_equal(s.history(), np.array([0. , 0.34525776, 0.9385079 ]))
+    s.latest_directions = np.array([[0., 0., 0.00000001]])
+    assert_array_almost_equal(s.history(), np.array([0.e+00, 0.e+00, 1.e-08]))

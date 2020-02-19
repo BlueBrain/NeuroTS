@@ -8,6 +8,7 @@ from numpy.linalg import norm as vectorial_norm  # vectorial_norm used for array
 from tns.morphmath.utils import get_random_point, norm  # norm used for single vectors
 
 MEMORY = 5
+DISTANCE_MIN = 1e-8
 
 # Memory decreases with distance from current point
 WEIGHTS = np.exp(np.arange(1, MEMORY + 1) - MEMORY)
@@ -96,9 +97,9 @@ class SectionGrower(object):
             return np.zeros(3)
 
         hist = np.dot(WEIGHTS[MEMORY - n_points:], self.latest_directions)
-        distance = vectorial_norm(hist)
 
-        if not np.isclose(distance, 0.0):
+        distance = vectorial_norm(hist)
+        if distance > DISTANCE_MIN:
             hist /= distance
 
         return hist
