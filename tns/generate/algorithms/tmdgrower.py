@@ -1,8 +1,10 @@
 """Basic class for TreeGrower Algorithms"""
 
 import copy
+import logging
 import numpy as np
 
+from tmd.Topology.analysis import get_lengths
 from tns.generate.algorithms.abstractgrower import AbstractAlgo
 from tns.generate.algorithms.common import bif_methods
 from tns.generate.algorithms.common import TMDStop
@@ -10,6 +12,8 @@ from tns.generate.algorithms.common import section_data
 from tns.morphmath import sample
 from tns.morphmath.utils import norm
 from tns.generate.algorithms.barcode import Barcode
+
+L = logging.getLogger(__name__)
 
 
 class TMDAlgo(AbstractAlgo):
@@ -30,6 +34,11 @@ class TMDAlgo(AbstractAlgo):
         if params.get('modify'):
             self.ph_angles = params['modify']['funct'](self.ph_angles,
                                                        **params['modify']['kwargs'])
+        # Consistency check between parameters - persistence diagram
+        barSZ = np.min(get_lengths(self.ph_angles))
+        stepSZ = self.params['step_size']['norm']['mean']
+        if stepSZ >= barSZ:
+            L.warning('Selected step size %f is too big for bars of size %f', stepSZ, barSZ)
         self.barcode = Barcode(list(self.ph_angles))
         self.start_point = start_point
         self.apical_point = None
