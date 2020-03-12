@@ -79,7 +79,7 @@ class SomaGrower(object):
         but replaces the third (z) coordinate with the equivalent
         soma-z in order to create a contour at the soma level.
         '''
-        return np.array((point[0], point[1], self.center[2], 0.), dtype=np.float)
+        return np.array((point[0], point[1], self.center[2]), dtype=np.float)
 
     def add_points_from_trunk_angles(self, trunk_angles, z_angles):
         """Generates a sequence of points in the circumference of
@@ -142,7 +142,7 @@ class SomaGrower(object):
             x = self.radius * np.sin(angles) + self.center[0]
             y = self.radius * np.cos(angles) + self.center[1]
             z = np.full_like(angles, self.center[2])
-            points_to_interpolate = points + [[i, j, k, 0.] for i, j, k in zip(x, y, z)]
+            points_to_interpolate = points + [[i, j, k] for i, j, k in zip(x, y, z)]
 
         # a convex hull from 2D points is guaranteed to be ordered
         xy_points = np.asarray(points_to_interpolate)[:, :2]
@@ -172,14 +172,18 @@ class SomaGrower(object):
         """Generates a single point soma, representing a sphere
            including the center and the diameter.
         """
-        return np.array([list(self.center) + [2.0 * self.radius]], dtype=np.float32)
+        soma_points = [self.center]
+        soma_diameters = [2.0 * self.radius]
+        return soma_points, soma_diameters
 
     def contour_soma(self):
         """Generates a contour soma, that consists of all soma points.
            The contour must contain at least three points.
         """
-        return self.interpolate([self.contour_point(p) for p in self.points])
+        contour = [self.contour_point(p) for p in self.points]
+        soma_pts = self.interpolate(contour)
+        return soma_pts, np.zeros(len(soma_pts), dtype=np.float)
 
     def original_soma(self):
         """Returns the original somata points"""
-        return np.array([list(point) + [0.] for point in self.points], dtype=np.float32)
+        return self.points, np.zeros(len(self.points), dtype=np.float)

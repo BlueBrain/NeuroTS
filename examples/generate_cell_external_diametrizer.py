@@ -4,14 +4,13 @@ from functools import partial
 import tns
 from tns import extract_input
 from diameter_synthesis import build_models, build_diameters
-from neurom.core._neuron import Neuron
 
 def run():
     """Extract distributions from cells in input directory"""
     dir_path = os.path.dirname(os.path.realpath(__file__))
     filename = os.path.join(dir_path, '../test_data/bio/')
 
-    neurite_types = ['basal', 'apical']
+    neurite_types = ['basal']
 
     config = {}
     config['neurite_types'] = neurite_types
@@ -38,8 +37,7 @@ def run():
 
     # converts a morphio to neuromV2 neuron
     def external_diametrizer(neuron, model, neurite_type):
-        config['neurite_types'] = [neurite_type, ]
-        return build_diameters.build(neuron, model, config)
+        return build_diameters.build(neuron, model, neurite_types, config)
 
     # Initialize a neuron
     grower = tns.NeuronGrower(input_distributions=distr,
