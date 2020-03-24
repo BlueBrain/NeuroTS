@@ -43,7 +43,7 @@ def _load_inputs(distributions, parameters):
     return distributions, params
 
 
-def _test_full(feature, distributions, parameters, ref_cell, ref_persistence_diagram):
+def _test_full(feature, distributions, parameters, ref_cell, ref_persistence_diagram, save=False):
 
     np.random.seed(0)
     distributions, params = _load_inputs(join(_path, distributions), join(_path, parameters))
@@ -53,14 +53,16 @@ def _test_full(feature, distributions, parameters, ref_cell, ref_persistence_dia
         out_neuron = os.path.join(folder, 'test_output_neuron_.h5')
         n.write(out_neuron)
         # For checking purposes, we can output the cells as swc
-        # n.write(ref_cell.replace('.h5', 'NEW.h5'))
+        if save:
+            n.write(ref_cell.replace('.h5', 'NEW.h5'))
 
         if ref_persistence_diagram is not None:
             # Load with TMD and extract radial persistence
             n0 = tmd.io.load_neuron(out_neuron)
 
             actual_persistence_diagram = tmd.methods.get_persistence_diagram(n0.apical[0], feature=feature)
-            # print(actual_persistence_diagram)
+            if save:
+                print(actual_persistence_diagram)
 
             with open(join(_path, ref_persistence_diagram)) as f:
                 expected_persistence_diagram = json.load(f)
@@ -120,3 +122,9 @@ def test_bio_rat_l5_tpc():
                'params3.json',
                'expected_bio_rat_L5_TPC_B_with_params3.h5',
                'expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json')
+
+    _test_full('path_distances',
+               'bio_rat_L5_TPC_B.json',
+               'params4.json',
+               'expected_bio_rat_L5_TPC_B_with_params4.h5',
+               'expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json')

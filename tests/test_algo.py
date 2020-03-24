@@ -23,6 +23,7 @@ def _setup_test(Algo, Grower):
         parameters = json.load(f)['basal']
     parameters['bias_length'] = 0.5
     parameters['bias'] = 0.5
+    parameters["has_apical_tuft"] = True
 
     np.random.seed(42)
     algo = Algo(distributions, parameters, [0, 0, 1])

@@ -3,6 +3,7 @@ TNS class : Grower object that contains the grower functionality.
 '''
 import copy
 import logging
+
 from morphio.mut import Morphology  # pylint: disable=import-error
 from tns.generate.soma import SomaGrower
 from tns.morphmath import sample
@@ -72,8 +73,8 @@ class NeuronGrower(object):
         for grower in list(self.active_neurites):
             if grower.end():
                 # If tree is an apical, the apical points get appended at the end of growth
-                # This will ensure that for each apical tree the relevant apical point,
-                # as a set of 3D coordinates (x,y,z) will be exposed to the user.
+                # This will ensure that for each apical tree a relevant apical point,
+                # will be exposed to the user as a set of 3D coordinates (x,y,z).
                 if 'apical' in self.input_parameters['grow_types'] and \
                    grower.type == self.input_parameters['apical']['tree_type']:
                     self.apical_points.append(grower.growth_algo.apical_point)

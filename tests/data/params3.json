@@ -2,6 +2,7 @@
             "bias_length": 100,
             "branching_method": "directional",
             "growth_method": "tmd_gradient",
+            "has_apical_tuft": true,
             "metric": "path_distances",
             "modify": null,
             "orientation": [[0.0,

@@ -36,7 +36,7 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30):
     angles = [i for a in angles for i in a]
     heights, bins = np.histogram(angles, bins=bins)
 
-    # Extract trunk relative orientations to reshample
+    # Extract trunk relative orientations to resample
     actual_bins = (bins[1:] + bins[:-1]) / 2.
 
     return {"trunk": {"orientation_deviation": {"data":

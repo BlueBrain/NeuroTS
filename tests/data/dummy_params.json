@@ -1,5 +1,6 @@
 { "apical": {
         "branching_method": "directional",
+        "has_apical_tuft": true,
         "growth_method": "tmd_apical",
         "metric": "path_distances",
         "modify": null,

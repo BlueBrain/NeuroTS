@@ -16,7 +16,7 @@ setup(
     install_requires=[
         'matplotlib>=1.3.1',
         'morph-tool>=0.1.12',
-        'tmd>=2.0.5',
+        'tmd>=2.0.8',
         'neurom @ git+https://git@github.com/BlueBrain/NeuroM.git@mut_morphio#egg=neurom-2.0.0',
         'enum-compat>=0.0.1',
         'scipy>=0.13.3',

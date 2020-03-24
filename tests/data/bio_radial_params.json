@@ -9,6 +9,7 @@
            "tree_type": 3,
            "step_size": {"norm":{"mean":1.0, "std":0.2}}},
 "apical": {"metric":"radial_distances",
+           "has_apical_tuft": true,
            "randomness": 0.0,
            "targeting": 0.2,
            "radius": 0.3,
