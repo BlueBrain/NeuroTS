@@ -4,6 +4,7 @@ import copy
 from collections import OrderedDict
 import numpy as np
 from tns.basic import round_num
+from tns.utils import TNSError
 
 
 class Barcode(object):
@@ -81,7 +82,9 @@ class Barcode(object):
 
     def get_term(self, bar_id):
         '''Returns a termination based on index,
-           if the input ID exists
+           if the input ID exists.
+           If it doesn't exist the branch will terminate
+           as it gets term = -infinity.
         '''
         try:
             return self.terms[bar_id]
@@ -93,6 +96,8 @@ class Barcode(object):
         '''Returns a termination based on index,
            if it exists and its value is between the
            above / below thresholds.
+           If it doesn't exist the branch will terminate
+           as it gets term = -infinity.
         '''
         try:
             term = self.terms[bar_id]
@@ -100,10 +105,10 @@ class Barcode(object):
                 return (bar_id, term)
             else:
                 # no term found with requested properties
-                return (None, np.inf)
+                return (None, -np.inf)
         except KeyError:
             # bar ID does not exist
-            return (None, np.inf)
+            return (None, -np.inf)
 
     def min_bif(self, bif_above=0.0, bif_below=np.inf):
         '''Returns the id and value of the minimum bifurcation
@@ -146,7 +151,7 @@ class Barcode(object):
            The child bar's length should be smaller than the current bar's length.
            This process ensures that each branch can only generate smaller branches.
            The criteria to ensure this statement is True are the following:
-              * parent_stop.ref <= child_stop.bif <= parent_stop.term  or child_stop.bif = infinite
+              * parent_stop.ref <= child_stop.bif <= parent_stop.term or child_stop.bif = inf
               * child_stop.term <= parent_stop.term
               * term(child_stop.bif) <= parent_stop.term
            Args:
@@ -163,9 +168,9 @@ class Barcode(object):
         # One of the assumed conditions is wrong
         # This should not happen, therefore growth should stop!
         if target_stop.term > MAX_ref:
-            raise Exception('Broken pipeline')
+            raise TNSError('broken pipeline')
         if (not np.isinf(target_stop.bif)) and (target_stop.bif > MAX_ref):
-            raise Exception('Broken pipeline')
+            raise TNSError('broken pipeline')
 
         # Case 1. Requirements fullfiled for inputs ref, bif, term
         if self.get_term(target_stop.bif_id) <= target_stop.term:

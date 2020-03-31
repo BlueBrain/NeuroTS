@@ -197,9 +197,12 @@ class TMDApicalAlgo(TMDAlgo):
         if self.params['has_apical_tuft']:
             self.apical_point_distance_from_soma = ap_dist(self.ph_angles)
         else:
-            # If cell does not have a tuft return the 70% of its length instead
+            # If cell does not have a tuft return the distance before last bifurcation
             # this will result in a point very close to the proximal apical point.
-            self.apical_point_distance_from_soma = 0.7 * np.nanmax(self.ph_angles)
+            step_size = self.params['step_size']['norm']['mean']
+            selected_length = list(self.barcode.bifs.values())[-1]
+            # From last bifurcation subtract 10 step sizes for apical point distance
+            self.apical_point_distance_from_soma = selected_length - 10 * step_size
         return stop, num_sec
 
     def bifurcate(self, current_section):
@@ -226,6 +229,9 @@ class TMDApicalAlgo(TMDAlgo):
             dir1, dir2 = self.bif_method(current_section.history(), angles=ang)
             process1 = 'secondary'
             process2 = 'secondary'
+
+            if current_pd > self.apical_point_distance_from_soma and self.apical_point is None:
+                self.apical_point = first_point
 
         stop1, stop2 = self.get_stop_criteria(current_section)
 
