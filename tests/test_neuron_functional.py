@@ -7,6 +7,7 @@ Finally, we need to check the TMD of the produced cells.
 '''
 
 
+from tempfile import TemporaryDirectory
 import json
 import os
 from os.path import join
@@ -16,7 +17,6 @@ from numpy.testing import assert_almost_equal, assert_array_almost_equal
 from nose.tools import assert_raises, ok_
 from morph_tool import diff
 from tns.generate.grower import NeuronGrower
-from .utils import setup_tempdir
 import tmd
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
@@ -49,7 +49,7 @@ def _test_full(feature, distributions, parameters, ref_cell, ref_persistence_dia
     distributions, params = _load_inputs(join(_path, distributions), join(_path, parameters))
     n = NeuronGrower(input_distributions=distributions, input_parameters=params).grow()
 
-    with setup_tempdir('test_grower', cleanup=False) as folder:
+    with TemporaryDirectory('test_grower') as folder:
         out_neuron = os.path.join(folder, 'test_output_neuron_.h5')
         n.write(out_neuron)
         # For checking purposes, we can output the cells as swc

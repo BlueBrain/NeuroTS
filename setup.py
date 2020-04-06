@@ -9,7 +9,7 @@ VERSION = imp.load_source("tns.version", "tns/version.py").VERSION
 
 
 setup(
-    version= VERSION,
+    version=VERSION,
     description='TNS= synthesis of artificial neurons using their topological profiles package',
     author='Lida Kanari',
     author_email='lida.kanari@epfl.ch',
@@ -23,6 +23,7 @@ setup(
         'numpy>=1.15.0',
         'jsonschema>=3.0.1',
     ],
+    python_requires='>=3.6',
     packages=find_packages(),
     license='BSD',
     scripts=[],

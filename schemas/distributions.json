@@ -1,0 +1,76 @@
+{
+    "definitions": {
+        "empty_object": {"type": "object", "additionalProperties": false},
+
+        "neurite_distrib": {
+            "type": "object",
+            "properties": {
+                "num_trees": {"type": "object"},
+                "persistence_diagram": {"type": "array",
+                                        "items": {"type": "array",
+                                                  "items": {"type": "array",
+                                                            "items": {"type": "number"}}}},
+                "trunk": {"type": "object",
+                          "properties": {
+                              "azimuth": {"type": "object",
+                                          "properties": {
+                                              "uniform": { "type": "object",
+                                                           "properties": {
+                                                               "max": {"type": "number"},
+                                                               "min": {"type": "number"}
+                                                           },
+                                                           "additionalProperties": false
+                                                           }
+                                              }
+                                          },
+                              "orientation_deviation": {
+                                  "type": "object",
+                                  "properties":{
+                                      "data": {"type": "object",
+                                               "properties": {
+                                                   "bins": {"type": "array",
+                                                            "items": {"type": "number"}},
+                                                   "weights": {"type": "array",
+                                                               "items": {"type": "number"}}
+                                               },
+                                               "additionalProperties": false
+                                      }
+                                  }
+                              }
+                          }
+                }
+            },
+            "required": ["trunk"]
+        }
+    },
+
+    "type": "object",
+    "properties": {
+        "apical": {"oneOf": [{"$ref": "#/definitions/empty_object"},
+                             {"$ref": "#/definitions/neurite_distrib"}]},
+        "axon": {"type": "object"},
+        "basal": {"$ref": "#/definitions/neurite_distrib"},
+        "soma": {"type": "object",
+                 "properties":{
+                     "size": {"type": "object",
+                              "properties": {
+                                  "norm": { "type": "object",
+                                            "properties": {
+                                                "std": {"type": "number"},
+                                                "mean": {"type": "number"}
+                                            },
+                                            "required": ["std", "mean"],
+                                            "additionalProperties": false
+                                  }
+                              }
+                     }
+                 }
+        },
+        "diameter": {"type": "object",
+                     "properties": {"method": {"type": "string"}},
+                     "required": ["method"]
+        }
+    },
+    "additionalProperties": false,
+    "required": ["diameter", "soma"]
+}

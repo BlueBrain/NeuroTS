@@ -1,0 +1,59 @@
+{
+    "definitions": {
+        "point": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3
+        },
+
+        "empty_object": {"type": "object", "additionalProperties": false},
+
+        "neurite": {
+            "type": "object",
+            "properties": {
+                "randomness": {"type": "number"},
+                "targeting": {"type": "number"},
+                "radius": {"type": "number"},
+                "orientation": {"anyOf": [{"type": "null"},
+                                          {"type": "array",
+                                           "items": {"$ref": "#/definitions/point"}}]},
+                "growth_method": {"type": "string",
+                                  "enum": ["tmd", "tmd_gradient", "tmd_apical", "trunk"]},
+                "step_size": {"type": "object",
+                              "properties": {
+                                  "norm": {
+                                      "type": "object",
+                                      "properties": {
+                                          "mean": {"type": "number"},
+                                          "std": {"type": "number"}
+                                      }
+                                  }
+                              }
+                              }
+            },
+            "required": ["branching_method", "growth_method", "metric", "modify", "orientation", "radius", "randomness", "targeting", "tree_type"]
+        }
+    },
+
+    "type": "object",
+    "properties": {
+        "apical": {"oneOf": [{"$ref": "#/definitions/empty_object"},
+                             {"$ref": "#/definitions/neurite"}]},
+        "axon": {"oneOf": [{"$ref": "#/definitions/empty_object"},
+                           {"$ref": "#/definitions/neurite"}]},
+        "basal": {"$ref": "#/definitions/neurite"},
+        "grow_types": {"type": "array",
+                       "items": {"type": "string", "enum": ["basal", "apical"]}
+                       },
+        "origin": {"$ref": "#/definitions/point"},
+        "diameter_params": {
+            "type": "object",
+            "properties": {"method": {"type": "string"}},
+            "required": ["method"]
+        }
+
+    },
+
+    "required": ["origin", "diameter_params", "grow_types"],
+    "additionalProperties": false
+}

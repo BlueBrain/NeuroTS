@@ -4,11 +4,14 @@ TNS class : Grower object that contains the grower functionality.
 import copy
 import logging
 
+import numpy as np
+
 from morphio.mut import Morphology  # pylint: disable=import-error
 from tns.generate.soma import SomaGrower
 from tns.morphmath import sample
 from tns.generate.tree import TreeGrower
 from tns.generate import diametrizer
+from tns.validator import validate_neuron_params, validate_neuron_distribs
 
 L = logging.getLogger(__name__)
 
@@ -34,7 +37,10 @@ class NeuronGrower(object):
         self.context = context
 
         self.input_parameters = copy.deepcopy(input_parameters)
+        self.validate_params()
+
         self.input_distributions = copy.deepcopy(input_distributions)
+        self.validate_distribs()
 
         # Consistency check between parameters and distributions
         for tree_type in self.input_parameters['grow_types']:
@@ -67,6 +73,14 @@ class NeuronGrower(object):
 
         # initialize diametrizer
         self._init_diametrizer(external_diametrizer=external_diametrizer)
+
+    def validate_params(self):
+        '''Validate the parameter dictionary'''
+        validate_neuron_params(self.input_parameters)
+
+    def validate_distribs(self):
+        '''Validate the distribution dictionary'''
+        validate_neuron_distribs(self.input_distributions)
 
     def next(self):
         '''Call the "next" method of each neurite grower'''
@@ -125,6 +139,8 @@ class NeuronGrower(object):
         '''
 
         if isinstance(orientation, list):  # Gets major orientations externally
+            assert np.all(np.linalg.norm(orientation, axis=1) > 0), (
+                'Orientations should have non-zero lengths')
             if len(orientation) >= n_trees:
                 pts = self.soma.add_points_from_orientations(orientation[:n_trees])
             else:

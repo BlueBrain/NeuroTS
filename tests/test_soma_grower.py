@@ -306,3 +306,13 @@ def test_soma_grower():
                               expected.root_sections[0].points)
     for sec_actual, sec_expected in zip(actual.iter(), expected.iter()):
         assert_array_almost_equal(sec_actual.points, sec_expected.points)
+
+
+def test_null_orientation():
+    with open(os.path.join(_path, 'dummy_params.json')) as f:
+        params = json.load(f)
+    params['apical']['orientation'] = [[0, 0, 0], [1, 0, 0]]
+    with open(os.path.join(_path, 'dummy_distribution.json')) as f:
+        distributions = json.load(f)
+    N = NeuronGrower(input_distributions=distributions, input_parameters=params)
+    assert_raises(AssertionError, N.grow)
