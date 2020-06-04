@@ -30,10 +30,7 @@ class TMDAlgo(AbstractAlgo):
         super(TMDAlgo, self).__init__(input_data, params, start_point, context)
         self.bif_method = bif_methods[params["branching_method"]]
         self.params = copy.deepcopy(params)
-        self.ph_angles = sample.ph(input_data["persistence_diagram"])
-        if params.get('modify'):
-            self.ph_angles = params['modify']['funct'](self.ph_angles,
-                                                       **params['modify']['kwargs'])
+        self.ph_angles = self.select_persistence(input_data)
         # Consistency check between parameters - persistence diagram
         barSZ = np.min(get_lengths(self.ph_angles))
         stepSZ = self.params['step_size']['norm']['mean']
@@ -43,6 +40,18 @@ class TMDAlgo(AbstractAlgo):
         self.start_point = start_point
         self.apical_point = None
         self.apical_point_distance_from_soma = 0.0
+
+    def select_persistence(self, input_data):
+        """Samples one persistence diagram from a list of diagrams
+           and modifies according to input parameters.
+        """
+        list_of_persistences = input_data["persistence_diagram"]
+        persistence = sample.ph(list_of_persistences)
+
+        if self.params.get('modify'):
+            persistence = self.params['modify']['funct'](persistence,
+                                                         **self.params['modify']['kwargs'])
+        return persistence
 
     @staticmethod
     def metric_ref(section):
