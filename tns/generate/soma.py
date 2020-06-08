@@ -149,7 +149,7 @@ class SomaGrower(object):
 
         try:
             selected = ConvexHull(xy_points).vertices
-            return [points_to_interpolate[index] for index in selected]
+            return [points_to_interpolate[index] for index in selected]  # pylint: disable=not-an-iterable
         except QhullError:
             raise TNSError('Warning! Convex hull failed, contour soma generation failed.')
 

@@ -18,7 +18,7 @@ from tns.morphmath import sample
 L = logging.getLogger('tns')
 
 # LAMBDA: parameter that defines the slope of exponential probability
-LAMDA = 1.0
+LAMDA = 1.
 
 growth_algorithms = {'tmd': tmdgrower.TMDAlgo,
                      'tmd_apical': tmdgrower.TMDApicalAlgo,
@@ -88,25 +88,30 @@ class TreeGrower(object):
         """
         self.neuron = neuron
         self.direction = initial_direction
-        self.point = list(initial_point)
+        self.point = initial_point
         self.type = parameters["tree_type"]  # 2: axon, 3: basal, 4: apical, 5: other
         self.params = parameters
         self.distr = distributions
         self.active_sections = list()
         self.context = context
-        grow_meth = growth_algorithms[self.params["growth_method"]]
-
-        self.growth_algo = grow_meth(input_data=self.distr,
-                                     params=self.params,
-                                     start_point=self.point,
-                                     context=context)
-        stop, num_sec = self.growth_algo.initialize()
-
-        self._section_parameters = _create_section_parameters(parameters)
 
         # Creates the distribution from which the segment lengths
         # To sample a new seg_len call self.seg_len.draw()
         self.seg_length_distr = sample.Distr(self.params["step_size"])
+        self._section_parameters = _create_section_parameters(parameters)
+        self.growth_algo = self._initialize_algorithm()
+
+    def _initialize_algorithm(self):
+        """ Initialization steps for TreeGrower
+        """
+        grow_meth = growth_algorithms[self.params["growth_method"]]
+
+        growth_algo = grow_meth(input_data=self.distr,
+                                params=self.params,
+                                start_point=self.point,
+                                context=self.context)
+
+        stop, num_sec = growth_algo.initialize()
 
         sec = self.add_section(parent=None,
                                direction=self.direction,
@@ -117,6 +122,8 @@ class TreeGrower(object):
                                children=2 if num_sec > 1 else 0)
         # First section of the tree has at least one point.
         sec.first_point()
+
+        return growth_algo
 
     def add_section(self, parent, direction, first_point, stop, pathlength,
                     process=None, children=0):

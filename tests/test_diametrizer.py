@@ -41,9 +41,12 @@ def test_bifurcator():
 
 
 def test_taper_section_diam_from_root():
+
     neu1 = morphio.mut.Morphology(NEU_PATH1)
     section = neu1.root_sections[0]
+
     diametrizer.taper_section_diam_from_root(section, 4., 0.6, 0.07, 100.)
+
     assert_array_almost_equal(section.diameters,
                               [4., 3.9, 3.8, 3.7, 3.6, 3.5, 3.4])
 

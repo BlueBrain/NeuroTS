@@ -3,7 +3,7 @@ disable=bad-continuation,fixme,invalid-name,len-as-condition,no-else-return,ungr
 
 [FORMAT]
 # Maximum number of characters on a single line.
-max-line-length=100
+max-line-length=120
 
 [DESIGN]
 # Maximum number of arguments for function / method
@@ -45,7 +45,7 @@ ignore-docstrings=yes
 # (useful for classes with attributes dynamically set).
 
 #as of numpy 1.8.0, name resolution seems to be a problem.  Ignore lookups in numpy
-ignored-classes=numpy,list,morphio
+ignored-classes=numpy,scipy,list,morphio
 
-extension-pkg-whitelist=numpy,lxml,brain,pybinreports,morphio
+extension-pkg-whitelist=numpy,scipy,lxml,brain,pybinreports,morphio
 unsafe-load-all-extensions=morphio

@@ -37,6 +37,7 @@ class NeuronGrower(object):
         self.context = context
 
         self.input_parameters = copy.deepcopy(input_parameters)
+        L.debug('Input Parameters: %s', input_parameters)
         self.validate_params()
 
         self.input_distributions = copy.deepcopy(input_distributions)
@@ -107,8 +108,12 @@ class NeuronGrower(object):
         self._grow_soma()
         while self.active_neurites:
             self.next()
+        self._post_grow()
         self._diametrize()
         return self.neuron
+
+    def _post_grow(self):
+        """ Actions after the morphology has been grown and before its diametrization """
 
     def _init_diametrizer(self, external_diametrizer=None):
         """set a diametrizer function"""
