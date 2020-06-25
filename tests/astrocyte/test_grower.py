@@ -211,5 +211,5 @@ def test_grow__run():
 
     astro_grower = _astrocyte_grower()
     astro_grower.grow()
-
-    assert not diff(astro_grower.neuron, _path / 'astrocyte.h5')
+    difference = diff(astro_grower.neuron, _path / 'astrocyte.h5', atol=0.001)
+    assert not difference, difference.info
