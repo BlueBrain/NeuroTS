@@ -4,14 +4,16 @@ Visit https://json-schema.org/understanding-json-schema/ for more information ab
 '''
 import json
 from pathlib import Path
+import pkg_resources
 
 from jsonschema import validate
 
+SCHEMA_PATH = pkg_resources.resource_filename('tns', 'schemas')
 
-with (Path(__file__).parent.parent.resolve() / 'schemas' / 'parameters.json').open() as f:
+with Path(SCHEMA_PATH, 'parameters.json').open() as f:
     PARAMS_SCHEMA = json.load(f)
 
-with (Path(__file__).parent.parent.resolve() / 'schemas' / 'distributions.json').open() as f:
+with Path(SCHEMA_PATH, 'distributions.json').open() as f:
     DISTRIBS_SCHEMA = json.load(f)
 
 
