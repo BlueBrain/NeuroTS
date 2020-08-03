@@ -4,7 +4,7 @@ import abc
 import copy
 
 
-class AbstractAlgo(object):
+class AbstractAlgo():
     """TreeGrower abstract class"""
     # meta class is used to define other classes
     __metaclass__ = abc.ABCMeta

@@ -72,7 +72,7 @@ def model(input_object):
         key = NEUROM_TYPE_TO_STR[neurite_type]
 
         values[key] = {"taper": taper_c,
-                       "term": [c for c in chain(*term_diam)],
+                       "term": list(chain(*term_diam)),
                        "trunk": trunk_diam,
                        "trunk_taper": trunk_taper}
 

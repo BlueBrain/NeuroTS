@@ -66,7 +66,7 @@ def _create_section_parameters(input_dict):
         raise TNSError(msg)
 
 
-class TreeGrower(object):
+class TreeGrower():
     """Tree class"""
 
     def __init__(self,

@@ -36,7 +36,7 @@ def section_data(direction, first_point, stop_criteria, process_type):
             'process': process_type}
 
 
-class TMDStop(object):
+class TMDStop():
     '''Class to define the data for stop criteria
        based on the TMD method.
     '''

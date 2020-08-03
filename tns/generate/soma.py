@@ -14,7 +14,7 @@ from tns.morphmath.utils import norm
 L = logging.getLogger()
 
 
-class SomaGrower(object):
+class SomaGrower():
     """Soma class"""
 
     def __init__(self, initial_point, radius=1.0, context=None):

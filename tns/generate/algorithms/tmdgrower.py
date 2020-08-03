@@ -201,7 +201,7 @@ class TMDApicalAlgo(TMDAlgo):
         Initializes the tree grower and
         computes the apical distance using the input barcode.
         """
-        from tmd.Topology.analysis import find_apical_point_distance_smoothed as ap_dist
+        from tmd.Topology.analysis import find_apical_point_distance_smoothed as ap_dist  # pylint: disable=C0415
         stop, num_sec = super(TMDApicalAlgo, self).initialize()
         if self.params['has_apical_tuft']:
             self.apical_point_distance_from_soma = ap_dist(self.ph_angles)

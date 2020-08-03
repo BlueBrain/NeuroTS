@@ -18,7 +18,7 @@ L = logging.getLogger(__name__)
 bifurcation_methods = ['symmetric', 'bio_oriented', 'directional', 'bio_smoothed']
 
 
-class NeuronGrower(object):
+class NeuronGrower():
     """
     A Grower object is a container for a Neuron, encoded in the (groups, points) structure,
     as a morphIO Morphology object. A set of input distributions that store the data
@@ -107,7 +107,7 @@ class NeuronGrower(object):
         """
         self._grow_soma()
         while self.active_neurites:
-            self.next()
+            self.next()  # pylint: disable=E1102
         self._post_grow()
         self._diametrize()
         return self.neuron
