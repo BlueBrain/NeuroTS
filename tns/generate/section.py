@@ -14,7 +14,7 @@ DISTANCE_MIN = 1e-8
 WEIGHTS = np.exp(np.arange(1, MEMORY + 1) - MEMORY)
 
 
-class SectionGrower():
+class SectionGrower:
     '''Class for the section growth
     '''
     # pylint: disable-msg=too-many-arguments

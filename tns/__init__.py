@@ -11,3 +11,5 @@
 from tns.utils import TNSError
 from tns.generate.grower import NeuronGrower
 from tns.astrocyte.grower import AstrocyteGrower
+
+from tns.version import VERSION as version

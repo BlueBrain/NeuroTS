@@ -7,7 +7,7 @@ from tns.basic import round_num
 from tns.utils import TNSError
 
 
-class Barcode():
+class Barcode:
     """Class to generate the barcode structure
        which is essential for the TMD based growth
        algorithms.

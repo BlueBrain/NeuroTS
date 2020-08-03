@@ -5,7 +5,7 @@ import numpy as np
 from scipy import stats
 
 
-class Distr():
+class Distr:
     '''Class of custom distributions
     '''
 
