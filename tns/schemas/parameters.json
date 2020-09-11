@@ -11,27 +11,72 @@
         "neurite": {
             "type": "object",
             "properties": {
-                "randomness": {"type": "number"},
-                "targeting": {"type": "number"},
-                "radius": {"type": "number"},
+                "apical_distance": {"type": "number"},
+                "bias": {"type": "number"},
+                "bias_length": {"type": "number"},
+                "branching_method": {"type": "string"},
+                "growth_method": {"type": "string",
+                                  "enum": ["tmd", "tmd_gradient", "tmd_apical", "trunk"]},
+                "has_apical_tuft": {"type": "boolean"},
+                "metric": {"type": "string"},
+                "modify": {"oneOf": [{"type": "object"}, {"type": "null"}]},
+                "num_seg": {"type": "integer"},
                 "orientation": {"anyOf": [{"type": "null"},
                                           {"type": "array",
                                            "items": {"$ref": "#/definitions/point"}}]},
-                "growth_method": {"type": "string",
-                                  "enum": ["tmd", "tmd_gradient", "tmd_apical", "trunk"]},
-                "step_size": {"type": "object",
-                              "properties": {
-                                  "norm": {
-                                      "type": "object",
-                                      "properties": {
-                                          "mean": {"type": "number"},
-                                          "std": {"type": "number"}
-                                      }
-                                  }
-                              }
-                              }
+                "radius": {"type": "number"},
+                "randomness": {"type": "number"},
+                "step_size": {
+                    "type": "object",
+                    "properties": {
+                        "norm": {
+                            "type": "object",
+                            "properties": {
+                                "mean": {"type": "number"},
+                                "std": {"type": "number"}
+                            }
+                        }
+                    }
+                },
+                "targeting": {"type": "number"},
+                "tree_type": {"type": "integer"}
             },
-            "required": ["branching_method", "growth_method", "metric", "modify", "orientation", "radius", "randomness", "targeting", "tree_type"]
+            "required": [
+                "branching_method",
+                "growth_method",
+                "metric",
+                "modify",
+                "orientation",
+                "radius",
+                "randomness",
+                "targeting",
+                "tree_type"
+            ],
+            "additionalProperties": false
+        },
+
+        "limit": {
+            "type": "object",
+            "properties": {
+                "layer": {
+                    "type": "integer"
+                },
+                "fraction": {
+                    "type": "number"
+                }
+            },
+            "required": ["layer", "fraction"],
+            "additionalProperties": false
+        },
+
+        "limits": {
+            "type": "object",
+            "properties": {
+                "min": {"$ref": "#/definitions/limit"},
+                "target": {"$ref": "#/definitions/limit"},
+                "max": {"$ref": "#/definitions/limit"}
+            },
+            "additionalProperties": false
         }
     },
 
@@ -50,8 +95,32 @@
             "type": "object",
             "properties": {"method": {"type": "string"}},
             "required": ["method"]
+        },
+        "context": {
+            "type": "object",
+            "properties": {
+                "apical": {"anyOf": [
+                    {"$ref": "#/definitions/limits"},
+                    {
+                        "extent_to_path": {
+                            "type": "object",
+                            "properties": {
+                                "slope": {
+                                    "type": "number"
+                                },
+                                "intercept": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": ["slope", "intercept"],
+                            "additionalProperties": false
+                        }
+                    }
+                ]},
+                "basal": {"$ref": "#/definitions/limits"}
+            },
+            "additionalProperties": false
         }
-
     },
 
     "required": ["origin", "diameter_params", "grow_types"],
