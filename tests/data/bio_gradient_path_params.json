@@ -18,7 +18,7 @@
                              1.0,
                              0.0]],
            "growth_method": "tmd_gradient",
-           "bias_length": 100,
+           "bias_length": 0.09313119270045161,
            "bias": 0.5,
            "branching_method": "directional",
            "modify": null,

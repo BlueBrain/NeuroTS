@@ -253,8 +253,10 @@ class TMDGradientAlgo(TMDApicalAlgo):
 
     def _majorize_process(self, section, stop, process, input_dir):
         '''Currates the non-major processes to apply a gradient to large components'''
+        persistence_length = self.barcode.get_persistence_length()
+        bias_length = self.params['bias_length'] * persistence_length
         difference = stop.expected_maximum_length()
-        if difference > self.params['bias_length']:
+        if difference > bias_length:
             direction1 = (1.0 - self.params['bias']) * np.array(input_dir)
             direction2 = self.params['bias'] * np.array(section.direction)
             direct = np.add(direction1, direction2)

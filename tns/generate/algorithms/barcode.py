@@ -68,6 +68,10 @@ class Barcode:
             return (0, self.terms[bar_id])
         return (self.bifs[bar_id], self.terms[bar_id])
 
+    def get_persistence_length(self):
+        '''Returns the maximum bar length'''
+        return self.terms[0]
+
     def remove_bif(self, bar_id):
         '''Remove a bifurcation that has been used
            if bif_id is not None'''
