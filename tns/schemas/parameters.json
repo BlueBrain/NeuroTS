@@ -96,7 +96,7 @@
             "properties": {"method": {"type": "string"}},
             "required": ["method"]
         },
-        "context": {
+        "context_constraints": {
             "type": "object",
             "properties": {
                 "apical": {"anyOf": [
