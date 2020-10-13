@@ -26,22 +26,26 @@ class NeuronGrower:
     """
 
     def __init__(self, input_parameters, input_distributions,
-                 context=None, external_diametrizer=None):
+                 context=None, external_diametrizer=None, skip_validation=False):
         """TNS NeuronGrower
         input_parameters: the user-defined parameters
         input_distributions: distributions extracted from biological data
         context: an object containing contextual information
-        extremal_diametrizer: diametrizer function for external diametrizer module
+        external_diametrizer: diametrizer function for external diametrizer module
+        skip_validation: if set to False, the parameters and distributions are validated
         """
         self.neuron = Morphology()
         self.context = context
 
         self.input_parameters = copy.deepcopy(input_parameters)
         L.debug('Input Parameters: %s', input_parameters)
-        self.validate_params()
 
         self.input_distributions = copy.deepcopy(input_distributions)
-        self.validate_distribs()
+
+        # Validate parameters and distributions
+        if not skip_validation:
+            self.validate_params()
+            self.validate_distribs()
 
         # Consistency check between parameters and distributions
         for tree_type in self.input_parameters['grow_types']:

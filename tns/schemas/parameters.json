@@ -53,30 +53,6 @@
                 "tree_type"
             ],
             "additionalProperties": false
-        },
-
-        "limit": {
-            "type": "object",
-            "properties": {
-                "layer": {
-                    "type": "integer"
-                },
-                "fraction": {
-                    "type": "number"
-                }
-            },
-            "required": ["layer", "fraction"],
-            "additionalProperties": false
-        },
-
-        "limits": {
-            "type": "object",
-            "properties": {
-                "min": {"$ref": "#/definitions/limit"},
-                "target": {"$ref": "#/definitions/limit"},
-                "max": {"$ref": "#/definitions/limit"}
-            },
-            "additionalProperties": false
         }
     },
 
@@ -95,34 +71,8 @@
             "type": "object",
             "properties": {"method": {"type": "string"}},
             "required": ["method"]
-        },
-        "context_constraints": {
-            "type": "object",
-            "properties": {
-                "apical": {"anyOf": [
-                    {"$ref": "#/definitions/limits"},
-                    {
-                        "extent_to_path": {
-                            "type": "object",
-                            "properties": {
-                                "slope": {
-                                    "type": "number"
-                                },
-                                "intercept": {
-                                    "type": "number"
-                                }
-                            },
-                            "required": ["slope", "intercept"],
-                            "additionalProperties": false
-                        }
-                    }
-                ]},
-                "basal": {"$ref": "#/definitions/limits"}
-            },
-            "additionalProperties": false
         }
     },
 
-    "required": ["origin", "diameter_params", "grow_types"],
-    "additionalProperties": false
+    "required": ["origin", "diameter_params", "grow_types"]
 }

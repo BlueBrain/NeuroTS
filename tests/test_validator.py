@@ -33,6 +33,11 @@ def test_validate_params():
     data['apical']['orientation'] = [0, 0, 0]
     assert_raises(ValidationError, tested.validate_neuron_params, data)
 
+    # Unknown parameters can be added at the root
+    params = dummy_params()
+    params["unknown_param"] = 0
+    tested.validate_neuron_params(params)
+
 def test_empty_params_raises():
     data = {'apical': {},
             'axon': {},
