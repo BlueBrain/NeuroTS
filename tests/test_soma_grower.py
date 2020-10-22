@@ -308,6 +308,59 @@ def test_soma_grower():
         assert_array_almost_equal(sec_actual.points, sec_expected.points)
 
 
+def test_apical_points():
+    # Found apical point
+    np.random.seed(0)
+    with open(os.path.join(_path, 'bio_distribution.json')) as f:
+        distributions = json.load(f)
+
+    with open(os.path.join(_path, 'bio_path_params.json')) as f:
+        params = json.load(f)
+
+    grower = NeuronGrower(input_distributions=distributions,
+                          input_parameters=params)
+    grower.grow()
+
+    apicals = grower.apical_points
+    expected = [0, 724.0969766, 0]
+    assert len(apicals) == 1
+    assert_array_almost_equal(apicals[0], expected)
+
+    # Found apical point
+    np.random.seed(0)
+    with open(os.path.join(_path, 'bio_path_distribution.json')) as f:
+        distributions = json.load(f)
+
+    with open(os.path.join(_path, 'bio_path_params.json')) as f:
+        params = json.load(f)
+
+    grower = NeuronGrower(input_distributions=distributions,
+                          input_parameters=params)
+    grower.grow()
+
+    apicals = grower.apical_points
+    expected = [0, 623.4577604, 0]
+    assert len(apicals) == 1
+    assert_array_almost_equal(apicals[0], expected)
+
+    # Apical point not found so keep the last bifurcation
+    np.random.seed(0)
+    with open(os.path.join(_path, 'bio_distribution_apical_point.json')) as f:
+        distributions = json.load(f)
+
+    with open(os.path.join(_path, 'bio_path_params.json')) as f:
+        params = json.load(f)
+
+    grower = NeuronGrower(input_distributions=distributions,
+                          input_parameters=params)
+    grower.grow()
+
+    apicals = grower.apical_points
+    expected = [-1.07191646, 114.53609137, 0]
+    assert len(apicals) == 1
+    assert_array_almost_equal(apicals[0], expected)
+
+
 def test_null_orientation():
     with open(os.path.join(_path, 'dummy_params.json')) as f:
         params = json.load(f)

@@ -195,6 +195,10 @@ class TMDAlgo(AbstractAlgo):
 class TMDApicalAlgo(TMDAlgo):
     """TreeGrower of TMD apical growth"""
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._found_last_bif = False
+
     def initialize(self):
         """
         TMD basic grower of an apical tree based on path distance
@@ -226,21 +230,29 @@ class TMDApicalAlgo(TMDAlgo):
 
         if current_section.process == 'major':
             dir1, dir2 = bif_methods['directional'](current_section.direction, angles=ang)
+
+            if not self._found_last_bif:
+                self.apical_point = first_point
+
             if current_pd <= self.apical_point_distance_from_soma:
                 process1 = 'major'
                 process2 = 'secondary'
             else:
-                if self.apical_point is None:
-                    self.apical_point = first_point
                 process1 = 'secondary'
                 process2 = 'secondary'
+
+                if not self._found_last_bif:
+                    self._found_last_bif = True
         else:
             dir1, dir2 = self.bif_method(current_section.history(), angles=ang)
             process1 = 'secondary'
             process2 = 'secondary'
 
-            if current_pd > self.apical_point_distance_from_soma and self.apical_point is None:
+            if not self._found_last_bif:
                 self.apical_point = first_point
+
+                if current_pd > self.apical_point_distance_from_soma:
+                    self._found_last_bif = True
 
         stop1, stop2 = self.get_stop_criteria(current_section)
 
