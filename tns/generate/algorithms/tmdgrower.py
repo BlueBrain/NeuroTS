@@ -40,6 +40,7 @@ class TMDAlgo(AbstractAlgo):
         self.start_point = start_point
         self.apical_point = None
         self.apical_point_distance_from_soma = 0.0
+        self.persistence_length = self.barcode.get_persistence_length()
 
     def select_persistence(self, input_data):
         """Samples one persistence diagram from a list of diagrams
@@ -265,8 +266,7 @@ class TMDGradientAlgo(TMDApicalAlgo):
 
     def _majorize_process(self, section, stop, process, input_dir):
         '''Currates the non-major processes to apply a gradient to large components'''
-        persistence_length = self.barcode.get_persistence_length()
-        bias_length = self.params['bias_length'] * persistence_length
+        bias_length = self.params['bias_length'] * self.persistence_length
         difference = stop.expected_maximum_length()
         if difference > bias_length:
             direction1 = (1.0 - self.params['bias']) * np.array(input_dir)

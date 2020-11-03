@@ -80,6 +80,20 @@ def test_wrong_filtration():
     assert_raises(ValueError, NeuronGrower, parameters, distributions)
 
 
+def test_breaker_of_tmd_algo():
+    '''Test example that could break tmd_algo. Test should fail if problem occurs.
+       Otherwise, this grower should run smoothly.
+    '''
+    distributions, params = _load_inputs(join(_path, 'bio_distr_breaker.json'),
+                                         join(_path, 'bio_params_breaker.json'))
+    np.random.seed(3367155)
+    N = NeuronGrower(input_distributions=distributions, input_parameters=params)
+    n = N.grow()
+
+    assert_array_almost_equal(N.apical_points[0], np.array([-5.70209515, 49.63086903,  2.65869129]))
+    assert_array_almost_equal(n.sections[169].points[-1], np.array([117.20551, -41.12157, 189.57013]), decimal=5)
+    assert_array_almost_equal(n.sections[122].points[-1], np.array([ 77.08879, 115.79825,  -0.99393]), decimal=5)
+
 def test_basic_grower():
     _test_full('radial_distances',
                'bio_trunk_distribution.json',
