@@ -9,10 +9,16 @@ VERSION = imp.load_source("tns.version", "tns/version.py").VERSION
 
 
 setup(
-    version=VERSION,
-    description='TNS= synthesis of artificial neurons using their topological profiles package',
+    name='TNS',
     author='Lida Kanari',
     author_email='lida.kanari@epfl.ch',
+    version=VERSION,
+    description='Synthesis of artificial neurons using their topological profiles package',
+    url="https://bbpteam.epfl.ch/documentation/projects/tns",
+    project_urls={
+        "Tracker": "https://bbpteam.epfl.ch/project/issues/projects/CELLS/issues",
+        "Source": "ssh://bbpcode.epfl.ch/molecularsystems/TNS",
+    },
     install_requires=[
         'matplotlib>=1.3.1',
         'tmd>=2.0.8',
@@ -27,6 +33,5 @@ setup(
     packages=find_packages(),
     license='BSD',
     scripts=[],
-    name='tns',
     include_package_data=True,
 )

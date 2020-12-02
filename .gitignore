@@ -19,3 +19,7 @@ coverage.xml
 
 # test venv
 test_venv/
+
+# doc
+doc/build
+doc/source/generated
