@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 2.2.8
+-------------
+
+New Features
+~~~~~~~~~~~~
+- Add doc generation
+- Improve doc
+
 Version 2.2.7
 -------------
 

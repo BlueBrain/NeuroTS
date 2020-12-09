@@ -74,9 +74,8 @@ autosummary_generate = True
 
 # autodoc settings
 autodoc_typehints = "signature"
-autodoc_default_options = {"members": True, "show-inheritance": True}
+autodoc_default_options = {"members": True, "show-inheritance": True, "special-members": "__init__"}
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "luigi": ("https://luigi.readthedocs.io/en/stable", None),
 }

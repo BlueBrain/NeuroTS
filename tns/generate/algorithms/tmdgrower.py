@@ -73,12 +73,17 @@ class TMDAlgo(AbstractAlgo):
         return section.pathlength
 
     def get_stop_criteria(self, current_section):
-        """Returns stop1 and stop2 that are the commonly
-           shared stop criteria for all TMDPath algorithms.
-           stop["TMD"] = {ref: the current path distance
-                          bif: the smallest appropriate bifurcation path length
-                          term: the appropriate termination path length
-                          }
+        """Returns stop1 and stop2 that are the commonly shared stop criteria for all TMDPath algorithms.
+
+        Returns:
+            A tuple of two dictionaries containing a "TMD" entry, formatted as the following::
+
+                stop["TMD"] = {
+                    ref: the current path distance
+                    bif: the smallest appropriate bifurcation path length
+                    term: the appropriate termination path length
+
+                }
         """
         # Ensure that reference is correctly assigned
         current_section.stop_criteria["TMD"].ref = self.metric_ref(current_section)

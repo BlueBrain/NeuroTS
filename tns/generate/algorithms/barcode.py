@@ -14,22 +14,38 @@ class Barcode:
     """
 
     def __init__(self, ph_angles):
-        '''Initialize the ph_angles
-           into a barcode object.
-           Args:
-               ph_angles (list of lists): list of bracodes and angles of 6 elements:
-                                          [end_point, start_point, 4D_angles]
-                                           or equivalent:
-                                          [Termination,
-                                           Bifurcation,
-                                           Angle parent - child (x-y),
-                                           Angle parent - child (z),
-                                           Angle child1 - child2 (x-y),
-                                           Angle child1 - child2 (z)]
-       The ph_angles will be decomposed in the following dictionaries
-           angles: {ID: 4D_angles}
-           bifs: {ID: start_point}
-           terms: {ID, end_point}
+        '''Initialize the ph_angles into a barcode object.
+
+        Args:
+            ph_angles (list of lists): list of barcodes and angles of 6 elements:
+
+                * either::
+
+                    [
+                        end_point,
+                        start_point,
+                        4D_angles
+                    ]
+
+                * or equivalent::
+
+                    [
+                        Termination,
+                        Bifurcation,
+                        Angle parent - child (x-y),
+                        Angle parent - child (z),
+                        Angle child1 - child2 (x-y),
+                        Angle child1 - child2 (z)
+                    ]
+
+        Returns:
+           The ph_angles will be decomposed in the following dictionaries::
+
+               {
+                   angles: {ID: 4D_angles}
+                   bifs: {ID: start_point}
+                   terms: {ID, end_point}
+               }
         '''
         # Sort persistence bars according to bifurcation
         ph_angles.sort(key=lambda x: x[1])
@@ -152,18 +168,22 @@ class Barcode:
 
     def curate_stop_criterion(self, parent_stop, child_stop):
         '''Checks if the children stop criterion is compatible with parent.
-           The child bar's length should be smaller than the current bar's length.
-           This process ensures that each branch can only generate smaller branches.
-           The criteria to ensure this statement is True are the following:
-              * parent_stop.ref <= child_stop.bif <= parent_stop.term or child_stop.bif = inf
-              * child_stop.term <= parent_stop.term
-              * term(child_stop.bif) <= parent_stop.term
-           Args:
-                parent_stop (TMDStop): stop criteria of parent section
-                target_stop (TMDStop): proposed stop criteria for child.
 
-           Returns the next bar for which the expected length of the child
-           branch is smaller than current one for both bif and term.
+        The child bar's length should be smaller than the current bar's length.
+        This process ensures that each branch can only generate smaller branches.
+        The criteria to ensure this statement is True are the following:
+
+           * parent_stop.ref <= child_stop.bif <= parent_stop.term or child_stop.bif = inf
+           * child_stop.term <= parent_stop.term
+           * term(child_stop.bif) <= parent_stop.term
+
+        Args:
+            parent_stop (TMDStop): stop criteria of parent section
+            target_stop (TMDStop): proposed stop criteria for child.
+
+        Returns:
+            The next bar for which the expected length of the child
+            branch is smaller than current one for both bif and term.
         '''
         MAX_ref = parent_stop.term
         target_stop = copy.deepcopy(child_stop)

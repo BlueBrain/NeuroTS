@@ -24,14 +24,16 @@ def distributions(filepath, neurite_types=('basal', 'apical', 'axon'), threshold
                   diameter_input_morph=None, feature='path_distances', diameter_model=None):
     '''Extracts the input distributions from an input population
     defined by a directory of swc or h5 files
-    threshold_sec: defines the minimum accepted number of terminations
-    diameter_input_morph: if input set of morphologies is provided
-                          it will be used for the generation of diameter model
-                          if no input is provided no diameter model will be generated
-    feature: defines the TMD feature that will be used to extract the
-             persistence barcode: radial_distances, path_distances
-    diameter_model: model for diameters, internal models are M1, M2, M3, M4, M5,
-             set it to external for external model
+
+    Args:
+        threshold_sec: defines the minimum accepted number of terminations
+        diameter_input_morph: if input set of morphologies is provided
+                              it will be used for the generation of diameter model,
+                              if no input is provided no diameter model will be generated
+        feature: defines the TMD feature that will be used to extract the
+                 persistence barcode: radial_distances, path_distances
+        diameter_model: model for diameters, internal models are `M1`, `M2`, `M3`, `M4`, `M5`,
+                 set it to `external` for external model
     '''
     pop_tmd = tmd.io.load_population(filepath)
     pop_nm = nm.load_neurons(filepath)
