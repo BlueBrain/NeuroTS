@@ -1,7 +1,17 @@
+import os
+import json
+
+import numpy as np
 from nose import tools as nt
+from numpy import testing as npt
+
+from tns import NeuronGrower
 from tns.utils import TNSError
 from tns.generate.tree import _create_section_parameters
-from numpy import testing as npt
+from tns.generate.tree import TreeGrower
+
+
+_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 
 def test_create_section_parameters__normal_input():
@@ -40,3 +50,23 @@ def test_create_section_parameters__sum_to_one_error():
     parameters = _create_section_parameters(input_dict)
 
 
+def test_TreeGrower():
+    np.random.seed(0)
+    with open(os.path.join(_path, 'bio_distribution.json')) as f:
+        distributions = json.load(f)
+
+    with open(os.path.join(_path, 'bio_path_params.json')) as f:
+        params = json.load(f)
+
+    grower = NeuronGrower(input_distributions=distributions,
+                          input_parameters=params)
+    grower._grow_soma()
+
+    # Test order_per_process()
+    tree_grower = grower.active_neurites[0]
+    sections = [i.active_sections[0] for i in grower.active_neurites]
+    for num, i in enumerate(sections):
+        i.process = str(len(sections) - num - 1)
+    res = TreeGrower.order_per_process(sections)
+    for num, i in enumerate(res):
+        assert i == sections[len(sections) - num - 1], (i, sections[len(sections) - num - 1])

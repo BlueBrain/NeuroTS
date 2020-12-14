@@ -169,7 +169,7 @@ class TreeGrower:
         else:
             append_fun = self.neuron.append_root_section
 
-        if L.level == logging.DEBUG:
+        if L.level == logging.DEBUG:  # pragma: no cover
             data = {"parent": section.parent.id if section.parent else None,
                     "coord": np.vstack(section.points).tolist(),
                     "radius": [self.params["radius"] * 2] * len(section.points),

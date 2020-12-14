@@ -1,9 +1,8 @@
 """Input distributions"""
-
 import logging
-import neurom as nm
-from neurom import load_neurons
+
 import tmd
+from neurom import load_neurons
 from tns.extract_input.from_TMD import persistent_homology_angles
 from tns.extract_input.from_neurom import soma_data, trunk_neurite, number_neurites
 from tns.extract_input import from_diameter
@@ -36,7 +35,7 @@ def distributions(filepath, neurite_types=('basal', 'apical', 'axon'), threshold
                  set it to `external` for external model
     '''
     pop_tmd = tmd.io.load_population(filepath)
-    pop_nm = nm.load_neurons(filepath)
+    pop_nm = load_neurons(filepath)
 
     input_distributions = {'soma': {}, 'basal': {}, 'apical': {}, 'axon': {}}
     input_distributions['soma'] = soma_data(pop_nm)

@@ -57,10 +57,13 @@ class TMDStop:
         self.ref = ref
         # self.verify()
 
+    def __str__(self):
+        TMDtuple = self.ref, self.bif_id, self.bif, self.term_id, self.term
+        return "(Ref: {}, BifID: {}, Bif: {}, TermID: {}, Term: {})".format(*TMDtuple)
+
     def printme(self):
         '''Prints all features'''
-        TMDuple = self.ref, self.bif_id, self.bif, self.term_id, self.term
-        print("(Ref: {}, BifID: {}, Bif: {}, TermID: {}, Term: {})".format(*TMDuple))
+        print(self)  # pragma: no cover
 
     def verify(self):
         '''Returns True if stop is valid.

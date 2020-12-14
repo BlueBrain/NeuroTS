@@ -80,6 +80,90 @@ def test_wrong_filtration():
     assert_raises(ValueError, NeuronGrower, parameters, distributions)
 
 
+def test_grow_trunk_1_basal():
+    '''Test NeuronGrower._grow_trunk() with only 1 basal (should raise an Exception)'''
+    distributions, parameters = _load_inputs(os.path.join(_path, 'bio_path_distribution.json'),
+                                             os.path.join(_path, 'bio_path_params.json'))
+    distributions['basal']['num_trees']['data']['bins'] = [1]
+    ng = NeuronGrower(parameters, distributions)
+    with assert_raises(Exception) as e:
+        ng.grow()
+    assert e.exception.args[0] == 'There should be at least 2 basal dendrites (got 1)'
+
+
+def test_external_diametrizer():
+    '''Test external diametrizer'''
+    distributions, parameters = _load_inputs(os.path.join(_path, 'bio_path_distribution.json'),
+                                             os.path.join(_path, 'bio_path_params.json'))
+    distributions['diameter']['method'] = 'M1'
+    parameters['diameter_params']['method'] = 'M1'
+    ng = NeuronGrower(parameters, distributions)
+    ng.grow()
+
+    # Inconsistent methods
+    distributions['diameter']['method'] = 'external'
+    parameters['diameter_params']['method'] = 'M1'
+    with assert_raises(ValueError) as e:
+        NeuronGrower(parameters, distributions)
+    assert e.exception.args[0] == 'Diameters methods of parameters and distributions is inconsistent: M1 != external'
+
+    # No external diametrizer provided
+    distributions['diameter']['method'] = 'external'
+    parameters['diameter_params']['method'] = 'external'
+    with assert_raises(ValueError) as e:
+        NeuronGrower(parameters, distributions)
+    assert e.exception.args[0] == 'External diametrizer is missing the diametrizer function.'
+
+    bad_ng = NeuronGrower(parameters, distributions, external_diametrizer=object())
+    with assert_raises(Exception) as e:
+        bad_ng._init_diametrizer()
+    assert e.exception.args[0] == 'Please provide an external diametrizer!'
+
+
+def test_convert_orientation2points():
+    '''Test NeuronGrower._convert_orientation2points()'''
+    np.random.seed(0)
+    distributions, parameters = _load_inputs(os.path.join(_path, 'bio_path_distribution.json'),
+                                             os.path.join(_path, 'bio_path_params.json'))
+    distributions['diameter']['method'] = 'M1'
+    parameters['diameter_params']['method'] = 'M1'
+    ng = NeuronGrower(parameters, distributions)
+
+    pts = ng._convert_orientation2points([[0, 1, 0]], 1, distributions["apical"])
+    assert_array_almost_equal(pts, [[0, 15.27995, 0]])
+
+    ng = NeuronGrower(parameters, distributions)
+    pts = ng._convert_orientation2points(None, 2, distributions["apical"])
+    assert_array_almost_equal(
+        pts,
+        [[-10.399604, -0.173343, 0.937449], [10.31932, 0.172005, -1.594578]]
+    )
+
+    assert_raises(
+        ValueError,
+        ng._convert_orientation2points,
+        "from_space",
+        1,
+        distributions["apical"]
+    )
+
+    assert_raises(
+        ValueError,
+        ng._convert_orientation2points,
+        object(),
+        1,
+        distributions["apical"]
+    )
+
+    assert_raises(
+        ValueError,
+        ng._convert_orientation2points,
+        [[0, 1, 0]],
+        99,
+        distributions["apical"]
+    )
+
+
 def test_breaker_of_tmd_algo():
     '''Test example that could break tmd_algo. Test should fail if problem occurs.
        Otherwise, this grower should run smoothly.

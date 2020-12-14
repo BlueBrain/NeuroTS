@@ -1,9 +1,10 @@
 
 '''Test tns.generate.diametrizer code'''
 import os
-from nose import tools as nt
+from nose.tools import assert_raises
 import numpy as np
 from numpy.testing import assert_array_almost_equal
+from numpy.testing import assert_equal
 from tns.generate import diametrizer
 import morphio
 from morphio import SectionType
@@ -54,6 +55,33 @@ def test_taper_section_diam_from_root():
     diametrizer.taper_section_diam_from_root(section1, 4., 0.5, 0.07, 100.)
     assert_array_almost_equal(section1.diameters,
                               [4., 4., 3.9, 3.8, 3.7, 3.6])
+
+    section2 = section.children[0]
+    diametrizer.taper_section_diam_from_root(section2, 4., 0.5, 99, 100.)
+    assert_array_almost_equal(section2.diameters,
+                              [4, 99, 99, 99, 99, 99])
+
+
+def test_taper_section_diam_from_tips():
+
+    neu1 = morphio.mut.Morphology(NEU_PATH1)
+    section = neu1.root_sections[0]
+
+    diametrizer.taper_section_diam_from_tips(section, 4., 0.6, 0.07, 100.)
+
+    assert_array_almost_equal(section.diameters,
+                              [4.6, 4.5, 4.4, 4.3, 4.2, 4.1, 4.])
+
+    section1 = section.children[0]
+    diametrizer.taper_section_diam_from_tips(section1, 4., 0.5, 0.07, 100.)
+    assert_array_almost_equal(section1.diameters,
+                              [4.5, 4.4, 4.3, 4.2, 4.1, 4.])
+
+    section2 = section.children[0]
+    diametrizer.taper_section_diam_from_tips(section2, 4., 0.5, 99, 99.2)
+    assert_array_almost_equal(section2.diameters,
+                              [99.2, 99.2, 99.2, 99.1, 99, 4.],
+                              decimal=5)
 
 def test_diametrize_constant_per_section():
     neu2 = morphio.mut.Morphology(NEU_PATH2) # has to be loaded to start clean
@@ -115,3 +143,75 @@ def test_diametrize_from_tips():
                                2.  ,       2.8,        2. ,        2.4,        2. ,       2.2,
                                2.  ,      1.2,         1.1142857,  1.0285715,  0.94285715, 0.85714287,
                                0.7714286,  0.6857143,  0.6])
+
+
+def test_redefine_diameter_section():
+    neu1 = morphio.mut.Morphology(NEU_PATH1)
+    section = neu1.root_sections[0]
+    assert_equal(section.diameters[0], 4)
+    diametrizer.redefine_diameter_section(section, 0, 999)
+    assert_equal(section.diameters[0], 999)
+
+    section.points = np.array([[0, 1, 2]])
+    assert_raises(Exception, diametrizer.redefine_diameter_section, section, 1, 2)
+
+
+def test_build():
+    neuron = morphio.mut.Morphology(NEU_PATH1)
+    diametrizer.build(neuron, diam_method="M1")
+    diameters = [i.diameters for i in neuron.sections.values()]
+    assert_array_almost_equal(diameters[0], [2.7368422] * 7)
+    assert_array_almost_equal(diameters[1], diameters[2])
+    assert_array_almost_equal(diameters[2], [2.7368422] * 6)
+
+    neuron = morphio.mut.Morphology(NEU_PATH1)
+    diametrizer.build(neuron, diam_method="M2")
+    diameters = [i.diameters for i in neuron.sections.values()]
+    assert_array_almost_equal(diameters[0], [3.4] * 7)
+    assert_array_almost_equal(diameters[1], [2.4666667] * 6)
+    assert_array_almost_equal(diameters[2], [2.2333333] * 6)
+
+    neuron = morphio.mut.Morphology(NEU_PATH1)
+    diametrizer.build(neuron, diam_method="M3")
+    diameters = [i.diameters for i in neuron.sections.values()]
+    assert_array_almost_equal(diameters[0], [4, 3.9, 3.8, 3.7, 3.6, 3.5, 3.4])
+    assert_array_almost_equal(diameters[1], [2.8, 2.8, 2.704, 2.608, 2.512, 2.416])
+    assert_array_almost_equal(diameters[2], [2.8, 2.8, 2.76, 2.72, 2.68, 2.64])
+
+    neuron = morphio.mut.Morphology(NEU_PATH1)
+    diametrizer.build(neuron, input_model=MODEL, diam_method="M4")
+    diameters = [i.diameters for i in neuron.sections.values()]
+    assert_array_almost_equal(diameters[0], [3, 2.9, 2.8, 2.7, 2.6, 2.5, 2.4])
+    assert_array_almost_equal(diameters[1], diameters[2])
+    assert_array_almost_equal(
+        diameters[2],
+        [2.4, 0.84852815, 0.82852817, 0.8085281 , 0.78852814, 0.76852816]
+    )
+
+    neuron = morphio.mut.Morphology(NEU_PATH1)
+    diametrizer.build(neuron, input_model=MODEL, diam_method="M5")
+    diameters = [i.diameters for i in neuron.sections.values()]
+    assert_array_almost_equal(
+        diameters[0],
+        [2.5233305, 2.4233305, 2.3233304, 2.2233305, 2.1233304, 2.0233305, 1.923330]
+    )
+    assert_array_almost_equal(diameters[1], diameters[2])
+    assert_array_almost_equal(diameters[2], [1.9233304, 0.68, 0.66, 0.64, 0.62, 0.6])
+
+    def diam_method(neuron, input_model, tree_type):
+        diametrizer.diametrize_constant_per_neurite(neuron)
+
+    neuron = morphio.mut.Morphology(NEU_PATH1)
+    diametrizer.build(neuron, diam_method=diam_method)
+    assert_array_almost_equal(
+        diameters[0],
+        [2.52333, 2.423331, 2.32333, 2.22333, 2.12333, 2.02333, 1.92333]
+    )
+    assert_array_almost_equal(diameters[1], diameters[2])
+    assert_array_almost_equal(diameters[2], [1.92333, 0.68, 0.66, 0.64, 0.62, 0.6])
+
+    neuron = morphio.mut.Morphology(NEU_PATH1)
+    assert_raises(KeyError, diametrizer.build, neuron, None, None, "UNKNOWN")
+
+    neuron = morphio.mut.Morphology(NEU_PATH1)
+    assert_raises(ValueError, diametrizer.build, neuron, None, None, object())

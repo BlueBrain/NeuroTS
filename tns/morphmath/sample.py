@@ -54,7 +54,7 @@ class Distr:
         # If distribution consists of data we reformat input
         else:
             w = np.array(self.params["weights"], dtype=np.float)
-            b = self.params["bins"]
+            b = np.array(self.params["bins"])
             self.distribution = {"bins": b, "weights": w / np.sum(w)}
 
     def draw(self):

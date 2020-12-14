@@ -9,13 +9,16 @@ from tns.generate.algorithms.common import TMDStop
 from tns.morphmath import sample
 
 from tns.generate.algorithms.tmdgrower import (TMDAlgo, TMDApicalAlgo, TMDGradientAlgo)
-from tns.generate.section import SectionGrower, SectionGrowerPath
+from tns.generate.algorithms.basicgrower import TrunkAlgo
+from tns.generate.section import SectionGrower
+from tns.generate.section import SectionGrowerPath
+from tns.generate.section import SectionGrowerTMD
 from tns.generate.tree import SectionParameters
 
 _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 
-def _setup_test(Algo, Grower):
+def _setup_test(Algo, Grower, custom_parameters=None):
     with open(os.path.join(_PATH, 'dummy_distribution.json')) as f:
         distributions = json.load(f)['basal']
 
@@ -24,6 +27,9 @@ def _setup_test(Algo, Grower):
     parameters['bias_length'] = 0.5
     parameters['bias'] = 0.5
     parameters["has_apical_tuft"] = True
+
+    if custom_parameters is not None:
+        parameters.update(custom_parameters)
 
     np.random.seed(42)
     algo = Algo(distributions, parameters, [0, 0, 1])
@@ -59,12 +65,39 @@ def _assert_dict_or_array(dict1, dict2):
             assert_equal(dict1[key], dict2[key], 'Error for key: %s' % key)
 
 
+def test_TrunkAlgo():
+    np.random.seed(0)
+    custom_parameters = {
+        "num_seg": 10,
+        "branching_method": "random",
+    }
+    algo, grower = _setup_test(TrunkAlgo, SectionGrowerPath, custom_parameters)
+
+    stop, num_sec = algo.initialize()
+    assert_dict_equal(stop, {"num_seg": 10})
+    assert_equal(num_sec, 1)
+
+    s1, s2 = algo.bifurcate(grower)
+    _assert_dict_or_array(s1,
+                          {'direction': [-0.30524033,  0.30700944,  0.90142861],
+                           'process': 'major',
+                           'first_point': [1.1, 0. , 0. ],
+                           'stop': {"TMD": TMDStop(bif_id=1, bif=9.7747, term_id=0, term=159.798, ref=0.0)}})
+
+    _assert_dict_or_array(s2,
+                          {'direction': [-0.11067468, -0.97407245,  0.19731697],
+                           'process': 'major',
+                           'first_point': [1.1, 0. , 0. ],
+                           'stop': {"TMD": TMDStop(bif_id=1, bif=9.7747, term_id=0, term=159.798, ref=0.0)}})
+
+
 def test_TMDAlgo():
     algo, grower = _setup_test(TMDAlgo, SectionGrowerPath)
 
     stop, num_sec = algo.initialize()
     assert_dict_equal(stop, {"TMD": TMDStop(bif_id=1, bif=9.7747, term_id=0, term=159.798, ref=0.0)})
     assert_equal(num_sec, 10)
+    assert_equal(grower.get_val(), 0)
 
     s1, s2 = algo.bifurcate(grower)
     _assert_dict_or_array(s1,
@@ -78,6 +111,66 @@ def test_TMDAlgo():
                            'process': 'major',
                            'first_point': [1.1, 0. , 0. ],
                            'stop': {"TMD": TMDStop(bif_id=2, bif=18.5246, term_id=1, term=124.8796, ref=0.0)}})
+
+    algo, grower = _setup_test(TMDAlgo, SectionGrowerTMD)
+
+    stop, num_sec = algo.initialize()
+    assert_dict_equal(stop, {"TMD": TMDStop(bif_id=1, bif=9.7747, term_id=0, term=159.798, ref=0.0)})
+    assert_equal(num_sec, 10)
+    assert_equal(grower.get_val(), 1.1)
+
+    s1, s2 = algo.bifurcate(grower)
+    _assert_dict_or_array(s1,
+                          {'direction': [0., 0., 0.],
+                           'process': 'major',
+                           'first_point': [1.1, 0. , 0. ],
+                           'stop': {"TMD": TMDStop(bif_id=2, bif=18.5246, term_id=0, term=159.798, ref=0.0)}})
+
+    _assert_dict_or_array(s2,
+                          {'direction': [0., 0., 0.],
+                           'process': 'major',
+                           'first_point': [1.1, 0. , 0. ],
+                           'stop': {"TMD": TMDStop(bif_id=2, bif=18.5246, term_id=1, term=124.8796, ref=0.0)}})
+
+
+def test_TMDAlgo_modify():
+
+    def tmd_scale(barcode, thickness):
+        # only the two first points of each bar are modified
+        # because they correspond to spatial dimensions
+        scaling_factor = np.ones(len(barcode[0]), dtype=np.float)
+        scaling_factor[:2] = thickness
+        return np.multiply(barcode, scaling_factor).tolist()
+
+    def modify_barcode(ph, thickness=1150.0, thickness_reference=1150.0):
+        max_p = np.max(ph)
+        scaling_reference = 1.0
+        if 1 - max_p / thickness_reference < 0: #If cell is larger than the layers
+            scaling_reference = thickness_reference / max_p
+        return tmd_scale(ph, scaling_reference * thickness / thickness_reference)
+
+    custom_parameters = {
+        "modify": {"funct": modify_barcode, "kwargs": {"thickness": 100, "thickness_reference": 1000}}
+    }
+
+    algo, grower = _setup_test(TMDAlgo, SectionGrowerPath, custom_parameters)
+
+    stop, num_sec = algo.initialize()
+    assert_dict_equal(stop, {"TMD": TMDStop(bif_id=1, bif=0.9775, term_id=0, term=15.9798, ref=0.0)})
+    assert_equal(num_sec, 10)
+
+    s1, s2 = algo.bifurcate(grower)
+    _assert_dict_or_array(s1,
+                          {'direction': [0., 0., 0.],
+                           'process': 'major',
+                           'first_point': [1.1, 0. , 0. ],
+                           'stop': {"TMD": TMDStop(bif_id=2, bif=1.8525, term_id=0, term=159.798, ref=0.0)}})
+
+    _assert_dict_or_array(s2,
+                          {'direction': [0., 0., 0.],
+                           'process': 'major',
+                           'first_point': [1.1, 0. , 0. ],
+                           'stop': {"TMD": TMDStop(bif_id=2, bif=1.8525, term_id=1, term=12.488, ref=0.0)}})
 
 
 def test_TMDApicalAlgo():
@@ -89,6 +182,7 @@ def test_TMDApicalAlgo():
     assert_equal(num_sec, 10)
 
     s1, s2 = algo.bifurcate(grower)
+    assert_array_almost_equal(algo.apical_point, [1.1, 0, 0])
     _assert_dict_or_array(s1,
                           {'direction': [0.57735, 0.57735, 0.57735],
                            'process': 'major',
@@ -100,6 +194,27 @@ def test_TMDApicalAlgo():
                            'process': 'secondary',
                            'first_point': [1.1, 0. , 0. ],
                            'stop': {"TMD": TMDStop(bif_id=2, bif=18.5246, term_id=1, term=124.8796, ref=0.0)}})
+
+    grower.stop_criteria["TMD"].bif_id = 2
+    grower.stop_criteria["TMD"].bif = 18.5246
+    grower.points[-1] *= 2
+    algo.bifurcate(grower)
+    assert_array_almost_equal(algo.apical_point, [2.2, 0, 0])
+
+    # Find last bifurcation in secondary branch
+    algo, grower = _setup_test(TMDApicalAlgo, SectionGrowerPath)
+    grower.pathlength = 9999
+    grower.process = "secondary"
+    stop, num_sec = algo.initialize()
+    s1, s2 = algo.bifurcate(grower)
+    assert_array_almost_equal(algo.apical_point, [1.1, 0, 0])
+
+    grower.stop_criteria["TMD"].bif_id = 2
+    grower.stop_criteria["TMD"].bif = 18.5246
+    grower.points[-1] *= 2
+    algo.bifurcate(grower)
+    # This time the apical point was not updated
+    assert_array_almost_equal(algo.apical_point, [1.1, 0, 0])
 
 
 def test_TMDGradientAlgo():
