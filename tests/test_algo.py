@@ -181,8 +181,9 @@ def test_TMDApicalAlgo():
     assert_dict_equal(stop, expected_stop)
     assert_equal(num_sec, 10)
 
+    grower.id = 1
     s1, s2 = algo.bifurcate(grower)
-    assert_array_almost_equal(algo.apical_point, [1.1, 0, 0])
+    assert_equal(algo.apical_section, 1)
     _assert_dict_or_array(s1,
                           {'direction': [0.57735, 0.57735, 0.57735],
                            'process': 'major',
@@ -198,23 +199,26 @@ def test_TMDApicalAlgo():
     grower.stop_criteria["TMD"].bif_id = 2
     grower.stop_criteria["TMD"].bif = 18.5246
     grower.points[-1] *= 2
+    grower.id = 2
     algo.bifurcate(grower)
-    assert_array_almost_equal(algo.apical_point, [2.2, 0, 0])
+    assert_equal(algo.apical_section, 2)
 
     # Find last bifurcation in secondary branch
     algo, grower = _setup_test(TMDApicalAlgo, SectionGrowerPath)
     grower.pathlength = 9999
     grower.process = "secondary"
     stop, num_sec = algo.initialize()
+    grower.id = 3
     s1, s2 = algo.bifurcate(grower)
-    assert_array_almost_equal(algo.apical_point, [1.1, 0, 0])
+    assert_equal(algo.apical_section, 3)
 
     grower.stop_criteria["TMD"].bif_id = 2
     grower.stop_criteria["TMD"].bif = 18.5246
     grower.points[-1] *= 2
+    grower.id = 4
     algo.bifurcate(grower)
-    # This time the apical point was not updated
-    assert_array_almost_equal(algo.apical_point, [1.1, 0, 0])
+    # This time the apical section was not updated
+    assert_equal(algo.apical_section, 3)
 
 
 def test_TMDGradientAlgo():

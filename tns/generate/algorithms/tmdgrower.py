@@ -38,7 +38,7 @@ class TMDAlgo(AbstractAlgo):
             L.warning('Selected step size %f is too big for bars of size %f', stepSZ, barSZ)
         self.barcode = Barcode(list(self.ph_angles))
         self.start_point = start_point
-        self.apical_point = None
+        self.apical_section = None
         self.apical_point_distance_from_soma = 0.0
         self.persistence_length = self.barcode.get_persistence_length()
 
@@ -238,7 +238,7 @@ class TMDApicalAlgo(TMDAlgo):
             dir1, dir2 = bif_methods['directional'](current_section.direction, angles=ang)
 
             if not self._found_last_bif:
-                self.apical_point = first_point
+                self.apical_section = current_section.id
 
             if current_pd <= self.apical_point_distance_from_soma:
                 process1 = 'major'
@@ -255,7 +255,7 @@ class TMDApicalAlgo(TMDAlgo):
             process2 = 'secondary'
 
             if not self._found_last_bif:
-                self.apical_point = first_point
+                self.apical_section = current_section.id
 
                 if current_pd > self.apical_point_distance_from_soma:
                     self._found_last_bif = True

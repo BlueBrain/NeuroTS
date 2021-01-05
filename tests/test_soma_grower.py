@@ -321,10 +321,9 @@ def test_apical_points():
                           input_parameters=params)
     grower.grow()
 
-    apicals = grower.apical_points
-    expected = [0, 724.0969766, 0]
-    assert len(apicals) == 1
-    assert_array_almost_equal(apicals[0], expected)
+    apicals = grower.apical_sections
+    expected = [127]
+    assert_array_equal(apicals[0], expected)
 
     # Found apical point
     np.random.seed(0)
@@ -338,10 +337,9 @@ def test_apical_points():
                           input_parameters=params)
     grower.grow()
 
-    apicals = grower.apical_points
-    expected = [0, 623.4577604, 0]
-    assert len(apicals) == 1
-    assert_array_almost_equal(apicals[0], expected)
+    apicals = grower.apical_sections
+    expected = [60]
+    assert_array_equal(apicals, expected)
 
     # Apical point not found so keep the last bifurcation
     np.random.seed(0)
@@ -355,10 +353,9 @@ def test_apical_points():
                           input_parameters=params)
     grower.grow()
 
-    apicals = grower.apical_points
-    expected = [-1.07191646, 114.53609137, 0]
-    assert len(apicals) == 1
-    assert_array_almost_equal(apicals[0], expected)
+    apicals = grower.apical_sections
+    expected = [11]
+    assert_array_equal(apicals, expected)
 
 
 def test_null_orientation():

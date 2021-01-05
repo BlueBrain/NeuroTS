@@ -13,7 +13,7 @@ import os
 from os.path import join
 import numpy as np
 from scipy.spatial.distance import cdist
-from numpy.testing import assert_almost_equal, assert_array_almost_equal
+from numpy.testing import assert_almost_equal, assert_array_equal, assert_array_almost_equal
 from nose.tools import assert_raises, ok_
 from morph_tool import diff
 from tns.generate.grower import NeuronGrower
@@ -174,7 +174,7 @@ def test_breaker_of_tmd_algo():
     N = NeuronGrower(input_distributions=distributions, input_parameters=params)
     n = N.grow()
 
-    assert_array_almost_equal(N.apical_points[0], np.array([-5.70209515, 49.63086903,  2.65869129]))
+    assert_array_equal(N.apical_sections, [33])
     assert_array_almost_equal(n.sections[169].points[-1], np.array([117.20551, -41.12157, 189.57013]), decimal=5)
     assert_array_almost_equal(n.sections[122].points[-1], np.array([ 77.08879, 115.79825,  -0.99393]), decimal=5)
 

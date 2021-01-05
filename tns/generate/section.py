@@ -25,6 +25,7 @@ class SectionGrower:
         generates a tubular morphology that resembles a random walk.
         '''
         self.parent = parent
+        self.id = None
         assert not np.isclose(vectorial_norm(direction), 0.0), 'Nan direction not recognized'
         self.direction = direction / vectorial_norm(direction)
         self.children = children

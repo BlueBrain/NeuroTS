@@ -132,12 +132,23 @@ def test_number_neurites():
     )
 
     pop_cut = load_neurons(POP_PATH)
-    pop_cut.neurons[0].neurites = [pop_cut.neurons[0].neurites[i] for i in (0, 1, -1)]
+    if len(pop_cut.neurons[0].neurites) > len(pop_cut.neurons[1].neurites):
+        smallest = 1
+        biggest = 0
+    else:
+        smallest = 0
+        biggest = 1
+    pop_cut.neurons[biggest].neurites = [pop_cut.neurons[biggest].neurites[i] for i in (0, 1, -1)]
+    pop_cut.neurites = [j for i in pop_cut.neurons for j in i.neurites]
+    assert_equal(len(pop_cut.neurons), 2)
+    assert_equal(len(pop_cut.neurons[biggest].neurites), 3)
+    assert_equal(len(pop_cut.neurons[smallest].neurites), 6)
+    assert_equal(len(pop_cut.neurites), 9)
     res_cut = extract_input.from_neurom.number_neurites(pop_cut)
     assert_equal(
         res_cut,
-        {'num_trees': {'data': {'bins': [2, 3, 4, 5, 6, 7, 8, 9],
-                                'weights': [1, 0, 0, 0, 0, 0, 0, 1]}}}
+        {'num_trees': {'data': {'bins': [2, 3, 4],
+                                'weights': [1, 0, 1]}}}
     )
 
 

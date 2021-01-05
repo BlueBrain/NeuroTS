@@ -201,6 +201,7 @@ class TreeGrower:
                 if state == 'bifurcate':
                     # Save the final normed direction of parent
                     latest = section_grower.latest_directions[-1]
+                    section_grower.id = section.id
                     # the current section_grower bifurcates
                     # Returns two section_grower dictionaries: (S1, S2)
                     for child_section in self.growth_algo.bifurcate(section_grower):

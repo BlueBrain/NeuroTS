@@ -71,10 +71,10 @@ class NeuronGrower:
         self.soma = SomaGrower(initial_point=self.input_parameters["origin"],
                                radius=sample.soma_size(self.input_distributions),
                                context=context)
-        # Create a list to expose apical points for each apical tree in the neuron,
-        # the user can call NeuronGrower.apical_points to get the 3D corrdinates
-        # for the apical point of each generated apical tree.
-        self.apical_points = list()
+        # Create a list to expose apical sections for each apical tree in the neuron,
+        # the user can call NeuronGrower.apical_sections to get section IDs whose the last
+        # point is the apical point of each generated apical tree.
+        self.apical_sections = list()
 
         # initialize diametrizer
         self._init_diametrizer(external_diametrizer=external_diametrizer)
@@ -96,7 +96,7 @@ class NeuronGrower:
                 # will be exposed to the user as a set of 3D coordinates (x,y,z).
                 if 'apical' in self.input_parameters['grow_types'] and \
                    grower.type == self.input_parameters['apical']['tree_type']:
-                    self.apical_points.append(grower.growth_algo.apical_point)
+                    self.apical_sections.append(grower.growth_algo.apical_section)
                 self.active_neurites.remove(grower)
             else:
                 grower.next_point()
