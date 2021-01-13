@@ -16,7 +16,7 @@
                 "bias_length": {"type": "number"},
                 "branching_method": {"type": "string"},
                 "growth_method": {"type": "string",
-                                  "enum": ["tmd", "tmd_gradient", "tmd_apical", "trunk"]},
+                                  "enum": ["tmd", "tmd_gradient", "tmd_apical", "axon_trunk", "trunk"]},
                 "has_apical_tuft": {"type": "boolean"},
                 "metric": {"type": "string"},
                 "modify": {"oneOf": [{"type": "object"}, {"type": "null"}]},
@@ -64,7 +64,7 @@
                            {"$ref": "#/definitions/neurite"}]},
         "basal": {"$ref": "#/definitions/neurite"},
         "grow_types": {"type": "array",
-                       "items": {"type": "string", "enum": ["basal", "apical"]}
+                       "items": {"type": "string", "enum": ["basal", "apical", "axon"]}
                        },
         "origin": {"$ref": "#/definitions/point"},
         "diameter_params": {

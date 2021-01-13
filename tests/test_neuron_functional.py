@@ -6,7 +6,6 @@ will generate cells with different properties, according to their input paramete
 Finally, we need to check the TMD of the produced cells.
 '''
 
-
 from tempfile import TemporaryDirectory
 import json
 import os
@@ -177,6 +176,19 @@ def test_breaker_of_tmd_algo():
     assert_array_equal(N.apical_sections, [33])
     assert_array_almost_equal(n.sections[169].points[-1], np.array([117.20551, -41.12157, 189.57013]), decimal=5)
     assert_array_almost_equal(n.sections[122].points[-1], np.array([ 77.08879, 115.79825,  -0.99393]), decimal=5)
+
+
+def test_axon_grower():
+    '''Test axon grower, which should only grow trunks with 1 section to allow later axon grafting.
+
+    The num_seg value in the parameters is set to 999 but only 1 segment should be synthesized.
+    '''
+    _test_full('radial_distances',
+               'axon_trunk_distribution.json',
+               'axon_trunk_parameters.json',
+               'test_axon_grower.h5',
+               None)
+
 
 def test_basic_grower():
     _test_full('radial_distances',

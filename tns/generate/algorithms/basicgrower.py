@@ -58,3 +58,18 @@ class TrunkAlgo(AbstractAlgo):
            until at least one stop criterion is fulfilled.
         '''
         return current_section.next()
+
+
+class AxonAlgo(TrunkAlgo):
+    """TreeGrower of axon growth.
+
+    Only a trunk with one segment is synthesized and another process is supposed to gaft an actual
+    axon on this trunk.
+    """
+
+    def __init__(self, *args, **kwargs):
+        # Force num_seg in params to 1
+        params = kwargs.get("params", None) or args[1]
+        params["num_seg"] = 1
+
+        super().__init__(*args, **kwargs)

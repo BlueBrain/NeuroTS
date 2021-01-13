@@ -23,6 +23,7 @@ LAMDA = 1.
 growth_algorithms = {'tmd': tmdgrower.TMDAlgo,
                      'tmd_apical': tmdgrower.TMDApicalAlgo,
                      'tmd_gradient': tmdgrower.TMDGradientAlgo,
+                     'axon_trunk': basicgrower.AxonAlgo,
                      'trunk': basicgrower.TrunkAlgo}
 
 section_growers = {'radial_distances': SectionGrowerTMD,
