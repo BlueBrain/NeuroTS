@@ -203,12 +203,38 @@ def test_build():
 
     neuron = morphio.mut.Morphology(NEU_PATH1)
     diametrizer.build(neuron, diam_method=diam_method)
+    diameters = [i.diameters for i in neuron.sections.values()]
     assert_array_almost_equal(
         diameters[0],
-        [2.52333, 2.423331, 2.32333, 2.22333, 2.12333, 2.02333, 1.92333]
+        [2.7368424, 2.7368424, 2.7368424, 2.7368424, 2.7368424, 2.7368424, 2.7368424]
     )
     assert_array_almost_equal(diameters[1], diameters[2])
-    assert_array_almost_equal(diameters[2], [1.92333, 0.68, 0.66, 0.64, 0.62, 0.6])
+    assert_array_almost_equal(diameters[2], [2.7368424, 2.7368424, 2.7368424, 2.7368424, 2.7368424, 2.7368424])
+
+    neuron = morphio.mut.Morphology(NEU_PATH2)
+    diametrizer.build(neuron, diam_method="M1", neurite_types=["basal", "axon"])
+    diameters = [i.diameters for i in neuron.sections.values()]
+    assert_array_almost_equal(
+        diameters[0],
+        [2.3333333, 2.3333333]
+    )
+    assert_array_almost_equal(diameters[1], diameters[2])
+    assert_array_almost_equal(diameters[3], [2.6666667, 2.6666667])
+    assert_array_almost_equal(diameters[3], diameters[4])
+    assert_array_almost_equal(diameters[4], diameters[5])
+
+    neuron = morphio.mut.Morphology(NEU_PATH2)
+    diametrizer.build(neuron, diam_method="M1", neurite_types=["axon"])
+    diameters = [i.diameters for i in neuron.sections.values()]
+    assert_array_almost_equal(
+        diameters[0],
+        [2.0, 2.0]
+    )
+    assert_array_almost_equal(diameters[1], [2.0, 3.0])
+    assert_array_almost_equal(diameters[1], diameters[2])
+    assert_array_almost_equal(diameters[3], [2.6666667, 2.6666667])
+    assert_array_almost_equal(diameters[3], diameters[4])
+    assert_array_almost_equal(diameters[4], diameters[5])
 
     neuron = morphio.mut.Morphology(NEU_PATH1)
     assert_raises(KeyError, diametrizer.build, neuron, None, None, "UNKNOWN")

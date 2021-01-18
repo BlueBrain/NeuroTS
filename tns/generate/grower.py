@@ -135,8 +135,13 @@ class NeuronGrower:
             def _diametrize():
                 """diametrizer function"""
                 self.input_distributions['diameter']['apical_point_sec_ids'] = self.apical_sections
+                neurite_types = self.input_parameters.get(
+                    'diameter_params', {}
+                ).get('neurite_types', None)
+                if neurite_types is None:
+                    neurite_types = self.input_parameters['grow_types']
                 diametrizer.build(self.neuron, self.input_distributions['diameter'],
-                                  neurite_types=self.input_parameters['grow_types'],
+                                  neurite_types=neurite_types,
                                   diam_method=diam_method)
             self._diametrize = _diametrize
 
