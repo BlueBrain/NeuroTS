@@ -36,6 +36,17 @@
                                                "additionalProperties": false
                                       }
                                   }
+                              },
+                              "absolute_elevation_deviation": {
+                                  "data": {"type": "object",
+                                           "properties": {
+                                               "bins": {"type": "array",
+                                                        "items": {"type": "number"}},
+                                               "weights": {"type": "array",
+                                                           "items": {"type": "number"}}
+                                           },
+                                           "additionalProperties": false
+                                  }
                               }
                           }
                 }

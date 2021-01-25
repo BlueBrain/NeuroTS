@@ -108,6 +108,31 @@ class SomaGrower:
 
         return new_points
 
+    def add_points_from_trunk_absolute_orientation(self, orientation, trunk_absolute_angles, z_angles):
+        """Generates a sequence of points in the circumference of
+        a circle of radius R, from a unit vector and a list of angles.
+        """
+        # Sort angles
+        sortIDs = np.argsort(trunk_absolute_angles)
+        sorted_phi = np.asarray(trunk_absolute_angles)[sortIDs]
+        sorted_thetas = np.asarray(z_angles)[sortIDs]
+
+        # Convert orientation vector to angles
+        phi, theta = rotation.spherical_from_vector(orientation[0])
+
+        new_points = []
+        for abs_phi, abs_theta in zip(sorted_phi, sorted_thetas):
+
+            # Update angles
+            new_phi = phi + abs_phi - 0.5 * np.pi  # Default is [0, 1, 0] so we rotate by -pi/2
+            new_theta = theta + abs_theta - 0.5 * np.pi  # Default is [0, 1, 0] so we rotate by -pi/2
+            point = self.point_from_trunk_direction(new_phi, new_theta)
+            new_points.append(point)
+
+        self.points.extend(new_points)
+
+        return new_points
+
     def add_points_from_orientations(self, vectors):
         """Generates a sequence of points in the circumference of
         a circle of radius R, from a list of unit vectors.

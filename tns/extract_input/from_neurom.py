@@ -33,16 +33,41 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30):
     '''Extracts the trunk data for a specific tree type'''
 
     angles = [nm.get('trunk_angles', neuron, neurite_type=neurite_type) for neuron in pop]
-    angles = [i for a in angles for i in a]
-    heights, bins = np.histogram(angles, bins=bins)
+    angles = np.concatenate(angles, axis=0)
+    angle_heights, angle_bins = np.histogram(angles, bins=bins)
 
     # Extract trunk relative orientations to resample
-    actual_bins = (bins[1:] + bins[:-1]) / 2.
+    actual_angle_bins = (angle_bins[1:] + angle_bins[:-1]) / 2.
 
-    return {"trunk": {"orientation_deviation": {"data":
-                                                {"bins": actual_bins,
-                                                 "weights": heights}},
-                      "azimuth": {"uniform": {"min": np.pi, "max": 0.0}}}}
+    elevations = [nm.get('trunk_origin_elevations', neuron, neurite_type=neurite_type) for neuron in pop]
+    elevations = np.concatenate(elevations, axis=0)
+    elevation_heights, elevation_bins = np.histogram(elevations, bins=bins)
+
+    # Extract trunk absolute orientations to resample
+    actual_elevation_bins = (elevation_bins[1:] + elevation_bins[:-1]) / 2.
+
+    return {
+        "trunk": {
+            "orientation_deviation": {
+                "data": {
+                    "bins": actual_angle_bins,
+                    "weights": angle_heights
+                }
+            },
+            "azimuth": {
+                "uniform": {
+                    "min": np.pi,
+                    "max": 0.0
+                }
+            },
+            "absolute_elevation_deviation": {
+                "data": {
+                    "bins": actual_elevation_bins,
+                    "weights": elevation_heights,
+                }
+            }
+        }
+    }
 
 
 def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE):

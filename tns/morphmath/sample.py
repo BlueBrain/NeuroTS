@@ -112,7 +112,7 @@ def n_neurites(distrib):
 
 
 def trunk_angles(distrib, N):
-    """Returns a sequence of angles,
+    """Returns a sequence of relative angles,
     depending on the number of trunks "N"
     and the input distribution.
     """
@@ -120,6 +120,21 @@ def trunk_angles(distrib, N):
     angles = [trunks_d.draw() for _ in range(N - 1)]
     angles = angles + [sum(angles)]
     return angles
+
+
+def trunk_absolute_angles(distrib, N):
+    """Returns a sequence of absolute angles,
+    depending on the number of trunks "N"
+    and the input distribution.
+    """
+    elevation = distrib.get('trunk', {}).get('absolute_elevation_deviation', None)
+    if elevation is None:
+        raise KeyError(
+            "No elevation distribution found in parameters['trunk']"
+            "['absolute_elevation_deviation']."
+        )
+    trunks_d_theta = Distr(elevation)
+    return [trunks_d_theta.draw() for _ in range(N)]
 
 
 def azimuth_angles(distrib, N):

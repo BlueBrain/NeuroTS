@@ -39,7 +39,8 @@
                     }
                 },
                 "targeting": {"type": "number"},
-                "tree_type": {"type": "integer"}
+                "tree_type": {"type": "integer"},
+                "trunk_absolute_orientation": {"type": "boolean"}
             },
             "required": [
                 "branching_method",

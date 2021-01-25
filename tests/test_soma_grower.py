@@ -109,6 +109,40 @@ def test_add_points_from_trunk_angles():
     assert_array_almost_equal(points, expected)
 
 
+def test_add_points_from_trunk_absolute_orientation():
+
+    # Test with trivial orientation
+    soma = SomaGrower((1., 2., 3.), 2.0)
+
+    orientation = [[0, 1, 0]]
+    trunk_absolute_angles = [0.75, 1.0, 0.75]
+    z_angles = [1.48090896530732, 1.7240863537476048, 1.2747004358482887]
+
+    points = soma.add_points_from_trunk_absolute_orientation(orientation, trunk_absolute_angles, z_angles)
+
+    expected = np.array([[2.457469863016131, 3.3577737648609998, 3.179532731987588],
+                         [2.399695853613939, 3.3039517022251426, 3.5835764522666245],
+                         [2.067933519838869, 3.6632079132149533, 2.694619197355619]])
+
+    assert_array_almost_equal(points, expected)
+
+    # Test with non trivial orientation
+    soma = SomaGrower((1., 2., 3.), 2.0)
+
+    base_orientation = [0.25, 0.5, 0.75]
+    orientation = [np.array(base_orientation) / np.linalg.norm(base_orientation)]
+    trunk_absolute_angles = [0.75, 1.0, 1.0]
+    z_angles = [1.806078056398836, 0.947826003221246, 1.512974272395405]
+
+    points = soma.add_points_from_trunk_absolute_orientation(orientation, trunk_absolute_angles, z_angles)
+
+    expected = np.array([[2.473567419532686, 2.4338840563147373, 4.280759027205216],
+                         [1.0301730699570344, 2.0179373519813315, 4.999691935587396],
+                         [1.9460185698129842, 2.5623911684086043, 4.6699595921054495]])
+
+    assert_array_almost_equal(points, expected)
+
+
 def test_add_points_from_orientations():
 
     soma = SomaGrower((1., 2., 3.), 2.0)

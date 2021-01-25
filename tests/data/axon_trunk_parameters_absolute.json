@@ -10,7 +10,9 @@
            "branching_method": "bio_oriented",
            "modify": null,
            "tree_type": 2,
-           "step_size": {"norm":{"mean":1.0, "std":0.2}}},
+           "step_size": {"norm":{"mean":1.0, "std":0.2}},
+           "trunk_absolute_orientation": true
+         },
 "origin": [0.0,
            0.0,
            0.0],

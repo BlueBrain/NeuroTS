@@ -51,6 +51,7 @@ def _test_full(feature, distributions, parameters, ref_cell, ref_persistence_dia
     with TemporaryDirectory('test_grower') as folder:
         out_neuron = os.path.join(folder, 'test_output_neuron_.h5')
         n.write(out_neuron)
+
         # For checking purposes, we can output the cells as swc
         if save:
             n.write(ref_cell.replace('.h5', 'NEW.h5'))
@@ -128,11 +129,11 @@ def test_convert_orientation2points():
     parameters['diameter_params']['method'] = 'M1'
     ng = NeuronGrower(parameters, distributions)
 
-    pts = ng._convert_orientation2points([[0, 1, 0]], 1, distributions["apical"])
+    pts = ng._convert_orientation2points([[0, 1, 0]], 1, distributions["apical"], {})
     assert_array_almost_equal(pts, [[0, 15.27995, 0]])
 
     ng = NeuronGrower(parameters, distributions)
-    pts = ng._convert_orientation2points(None, 2, distributions["apical"])
+    pts = ng._convert_orientation2points(None, 2, distributions["apical"], {})
     assert_array_almost_equal(
         pts,
         [[-10.399604, -0.173343, 0.937449], [10.31932, 0.172005, -1.594578]]
@@ -143,7 +144,8 @@ def test_convert_orientation2points():
         ng._convert_orientation2points,
         "from_space",
         1,
-        distributions["apical"]
+        distributions["apical"],
+        {}
     )
 
     assert_raises(
@@ -151,7 +153,8 @@ def test_convert_orientation2points():
         ng._convert_orientation2points,
         object(),
         1,
-        distributions["apical"]
+        distributions["apical"],
+        {}
     )
 
     assert_raises(
@@ -159,7 +162,30 @@ def test_convert_orientation2points():
         ng._convert_orientation2points,
         [[0, 1, 0]],
         99,
-        distributions["apical"]
+        distributions["apical"],
+        {}
+    )
+
+
+    distributions, parameters = _load_inputs(os.path.join(_path, 'axon_trunk_distribution.json'),
+                                             os.path.join(_path, 'axon_trunk_parameters_absolute.json'))
+    assert_raises(
+        ValueError,
+        ng._convert_orientation2points,
+        [[0, 1, 0], [0, 1, 0]],
+        1,
+        distributions["axon"],
+        {"trunk_absolute_orientation": True}
+    )
+
+    del distributions["axon"]["trunk"]["absolute_elevation_deviation"]
+    assert_raises(
+        KeyError,
+        ng._convert_orientation2points,
+        [[0, 1, 0]],
+        1,
+        distributions["axon"],
+        {"trunk_absolute_orientation": True}
     )
 
 
@@ -187,6 +213,12 @@ def test_axon_grower():
                'axon_trunk_distribution.json',
                'axon_trunk_parameters.json',
                'test_axon_grower.h5',
+               None)
+
+    _test_full('radial_distances',
+               'axon_trunk_distribution.json',
+               'axon_trunk_parameters_absolute.json',
+               'test_axon_grower_absolute.h5',
                None)
 
 

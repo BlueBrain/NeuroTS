@@ -44,18 +44,44 @@ def test_trunk_distr():
                 2.2529866952339734,
                 2.547139403672574,
                 2.841292112111175]
+
+    absolute_elevation_deviation_BAS = {
+        "data": {
+            "weights": [2, 0, 0, 3, 1, 2, 1, 1, 1, 2],
+        }
+    }
+    bins_absolute_ele_dev_BAS = [-0.7718245274301169,
+                                 -0.6464835753472811,
+                                 -0.5211426232644452,
+                                 -0.39580167118160936,
+                                 -0.27046071909877345,
+                                 -0.1451197670159376,
+                                 -0.019778814933101796,
+                                 0.10556213714973406,
+                                 0.23090308923256997,
+                                 0.35624404131540577]
+    bins_absolute_ele_dev_APIC = [1.03738723]
+
     target_trunkBAS = {'trunk':
                       {'azimuth': {'uniform': {'max': 0.0, 'min': np.pi}},
-                                   'orientation_deviation': {'data': {'weights': [4, 3, 1, 2, 0, 1, 0, 0, 0, 2]}}}}
+                                   'orientation_deviation': {'data': {'weights': [4, 3, 1, 2, 0, 1, 0, 0, 0, 2]}},
+                                   'absolute_elevation_deviation': absolute_elevation_deviation_BAS}}
     target_trunkAPIC = {'trunk': {'azimuth': {'uniform': {'max': 0.0, 'min': np.pi}},
-                                  'orientation_deviation': {'data': {'bins': [0.0], 'weights': [2]}}}}
+                                  'orientation_deviation': {'data': {'bins': [0.0], 'weights': [2]}},
+                                  'absolute_elevation_deviation': {'data': {'weights': [2]}}}}
 
     trunkAP = extract_input.from_neurom.trunk_neurite(POPUL, neurite_type=neurom.APICAL_DENDRITE, bins=1)
     trunkBAS = extract_input.from_neurom.trunk_neurite(POPUL, bins=10)
 
     assert_array_almost_equal(trunkBAS['trunk']['orientation_deviation']['data']['bins'],
                               bins_BAS)
+    assert_array_almost_equal(trunkBAS['trunk']['absolute_elevation_deviation']['data']['bins'],
+                              bins_absolute_ele_dev_BAS)
+    assert_array_almost_equal(trunkAP['trunk']['absolute_elevation_deviation']['data']['bins'],
+                              bins_absolute_ele_dev_APIC)
     del trunkBAS['trunk']['orientation_deviation']['data']['bins']
+    del trunkBAS['trunk']['absolute_elevation_deviation']['data']['bins']
+    del trunkAP['trunk']['absolute_elevation_deviation']['data']['bins']
 
     assert_equal(trunkBAS, target_trunkBAS)
     assert_equal(trunkAP, target_trunkAPIC)
