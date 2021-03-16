@@ -24,7 +24,6 @@ setup(
         'tmd>=2.0.8',
         'morphio>=2.3.10',
         'neurom>=1.4.15',
-        'enum-compat>=0.0.1',
         'scipy>=0.13.3',
         'numpy>=1.15.0',
         'jsonschema>=3.0.1',
