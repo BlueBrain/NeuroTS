@@ -22,7 +22,7 @@ setup(
     install_requires=[
         'matplotlib>=1.3.1',
         'tmd>=2.0.8',
-        'morphio>=2.3.10',
+        'morphio>=2.7.1',
         'neurom>=1.4.15',
         'scipy>=0.13.3',
         'numpy>=1.15.0',
