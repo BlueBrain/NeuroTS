@@ -4,7 +4,7 @@ from itertools import chain
 
 import numpy as np
 from neurom import get
-from neurom.core import Tree, iter_neurites
+from neurom.core import Section, iter_neurites
 from neurom.core.types import tree_type_checker as is_type
 from neurom.morphmath import segment_length, segment_radius
 
@@ -28,7 +28,7 @@ def section_mean_taper(s):
 def terminal_diam(tree):
     """Returns the model for the terminations"""
     mean_diam = np.mean(tree.points[:, 3])
-    term_diam = [2. * t.points[-1, 3] for t in Tree.ileaf(next(tree.iter_sections()))
+    term_diam = [2. * t.points[-1, 3] for t in Section.ileaf(next(tree.iter_sections()))
                  if t.points[-1, 3] < 1.2 * mean_diam]
 
     return term_diam
