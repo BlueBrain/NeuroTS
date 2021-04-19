@@ -164,7 +164,12 @@ def test_number_neurites():
     else:
         smallest = 0
         biggest = 1
-    pop_cut.neurons[biggest].neurites = [pop_cut.neurons[biggest].neurites[i] for i in (0, 1, -1)]
+
+    for i in list(range(2, len(pop_cut.neurons[biggest].root_sections) - 1))[::-1]:
+        pop_cut.neurons[biggest].delete_section(
+            pop_cut.neurons[biggest].root_sections[i], recursive=True
+        )
+
     pop_cut.neurites = [j for i in pop_cut.neurons for j in i.neurites]
     assert_equal(len(pop_cut.neurons), 2)
     assert_equal(len(pop_cut.neurons[biggest].neurites), 3)
