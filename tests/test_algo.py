@@ -142,7 +142,7 @@ def test_TMDAlgo_modify():
         scaling_factor[:2] = thickness
         return np.multiply(barcode, scaling_factor).tolist()
 
-    def modify_barcode(ph, thickness=1150.0, thickness_reference=1150.0):
+    def modify_barcode(ph, context, thickness=1150.0, thickness_reference=1150.0):
         max_p = np.max(ph)
         scaling_reference = 1.0
         if 1 - max_p / thickness_reference < 0: #If cell is larger than the layers

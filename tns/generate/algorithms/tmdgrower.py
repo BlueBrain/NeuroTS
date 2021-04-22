@@ -51,6 +51,7 @@ class TMDAlgo(AbstractAlgo):
 
         if self.params.get('modify'):
             persistence = self.params['modify']['funct'](persistence,
+                                                         self.context,
                                                          **self.params['modify']['kwargs'])
         return persistence
 
