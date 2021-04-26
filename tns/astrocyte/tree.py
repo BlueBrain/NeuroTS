@@ -28,7 +28,8 @@ class TreeGrowerSpaceColonization(TreeGrower):
         growth_algo = grow_meth(input_data=self.distr,
                                 params=self.params,
                                 start_point=self.point,
-                                context=self.context)
+                                context=self.context,
+                                random_generator=self._rng)
 
         stop, num_sec = growth_algo.initialize()
 
@@ -62,7 +63,8 @@ class TreeGrowerSpaceColonization(TreeGrower):
                              stop_criteria=copy.deepcopy(stop),
                              step_size_distribution=self.seg_length_distr,
                              pathlength=pathlength,
-                             context=self.context)
+                             context=self.context,
+                             random_generator=self._rng)
 
         self.active_sections.append(sec_grower)
         return sec_grower

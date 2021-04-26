@@ -4,15 +4,15 @@ import numpy as np
 from numpy import sqrt
 
 
-def get_random_point(D=1.0):
+def get_random_point(D=1.0, random_generator=np.random):
     '''
     Get 3-d coordinates of a new random point.
     The distance between the produced point and (0,0,0)
     is given by the value D.
     '''
     # pylint: disable=assignment-from-no-return
-    phi = np.random.uniform(0., 2. * np.pi)
-    theta = np.arccos(np.random.uniform(-1.0, 1.0))
+    phi = random_generator.uniform(0., 2. * np.pi)
+    theta = np.arccos(random_generator.uniform(-1.0, 1.0))
 
     sn_theta = np.sin(theta)
 

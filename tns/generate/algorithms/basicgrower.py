@@ -16,7 +16,8 @@ class TrunkAlgo(AbstractAlgo):
                  input_data,
                  params,
                  start_point,
-                 context=None):
+                 context=None,
+                 **_):
         """
         input_data: saves all the data required for the growth
         params: parameters needed for growth, it should include the bif_method

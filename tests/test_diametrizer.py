@@ -1,6 +1,7 @@
 
 '''Test tns.generate.diametrizer code'''
 import os
+import copy
 from nose.tools import assert_raises
 import numpy as np
 from numpy.testing import assert_array_almost_equal
@@ -107,7 +108,7 @@ def test_diametrize_smoothing():
 def test_diametrize_from_root():
     neu1 = morphio.mut.Morphology(NEU_PATH1) # has to be loaded to start clean
     np.random.seed(0) # ensure constant random number for sampling
-    diametrizer.diametrize_from_root(neu1, MODEL)
+    diametrizer.diametrize_from_root(neu1, model_all=MODEL)
     assert_array_almost_equal(morphio.Morphology(neu1).diameters,
                               [4.      , 3.9     , 3.8     , 3.7     , 3.6     , 3.5     ,
                                3.4     , 3.4     , 1.202082, 1.182082, 1.162082, 1.142082,
@@ -116,7 +117,7 @@ def test_diametrize_from_root():
 
     neu2 = morphio.mut.Morphology(NEU_PATH3) # has to be loaded to start clean
     np.random.seed(0) # ensure constant random number for sampling
-    diametrizer.diametrize_from_root(neu2, MODEL, neurite_type=SectionType.axon)
+    diametrizer.diametrize_from_root(neu2, SectionType.axon, model_all=MODEL)
     assert_array_almost_equal(morphio.Morphology(neu2).diameters,
                               [4.,         3.8,        3.6,        3.4,        3.2,       3.,
                                2.8 ,       2.8,        2.8,        2.6,        2.4,       2.2,
@@ -127,7 +128,7 @@ def test_diametrize_from_root():
 def test_diametrize_from_tips():
     neu1 = morphio.mut.Morphology(NEU_PATH1) # has to be loaded to start clean
     np.random.seed(0) # ensure constant random number for sampling
-    diametrizer.diametrize_from_tips(neu1, MODEL)
+    diametrizer.diametrize_from_tips(neu1, model_all=MODEL)
     assert_array_almost_equal(morphio.Morphology(neu1).diameters,
                               [2.52333 , 2.423331, 2.32333 , 2.22333 , 2.12333 , 2.02333 ,
                                1.92333 , 1.92333 , 0.68    , 0.66    , 0.64    , 0.62    ,
@@ -136,7 +137,7 @@ def test_diametrize_from_tips():
 
     neu2 = morphio.mut.Morphology(NEU_PATH3) # has to be loaded to start clean
     np.random.seed(0) # ensure constant random number for sampling
-    diametrizer.diametrize_from_tips(neu2, MODEL, neurite_type=SectionType.axon)
+    diametrizer.diametrize_from_tips(neu2, model_all=MODEL, neurite_type=SectionType.axon)
     assert_array_almost_equal(morphio.Morphology(neu2).diameters,
                               [4.,         3.8,        3.6,        3.4,        3.2,       3.,
                                2.8 ,       2.8,        2.8,        2.6,        2.4,       2.2,
@@ -157,6 +158,7 @@ def test_redefine_diameter_section():
 
 
 def test_build():
+    np.random.seed(1) # ensure constant random number for sampling
     neuron = morphio.mut.Morphology(NEU_PATH1)
     diametrizer.build(neuron, diam_method="M1")
     diameters = [i.diameters for i in neuron.sections.values()]
@@ -198,7 +200,7 @@ def test_build():
     assert_array_almost_equal(diameters[1], diameters[2])
     assert_array_almost_equal(diameters[2], [1.9233304, 0.68, 0.66, 0.64, 0.62, 0.6])
 
-    def diam_method(neuron, input_model, tree_type):
+    def diam_method(neuron, tree_type, **kwargs):
         diametrizer.diametrize_constant_per_neurite(neuron)
 
     neuron = morphio.mut.Morphology(NEU_PATH1)
@@ -235,6 +237,34 @@ def test_build():
     assert_array_almost_equal(diameters[3], [2.6666667, 2.6666667])
     assert_array_almost_equal(diameters[3], diameters[4])
     assert_array_almost_equal(diameters[4], diameters[5])
+
+    # Test with custom random generator
+    neuron = morphio.mut.Morphology(NEU_PATH1)
+    test_model = copy.deepcopy(MODEL)
+    test_model["basal"]["trunk_taper"] = np.arange(0, 10, 0.3)
+    diametrizer.build(
+        neuron,
+        input_model=test_model,
+        diam_method="M4",
+        random_generator=np.random.default_rng(3),
+    )
+    diameters = [i.diameters for i in neuron.sections.values()]
+    assert_array_almost_equal(diameters[0], [3, 2.9, 2.8, 2.7, 2.6, 2.5, 2.4])
+    assert_array_almost_equal(diameters[1], diameters[2])
+    assert_array_almost_equal(
+        diameters[2],
+        [2.4, 0.84852815, 0.82852817, 0.8085281 , 0.78852814, 0.76852816]
+    )
+
+    neuron = morphio.mut.Morphology(NEU_PATH1)
+    diametrizer.build(neuron, input_model=MODEL, diam_method="M5")
+    diameters = [i.diameters for i in neuron.sections.values()]
+    assert_array_almost_equal(
+        diameters[0],
+        [2.5233305, 2.4233305, 2.3233304, 2.2233305, 2.1233304, 2.0233305, 1.923330]
+    )
+    assert_array_almost_equal(diameters[1], diameters[2])
+    assert_array_almost_equal(diameters[2], [1.9233304, 0.68, 0.66, 0.64, 0.62, 0.6])
 
     neuron = morphio.mut.Morphology(NEU_PATH1)
     assert_raises(KeyError, diametrizer.build, neuron, None, None, "UNKNOWN")
