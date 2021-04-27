@@ -6,5 +6,6 @@
    :maxdepth: 2
 
    Home <self>
+   params_and_distrs
    changelog
    api

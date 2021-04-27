@@ -29,6 +29,36 @@ def test_validate_params():
     data['apical']['orientation'] = None
     tested.validate_neuron_params(data)
 
+    # If method != external it should not have any other entry than 'method'
+    data['diameter_params'] = {
+        "method": "default"
+    }
+    tested.validate_neuron_params(data)
+
+    data['diameter_params'] = {
+        "method": "default",
+        "other key": "any value"
+    }
+    assert_raises(ValidationError, tested.validate_neuron_params, data)
+
+    data['diameter_params'] = {
+        "method": "M1",
+        "other key": "any value"
+    }
+    assert_raises(ValidationError, tested.validate_neuron_params, data)
+
+    # If method == external it may have any other entry than 'method'
+    data['diameter_params'] = {
+        "method": "external"
+    }
+    tested.validate_neuron_params(data)
+
+    data['diameter_params'] = {
+        "method": "external",
+        "other key": "any value"
+    }
+    tested.validate_neuron_params(data)
+
     # It must be a list of vectors, not a single one
     data['apical']['orientation'] = [0, 0, 0]
     assert_raises(ValidationError, tested.validate_neuron_params, data)

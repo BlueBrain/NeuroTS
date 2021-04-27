@@ -1,87 +1,253 @@
 {
+    "additionalProperties": false,
     "definitions": {
-        "empty_object": {"type": "object", "additionalProperties": false},
-
-        "neurite_distrib": {
-            "type": "object",
+        "data_distr": {
+            "additionalProperties": false,
+            "description": "A distribution based on data bins and weights",
             "properties": {
-                "num_trees": {"type": "object"},
-                "persistence_diagram": {"type": "array",
-                                        "items": {"type": "array",
-                                                  "items": {"type": "array",
-                                                            "items": {"type": "number"}}}},
-                "trunk": {"type": "object",
-                          "properties": {
-                              "azimuth": {"type": "object",
-                                          "properties": {
-                                              "uniform": { "type": "object",
-                                                           "properties": {
-                                                               "max": {"type": "number"},
-                                                               "min": {"type": "number"}
-                                                           },
-                                                           "additionalProperties": false
-                                                           }
-                                              }
-                                          },
-                              "orientation_deviation": {
-                                  "type": "object",
-                                  "properties":{
-                                      "data": {"type": "object",
-                                               "properties": {
-                                                   "bins": {"type": "array",
-                                                            "items": {"type": "number"}},
-                                                   "weights": {"type": "array",
-                                                               "items": {"type": "number"}}
-                                               },
-                                               "additionalProperties": false
-                                      }
-                                  }
-                              },
-                              "absolute_elevation_deviation": {
-                                  "data": {"type": "object",
-                                           "properties": {
-                                               "bins": {"type": "array",
-                                                        "items": {"type": "number"}},
-                                               "weights": {"type": "array",
-                                                           "items": {"type": "number"}}
-                                           },
-                                           "additionalProperties": false
-                                  }
-                              }
-                          }
+                "data": {
+                    "additionalProperties": false,
+                    "description": "The data used for the distribution",
+                    "properties": {
+                        "bins": {
+                            "description": "The bins",
+                            "items": {
+                                "type": "number"
+                            },
+                            "type": "array"
+                        },
+                        "weights": {
+                            "description": "The weights",
+                            "items": {
+                                "type": "number"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "type": "object"
                 }
             },
-            "required": ["trunk"]
-        }
-    },
-
-    "type": "object",
-    "properties": {
-        "apical": {"oneOf": [{"$ref": "#/definitions/empty_object"},
-                             {"$ref": "#/definitions/neurite_distrib"}]},
-        "axon": {"type": "object"},
-        "basal": {"$ref": "#/definitions/neurite_distrib"},
-        "soma": {"type": "object",
-                 "properties":{
-                     "size": {"type": "object",
-                              "properties": {
-                                  "norm": { "type": "object",
-                                            "properties": {
-                                                "std": {"type": "number"},
-                                                "mean": {"type": "number"}
-                                            },
-                                            "required": ["std", "mean"],
-                                            "additionalProperties": false
-                                  }
-                              }
-                     }
-                 }
+            "title": "Data distribution",
+            "type": "object"
         },
-        "diameter": {"type": "object",
-                     "properties": {"method": {"type": "string"}},
-                     "required": ["method"]
+        "empty_distr": {
+            "additionalProperties": false,
+            "description": "An object without any property",
+            "title": "Empty distribution",
+            "type": "object"
+        },
+        "neurite_distrib": {
+            "additionalProperties": false,
+            "description": "The distributions of a type of neurite",
+            "properties": {
+                "filtration_metric": {
+                    "type": "string"
+                },
+                "num_trees": {
+                    "$ref": "#/definitions/data_distr",
+                    "description": "The data distribution used for the number of trees to synthesize"
+                },
+                "persistence_diagram": {
+                    "description": "The persistence diagram",
+                    "items": {
+                        "items": {
+                            "items": {
+                                "type": "number"
+                            },
+                            "type": "array"
+                        },
+                        "type": "array"
+                    },
+                    "type": "array"
+                },
+                "trunk": {
+                    "additionalProperties": false,
+                    "description": "The distributions used to synthesize the trunk",
+                    "properties": {
+                        "absolute_elevation_deviation": {
+                            "$ref": "#/definitions/data_distr",
+                            "description": "The data distribution used for the absolute elevation deviation"
+                        },
+                        "azimuth": {
+                            "additionalProperties": false,
+                            "description": "The uniform distribution used for the azimuth",
+                            "properties": {
+                                "uniform": {
+                                    "additionalProperties": false,
+                                    "description": "The properties of the uniform distribution",
+                                    "properties": {
+                                        "max": {
+                                            "type": "number"
+                                        },
+                                        "min": {
+                                            "type": "number"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "orientation_deviation": {
+                            "$ref": "#/definitions/data_distr",
+                            "description": "The data distribution used for the orientation deviation"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "required": [
+                "trunk"
+            ],
+            "title": "Neurite distribution",
+            "type": "object"
+        },
+        "neurite_diameter": {
+            "additionalProperties": false,
+            "description": "The diameter distributions of a type of neurite",
+            "properties": {
+                "Rall_ratio": {
+                    "type": "number"
+                },
+                "siblings_ratio": {
+                    "type": "number"
+                },
+                "taper": {
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": "array"
+                },
+                "term": {
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": "array"
+                },
+                "trunk": {
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": "array"
+                },
+                "trunk_taper": {
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": "array"
+                }
+            },
+            "title": "Neurite diameter distribution",
+            "type": "object"
         }
     },
-    "additionalProperties": false,
-    "required": ["diameter", "soma"]
+    "properties": {
+        "apical": {
+            "description": "Specific distributions for apicals",
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/empty_distr"
+                },
+                {
+                    "$ref": "#/definitions/neurite_distrib"
+                }
+            ]
+        },
+        "axon": {
+            "description": "Specific distributions for axons",
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/empty_distr"
+                },
+                {
+                    "$ref": "#/definitions/neurite_distrib"
+                }
+            ]
+        },
+        "basal": {
+            "$ref": "#/definitions/neurite_distrib",
+            "description": "Specific distributions for basals"
+        },
+        "diameter": {
+            "additionalProperties": true,
+            "description": "The diameter specifications",
+            "oneOf": [
+                {
+                    "additionalProperties": true,
+                    "properties": {
+                        "method": {
+                            "enum": [
+                                "external"
+                            ],
+                            "type": "string"
+                        }
+                    }
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "method": {
+                            "not": {
+                                "enum": [
+                                    "external"
+                                ]
+                            },
+                            "type": "string"
+                        },
+                        "apical": {
+                            "$ref": "#/definitions/neurite_diameter"
+                        },
+                        "basal": {
+                            "$ref": "#/definitions/neurite_diameter"
+                        },
+                        "axon": {
+                            "$ref": "#/definitions/neurite_diameter"
+                        }
+                    }
+                }
+            ],
+            "required": [
+                "method"
+            ],
+            "type": "object"
+        },
+        "soma": {
+            "additionalProperties": false,
+            "description": "Specific distributions for the somas",
+            "properties": {
+                "size": {
+                    "additionalProperties": false,
+                    "description": "The distribution of soma sizes",
+                    "properties": {
+                        "norm": {
+                            "additionalProperties": false,
+                            "properties": {
+                                "mean": {
+                                    "description": "The mean of the distribution",
+                                    "type": "number"
+                                },
+                                "std": {
+                                    "description": "The std of the distribution",
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "std",
+                                "mean"
+                            ],
+                            "type": "object"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "required": [
+        "diameter",
+        "soma"
+    ],
+    "title": "TMD distributions",
+    "type": "object"
 }

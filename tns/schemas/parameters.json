@@ -1,46 +1,129 @@
 {
     "definitions": {
-        "point": {
-            "type": "array",
-            "minItems": 3,
-            "maxItems": 3
+        "empty_object": {
+            "additionalProperties": false,
+            "description": "An object without any property",
+            "title": "Empty object",
+            "type": "object"
         },
-
-        "empty_object": {"type": "object", "additionalProperties": false},
-
         "neurite": {
-            "type": "object",
+            "additionalProperties": false,
+            "description": "The properties of a neurite",
             "properties": {
-                "apical_distance": {"type": "number"},
-                "bias": {"type": "number"},
-                "bias_length": {"type": "number"},
-                "branching_method": {"type": "string"},
-                "growth_method": {"type": "string",
-                                  "enum": ["tmd", "tmd_gradient", "tmd_apical", "axon_trunk", "trunk"]},
-                "has_apical_tuft": {"type": "boolean"},
-                "metric": {"type": "string"},
-                "modify": {"oneOf": [{"type": "object"}, {"type": "null"}]},
-                "num_seg": {"type": "integer"},
-                "orientation": {"anyOf": [{"type": "null"},
-                                          {"type": "array",
-                                           "items": {"$ref": "#/definitions/point"}}]},
-                "radius": {"type": "number"},
-                "randomness": {"type": "number"},
+                "apical_distance": {
+                    "description": "The apical distance (NEVER USED)",
+                    "type": "number"
+                },
+                "bias": {
+                    "description": "The branches that are major inherit a bias towards the target orientation of the tree. Bias defines the weight. If bias = 0 the growth is isotropic, and if bias = 1 it goes straight along orientation.",
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "bias_length": {
+                    "description": "The branches that are major inherit a bias towards the target orientation of the tree. Bias_length defines which branches are major and therefore will have a bias. Only branches of size greater than (bias_length * barcode length) are biased.",
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "branching_method": {
+                    "description": "Defines the method that will be used for the bifurcation angles",
+                    "type": "string"
+                },
+                "growth_method": {
+                    "description": "Defines the method that will be used for the growth",
+                    "enum": [
+                        "tmd",
+                        "tmd_gradient",
+                        "tmd_apical",
+                        "axon_trunk",
+                        "trunk"
+                    ],
+                    "type": "string"
+                },
+                "has_apical_tuft": {
+                    "description": "Select True if the tree is an apical and is expected to have a tuft",
+                    "type": "boolean"
+                },
+                "metric": {
+                    "description": "Defines the metric for the growth (only path distance is currently available)",
+                    "type": "string"
+                },
+                "modify": {
+                    "description": "A modification function to be applied to a TMD (barcode) before synthesis starts",
+                    "oneOf": [
+                        {
+                            "type": "object"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "num_seg": {
+                    "description": "Number of segments (used when an alternative to TMD, basic growth algorithm is chosen)",
+                    "minimum": 0,
+                    "type": "integer"
+                },
+                "orientation": {
+                    "anyOf": [
+                        {
+                            "type": "null"
+                        },
+                        {
+                            "items": {
+                                "$ref": "#/definitions/point",
+                                "title": "test"
+                            },
+                            "type": "array"
+                        }
+                    ],
+                    "description": "Defines the target orientation of a tree, as it emanates from the soma"
+                },
+                "radius": {
+                    "description": "Defines the radius of the tree. If default diameter is chosen, diameter will be constant. If external diametrization is used, the radius value is not important",
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "randomness": {
+                    "description": "Controls the percentage of randomness within a section of a neuron. 0.0: the path is straight, 1.0: the path is a random walk. Randomness + targeting + history should be normalized to 1.",
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
                 "step_size": {
-                    "type": "object",
+                    "description": "Defines the distribution from which the step size is sampled",
                     "properties": {
                         "norm": {
-                            "type": "object",
+                            "description": "The normal distribution used",
                             "properties": {
-                                "mean": {"type": "number"},
-                                "std": {"type": "number"}
-                            }
+                                "mean": {
+                                    "description": "The mean of the distribution",
+                                    "type": "number"
+                                },
+                                "std": {
+                                    "description": "The std of the distribution",
+                                    "type": "number"
+                                }
+                            },
+                            "type": "object"
                         }
-                    }
+                    },
+                    "type": "object"
                 },
-                "targeting": {"type": "number"},
-                "tree_type": {"type": "integer"},
-                "trunk_absolute_orientation": {"type": "boolean"}
+                "targeting": {
+                    "description": "Controls the percentage of targeting (complementary to the randomness). 1.0: the path is straight, 0.0: the path is a random walk. Randomness + targeting + history should be normalized to 1.",
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "tree_type": {
+                    "description": "Defines the tree index that will be written to the file",
+                    "type": "integer"
+                },
+                "trunk_absolute_orientation": {
+                    "description": "Orientation of trunks emerging from the soma (on x-y plane).",
+                    "type": "boolean"
+                }
             },
             "required": [
                 "branching_method",
@@ -53,27 +136,111 @@
                 "targeting",
                 "tree_type"
             ],
-            "additionalProperties": false
+            "title": "Neurite",
+            "type": "object"
+        },
+        "neurite_type": {
+            "description": "Type of neurite",
+            "enum": [
+                "basal",
+                "apical",
+                "axon"
+            ],
+            "type": "string"
+        },
+        "point": {
+            "description": "A point with 3 coordinates",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Point",
+            "type": "array"
         }
     },
-
-    "type": "object",
+    "description": "The parameters used to synthesize new cells",
     "properties": {
-        "apical": {"oneOf": [{"$ref": "#/definitions/empty_object"},
-                             {"$ref": "#/definitions/neurite"}]},
-        "axon": {"oneOf": [{"$ref": "#/definitions/empty_object"},
-                           {"$ref": "#/definitions/neurite"}]},
-        "basal": {"$ref": "#/definitions/neurite"},
-        "grow_types": {"type": "array",
-                       "items": {"type": "string", "enum": ["basal", "apical", "axon"]}
-                       },
-        "origin": {"$ref": "#/definitions/point"},
+        "apical": {
+            "description": "Specific parameters for apicals",
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/empty_object"
+                },
+                {
+                    "$ref": "#/definitions/neurite"
+                }
+            ]
+        },
+        "axon": {
+            "description": "Specific parameters for axons",
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/empty_object"
+                },
+                {
+                    "$ref": "#/definitions/neurite"
+                }
+            ]
+        },
+        "basal": {
+            "$ref": "#/definitions/neurite",
+            "description": "Specific parameters for basals"
+        },
         "diameter_params": {
-            "type": "object",
-            "properties": {"method": {"type": "string"}},
-            "required": ["method"]
+            "description": "Parameters used to generate the diameters",
+            "oneOf": [
+                {
+                    "additionalProperties": true,
+                    "properties": {
+                        "method": {
+                            "enum": [
+                                "external"
+                            ],
+                            "description": "The method used to synthesize the diameters",
+                            "type": "string"
+                        }
+                    }
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "method": {
+                            "description": "The method used to synthesize the diameters",
+                            "not": {
+                                "enum": [
+                                    "external"
+                                ]
+                            },
+                            "type": "string"
+                        }
+                    }
+                }
+            ],
+            "required": [
+                "method"
+            ],
+            "type": "object"
+        },
+        "grow_types": {
+            "description": "Select which tree types will be generated",
+            "items": {
+                "enum": [
+                    "basal",
+                    "apical",
+                    "axon"
+                ],
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "origin": {
+            "$ref": "#/definitions/point",
+            "description": "Defines the center of the soma, from which the growth starts"
         }
     },
-
-    "required": ["origin", "diameter_params", "grow_types"]
+    "required": [
+        "origin",
+        "diameter_params",
+        "grow_types"
+    ],
+    "title": "TMD parameters",
+    "type": "object"
 }
