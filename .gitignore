@@ -23,3 +23,6 @@ test_venv/
 # doc
 doc/build
 doc/source/generated
+
+# reports
+reports

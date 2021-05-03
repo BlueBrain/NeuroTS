@@ -4,7 +4,7 @@ from itertools import chain
 
 import numpy as np
 from neurom import get
-from neurom.core import Section, iter_neurites
+from neurom.core.neuron import Section, iter_neurites
 from neurom.core.types import tree_type_checker as is_type
 from neurom.morphmath import segment_length, segment_radius
 
