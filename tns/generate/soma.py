@@ -17,7 +17,7 @@ L = logging.getLogger()
 class SomaGrower:
     """Soma class"""
 
-    def __init__(self, initial_point, radius=1.0, context=None):
+    def __init__(self, initial_point, radius=1.0, context=None, random_generator=np.random):
         """TNS Soma Object
 
         Parameters:
@@ -28,6 +28,7 @@ class SomaGrower:
         self.radius = float(radius)
         self._center = np.asarray(initial_point, dtype=np.float)
         self.context = context  # for future, hypothetical use
+        self._rng = random_generator
 
     @property
     def points(self):
@@ -163,7 +164,7 @@ class SomaGrower:
             points_to_interpolate = points
         else:
             # Adds points from circle circumference to the soma points.
-            angles = 2. * np.pi * np.random.rand(interpolation - len(points))
+            angles = 2. * np.pi * self._rng.random(interpolation - len(points))
             x = self.radius * np.sin(angles) + self.center[0]
             y = self.radius * np.cos(angles) + self.center[1]
             z = np.full_like(angles, self.center[2])

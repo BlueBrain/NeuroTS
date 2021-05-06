@@ -19,7 +19,8 @@ class SectionGrower:
     '''
     # pylint: disable-msg=too-many-arguments
     def __init__(self, parent, children, first_point, direction, parameters,
-                 process, stop_criteria, step_size_distribution, pathlength, context=None):
+                 process, stop_criteria, step_size_distribution, pathlength,
+                 context=None, random_generator=np.random):
         '''A section is a list of points in 4D space (x, y, x, r)
         that are sequentially connected to each other. This process
         generates a tubular morphology that resembles a random walk.
@@ -37,6 +38,7 @@ class SectionGrower:
         self.process = process
         self.latest_directions = deque(maxlen=MEMORY)
         self.context = context
+        self._rng = random_generator
         self.step_size_distribution = step_size_distribution
         self.pathlength = 0 if parent is None else pathlength
 
@@ -53,9 +55,11 @@ class SectionGrower:
         """Returns the next point depending
         on the growth method and the previous point.
         """
-        direction = self.params.targeting * self.direction + \
-            self.params.randomness * get_random_point() + \
+        direction = (
+            self.params.targeting * self.direction +
+            self.params.randomness * get_random_point(random_generator=self._rng) +
             self.params.history * self.history()
+        )
 
         direction = direction / vectorial_norm(direction)
         seg_length = self.step_size_distribution.draw_positive()
@@ -144,7 +148,7 @@ class SectionGrowerExponentialProba(SectionGrower):
             # no need to exponentiate, the comparison below automatically resolves to `True`
             return True
         # Check if close enough to exp( distance * lamda)
-        return np.random.random() < np.exp(-x * lamda)
+        return self._rng.random() < np.exp(-x * lamda)
 
     def check_stop(self):
         '''Probabilities of bifurcating and stopping are proportional

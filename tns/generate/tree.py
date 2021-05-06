@@ -76,7 +76,8 @@ class TreeGrower:
                  initial_point,
                  parameters,
                  distributions,
-                 context=None):
+                 context=None,
+                 random_generator=np.random):
         """TNS Tree Object
 
         Parameters:
@@ -95,10 +96,11 @@ class TreeGrower:
         self.distr = distributions
         self.active_sections = list()
         self.context = context
+        self._rng = random_generator
 
         # Creates the distribution from which the segment lengths
         # To sample a new seg_len call self.seg_len.draw()
-        self.seg_length_distr = sample.Distr(self.params["step_size"])
+        self.seg_length_distr = sample.Distr(self.params["step_size"], random_generator=self._rng)
         self._section_parameters = _create_section_parameters(parameters)
         self.growth_algo = self._initialize_algorithm()
 
@@ -110,7 +112,8 @@ class TreeGrower:
         growth_algo = grow_meth(input_data=self.distr,
                                 params=self.params,
                                 start_point=self.point,
-                                context=self.context)
+                                context=self.context,
+                                random_generator=self._rng)
 
         stop, num_sec = growth_algo.initialize()
 
@@ -143,7 +146,8 @@ class TreeGrower:
                              stop_criteria=copy.deepcopy(stop),
                              step_size_distribution=self.seg_length_distr,
                              pathlength=pathlength,
-                             context=self.context)
+                             context=self.context,
+                             random_generator=self._rng)
 
         self.active_sections.append(sec_grower)
         return sec_grower

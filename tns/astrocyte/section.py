@@ -64,7 +64,7 @@ class SectionSpatialGrower(SectionGrowerPath):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._influence_distance = self.context.influence_distance(
-            self.step_size_distribution.params['mean'])
+            self.step_size_distribution.loc)
 
     @property
     def point_cloud(self):

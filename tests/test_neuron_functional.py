@@ -21,6 +21,12 @@ import tmd
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 
+def build_random_generator(seed=None):
+    mt = np.random.MT19937()
+    mt._legacy_seeding(seed)  # Use legacy seeding to get the same result as with np.random.seed()
+    return np.random.RandomState(mt)
+
+
 def assert_close_persistent_diagram(actual, expected):
     # compute distances between points
     distances = np.min(cdist(np.array(tmd.analysis.sort_ph(expected)), actual), axis=0)
@@ -42,11 +48,25 @@ def _load_inputs(distributions, parameters):
     return distributions, params
 
 
-def _test_full(feature, distributions, parameters, ref_cell, ref_persistence_diagram, save=False):
-
-    np.random.seed(0)
+def _test_full(
+    feature,
+    distributions,
+    parameters,
+    ref_cell,
+    ref_persistence_diagram,
+    save=False,
+    rng_or_seed=None,
+):
     distributions, params = _load_inputs(join(_path, distributions), join(_path, parameters))
-    n = NeuronGrower(input_distributions=distributions, input_parameters=params).grow()
+    if rng_or_seed is None:
+        np.random.seed(0)
+        n = NeuronGrower(input_distributions=distributions, input_parameters=params).grow()
+    else:
+        n = NeuronGrower(
+            input_distributions=distributions,
+            input_parameters=params,
+            rng_or_seed=rng_or_seed,
+        ).grow()
 
     with TemporaryDirectory('test_grower') as folder:
         out_neuron = os.path.join(folder, 'test_output_neuron_.h5')
@@ -78,6 +98,25 @@ def test_wrong_filtration():
     distributions, parameters = _load_inputs(os.path.join(_path, 'bio_path_distribution.json'),
                                              os.path.join(_path, 'bio_radial_params.json'))
     assert_raises(ValueError, NeuronGrower, parameters, distributions)
+
+
+def test_seeding():
+    '''Test seeding of internal random number generator'''
+    distributions, parameters = _load_inputs(os.path.join(_path, 'bio_path_distribution.json'),
+                                             os.path.join(_path, 'bio_path_params.json'))
+    ng = NeuronGrower(parameters, distributions, rng_or_seed=0)
+    assert ng._rng.bit_generator.state == {
+        "bit_generator": "PCG64",
+        "state": {
+            "state": 80186449399738619878794082838194943960,
+            "inc": 87136372517582989555478159403783844777
+        },
+        "has_uint32": 0,
+        "uinteger": 0,
+    }
+
+    ng = NeuronGrower(parameters, distributions, rng_or_seed=None)
+    assert ng._rng.bit_generator.state["bit_generator"] == "PCG64"
 
 
 def test_grow_trunk_1_basal():
@@ -203,6 +242,16 @@ def test_breaker_of_tmd_algo():
     assert_array_almost_equal(n.sections[169].points[-1], np.array([117.20551, -41.12157, 189.57013]), decimal=5)
     assert_array_almost_equal(n.sections[122].points[-1], np.array([ 77.08879, 115.79825,  -0.99393]), decimal=5)
 
+    # Test with a specific random generator
+    rng = build_random_generator(3367155)
+
+    N = NeuronGrower(input_distributions=distributions, input_parameters=params, rng_or_seed=rng)
+    n = N.grow()
+
+    assert_array_equal(N.apical_sections, [33])
+    assert_array_almost_equal(n.sections[169].points[-1], np.array([117.20551, -41.12157, 189.57013]), decimal=5)
+    assert_array_almost_equal(n.sections[122].points[-1], np.array([ 77.08879, 115.79825,  -0.99393]), decimal=5)
+
 
 def test_axon_grower():
     '''Test axon grower, which should only grow trunks with 1 section to allow later axon grafting.
@@ -214,12 +263,24 @@ def test_axon_grower():
                'axon_trunk_parameters.json',
                'test_axon_grower.h5',
                None)
+    _test_full('radial_distances',
+               'axon_trunk_distribution.json',
+               'axon_trunk_parameters.json',
+               'test_axon_grower.h5',
+               None,
+               rng_or_seed=build_random_generator(0))
 
     _test_full('radial_distances',
                'axon_trunk_distribution.json',
                'axon_trunk_parameters_absolute.json',
                'test_axon_grower_absolute.h5',
                None)
+    _test_full('radial_distances',
+               'axon_trunk_distribution.json',
+               'axon_trunk_parameters_absolute.json',
+               'test_axon_grower_absolute.h5',
+               None,
+               rng_or_seed=build_random_generator(0))
 
 
 def test_basic_grower():
@@ -228,6 +289,43 @@ def test_basic_grower():
                'trunk_parameters.json',
                'test_trunk_grower.h5',
                None)
+    _test_full('radial_distances',
+               'bio_trunk_distribution.json',
+               'trunk_parameters.json',
+               'test_trunk_grower.h5',
+               None,
+               rng_or_seed=build_random_generator(0))
+
+
+def test_basic_grower_with_generator():
+    distributions, params = _load_inputs(
+      join(_path, 'bio_trunk_distribution.json'),
+      join(_path, 'trunk_parameters.json'),
+    )
+    expected_pts = [
+        [-0.7312348484992981, 7.604228973388672, 11.173797607421875],
+        [-13.377432823181152, -1.2863954305648804, 2.9336819648742676],
+        [11.861421585083008, -0.049414388835430145, 6.1279988288879395],
+        [-2.3804218769073486, 12.54181957244873, 1.118072748184204],
+    ]
+
+    rng = np.random.default_rng(0)
+    rng_or_seeds = [0, rng]
+
+    for rng_or_seed in rng_or_seeds:
+        n = NeuronGrower(
+            input_distributions=distributions,
+            input_parameters=params,
+            rng_or_seed=rng_or_seed,
+        ).grow()
+        assert len(n.root_sections) == 4
+        assert_array_almost_equal(
+            [i.points[-1].tolist() for i in n.root_sections],
+            expected_pts,
+        )
+
+    assert_raises(TypeError, NeuronGrower, params, distributions, rng_or_seed="NOT A SEED")
+
 
 def test_path_grower():
     '''test tmd_path and tmd_apical_path'''
@@ -236,6 +334,13 @@ def test_path_grower():
                'bio_path_params.json',
                'path_grower.h5',
                'bio_path_persistence_diagram.json')
+    _test_full('path_distances',
+               'bio_distribution.json',
+               'bio_path_params.json',
+               'path_grower.h5',
+               'bio_path_persistence_diagram.json',
+               rng_or_seed=build_random_generator(0))
+
 
 def test_gradient_path_grower():
     '''test tmd_path'''
@@ -244,6 +349,12 @@ def test_gradient_path_grower():
               'bio_gradient_path_params.json',
               'gradient_path_grower.h5',
               'gradient_path_persistence_diagram.json')
+    _test_full('path_distances',
+              'bio_distribution.json',
+              'bio_gradient_path_params.json',
+              'gradient_path_grower.h5',
+              'gradient_path_persistence_diagram.json',
+               rng_or_seed=build_random_generator(0))
 
 
 def test_bio_rat_l5_tpc():
@@ -252,21 +363,45 @@ def test_bio_rat_l5_tpc():
                'params1.json',
                'expected_bio_rat_L5_TPC_B_with_params1.h5',
                'expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json')
+    _test_full('path_distances',
+               'bio_rat_L5_TPC_B.json',
+               'params1.json',
+               'expected_bio_rat_L5_TPC_B_with_params1.h5',
+               'expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json',
+               rng_or_seed=build_random_generator(0))
 
     _test_full('path_distances',
                'bio_rat_L5_TPC_B.json',
                'params2.json',
                'expected_bio_rat_L5_TPC_B_with_params2.h5',
                'expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json')
+    _test_full('path_distances',
+               'bio_rat_L5_TPC_B.json',
+               'params2.json',
+               'expected_bio_rat_L5_TPC_B_with_params2.h5',
+               'expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json',
+               rng_or_seed=build_random_generator(0))
 
     _test_full('path_distances',
                'bio_rat_L5_TPC_B.json',
                'params3.json',
                'expected_bio_rat_L5_TPC_B_with_params3.h5',
                'expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json')
+    _test_full('path_distances',
+               'bio_rat_L5_TPC_B.json',
+               'params3.json',
+               'expected_bio_rat_L5_TPC_B_with_params3.h5',
+               'expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json',
+               rng_or_seed=build_random_generator(0))
 
     _test_full('path_distances',
                'bio_rat_L5_TPC_B.json',
                'params4.json',
                'expected_bio_rat_L5_TPC_B_with_params4.h5',
                'expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json')
+    _test_full('path_distances',
+               'bio_rat_L5_TPC_B.json',
+               'params4.json',
+               'expected_bio_rat_L5_TPC_B_with_params4.h5',
+               'expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json',
+               rng_or_seed=build_random_generator(0))

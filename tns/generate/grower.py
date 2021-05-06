@@ -5,12 +5,13 @@ import copy
 import logging
 
 import numpy as np
+from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 
 from morphio.mut import Morphology  # pylint: disable=import-error
-from tns.generate.soma import SomaGrower
-from tns.morphmath import sample
-from tns.generate.tree import TreeGrower
 from tns.generate import diametrizer
+from tns.generate.soma import SomaGrower
+from tns.generate.tree import TreeGrower
+from tns.morphmath import sample
 from tns.validator import validate_neuron_params, validate_neuron_distribs
 
 L = logging.getLogger(__name__)
@@ -26,16 +27,31 @@ class NeuronGrower:
     """
 
     def __init__(self, input_parameters, input_distributions,
-                 context=None, external_diametrizer=None, skip_validation=False):
+                 context=None, external_diametrizer=None, skip_validation=False,
+                 rng_or_seed=np.random):
         """TNS NeuronGrower
         input_parameters: the user-defined parameters
         input_distributions: distributions extracted from biological data
         context: an object containing contextual information
         external_diametrizer: diametrizer function for external diametrizer module
         skip_validation: if set to False, the parameters and distributions are validated
+        rng_or_seed: should be a `numpy.random.Generator` or an object that can be used as a seed
+        for the `numpy.random.default_rng()` function.
         """
         self.neuron = Morphology()
         self.context = context
+        if rng_or_seed is None or isinstance(
+            rng_or_seed,
+            (int, np.integer, SeedSequence, BitGenerator)
+        ):
+            self._rng = np.random.default_rng(rng_or_seed)
+        elif isinstance(rng_or_seed, (RandomState, Generator)) or rng_or_seed is np.random:
+            self._rng = rng_or_seed
+        else:
+            raise TypeError(
+                "The 'rng_or_seed' argument must be None, np.random or an instance of one of the "
+                "following types: [int, SeedSequence, BitGenerator, RandomState, Generator]."
+            )
 
         self.input_parameters = copy.deepcopy(input_parameters)
         L.debug('Input Parameters: %s', input_parameters)
@@ -69,8 +85,8 @@ class NeuronGrower:
         # and initial points on the soma surface will be initialized.
         self.active_neurites = list()
         self.soma = SomaGrower(initial_point=self.input_parameters["origin"],
-                               radius=sample.soma_size(self.input_distributions),
-                               context=context)
+                               radius=sample.soma_size(self.input_distributions, self._rng),
+                               context=context, random_generator=self._rng)
         # Create a list to expose apical sections for each apical tree in the neuron,
         # the user can call NeuronGrower.apical_sections to get section IDs whose the last
         # point is the apical point of each generated apical tree.
@@ -141,8 +157,8 @@ class NeuronGrower:
                 if neurite_types is None:
                     neurite_types = self.input_parameters['grow_types']
                 diametrizer.build(self.neuron, self.input_distributions['diameter'],
-                                  neurite_types=neurite_types,
-                                  diam_method=diam_method)
+                                  neurite_types=neurite_types, diam_method=diam_method,
+                                  random_generator=self._rng)
             self._diametrize = _diametrize
 
     def _convert_orientation2points(self, orientation, n_trees, distr, params):
@@ -159,8 +175,8 @@ class NeuronGrower:
             if params.get('trunk_absolute_orientation', False):
                 if len(orientation) == 1:
                     # Pick random absolute angles
-                    trunk_absolute_angles = sample.trunk_absolute_angles(distr, n_trees)
-                    z_angles = sample.azimuth_angles(distr, n_trees)
+                    trunk_absolute_angles = sample.trunk_absolute_angles(distr, n_trees, self._rng)
+                    z_angles = sample.azimuth_angles(distr, n_trees, self._rng)
                     pts = self.soma.add_points_from_trunk_absolute_orientation(
                         orientation, trunk_absolute_angles, z_angles)
                 else:
@@ -172,8 +188,8 @@ class NeuronGrower:
                 else:
                     raise ValueError('Not enough orientation points!')
         elif orientation is None:  # Samples from trunk_angles
-            trunk_angles = sample.trunk_angles(distr, n_trees)
-            trunk_z = sample.azimuth_angles(distr, n_trees)
+            trunk_angles = sample.trunk_angles(distr, n_trees, self._rng)
+            trunk_z = sample.azimuth_angles(distr, n_trees, self._rng)
             pts = self.soma.add_points_from_trunk_angles(trunk_angles, trunk_z)
         elif orientation == 'from_space':
             raise ValueError('Not implemented yet!')
@@ -195,7 +211,7 @@ class NeuronGrower:
             distr = self.input_distributions[type_of_tree]
 
             # Sample the number of trees depending on the tree type
-            n_trees = sample.n_neurites(distr["num_trees"])
+            n_trees = sample.n_neurites(distr["num_trees"], self._rng)
             if type_of_tree == 'basal' and n_trees < 2:
                 raise Exception('There should be at least 2 basal dendrites (got {})'.format(
                     n_trees))
@@ -213,7 +229,8 @@ class NeuronGrower:
                                  initial_point=p,
                                  parameters=params,
                                  distributions=distr,
-                                 context=self.context)
+                                 context=self.context,
+                                 random_generator=self._rng)
                 self.active_neurites.append(obj)
 
     def _grow_soma(self, soma_type='contour'):

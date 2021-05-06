@@ -19,7 +19,7 @@ L = logging.getLogger(__name__)
 class TMDAlgo(AbstractAlgo):
     """TreeGrower of TMD basic growth"""
 
-    def __init__(self, input_data, params, start_point, context=None):
+    def __init__(self, input_data, params, start_point, context=None, random_generator=np.random, **_):
         """
         TMD basic grower
         input_data: saves all the data required for the growth
@@ -30,7 +30,7 @@ class TMDAlgo(AbstractAlgo):
         super(TMDAlgo, self).__init__(input_data, params, start_point, context)
         self.bif_method = bif_methods[params["branching_method"]]
         self.params = copy.deepcopy(params)
-        self.ph_angles = self.select_persistence(input_data)
+        self.ph_angles = self.select_persistence(input_data, random_generator)
         # Consistency check between parameters - persistence diagram
         barSZ = np.min(get_lengths(self.ph_angles))
         stepSZ = self.params['step_size']['norm']['mean']
@@ -42,12 +42,12 @@ class TMDAlgo(AbstractAlgo):
         self.apical_point_distance_from_soma = 0.0
         self.persistence_length = self.barcode.get_persistence_length()
 
-    def select_persistence(self, input_data):
+    def select_persistence(self, input_data, random_generator=np.random):
         """Samples one persistence diagram from a list of diagrams
            and modifies according to input parameters.
         """
         list_of_persistences = input_data["persistence_diagram"]
-        persistence = sample.ph(list_of_persistences)
+        persistence = sample.ph(list_of_persistences, random_generator)
 
         if self.params.get('modify'):
             persistence = self.params['modify']['funct'](persistence,

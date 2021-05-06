@@ -339,7 +339,7 @@ class SpaceColonization(TMDAlgo):
             - Seeds point cloud
             - Space colonization parameters (kill and influence distance)
     """
-    def select_persistence(self, input_data):
+    def select_persistence(self, input_data, random_generator=np.random):
         """Selects randomly from the barcodes the max radial of which
         is greater or equal to the distance from the soma to the domain
         face.
@@ -350,12 +350,14 @@ class SpaceColonization(TMDAlgo):
             Barcode: The topology barcode
         """
         if 'distance_to_domain' not in self.params:
-            return super().select_persistence(input_data)
+            return super().select_persistence(input_data, random_generator)
 
         target_distance = self.params['distance_to_domain']
 
         persistence = sample.ph(barcodes_greater_than_distance(
-            input_data['persistence_diagram'], target_distance))
+            input_data['persistence_diagram'], target_distance),
+            random_generator,
+        )
 
         if self.params['barcode_scaling']:
             persistence = scale_barcode(persistence, target_distance)
@@ -384,7 +386,7 @@ class SpaceColonizationTarget(SpaceColonization):
     """ A target is specified fot this algorithm. The tree grows biased from the
     target and when it reaches it, it stops being influenced by the point.
     """
-    def select_persistence(self, input_data):
+    def select_persistence(self, input_data, random_generator=np.random):
         """Selects randomly from the barcodes the max radial of which
         is greater or equal to the distance from the soma to the target.
 
@@ -396,7 +398,9 @@ class SpaceColonizationTarget(SpaceColonization):
         target_distance = self.params['distance_soma_target']
 
         persistence = sample.ph(barcodes_greater_than_distance(
-            input_data['persistence_diagram'], target_distance))
+            input_data['persistence_diagram'], target_distance),
+            random_generator,
+        )
 
         if self.params['barcode_scaling']:
             persistence = scale_barcode(persistence, target_distance)

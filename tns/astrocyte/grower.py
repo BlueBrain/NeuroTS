@@ -21,11 +21,11 @@ from tns.astrocyte.math_utils import norm as vectorial_norm
 L = logging.getLogger(__name__)
 
 
-def _number_of_trees(tree_type, orientations, distributions):
+def _number_of_trees(tree_type, orientations, distributions, random_generator=np.random):
     """ Sample the number of trees depending on the tree type if no predef orientations
     """
     if orientations is None:
-        n_trees = sample.n_neurites(distributions["num_trees"])
+        n_trees = sample.n_neurites(distributions["num_trees"], random_generator)
     else:
         n_trees = len(orientations)
 
@@ -75,11 +75,17 @@ class AstrocyteGrower(NeuronGrower):
     as a morphIO Morphology object. A set of input distributions that store the data
     consumed by the algorithms and the user-selected parameters are also stored.
     """
-    def __init__(self, input_parameters, input_distributions, context, external_diametrizer=None):
+
+    def __init__(self, input_parameters, input_distributions,
+                 context, external_diametrizer=None, skip_validation=False,
+                 rng_or_seed=np.random):
         super().__init__(
             input_parameters, input_distributions,
             context=SpaceColonizationContext(context),
-            external_diametrizer=external_diametrizer)
+            external_diametrizer=external_diametrizer,
+            skip_validation=skip_validation,
+            rng_or_seed=rng_or_seed,
+        )
 
     def validate_params(self):
         """Astrocyte parameter validation"""
@@ -103,7 +109,8 @@ class AstrocyteGrower(NeuronGrower):
                          initial_point=initial_soma_point,
                          parameters=parameters,
                          distributions=distributions,
-                         context=self.context)
+                         context=self.context,
+                         random_generator=self._rng)
 
         self.active_neurites.append(obj)
 
@@ -116,8 +123,8 @@ class AstrocyteGrower(NeuronGrower):
         '''
         if orientations is None:
             assert n_trees != 0, "Number of trees should be greater than zero"
-            trunk_angles = sample.trunk_angles(distr, n_trees)
-            trunk_z = sample.azimuth_angles(distr, n_trees)
+            trunk_angles = sample.trunk_angles(distr, n_trees, self._rng)
+            trunk_z = sample.azimuth_angles(distr, n_trees, self._rng)
             return self.soma.add_points_from_trunk_angles(trunk_angles, trunk_z)
 
         assert len(orientations) >= n_trees, "n_orientations < n_trees"
@@ -169,7 +176,7 @@ class AstrocyteGrower(NeuronGrower):
 
             trunk_points = self._orientations_to_points(
                 orientations,
-                _number_of_trees(tree_type, orientations, distributions),
+                _number_of_trees(tree_type, orientations, distributions, self._rng),
                 distributions)
 
             for i, trunk_point in enumerate(trunk_points):
