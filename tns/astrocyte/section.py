@@ -114,7 +114,7 @@ class SectionSpatialGrower(SectionGrowerPath):
         if pcloud_direction is not None:
             return pcloud_direction
 
-        return get_random_point()
+        return get_random_point(random_generator=self._rng)
 
     def next_direction(self, current_point):
         '''Given a starting point, find the new direction taking into account

@@ -193,23 +193,36 @@ def _context():
     }
 
 
-def _astrocyte_grower():
+def _global_rng():
+    np.random.seed(0)
+    return np.random
+
+
+def _legacy_rng():
+    mt = np.random.MT19937()
+    mt._legacy_seeding(0)  # Use legacy seeding to get the same result as with np.random.seed()
+    return np.random.RandomState(mt)
+
+
+def test_grow__run():
+    from numpy.random import MT19937
+    from numpy.random import RandomState
 
     parameters = _parameters()
     distributions = _distributions()
 
     context = _context()
 
-    return AstrocyteGrower(
-        input_distributions=distributions,
-        input_parameters=parameters,
-        context=context)
+    for rng in [_global_rng(), _legacy_rng()]:
 
-def test_grow__run():
+        print("RNG: ", rng)
 
-    np.random.seed(0)
+        astro_grower = AstrocyteGrower(
+            input_distributions=distributions,
+            input_parameters=parameters,
+            context=context,
+            rng_or_seed=rng)
 
-    astro_grower = _astrocyte_grower()
-    astro_grower.grow()
-    difference = diff(astro_grower.neuron, _path / 'astrocyte.h5', atol=0.001)
-    assert not difference, difference.info
+        astro_grower.grow()
+        difference = diff(astro_grower.neuron, _path / 'astrocyte.h5', atol=0.001)
+        assert not difference, difference.info
