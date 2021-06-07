@@ -5,6 +5,7 @@ from itertools import chain
 import numpy as np
 from neurom import get
 from neurom.core.neuron import Section, iter_neurites
+from neurom.core.population import Population
 from neurom.core.types import tree_type_checker as is_type
 from neurom.morphmath import segment_length, segment_radius
 
@@ -55,6 +56,11 @@ def model(input_object):
        Input can be a population of neurons, or a single neuron.
     """
     values = {}
+
+    if isinstance(input_object, Population):
+        # If the population only contains the filenames instead of the actual morphologies,
+        # we have to ensure they are all loaded before working on them.
+        input_object = Population(list(input_object.neurons))
 
     for neurite_type in set(tree.type for tree in input_object.neurites):
 

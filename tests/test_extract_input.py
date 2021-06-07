@@ -158,23 +158,24 @@ def test_number_neurites():
     )
 
     pop_cut = load_neurons(POP_PATH)
-    if len(pop_cut.neurons[0].neurites) > len(pop_cut.neurons[1].neurites):
+    neurons = [neuron for neuron in pop_cut.neurons]
+    if len(neurons[0].neurites) > len(neurons[1].neurites):
         smallest = 1
         biggest = 0
     else:
         smallest = 0
         biggest = 1
 
-    for i in list(range(2, len(pop_cut.neurons[biggest].root_sections) - 1))[::-1]:
-        pop_cut.neurons[biggest].delete_section(
-            pop_cut.neurons[biggest].root_sections[i], recursive=True
+    for i in list(range(2, len(neurons[biggest].root_sections) - 1))[::-1]:
+        neurons[biggest].delete_section(
+            neurons[biggest].root_sections[i], recursive=True
         )
 
-    pop_cut.neurites = [j for i in pop_cut.neurons for j in i.neurites]
-    assert_equal(len(pop_cut.neurons), 2)
-    assert_equal(len(pop_cut.neurons[biggest].neurites), 3)
-    assert_equal(len(pop_cut.neurons[smallest].neurites), 6)
-    assert_equal(len(pop_cut.neurites), 9)
+    pop_cut = neurom.core.population.Population(neurons)
+    assert_equal(len(neurons), 2)
+    assert_equal(len(neurons[biggest].neurites), 3)
+    assert_equal(len(neurons[smallest].neurites), 6)
+    assert_equal(len([i for i in pop_cut.neurites]), 9)
     res_cut = extract_input.from_neurom.number_neurites(pop_cut)
     assert_equal(
         res_cut,
