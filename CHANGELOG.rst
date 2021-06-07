@@ -1,6 +1,38 @@
 Changelog
 =========
 
+Version 2.4.4
+-------------
+
+Improvements
+~~~~~~~~~~~~
+
+- Update NeuroM requirements
+
+Version 2.4.3
+-------------
+
+New Features
+~~~~~~~~~~~~
+
+- Make astrocyte grower RandomState rng consistent with global
+
+Version 2.4.2
+-------------
+
+New Features
+~~~~~~~~~~~~
+
+- Use an instance of a numpy random generator instead of global numpy.random
+
+Version 2.4.1
+-------------
+
+Improvements
+~~~~~~~~~~~~
+
+- Improve JSON schemas and add them in the documentation
+
 Version 2.4.0
 -------------
 
