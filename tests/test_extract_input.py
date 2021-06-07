@@ -103,6 +103,60 @@ def test_diameter_extract():
     assert_raises(TNSError, extract_input.from_diameter.model,
                   load_neurons(os.path.join(_PATH, 'simple.swc')))
 
+    # Test on Population
+    res = extract_input.from_diameter.model(POPUL)
+    assert_equal(set(res.keys()), {'axon', 'basal', 'apical'})
+    expected = {
+        'basal': {
+            'Rall_ratio': 1.5,
+            'siblings_ratio': 1.0,
+            'taper': [
+                0.003361, 0.009487, 0.009931, 0.016477,
+                0.023878, 0.024852, 0.027809, 0.027975
+            ],
+            'term': [0.3] * 8,
+            'trunk': [0.6 , 0.6 , 0.72, 0.84, 1.2 , 1.5 , 1.8 , 2.4],
+            'trunk_taper': [
+                0, 3.036411e-02, 3.053287e-02, 5.059035e-02,
+                1.168936e-01, 1.172027e-01, 0.15, 2.121002e-01
+            ]
+        },
+        'apical': {
+            'Rall_ratio': 1.5,
+            'siblings_ratio': 1.0,
+            'taper': [
+                0.010331, 0.02135 , 0.02264 , 0.033914,
+                0.035313, 0.041116, 0.055751, 0.056211
+            ],
+            'term': [0.3] * 8,
+            'trunk': [1.57, 7.51],
+            'trunk_taper': [0.05324615, 0.65223652]
+        },
+        'axon': {
+            'Rall_ratio': 1.5,
+            'siblings_ratio': 1.0,
+            'taper': [
+                0.04079 , 0.055286, 0.092382, 0.099524,
+                0.11986 , 0.140346, 0.214172, 0.407058
+            ],
+            'term': [0.12] * 8,
+            'trunk': [2.1, 3.0],
+            'trunk_taper': [0.0435508, 0.0717109]
+        }
+    }
+
+    for neurite_type in ['basal', 'apical', 'axon']:
+        for key in expected[neurite_type].keys():
+            try:
+                assert_equal(res[neurite_type].keys(), expected[neurite_type].keys())
+                if key in ['taper', 'term', 'trunk', 'trunk_taper']:
+                    tested = sorted(res[neurite_type][key])[:8]
+                else:
+                    tested = res[neurite_type][key]
+                assert_array_almost_equal(tested, expected[neurite_type][key])
+            except AssertionError:
+                raise AssertionError(f"Failed for res[{neurite_type}][{key}]")
+
 
 def test_distributions():
     filename = os.path.join(_PATH, 'bio/')

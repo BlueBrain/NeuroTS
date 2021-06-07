@@ -1,12 +1,10 @@
 ''' Module to extract morphometrics about diameters of cells.'''
-
+from collections import defaultdict
 from itertools import chain
 
 import numpy as np
 from neurom import get
 from neurom.core.neuron import Section, iter_neurites
-from neurom.core.population import Population
-from neurom.core.types import tree_type_checker as is_type
 from neurom.morphmath import segment_length, segment_radius
 
 from tns.morphio_utils import NEUROM_TYPE_TO_STR
@@ -57,29 +55,30 @@ def model(input_object):
     """
     values = {}
 
-    if isinstance(input_object, Population):
-        # If the population only contains the filenames instead of the actual morphologies,
-        # we have to ensure they are all loaded before working on them.
-        input_object = Population(list(input_object.neurons))
+    tapers = defaultdict(list)
+    trunk_tapers = defaultdict(list)
+    term_diams = defaultdict(list)
+    trunk_diams = defaultdict(list)
 
-    for neurite_type in set(tree.type for tree in input_object.neurites):
+    for neurite in iter_neurites(input_object):
+        tapers[neurite.type].append(section_taper(neurite))
+        trunk_tapers[neurite.type].append(section_trunk_taper(neurite))
+        term_diams[neurite.type].append(terminal_diam(neurite))
+        trunk_diams[neurite.type].append(2. * np.max(get('segment_radii', neurite)))
 
-        neurites = list(iter_neurites(input_object, filt=is_type(neurite_type)))
+    for neurite_type in tapers:
+        key = NEUROM_TYPE_TO_STR[neurite_type]
 
-        taper = [section_taper(tree) for tree in neurites]
-        trunk_taper = np.array([section_trunk_taper(tree) for tree in neurites])
-        taper_c = np.array(list(chain(*taper)))
+        taper_c = np.array(list(chain(*tapers[neurite_type])))
+        trunk_taper = np.array(trunk_tapers[neurite_type])
+
         # Keep only positive, non-zero taper rates
         taper_c = taper_c[np.where(taper_c > 0.00001)[0]]
         trunk_taper = trunk_taper[np.where(trunk_taper >= 0.0)[0]]
-        term_diam = [terminal_diam(tree) for tree in neurites]
-        trunk_diam = [2. * np.max(get('segment_radii', tree)) for tree in neurites]
-
-        key = NEUROM_TYPE_TO_STR[neurite_type]
 
         values[key] = {"taper": taper_c,
-                       "term": list(chain(*term_diam)),
-                       "trunk": trunk_diam,
+                       "term": list(chain(*term_diams[neurite_type])),
+                       "trunk": trunk_diams[neurite_type],
                        "trunk_taper": trunk_taper}
 
         _check(values[key])
