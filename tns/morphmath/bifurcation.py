@@ -5,14 +5,14 @@ import tns.morphmath.rotation as rt
 from tns.morphmath.utils import get_random_point
 
 
-def random():
+def random(random_generator=np.random):
     '''
     Get 3-d coordinates of a new random point.
     The distance between the produced point and (0,0,0)
     is given by the value D.
     '''
-    dir1 = get_random_point()
-    dir2 = get_random_point()
+    dir1 = get_random_point(random_generator=random_generator)
+    dir2 = get_random_point(random_generator=random_generator)
 
     return (np.array(dir1), np.array(dir2))
 
