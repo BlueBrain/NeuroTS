@@ -1,7 +1,6 @@
 {
     "apical": {},
     "basal": {
-        "filtration_metric": "trunk_length",
         "num_trees": {
             "data": {
                 "bins": [
@@ -36,11 +35,20 @@
                         2
                     ]
                 }
+            },
+            "absolute_elevation_deviation": {
+                "data": {
+                    "bins": [
+                        0
+                    ],
+                    "weights": [
+                        1
+                    ]
+                }
             }
         }
     },
     "axon": {
-        "filtration_metric": "trunk_length",
         "num_trees": {
             "data": {
                 "bins": [
@@ -100,5 +108,7 @@
             }
         }
     },
-"diameter": {"method": "default"}
+    "diameter": {
+        "method": "default"
+    }
 }

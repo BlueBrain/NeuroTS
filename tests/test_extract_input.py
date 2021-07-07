@@ -230,6 +230,28 @@ class TestDistributions:
         distr = extract_input.distributions(filename, feature="path_distances")
         assert_equal(distr["basal"]["filtration_metric"], "path_distances")
 
+    def test_trunk_length(self, filename):
+        distr = extract_input.distributions(filename, feature="trunk_length")
+        assert "persistence_diagram" not in distr["basal"]
+        assert "filtration_metric" not in distr["basal"]
+
+    def test_different_features(self, filename):
+        # Test with different features for each neurite type
+        distr = extract_input.distributions(
+            filename,
+            feature={
+                "apical": "radial_distances",
+                "basal": "trunk_length",
+                "axon": "path_distances",
+            },
+        )
+        assert "filtration_metric" not in distr["basal"]
+        assert distr["apical"]["filtration_metric"] == "radial_distances"
+        assert distr["axon"]["filtration_metric"] == "path_distances"
+        assert "persistence_diagram" not in distr["basal"]
+        assert "persistence_diagram" in distr["apical"]
+        assert "persistence_diagram" in distr["axon"]
+
     def test_diameter_model_none(self, filename):
         distr = extract_input.distributions(
             filename,

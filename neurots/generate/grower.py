@@ -81,7 +81,7 @@ class NeuronGrower:
         for tree_type in self.input_parameters["grow_types"]:
             metric1 = self.input_parameters[tree_type].get("metric")
             metric2 = self.input_distributions[tree_type].get("filtration_metric")
-            if metric1 != metric2:
+            if metric1 not in ["trunk_length", metric2]:
                 raise ValueError(
                     "Metric of parameters and distributions is inconsistent:"
                     + " {} != {}".format(metric1, metric2)

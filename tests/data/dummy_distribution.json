@@ -395,6 +395,16 @@
                         0
                     ]
                 }
+            },
+            "absolute_elevation_deviation": {
+                "data": {
+                    "bins": [
+                        0
+                    ],
+                    "weights": [
+                        1
+                    ]
+                }
             }
         }
     },
@@ -865,6 +875,16 @@
                         2
                     ]
                 }
+            },
+            "absolute_elevation_deviation": {
+                "data": {
+                    "bins": [
+                        0
+                    ],
+                    "weights": [
+                        1
+                    ]
+                }
             }
         }
     },
@@ -876,5 +896,7 @@
             }
         }
     },
-"diameter": {"method": "default"}
+    "diameter": {
+        "method": "default"
+    }
 }

@@ -6,7 +6,6 @@ import json
 from pathlib import Path
 
 import pytest
-from jsonschema.exceptions import ValidationError
 
 import neurots.validator as tested
 
@@ -54,12 +53,12 @@ class TestValidateParams:
             "method": "default",
             "other key": "any value",
         }
-        with pytest.raises(ValidationError):
+        with pytest.raises(tested.ValidationError):
             tested.validate_neuron_params(dummy_params)
 
     def test_M1_diameter_unknown_key(self, dummy_params):
         dummy_params["diameter_params"] = {"method": "M1", "other key": "any value"}
-        with pytest.raises(ValidationError):
+        with pytest.raises(tested.ValidationError):
             tested.validate_neuron_params(dummy_params)
 
     def test_external_diameter(self, dummy_params):
@@ -77,7 +76,7 @@ class TestValidateParams:
     def test_orientation(self, dummy_params):
         # It must be a list of vectors, not a single one
         dummy_params["apical"]["orientation"] = [0, 0, 0]
-        with pytest.raises(ValidationError):
+        with pytest.raises(tested.ValidationError):
             tested.validate_neuron_params(dummy_params)
 
     def test_unknown_root_key(self, dummy_params):
@@ -95,7 +94,7 @@ def test_empty_params_raises():
         "grow_types": [],
         "origin": [0.0, 0.0, 0.0],
     }
-    with pytest.raises(ValidationError):
+    with pytest.raises(tested.ValidationError):
         tested.validate_neuron_params(data)
 
 

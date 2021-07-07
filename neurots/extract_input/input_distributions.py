@@ -38,13 +38,15 @@ def distributions(
         filepath: the morphology file.
         neurite_types: the neurite types to consider.
         threshold_sec: defines the minimum accepted number of terminations.
-        diameter_input_morph: if input set of morphologies is provided,
-            it will be used for the generation of diameter model, if no input is provided no
-            diameter model will be generated.
-        feature: defines the TMD feature that will be used to extract the
-            persistence barcode: radial_distances, path_distances.
-        diameter_model: model for diameters, internal models are `M1`, `M2`, `M3`, `M4`, `M5`,
-            set it to `external` for external model.
+        diameter_input_morph: if input set of morphologies is provided it will be used for the
+            generation of diameter model, if no input is provided no diameter model will be
+            generated.
+        feature: defines the TMD feature that will be used to extract the persistence barcode (can
+            be `radial_distances`, `path_distances` or `trunk_length`). It is also possible to
+            define one different feature per neurite type using a dict like
+            ``{<neurite type 1>: <feature 1>, ...}``.
+        diameter_model: model for diameters, internal models are `M1`, `M2`, `M3`, `M4`, `M5`, set
+            it to `external` for external model.
     """
     pop_tmd = tmd.io.load_population(filepath)
     pop_nm = load_morphologies(filepath)
@@ -70,16 +72,24 @@ def distributions(
         L.warning("No valid diameter model provided, so we will not generate a distribution.")
 
     for neurite_type in neurite_types:
+        if isinstance(feature, str):
+            type_feature = feature
+        else:
+            type_feature = feature.get(neurite_type, "path_distances")
         nm_type = STR_TO_NEUROM_TYPES[neurite_type]
         input_distributions[neurite_type] = _append_dicts(
             trunk_neurite(pop_nm, nm_type),
             number_neurites(pop_nm, nm_type),
-            persistent_homology_angles(
-                pop_tmd,
-                threshold=threshold_sec,
-                neurite_type=neurite_type,
-                feature=feature,
-            ),
-            {"filtration_metric": feature},
         )
+        if type_feature in ["path_distances", "radial_distances"]:
+            _append_dicts(
+                input_distributions[neurite_type],
+                persistent_homology_angles(
+                    pop_tmd,
+                    threshold=threshold_sec,
+                    neurite_type=neurite_type,
+                    feature=type_feature,
+                ),
+                {"filtration_metric": type_feature},
+            )
     return input_distributions

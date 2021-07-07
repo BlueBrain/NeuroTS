@@ -109,14 +109,8 @@ def trunk_angles(distrib, N, random_generator=np.random):
 
 def trunk_absolute_angles(distrib, N, random_generator=np.random):
     """Return N absolute angles, depending on the input distribution."""
-    elevation = distrib.get("trunk", {}).get("absolute_elevation_deviation", None)
-    if elevation is None:
-        raise KeyError(
-            "No elevation distribution found in parameters['trunk']"
-            "['absolute_elevation_deviation']."
-        )
-    trunks_d_theta = Distr(elevation, random_generator)
-    return [trunks_d_theta.draw() for _ in range(N)]
+    trunks_d = Distr(distrib["trunk"]["absolute_elevation_deviation"], random_generator)
+    return [trunks_d.draw() for _ in range(N)]
 
 
 def azimuth_angles(distrib, N, random_generator=np.random):

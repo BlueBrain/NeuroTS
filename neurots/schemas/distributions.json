@@ -24,9 +24,11 @@
                             "type": "array"
                         }
                     },
+                    "required": ["bins", "weights"],
                     "type": "object"
                 }
             },
+            "required": ["data"],
             "title": "Data distribution",
             "type": "object"
         },
@@ -93,6 +95,11 @@
                             "description": "The data distribution used for the orientation deviation"
                         }
                     },
+                    "required": [
+                        "absolute_elevation_deviation",
+                        "azimuth",
+                        "orientation_deviation"
+                    ],
                     "type": "object"
                 }
             },

@@ -24,10 +24,7 @@ def test_json_schema():
                         "data": {
                             "type": "object",
                             "additionalProperties": False,
-                            "properties": {
-                                "bins": {"type": "array"},
-                                "weights": {"type": "array"},
-                            },
+                            "properties": {"bins": {"type": "array"}, "weights": {"type": "array"}},
                         }
                     },
                 },
@@ -40,6 +37,7 @@ def test_json_schema():
                             "additionalProperties": False,
                             "properties": {
                                 "orientation_deviation": {"$ref": "#/definitions/histogram"},
+                                "absolute_elevation_deviation": {"$ref": "#/definitions/histogram"},
                                 "azimuth": {"$ref": "#/definitions/uniform_distrib"},
                             },
                         },

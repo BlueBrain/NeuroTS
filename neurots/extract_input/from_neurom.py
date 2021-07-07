@@ -52,13 +52,13 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30):
     return {
         "trunk": {
             "orientation_deviation": {
-                "data": {"bins": actual_angle_bins, "weights": angle_heights}
+                "data": {"bins": actual_angle_bins.tolist(), "weights": angle_heights.tolist()}
             },
             "azimuth": {"uniform": {"min": np.pi, "max": 0.0}},
             "absolute_elevation_deviation": {
                 "data": {
-                    "bins": actual_elevation_bins,
-                    "weights": elevation_heights,
+                    "bins": actual_elevation_bins.tolist(),
+                    "weights": elevation_heights.tolist(),
                 }
             },
         }
