@@ -5,10 +5,10 @@ from collections import namedtuple
 import numpy as np
 
 from tns.generate.section import SectionGrowerPath
-from tns.astrocyte.math_utils import normalize_inplace
-from tns.astrocyte.math_utils import in_squared_proximity
+from tns.morphmath.utils import normalize_inplace
+from tns.morphmath.utils import in_squared_proximity
 from tns.morphmath.utils import get_random_point
-from tns.astrocyte.math_utils import from_to_direction
+from tns.morphmath.utils import from_to_direction
 
 
 L = logging.getLogger(__name__)

@@ -56,16 +56,18 @@ def _test_full(
     ref_persistence_diagram,
     save=False,
     rng_or_seed=None,
+    skip_validation=False
 ):
     distributions, params = _load_inputs(join(_path, distributions), join(_path, parameters))
     if rng_or_seed is None:
         np.random.seed(0)
-        n = NeuronGrower(input_distributions=distributions, input_parameters=params).grow()
+        n = NeuronGrower(input_distributions=distributions, input_parameters=params, skip_validation=skip_validation).grow()
     else:
         n = NeuronGrower(
             input_distributions=distributions,
             input_parameters=params,
             rng_or_seed=rng_or_seed,
+            skip_validation=skip_validation
         ).grow()
 
     with TemporaryDirectory('test_grower') as folder:
@@ -258,6 +260,7 @@ def test_axon_grower():
 
     The num_seg value in the parameters is set to 999 but only 1 segment should be synthesized.
     '''
+
     _test_full('radial_distances',
                'axon_trunk_distribution.json',
                'axon_trunk_parameters.json',
@@ -269,6 +272,19 @@ def test_axon_grower():
                'test_axon_grower.h5',
                None,
                rng_or_seed=build_random_generator(0))
+    _test_full('radial_distances',
+               'axon_trunk_distribution.json',
+               'axon_trunk_parameters_orientation_manager.json',
+               'test_axon_grower.h5',
+               None,
+               skip_validation=True)
+    _test_full('radial_distances',
+               'axon_trunk_distribution.json',
+               'axon_trunk_parameters_orientation_manager.json',
+               'test_axon_grower.h5',
+               None,
+               rng_or_seed=build_random_generator(0),
+               skip_validation=True)
 
     _test_full('radial_distances',
                'axon_trunk_distribution.json',
@@ -281,6 +297,19 @@ def test_axon_grower():
                'test_axon_grower_absolute.h5',
                None,
                rng_or_seed=build_random_generator(0))
+    _test_full('radial_distances',
+               'axon_trunk_distribution.json',
+               'axon_trunk_parameters_absolute_orientation_manager.json',
+               'test_axon_grower_absolute.h5',
+               None,
+               skip_validation=True)
+    _test_full('radial_distances',
+               'axon_trunk_distribution.json',
+               'axon_trunk_parameters_absolute_orientation_manager.json',
+               'test_axon_grower_absolute.h5',
+               None,
+               rng_or_seed=build_random_generator(0),
+               skip_validation=True)
 
 
 def test_basic_grower():
@@ -329,11 +358,13 @@ def test_basic_grower_with_generator():
 
 def test_path_grower():
     '''test tmd_path and tmd_apical_path'''
+
     _test_full('path_distances',
                'bio_distribution.json',
                'bio_path_params.json',
                'path_grower.h5',
                'bio_path_persistence_diagram.json')
+
     _test_full('path_distances',
                'bio_distribution.json',
                'bio_path_params.json',
@@ -341,14 +372,31 @@ def test_path_grower():
                'bio_path_persistence_diagram.json',
                rng_or_seed=build_random_generator(0))
 
+    _test_full('path_distances',
+           'bio_distribution.json',
+           'bio_path_params_orientation_manager.json',
+           'path_grower.h5',
+           'bio_path_persistence_diagram.json',
+           skip_validation=True)
+
+    _test_full('path_distances',
+           'bio_distribution.json',
+           'bio_path_params_orientation_manager.json',
+           'path_grower.h5',
+           'bio_path_persistence_diagram.json',
+           skip_validation=True,
+           rng_or_seed=build_random_generator(0))
+
 
 def test_gradient_path_grower():
     '''test tmd_path'''
+
     _test_full('path_distances',
               'bio_distribution.json',
               'bio_gradient_path_params.json',
               'gradient_path_grower.h5',
               'gradient_path_persistence_diagram.json')
+
     _test_full('path_distances',
               'bio_distribution.json',
               'bio_gradient_path_params.json',
@@ -356,13 +404,29 @@ def test_gradient_path_grower():
               'gradient_path_persistence_diagram.json',
                rng_or_seed=build_random_generator(0))
 
+    _test_full('path_distances',
+              'bio_distribution.json',
+              'bio_gradient_path_params_orientation_manager.json',
+              'gradient_path_grower.h5',
+              'gradient_path_persistence_diagram.json',
+              skip_validation=True)
 
-def test_bio_rat_l5_tpc():
+    _test_full('path_distances',
+              'bio_distribution.json',
+              'bio_gradient_path_params_orientation_manager.json',
+              'gradient_path_grower.h5',
+              'gradient_path_persistence_diagram.json',
+               skip_validation=True,
+               rng_or_seed=build_random_generator(0))
+
+def test_bio_rat_l5_tpc__1():
+
     _test_full('path_distances',
                'bio_rat_L5_TPC_B.json',
                'params1.json',
                'expected_bio_rat_L5_TPC_B_with_params1.h5',
                'expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json')
+
     _test_full('path_distances',
                'bio_rat_L5_TPC_B.json',
                'params1.json',
@@ -372,9 +436,28 @@ def test_bio_rat_l5_tpc():
 
     _test_full('path_distances',
                'bio_rat_L5_TPC_B.json',
+               'params1_orientation_manager.json',
+               'expected_bio_rat_L5_TPC_B_with_params1.h5',
+               'expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json',
+                skip_validation=True)
+
+    _test_full('path_distances',
+               'bio_rat_L5_TPC_B.json',
+               'params1_orientation_manager.json',
+               'expected_bio_rat_L5_TPC_B_with_params1.h5',
+               'expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json',
+               skip_validation=True,
+               rng_or_seed=build_random_generator(0))
+
+
+def test_bio_rat_l5_tpc__2():
+
+    _test_full('path_distances',
+               'bio_rat_L5_TPC_B.json',
                'params2.json',
                'expected_bio_rat_L5_TPC_B_with_params2.h5',
                'expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json')
+
     _test_full('path_distances',
                'bio_rat_L5_TPC_B.json',
                'params2.json',
@@ -384,9 +467,28 @@ def test_bio_rat_l5_tpc():
 
     _test_full('path_distances',
                'bio_rat_L5_TPC_B.json',
+               'params2_orientation_manager.json',
+               'expected_bio_rat_L5_TPC_B_with_params2.h5',
+               'expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json',
+               skip_validation=True)
+
+    _test_full('path_distances',
+               'bio_rat_L5_TPC_B.json',
+               'params2_orientation_manager.json',
+               'expected_bio_rat_L5_TPC_B_with_params2.h5',
+               'expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json',
+               skip_validation=True,
+               rng_or_seed=build_random_generator(0))
+
+
+def test_bio_rat_l5_tpc__3():
+
+    _test_full('path_distances',
+               'bio_rat_L5_TPC_B.json',
                'params3.json',
                'expected_bio_rat_L5_TPC_B_with_params3.h5',
                'expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json')
+
     _test_full('path_distances',
                'bio_rat_L5_TPC_B.json',
                'params3.json',
@@ -396,12 +498,46 @@ def test_bio_rat_l5_tpc():
 
     _test_full('path_distances',
                'bio_rat_L5_TPC_B.json',
+               'params3_orientation_manager.json',
+               'expected_bio_rat_L5_TPC_B_with_params3.h5',
+               'expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json',
+               skip_validation=True)
+
+    _test_full('path_distances',
+               'bio_rat_L5_TPC_B.json',
+               'params3_orientation_manager.json',
+               'expected_bio_rat_L5_TPC_B_with_params3.h5',
+               'expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json',
+               skip_validation=True,
+               rng_or_seed=build_random_generator(0))
+
+
+def test_bio_rat_l5_tpc__4():
+
+    _test_full('path_distances',
+               'bio_rat_L5_TPC_B.json',
                'params4.json',
                'expected_bio_rat_L5_TPC_B_with_params4.h5',
                'expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json')
+
     _test_full('path_distances',
                'bio_rat_L5_TPC_B.json',
                'params4.json',
                'expected_bio_rat_L5_TPC_B_with_params4.h5',
                'expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json',
+               rng_or_seed=build_random_generator(0))
+
+    _test_full('path_distances',
+               'bio_rat_L5_TPC_B.json',
+               'params4_orientation_manager.json',
+               'expected_bio_rat_L5_TPC_B_with_params4.h5',
+               'expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json',
+               skip_validation=True)
+
+    _test_full('path_distances',
+               'bio_rat_L5_TPC_B.json',
+               'params4_orientation_manager.json',
+               'expected_bio_rat_L5_TPC_B_with_params4.h5',
+               'expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json',
+               skip_validation=True,
                rng_or_seed=build_random_generator(0))

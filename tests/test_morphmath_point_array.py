@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import testing as npt
-from tns.astrocyte import point_array as _pa
+from tns.morphmath import point_array as _pa
 
 
 def _create_dynamic_array():

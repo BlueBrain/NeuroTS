@@ -1,0 +1,37 @@
+{"basal": {"metric":"path_distances",
+           "randomness": 0.0,
+           "targeting": 0.2,
+           "radius": 0.3,
+           "orientation": {
+               "mode": "sample_pairwise_angles",
+               "values": {}
+           },
+           "growth_method": "tmd",
+           "branching_method": "bio_oriented",
+           "modify": null,
+           "tree_type": 3,
+           "step_size": {"norm":{"mean":1.0, "std":0.2}}},
+"apical": {"metric":"path_distances",
+           "has_apical_tuft": true,
+           "randomness": 0.0,
+           "targeting": 0.2,
+           "radius": 0.3,
+           "orientation": {
+              "mode": "use_predefined",
+              "values": {
+                  "orientations": [[0.0, 1.0, 0.0]]
+              }
+           },
+           "growth_method": "tmd_gradient",
+           "bias_length": 0.09313119270045161,
+           "bias": 0.5,
+           "branching_method": "directional",
+           "modify": null,
+           "tree_type": 4,
+           "step_size": {"norm":{"mean":1.0, "std":0.2}}},
+"axon": {},
+"origin": [0.0,
+           0.0,
+           0.0],
+"grow_types": ["basal","apical"],
+"diameter_params": {"method": "default"}}

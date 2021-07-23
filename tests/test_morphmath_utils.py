@@ -1,6 +1,7 @@
+
 import numpy as np
 from numpy import testing as npt
-from tns.astrocyte import math_utils as tested
+from tns.morphmath import utils as tested
 
 
 def test_norm():
@@ -71,7 +72,12 @@ def test_ball_query():
     npt.assert_array_equal(ids, [1, 2, 3])
 
 
-def test_ball_query():
+def test_upper_half_ball_query():
+
+    points = np.array([[10., 10., 10.], [11., 11., 11.]])
+    ids = tested.upper_half_ball_query(
+        points, np.zeros(3), 0.1, np.array([1., 0., 0.]))
+    assert ids.size == 0
 
     points = np.array([
         [0., 0., -2.],

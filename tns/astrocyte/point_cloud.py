@@ -3,8 +3,9 @@
 import logging
 
 import numpy as np
-from scipy.spatial import cKDTree
-from tns.astrocyte.math_utils import norm as vectorial_norm
+# TODO: use KDTree when python3.6 is dropped and scipy>=1.6 becomes available
+from scipy.spatial import cKDTree as KDTree
+from tns.morphmath.utils import norm as vectorial_norm
 
 
 L = logging.getLogger(__name__)
@@ -38,7 +39,7 @@ class PointCloud:
             an explicit value is not passed in the method.
     """
     def __init__(self, points):
-        self._tree = cKDTree(np.asarray(points, dtype=np.float32), copy_data=False)
+        self._tree = KDTree(np.asarray(points, dtype=np.float32), copy_data=False)
         self._available = np.ones(len(points), dtype=np.bool)
 
     @property
@@ -68,7 +69,12 @@ class PointCloud:
 
     def ball_query(self, point, radius):
         """ Ball query around point with radius """
-        indices = np.fromiter(self._tree.query_ball_point(point, radius), dtype=np.int)
+        indices = np.fromiter(
+            self._tree.query_ball_point(
+                point, radius, return_sorted=False, return_length=False
+            ),
+            dtype=np.int64
+        )
         return indices[self._available[indices]]
 
     def partial_ball_query(self, point, radius, direction, cap_angle_front, cap_angle_back):

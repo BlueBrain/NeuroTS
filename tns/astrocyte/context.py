@@ -4,7 +4,7 @@ import logging
 import numpy as np
 from scipy.special import logit
 from tns.astrocyte.point_cloud import PointCloud
-from tns.astrocyte.point_array import DynamicPointArray
+from tns.morphmath.point_array import DynamicPointArray
 from tns.utils import TNSError
 
 

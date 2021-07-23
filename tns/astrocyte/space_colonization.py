@@ -8,11 +8,11 @@ from tns.generate.algorithms.tmdgrower import TMDAlgo
 from tns.generate.algorithms.common import section_data
 
 from tns.morphmath.bifurcation import directional
-from tns.astrocyte.math_utils import from_to_direction
-from tns.astrocyte.math_utils import in_squared_proximity
+from tns.morphmath.utils import from_to_direction
+from tns.morphmath.utils import in_squared_proximity
 
-from tns.astrocyte.math_utils import upper_half_ball_query
-from tns.astrocyte.math_utils import norm as vectorial_norm
+from tns.morphmath.utils import upper_half_ball_query
+from tns.morphmath.utils import norm as vectorial_norm
 from tns.astrocyte.tmd_utils import scale_barcode
 from tns.astrocyte.tmd_utils import barcodes_greater_than_distance
 

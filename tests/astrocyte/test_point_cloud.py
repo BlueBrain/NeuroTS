@@ -38,6 +38,10 @@ def test_constructor():
     npt.assert_array_equal(point_cloud.removed_points, np.empty((0, 3)))
 
 
+def _assert_unordered_equal(arr1, arr2):
+    npt.assert_array_equal(np.sort(arr1), np.sort(arr2))
+
+
 def test_ball_query():
 
     point_cloud = create_point_cloud()
@@ -46,7 +50,8 @@ def test_ball_query():
     npt.assert_array_equal(ids, [])
 
     ids = point_cloud.ball_query(np.array([1., 1., 1.]), 2.0)
-    npt.assert_array_equal(ids, [5, 6])
+
+    _assert_unordered_equal(ids, [5, 6])
 
 
 def test_upper_half_ball_query():
@@ -60,7 +65,7 @@ def test_upper_half_ball_query():
     # ball_query will return [0, 1]
     ids = point_cloud.upper_half_ball_query(ref_point, 10.0, direction)
 
-    npt.assert_array_equal(ids, [3, 4, 5])
+    _assert_unordered_equal(ids, [3, 4, 5])
 
 
 def test_partial_ball_query():
@@ -83,7 +88,7 @@ def test_partial_ball_query():
     ids = point_cloud.partial_ball_query(
         ref_point, radius, direction, cap_angle_front, cap_angle_back)
 
-    npt.assert_array_equal(ids, [3, 4, 5, 6])
+    _assert_unordered_equal(ids, [3, 4, 5, 6])
 
 
 def test_remove_ids():

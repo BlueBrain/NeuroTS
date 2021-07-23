@@ -9,10 +9,14 @@ from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 
 from morphio.mut import Morphology  # pylint: disable=import-error
 from tns.generate import diametrizer
-from tns.generate.soma import SomaGrower
+from tns.generate.soma import Soma, SomaGrower
 from tns.generate.tree import TreeGrower
 from tns.morphmath import sample
+from tns.morphmath.utils import normalize_vectors
 from tns.validator import validate_neuron_params, validate_neuron_distribs
+from tns.generate.orientations import OrientationManager
+from tns.generate import orientations as _oris
+
 
 L = logging.getLogger(__name__)
 
@@ -28,7 +32,7 @@ class NeuronGrower:
 
     def __init__(self, input_parameters, input_distributions,
                  context=None, external_diametrizer=None, skip_validation=False,
-                 rng_or_seed=np.random):
+                 rng_or_seed=np.random, trunk_orientations_class=OrientationManager):
         """TNS NeuronGrower
         input_parameters: the user-defined parameters
         input_distributions: distributions extracted from biological data
@@ -84,9 +88,14 @@ class NeuronGrower:
         # A list of trees with the corresponding orientations
         # and initial points on the soma surface will be initialized.
         self.active_neurites = list()
-        self.soma = SomaGrower(initial_point=self.input_parameters["origin"],
-                               radius=sample.soma_size(self.input_distributions, self._rng),
-                               context=context, random_generator=self._rng)
+        self.soma_grower = SomaGrower(
+            Soma(
+                center=self.input_parameters["origin"],
+                radius=sample.soma_size(self.input_distributions, self._rng),
+            ),
+            context=context,
+            rng=self._rng
+        )
         # Create a list to expose apical sections for each apical tree in the neuron,
         # the user can call NeuronGrower.apical_sections to get section IDs whose the last
         # point is the apical point of each generated apical tree.
@@ -94,6 +103,8 @@ class NeuronGrower:
 
         # initialize diametrizer
         self._init_diametrizer(external_diametrizer=external_diametrizer)
+
+        self._trunk_orientations_class = trunk_orientations_class
 
     def validate_params(self):
         '''Validate the parameter dictionary'''
@@ -174,27 +185,45 @@ class NeuronGrower:
                 'Orientations should have non-zero lengths')
             if params.get('trunk_absolute_orientation', False):
                 if len(orientation) == 1:
+
+                    orientation = np.asarray(orientation[0], dtype=np.float64)
+                    orientation /= np.linalg.norm(orientation)
+
                     # Pick random absolute angles
                     trunk_absolute_angles = sample.trunk_absolute_angles(distr, n_trees, self._rng)
                     z_angles = sample.azimuth_angles(distr, n_trees, self._rng)
-                    pts = self.soma.add_points_from_trunk_absolute_orientation(
-                        orientation, trunk_absolute_angles, z_angles)
+
+                    phis, thetas = _oris.trunk_absolute_orientation_to_spherical_angles(
+                        orientation,
+                        trunk_absolute_angles,
+                        z_angles
+                    )
+
+                    orientations = _oris.spherical_angles_to_orientations(phis, thetas)
+
                 else:
                     raise ValueError('The orientation should contain exactly one point!')
             else:
                 if len(orientation) >= n_trees:
+
                     # TODO: pick orientations randomly?
-                    pts = self.soma.add_points_from_orientations(orientation[:n_trees])
+                    orientations = normalize_vectors(
+                        np.asarray(orientation, dtype=np.float64))[:n_trees]
+
                 else:
                     raise ValueError('Not enough orientation points!')
         elif orientation is None:  # Samples from trunk_angles
             trunk_angles = sample.trunk_angles(distr, n_trees, self._rng)
             trunk_z = sample.azimuth_angles(distr, n_trees, self._rng)
-            pts = self.soma.add_points_from_trunk_angles(trunk_angles, trunk_z)
+            phis, thetas = _oris.trunk_to_spherical_angles(trunk_angles, trunk_z)
+            orientations = _oris.spherical_angles_to_orientations(phis, thetas)
+
         elif orientation == 'from_space':
             raise ValueError('Not implemented yet!')
         else:
             raise ValueError('Input orientation format is not correct!')
+
+        pts = self.soma_grower.add_points_from_orientations(orientations)
         return pts
 
     def _grow_trunks(self):
@@ -205,33 +234,61 @@ class NeuronGrower:
         biological distribution of trunks on the soma surface if 'orientation' is None.
         """
 
-        for type_of_tree in self.input_parameters['grow_types']:
-            # Easier to access distributions
+        tree_types = self.input_parameters['grow_types']
+
+        legacy_mode = not isinstance(self.input_parameters[tree_types[0]]['orientation'], dict)
+
+        if not legacy_mode:
+
+            trunk_orientations_manager = self._trunk_orientations_class(
+                soma=self.soma_grower.soma,
+                parameters=self.input_parameters,
+                distributions=self.input_distributions,
+                context=self.context,
+                rng=self._rng
+            )
+
+        for type_of_tree in tree_types:
+
             params = self.input_parameters[type_of_tree]
             distr = self.input_distributions[type_of_tree]
 
-            # Sample the number of trees depending on the tree type
-            n_trees = sample.n_neurites(distr["num_trees"], self._rng)
-            if type_of_tree == 'basal' and n_trees < 2:
-                raise Exception('There should be at least 2 basal dendrites (got {})'.format(
-                    n_trees))
+            if legacy_mode:
 
-            orientation = params['orientation']
-            # Clean up orientation options in converting function
-            points = self._convert_orientation2points(orientation, n_trees, distr, params)
+                n_trees = sample.n_neurites(distr['num_trees'], random_generator=self._rng)
+
+                if type_of_tree == 'basal' and n_trees < 2:
+                    raise Exception('There should be at least 2 basal dendrites (got {})'.format(
+                        n_trees))
+
+                orientation = params['orientation']
+                points = self._convert_orientation2points(orientation, n_trees, distr, params)
+
+            else:
+
+                orientations = trunk_orientations_manager.compute_tree_type_orientations(type_of_tree)
+                n_trees = len(orientations)
+
+                if type_of_tree == 'basal' and n_trees < 2:
+                    raise Exception('There should be at least 2 basal dendrites (got {})'.format(
+                        n_trees))
+
+                points = self.soma_grower.add_points_from_orientations(orientations)
 
             # Iterate over all initial points on the soma and create new trees
             # with a direction and initial_point
             for p in points:
-                tree_direction = self.soma.orientation_from_point(p)
-                obj = TreeGrower(self.neuron,
-                                 initial_direction=tree_direction,
-                                 initial_point=p,
-                                 parameters=params,
-                                 distributions=distr,
-                                 context=self.context,
-                                 random_generator=self._rng)
-                self.active_neurites.append(obj)
+                self.active_neurites.append(
+                    TreeGrower(
+                        self.neuron,
+                        initial_direction=self.soma_grower.soma.orientation_from_point(p),
+                        initial_point=p,
+                        parameters=params,
+                        distributions=distr,
+                        context=self.context,
+                        random_generator=self._rng
+                    )
+                )
 
     def _grow_soma(self, soma_type='contour'):
         """Generates a soma based on the input_distributions. The coordinates
@@ -239,6 +296,6 @@ class NeuronGrower:
         """
         self._grow_trunks()
 
-        points, diameters = self.soma.build(soma_type)
+        points, diameters = self.soma_grower.build(soma_type)
         self.neuron.soma.points = points
         self.neuron.soma.diameters = diameters

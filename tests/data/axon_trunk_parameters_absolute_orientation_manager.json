@@ -1,0 +1,22 @@
+{"axon": {"randomness": 0.0,
+           "metric": "trunk_length",
+           "targeting": 0.2,
+           "radius": 0.3,
+           "num_seg": 999,
+           "orientation": {
+               "mode": "sample_around_primary_orientation",
+               "values": {
+                   "primary_orientation": [0.0, 1.0, 0.0]
+               }
+           },
+           "growth_method": "axon_trunk",
+           "branching_method": "bio_oriented",
+           "modify": null,
+           "tree_type": 2,
+           "step_size": {"norm":{"mean":1.0, "std":0.2}}
+         },
+"origin": [0.0,
+           0.0,
+           0.0],
+"grow_types": ["axon"],
+"diameter_params": {"method": "default"}}

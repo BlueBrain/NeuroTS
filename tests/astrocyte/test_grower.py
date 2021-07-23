@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import numpy as np
+from numpy import testing as npt
 from scipy.special import logit
 from tns.astrocyte.grower import AstrocyteGrower
 from morph_tool import diff
@@ -204,6 +205,23 @@ def _legacy_rng():
     return np.random.RandomState(mt)
 
 
+def _check_tns_soma(soma):
+
+    expected_points = np.array([
+        [-5.76409792, 14.02191629, -1.90732855],
+        [-8.7809688 , -3.60966098, 11.97254351],
+        [ 5.27523796, -2.20779452, 14.16948734],
+        [-5.56209362, 13.77868005, -3.56201546],
+        [8.82188325, 8.82188325, 8.82188202],
+        [10.80455588,  0.        , 10.80455679],
+        [ 1.52799497e+01,  0.00000000e+00, -6.67907815e-07],
+        [8.82188261, 8.82188261, 8.82188384]
+    ])
+
+    npt.assert_allclose(soma.points, expected_points)
+    npt.assert_equal(soma.radius, 15.279949720206192)
+
+
 def test_grow__run():
     from numpy.random import MT19937
     from numpy.random import RandomState
@@ -215,8 +233,6 @@ def test_grow__run():
 
     for rng in [_global_rng(), _legacy_rng()]:
 
-        print("RNG: ", rng)
-
         astro_grower = AstrocyteGrower(
             input_distributions=distributions,
             input_parameters=parameters,
@@ -224,5 +240,8 @@ def test_grow__run():
             rng_or_seed=rng)
 
         astro_grower.grow()
+
+        _check_tns_soma(astro_grower.soma_grower.soma)
+
         difference = diff(astro_grower.neuron, _path / 'astrocyte.h5', atol=0.001)
         assert not difference, difference.info
