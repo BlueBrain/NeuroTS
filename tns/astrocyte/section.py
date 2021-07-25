@@ -17,13 +17,13 @@ L = logging.getLogger(__name__)
 NextPointData = namedtuple('NextPointData', ['point', 'direction', 'segment_length'])
 
 
-def grow_to_target(point, direction, target_point, segment_length, p=0.5):
+def grow_to_target(start_point, start_direction, target_point, segment_length, p=0.5):
     """Starting from given point and direction grow towards the target_point
     with a segment_length step.
 
     Args:
-        point (np.ndarray): Starting point of the grower
-        direction (np.ndarray): Normalized initial direction
+        start_point (np.ndarray): Starting point of the grower
+        start_direction (np.ndarray): Normalized initial direction
         target_point (np.nadarray): Target point to grow to
         segment_length (np.ndarray): The step size of the grower
         p (float, optional): Influence from the target.
@@ -36,14 +36,20 @@ def grow_to_target(point, direction, target_point, segment_length, p=0.5):
     """
     target_proximity = (1.5 * segment_length) ** 2
 
+    point = start_point.copy()
+    direction = start_direction.copy()
+
     points = []
     while not in_squared_proximity(point, target_point, target_proximity):
 
-        direction = normalize_inplace(
-            (1. - p) * direction + p * from_to_direction(point, target_point)
-        )
+        target_direction = from_to_direction(point, target_point)
+        direction = (1. - p) * direction + p * target_direction
 
-        point = point + segment_length * direction
+        # zeros direction results from an initial direction which opposite to the target one
+        # and the p = 0.5 . In that case the target_direction is used instead.
+        direction = target_direction if np.allclose(direction, 0.0) else normalize_inplace(direction)
+
+        point += segment_length * direction
         points.append(point)
 
     # add the target point if the new point does not coincide
