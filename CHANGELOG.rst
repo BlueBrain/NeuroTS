@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 2.5.0
+-------------
+
+Improvements
+~~~~~~~~~~~~
+- Update NeuroM dependency to version 3
+
+
 Version 2.4.5
 -------------
 

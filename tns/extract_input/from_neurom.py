@@ -23,7 +23,7 @@ def soma_data(pop):
     '''Extract soma size'''
     # Extract soma size as a normal distribution
     # Returns a dictionary with the soma information
-    soma_size = nm.get('soma_radii', pop)
+    soma_size = nm.get('soma_radius', pop)
     ss = stats.fit(soma_size, distribution='norm')
 
     return {"size": transform_distr(ss)}
@@ -75,7 +75,8 @@ def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE):
     # Extract number of neurites as a precise distribution
     # The output is given in integer numbers which are
     # the permitted values for the number of trees.
-    nneurites = nm.get('number_of_neurites', pop, neurite_type=neurite_type)
+    nneurites = np.asarray(nm.get('number_of_neurites', pop, neurite_type=neurite_type),
+                           dtype=np.int32)
     # Clean the data from single basal trees cells
     if neurite_type == nm.BASAL_DENDRITE and len(np.where(nneurites == 1)[0]) > 0:
         nneurites[np.where(nneurites == 1)[0]] = 2

@@ -7,7 +7,7 @@ import pylab as plt
 # Set a list of features to be extracted
 feat_list = ['number_of_neurites',
              'number_of_sections_per_neurite',
-             'number_of_terminations',
+             'number_of_leaves',
              'number_of_bifurcations',
              'section_lengths',
              'section_tortuosity',

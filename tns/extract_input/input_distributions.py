@@ -2,7 +2,7 @@
 import logging
 
 import tmd
-from neurom import load_neurons
+from neurom import load_morphologies
 from tns.extract_input.from_TMD import persistent_homology_angles
 from tns.extract_input.from_neurom import soma_data, trunk_neurite, number_neurites
 from tns.extract_input import from_diameter
@@ -35,7 +35,7 @@ def distributions(filepath, neurite_types=('basal', 'apical', 'axon'), threshold
                  set it to `external` for external model
     '''
     pop_tmd = tmd.io.load_population(filepath)
-    pop_nm = load_neurons(filepath)
+    pop_nm = load_morphologies(filepath)
 
     input_distributions = {'soma': {}, 'basal': {}, 'apical': {}, 'axon': {}}
     input_distributions['soma'] = soma_data(pop_nm)
@@ -45,12 +45,12 @@ def distributions(filepath, neurite_types=('basal', 'apical', 'axon'), threshold
 
     if isinstance(diameter_model, str):
         input_distributions['diameter'] = \
-            from_diameter.model(load_neurons(diameter_input_morph))
+            from_diameter.model(load_morphologies(diameter_input_morph))
         input_distributions['diameter']['method'] = diameter_model
 
     elif hasattr(diameter_model, '__call__'):
         input_distributions['diameter'] = \
-            diameter_model(load_neurons(diameter_input_morph))
+            diameter_model(load_morphologies(diameter_input_morph))
         input_distributions['diameter']['method'] = 'external'
     else:
         input_distributions['diameter'] = {}

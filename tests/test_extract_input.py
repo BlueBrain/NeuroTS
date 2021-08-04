@@ -9,7 +9,7 @@ from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_array_equal
 from numpy.testing import assert_equal
 from numpy.testing import assert_raises
-from neurom import load_neurons
+from neurom import load_morphologies
 from neurom import stats
 
 from tns import extract_input
@@ -20,8 +20,8 @@ _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'test_dat
 POP_PATH = os.path.join(_PATH, 'bio/')
 NEU_PATH = os.path.join(_PATH, 'diam_simple.swc')
 
-POPUL = load_neurons(POP_PATH)
-NEU = load_neurons(NEU_PATH)
+POPUL = load_morphologies(POP_PATH)
+NEU = load_morphologies(NEU_PATH)
 
 def test_num_trees():
     target_numBAS = {'num_trees': {'data': {'bins': [4, 5, 6, 7, 8, 9],
@@ -101,7 +101,7 @@ def test_diameter_extract():
         assert_array_almost_equal(res['basal'][key], expected[key])
 
     assert_raises(TNSError, extract_input.from_diameter.model,
-                  load_neurons(os.path.join(_PATH, 'simple.swc')))
+                  load_morphologies(os.path.join(_PATH, 'simple.swc')))
 
     # Test on Population
     res = extract_input.from_diameter.model(POPUL)
@@ -204,15 +204,15 @@ def test_transform_distr():
 
 
 def test_number_neurites():
-    pop = load_neurons(POP_PATH)
+    pop = load_morphologies(POP_PATH)
     res = extract_input.from_neurom.number_neurites(pop)
     assert_equal(
         res,
         {'num_trees': {'data': {'bins': [4, 5, 6, 7, 8, 9], 'weights': [1, 0, 0, 0, 0, 1]}}}
     )
 
-    pop_cut = load_neurons(POP_PATH)
-    neurons = [neuron for neuron in pop_cut.neurons]
+    pop_cut = load_morphologies(POP_PATH)
+    neurons = [neuron for neuron in pop_cut]
     if len(neurons[0].neurites) > len(neurons[1].neurites):
         smallest = 1
         biggest = 0

@@ -4,7 +4,7 @@ from itertools import chain
 
 import numpy as np
 from neurom import get
-from neurom.core.neuron import Section, iter_neurites
+from neurom.core.morphology import Section, iter_neurites
 from neurom.morphmath import segment_length, segment_radius
 
 from tns.morphio_utils import NEUROM_TYPE_TO_STR

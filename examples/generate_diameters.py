@@ -4,7 +4,7 @@ from tns import extract_input
 
 from tns.generate import diametrizer
 
-k0 = neurom.load_neuron('../test_data/bio/C220197A-P2.h5')
+k0 = neurom.load_morphology('../test_data/bio/C220197A-P2.h5')
 model0 = extract_input.from_diameter.model(k0)
 
 n0 = morphio.mut.Morphology('../test_data/bio/C220197A-P2.h5')
