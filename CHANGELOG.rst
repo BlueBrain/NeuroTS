@@ -1,6 +1,19 @@
 Changelog
 =========
 
+Version 2.4.5
+-------------
+
+Bug Fixes
+~~~~~~~~~
+- Fix edge case for astrocyte target grower
+
+Improvements
+~~~~~~~~~~~~
+- Use random generator in morphmath.bifurcation.random()
+- Improve extract_input.from_diameter.model
+
+
 Version 2.4.4
 -------------
 
