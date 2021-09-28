@@ -1,8 +1,9 @@
 import inspect
 import numpy as np
+import pytest
 from numpy import testing as npt
+
 from tns.generate import orientations as tested
-from tns.generate.soma import Soma
 from tns.utils import TNSError
 
 
@@ -23,7 +24,7 @@ def test_orientation_manager__constructor():
     )
 
     assert om._parameters is parameters
-    assert om._distributions is  distributions
+    assert om._distributions is distributions
     assert om._context is context
     assert om._rng is rng
 
@@ -33,7 +34,6 @@ def test_orientation_manager__constructor():
     methods = inspect.getmembers(om)
     mode_methods = [(name, method) for name, method in methods if name.startswith('_mode_')]
     expected_modes = {name.replace('_mode_', ''): method for name, method in mode_methods}
-
 
     # check that the correct names have been bound to the
     # respective method names
@@ -122,22 +122,22 @@ def test_orientation_manager__tree_type_method_values():
 
     # check that method exists
     parameters['john']['orientation']['mode'] = 'non_existent_method'
-    with npt.assert_raises(TNSError):
+    with pytest.raises(TNSError):
         om.compute_tree_type_orientations('john')
 
     # check that config keys are correct
     parameters['john']['orientation']['random_key'] = 'lol'
-    with npt.assert_raises(TNSError):
+    with pytest.raises(TNSError):
         om.compute_tree_type_orientations('john')
 
     # check that config is not empty
     parameters['john']['orientation'] = {}
-    with npt.assert_raises(TNSError):
+    with pytest.raises(TNSError):
         om.compute_tree_type_orientations('john')
 
     # check that orientation is not None
     parameters['john']['orientation'] = None
-    with npt.assert_raises(TNSError):
+    with pytest.raises(TNSError):
         om.compute_tree_type_orientations('john')
 
 
@@ -249,7 +249,6 @@ def test_orientation_manager__mode_sample_pairwise_angles():
     expected = np.array([[0., 0., -1.], [0., 0., -1.], [0., 0., -1]])
 
     npt.assert_allclose(actual, expected, atol=1e-6)
-
 
 
 def test_spherical_angles_to_orientations():

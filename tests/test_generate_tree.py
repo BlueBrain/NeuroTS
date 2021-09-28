@@ -2,7 +2,7 @@ import os
 import json
 
 import numpy as np
-from nose import tools as nt
+import pytest
 from numpy import testing as npt
 
 from tns import NeuronGrower
@@ -42,12 +42,12 @@ def test_create_section_parameters__exceed_bounds():
     npt.assert_almost_equal(parameters.history, 0.0)
 
 
-@nt.raises(TNSError)
 def test_create_section_parameters__sum_to_one_error():
 
     input_dict = {'randomness': 2.0, 'targeting': 2.0}
 
-    parameters = _create_section_parameters(input_dict)
+    with pytest.raises(TNSError):
+        _create_section_parameters(input_dict)
 
 
 def test_TreeGrower():

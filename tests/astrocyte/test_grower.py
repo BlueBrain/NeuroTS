@@ -1,10 +1,7 @@
-import os
 import json
 from pathlib import Path
-from tempfile import TemporaryDirectory
 import numpy as np
 from numpy import testing as npt
-from scipy.special import logit
 from tns.astrocyte.grower import AstrocyteGrower
 from morph_tool import diff
 
@@ -218,14 +215,11 @@ def _check_tns_soma(soma):
         [8.82188261, 8.82188261, 8.82188384]
     ])
 
-    npt.assert_allclose(soma.points, expected_points)
+    npt.assert_allclose(soma.points, expected_points, atol=1e-6, rtol=1e-6)
     npt.assert_equal(soma.radius, 15.279949720206192)
 
 
 def test_grow__run():
-    from numpy.random import MT19937
-    from numpy.random import RandomState
-
     parameters = _parameters()
     distributions = _distributions()
 
@@ -243,5 +237,5 @@ def test_grow__run():
 
         _check_tns_soma(astro_grower.soma_grower.soma)
 
-        difference = diff(astro_grower.neuron, _path / 'astrocyte.h5', atol=0.001)
+        difference = diff(astro_grower.neuron, _path / 'astrocyte.h5')
         assert not difference, difference.info

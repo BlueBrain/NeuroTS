@@ -1,16 +1,14 @@
 import os
 import json
 
-from nose import tools as nt
-from nose.tools import assert_dict_equal
 import neurom
 import numpy as np
+import pytest
+from neurom import load_morphologies
+from neurom import stats
 from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_array_equal
 from numpy.testing import assert_equal
-from numpy.testing import assert_raises
-from neurom import load_morphologies
-from neurom import stats
 
 from tns import extract_input
 from tns import TNSError
@@ -20,10 +18,18 @@ _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'test_dat
 POP_PATH = os.path.join(_PATH, 'bio/')
 NEU_PATH = os.path.join(_PATH, 'diam_simple.swc')
 
-POPUL = load_morphologies(POP_PATH)
-NEU = load_morphologies(NEU_PATH)
 
-def test_num_trees():
+@pytest.fixture
+def POPUL():
+    return load_morphologies(POP_PATH)
+
+
+@pytest.fixture
+def NEU():
+    return load_morphologies(NEU_PATH)
+
+
+def test_num_trees(POPUL):
     target_numBAS = {'num_trees': {'data': {'bins': [4, 5, 6, 7, 8, 9],
                                       'weights': [1, 0, 0, 0, 0, 1]}}}
     target_numAX =  {'num_trees': {'data': {'bins': [1], 'weights': [2]}}}
@@ -33,7 +39,8 @@ def test_num_trees():
     assert_equal(numBAS, target_numBAS)
     assert_equal(numAX, target_numAX)
 
-def test_trunk_distr():
+
+def test_trunk_distr(POPUL):
     bins_BAS = [0.19391773616376634,
                 0.4880704446023673,
                 0.7822231530409682,
@@ -86,7 +93,8 @@ def test_trunk_distr():
     assert_equal(trunkBAS, target_trunkBAS)
     assert_equal(trunkAP, target_trunkAPIC)
 
-def test_diameter_extract():
+
+def test_diameter_extract(POPUL, NEU):
     res = extract_input.from_diameter.model(NEU)
     assert_equal(set(res.keys()), {'basal'})
     expected = {'Rall_ratio': 1.5,
@@ -100,8 +108,8 @@ def test_diameter_extract():
     for key in expected.keys():
         assert_array_almost_equal(res['basal'][key], expected[key])
 
-    assert_raises(TNSError, extract_input.from_diameter.model,
-                  load_morphologies(os.path.join(_PATH, 'simple.swc')))
+    with pytest.raises(TNSError):
+        extract_input.from_diameter.model(load_morphologies(os.path.join(_PATH, 'simple.swc')))
 
     # Test on Population
     res = extract_input.from_diameter.model(POPUL)
@@ -158,31 +166,45 @@ def test_diameter_extract():
                 raise AssertionError(f"Failed for res[{neurite_type}][{key}]")
 
 
-def test_distributions():
-    filename = os.path.join(_PATH, 'bio/')
-    distr = extract_input.distributions(filename, feature='radial_distances')
-    assert_equal(set(distr.keys()), {'soma', 'basal', 'apical', 'axon', 'diameter'})
-    assert_equal(distr['basal']['num_trees'],
-                 {'data': {'bins': [4, 5, 6, 7, 8, 9], 'weights': [1, 0, 0, 0, 0, 1]}})
-    assert_equal(distr['basal']['filtration_metric'], 'radial_distances')
-    distr = extract_input.distributions(filename, feature='path_distances')
-    assert_equal(distr['basal']['filtration_metric'], 'path_distances')
+class TestDistributions:
+    @pytest.fixture
+    def filename(self):
+        return os.path.join(_PATH, 'bio/')
 
-    distr = extract_input.distributions(filename, feature='radial_distances', diameter_model=None)
-    assert_equal(set(distr.keys()), {'soma', 'basal', 'apical', 'axon', 'diameter'})
+    def test_radial_distances(self, filename):
+        distr = extract_input.distributions(filename, feature='radial_distances')
+        assert_equal(set(distr.keys()), {'soma', 'basal', 'apical', 'axon', 'diameter'})
+        assert_equal(distr['basal']['num_trees'],
+                     {'data': {'bins': [4, 5, 6, 7, 8, 9], 'weights': [1, 0, 0, 0, 0, 1]}})
+        assert_equal(distr['basal']['filtration_metric'], 'radial_distances')
 
-    distr_M5 = extract_input.distributions(
-        filename, feature='radial_distances', diameter_model='M5'
-    )
-    assert_equal(set(distr_M5.keys()), {'soma', 'basal', 'apical', 'axon', 'diameter'})
+    def test_path_distances(self, filename):
+        distr = extract_input.distributions(filename, feature='path_distances')
+        assert_equal(distr['basal']['filtration_metric'], 'path_distances')
 
-    def diam_method(pop):
-        return extract_input.from_diameter.model(pop)
+    def test_diameter_model_none(self, filename):
+        distr = extract_input.distributions(
+            filename,
+            feature='radial_distances',
+            diameter_model=None,
+        )
+        assert_equal(set(distr.keys()), {'soma', 'basal', 'apical', 'axon', 'diameter'})
 
-    distr_external = extract_input.distributions(
-        filename, feature='radial_distances', diameter_model=diam_method
-    )
-    assert_equal(set(distr_external.keys()), {'soma', 'basal', 'apical', 'axon', 'diameter'})
+    def test_diameter_model_M5(self, filename):
+        distr_M5 = extract_input.distributions(
+            filename, feature='radial_distances', diameter_model='M5'
+        )
+        assert_equal(set(distr_M5.keys()), {'soma', 'basal', 'apical', 'axon', 'diameter'})
+
+    def test_external_diameter_model(self, filename):
+
+        def diam_method(pop):
+            return extract_input.from_diameter.model(pop)
+
+        distr_external = extract_input.distributions(
+            filename, feature='radial_distances', diameter_model=diam_method
+        )
+        assert_equal(set(distr_external.keys()), {'soma', 'basal', 'apical', 'axon', 'diameter'})
 
 
 def test_transform_distr():
@@ -203,16 +225,15 @@ def test_transform_distr():
     assert_equal(tss, None)
 
 
-def test_number_neurites():
-    pop = load_morphologies(POP_PATH)
-    res = extract_input.from_neurom.number_neurites(pop)
+def test_number_neurites(POPUL):
+    res = extract_input.from_neurom.number_neurites(POPUL)
     assert_equal(
         res,
         {'num_trees': {'data': {'bins': [4, 5, 6, 7, 8, 9], 'weights': [1, 0, 0, 0, 0, 1]}}}
     )
 
-    pop_cut = load_morphologies(POP_PATH)
-    neurons = [neuron for neuron in pop_cut]
+def test_number_neurites_cut_pop(POPUL):
+    neurons = [neuron for neuron in POPUL]
     if len(neurons[0].neurites) > len(neurons[1].neurites):
         smallest = 1
         biggest = 0
@@ -225,12 +246,12 @@ def test_number_neurites():
             neurons[biggest].root_sections[i], recursive=True
         )
 
-    pop_cut = neurom.core.population.Population(neurons)
+    POPUL = neurom.core.population.Population(neurons)
     assert_equal(len(neurons), 2)
     assert_equal(len(neurons[biggest].neurites), 3)
     assert_equal(len(neurons[smallest].neurites), 6)
-    assert_equal(len([i for i in pop_cut.neurites]), 9)
-    res_cut = extract_input.from_neurom.number_neurites(pop_cut)
+    assert_equal(len([i for i in POPUL.neurites]), 9)
+    res_cut = extract_input.from_neurom.number_neurites(POPUL)
     assert_equal(
         res_cut,
         {'num_trees': {'data': {'bins': [2, 3, 4],
@@ -325,16 +346,14 @@ def test_parameters():
          'grow_types': ['axon'], 'diameter_params': {'method': 'external', 'a': 1, 'b': 2}
         })
 
-    assert_raises(
-        KeyError,
-        extract_input.parameters,
-        neurite_types=['axon'],
-        method='UNKNOWN METHOD',
-    )
-    assert_raises(
-        ValueError,
-        extract_input.parameters,
-        neurite_types=['axon'],
-        method='trunk',
-        diameter_parameters=object(),
-    )
+    with pytest.raises(KeyError):
+        extract_input.parameters(
+            neurite_types=['axon'],
+            method='UNKNOWN METHOD',
+        )
+    with pytest.raises(ValueError):
+        extract_input.parameters(
+            neurite_types=['axon'],
+            method='trunk',
+            diameter_parameters=object(),
+        )

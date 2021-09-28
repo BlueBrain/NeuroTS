@@ -1,6 +1,6 @@
-
 import numpy as np
 from numpy import testing as npt
+
 from tns.morphmath import utils as tested
 
 
@@ -34,7 +34,7 @@ def test_in_same_halfspace():
 
     ref_point = np.array([0.5, 0.5, 0.5])
 
-    direction =  - np.array([1., 1., 1.])
+    direction = -np.array([1., 1., 1.])
     direction /= np.linalg.norm(direction)
 
     mask = tested.in_same_halfspace(points - ref_point, direction)

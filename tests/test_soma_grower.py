@@ -1,18 +1,19 @@
-import os
 import json
+import os
+
 import morphio
 import numpy as np
-from numpy.testing import assert_equal
-from numpy.testing import assert_raises
+import pytest
+from mock import patch
 from numpy.testing import assert_allclose
-from numpy.testing import assert_array_equal
 from numpy.testing import assert_almost_equal
+from numpy.testing import assert_array_almost_equal
+from numpy.testing import assert_array_equal
+from numpy.testing import assert_equal
 
 from tns.utils import TNSError
 from tns.generate import soma as tested
 from tns import NeuronGrower
-from numpy.testing import assert_array_equal, assert_array_almost_equal
-from mock import patch
 
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
@@ -55,7 +56,6 @@ def test_constructors():
     assert soma_grower._rng is rng
 
 
-
 def test_soma_point_from_trunk_direction():
 
     soma = tested.Soma((1., 2., 3.), 2.0)
@@ -90,8 +90,8 @@ def test_soma_orientation_from_point_exception():
 
     point = np.array([1., 2., 3.])
 
-    with assert_raises(ValueError):
-        _ = soma.orientation_from_point(point)
+    with pytest.raises(ValueError):
+        soma.orientation_from_point(point)
 
 
 def test_soma_contour_point():
@@ -178,8 +178,6 @@ def test_soma_grower_interpolate_from_neuron():
                      {'soma': {'size': {"norm": {"mean": 6, "std": 0}}},
                       'diameter': {'method': 'default'}})
 
-
-
     g.soma_grower.soma.points = [[0, 0, 0], [1, 0, 0], [0, 1, 1], [1, 0, 0]]
 
     assert_array_equal(
@@ -227,8 +225,8 @@ def test_soma_interpolate_exception():
 
     soma.points = [[1, 1, 1], [2, 2, 2], [3, 3, 3]]
 
-    with assert_raises(TNSError):
-        result = soma_grower.interpolate(soma.points, interpolation=1)
+    with pytest.raises(TNSError):
+        soma_grower.interpolate(soma.points, interpolation=1)
 
 
 def test_add_points_from_trunk_angles():
@@ -326,17 +324,16 @@ def test_build():
 
 def test_grow_soma_types():
     np.random.seed(0)
-    g = NeuronGrower({'origin': [0,0,0], 'grow_types':[],
+    g = NeuronGrower({'origin': [0, 0, 0], 'grow_types': [],
                       'diameter_params': {'method': 'default'}},
                      {'soma': {'size': {"norm": {"mean": 6, "std": 3}}},
                       'diameter': {'method': 'default'}})
-
 
     with patch.object(g, '_grow_trunks'):
         # test one soma point
         g._grow_soma(soma_type='one_point')
         assert_array_equal(g.neuron.soma.points, [[0.0, 0.0, 0.0]])
-        assert_array_almost_equal(g.neuron.soma.diameters,  [22.584314])
+        assert_array_almost_equal(g.neuron.soma.diameters, [22.584314])
 
         # normal case
         g.soma_grower.soma.points = [[0, 0, 0], [1, 0, 0], [0, 1, 1], [1, 0, 0]]
@@ -346,7 +343,7 @@ def test_grow_soma_types():
                             [1., 0., 0.],
                             [0., 1., 1.],
                             [1., 0., 0.]])
-        assert_array_equal(g.neuron.soma.diameters,  [0, 0, 0, 0])
+        assert_array_equal(g.neuron.soma.diameters, [0, 0, 0, 0])
         g._grow_soma(soma_type='contour')
         assert_array_almost_equal(g.neuron.soma.points,
                            [[ -7.10052,     8.7804,      0.       ],
@@ -430,10 +427,12 @@ def test_apical_points():
 
 
 def test_null_orientation():
+    np.random.seed(1)
     with open(os.path.join(_path, 'dummy_params.json')) as f:
         params = json.load(f)
     params['apical']['orientation'] = [[0, 0, 0], [1, 0, 0]]
     with open(os.path.join(_path, 'dummy_distribution.json')) as f:
         distributions = json.load(f)
     N = NeuronGrower(input_distributions=distributions, input_parameters=params)
-    assert_raises(AssertionError, N.grow)
+    with pytest.raises(AssertionError):
+        N.grow()

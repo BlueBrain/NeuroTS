@@ -7,6 +7,21 @@ from setuptools import find_packages, setup
 
 VERSION = imp.load_source("tns.version", "tns/version.py").VERSION
 
+doc_reqs = [
+    "sphinx",
+    "sphinx-bluebrain-theme",
+    "sphinx-jsonschema",
+]
+
+test_reqs = [
+    "mock",
+    "morph-tool>=0.1.12",
+    "pytest",
+    "pytest-cov",
+    "pytest-html",
+    "pytest-xdist",
+    "tqdm",
+]
 
 setup(
     name='TNS',
@@ -28,6 +43,10 @@ setup(
         'numpy>=1.15.0',
         'jsonschema>=3.0.1',
     ],
+    extras_require={
+        "docs": doc_reqs,
+        "test": test_reqs,
+    },
     python_requires='>=3.6',
     packages=find_packages(),
     license='BSD',

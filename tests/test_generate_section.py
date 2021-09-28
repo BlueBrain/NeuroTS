@@ -1,22 +1,27 @@
 '''Test tns.generate.section code'''
-from nose import tools as nt
-from tns.generate import section
 import numpy as np
+import pytest
 from numpy.testing import assert_array_almost_equal
+
+from tns.generate import section
 from tns.generate.algorithms.common import TMDStop
-from nose.tools import assert_raises
 from tns.morphmath import sample
 
-SEG_LEN = sample.Distr({"norm":{"mean":1.0, "std":0.2}})
+
+EXPECTED_WEIGHTS = np.array([0.01831564, 0.04978707, 0.13533528, 0.36787944, 1.])
 
 
-EXPECTED_WEIGHTS = np.array([0.01831564, 0.04978707, 0.13533528, 0.36787944, 1.        ])
+@pytest.fixture
+def SEG_LEN():
+    return sample.Distr({"norm": {"mean": 1.0, "std": 0.2}})
+
 
 def test_MEMORY_WEIGHTS():
-    nt.ok_(section.MEMORY == 5)
+    assert section.MEMORY == 5
     assert_array_almost_equal(section.WEIGHTS, EXPECTED_WEIGHTS)
 
-def test_SectionGrower():
+
+def test_SectionGrower(SEG_LEN):
     # Create basic section for testing purposes
     s = section.SectionGrower(None, None, [0.,0.,0.], [0., 1., 0.], 0.0, 0.0, None, None, SEG_LEN, 0.0)
     # Test trivial history is zeros.
@@ -44,9 +49,11 @@ def test_SectionGrower():
     s = section.SectionGrowerExponentialProba(None, None, [0.,0.,0.], [0., 1., 0.], 0.0, 0.0, tmd_stop, None, SEG_LEN, 0.0)
     # Check that the growth will continue for single point section
     assert(s.check_stop())
-    assert_raises(NotImplementedError, s.get_val)
+    with pytest.raises(NotImplementedError):
+        s.get_val()
 
-def test_history():
+
+def test_history(SEG_LEN):
     s = section.SectionGrower(None, None, [0.,0.,0.], [0., 1., 0.], 0.0, 0.0, None, None, SEG_LEN, 0.0)
     assert_array_almost_equal(s.history(), np.array([0.,0.,0.]))
     s.latest_directions = np.array([[0., 0., 0.]])

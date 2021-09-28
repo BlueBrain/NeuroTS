@@ -1,9 +1,12 @@
 import numpy as np
+import pytest
 from numpy import testing as npt
+
 from tns.morphmath import point_array as _pa
 
 
-def _create_dynamic_array():
+@pytest.fixture
+def dynamic_array():
 
     initial_capacity = 3
     resize_factor = 2
@@ -13,42 +16,36 @@ def _create_dynamic_array():
     return array
 
 
-def test_dynamic_point_array_contructor():
+def test_dynamic_point_array_contructor(dynamic_array):
+    assert len(dynamic_array) == 0
 
-    array = _create_dynamic_array()
+    npt.assert_allclose(dynamic_array.data, np.empty(shape=(0, 3)))
 
-    assert len(array) == 0
-
-    npt.assert_allclose(array.data, np.empty(shape=(0, 3)))
-
-    assert array._size == 0
-    assert array._capacity == 3
+    assert dynamic_array._size == 0
+    assert dynamic_array._capacity == 3
 
 
-def test_dynamic_point_array_append():
-
-    array = _create_dynamic_array()
-
+def test_dynamic_point_array_append(dynamic_array):
     p0 = np.random.random(3)
-    array.append(p0)
-    npt.assert_allclose(array.data, [p0])
-    assert len(array) == 1
-    assert array.capacity == 3
+    dynamic_array.append(p0)
+    npt.assert_allclose(dynamic_array.data, [p0])
+    assert len(dynamic_array) == 1
+    assert dynamic_array.capacity == 3
 
     p1 = np.random.random(3)
-    array.append(p1)
-    npt.assert_allclose(array.data, np.vstack((p0, p1)))
-    assert len(array) == 2
-    assert array.capacity == 3
+    dynamic_array.append(p1)
+    npt.assert_allclose(dynamic_array.data, np.vstack((p0, p1)))
+    assert len(dynamic_array) == 2
+    assert dynamic_array.capacity == 3
 
     p2 = np.random.random(3)
-    array.append(p2)
-    npt.assert_allclose(array.data, np.vstack((p0, p1, p2)))
-    assert len(array) == 3
-    assert array.capacity == 3
+    dynamic_array.append(p2)
+    npt.assert_allclose(dynamic_array.data, np.vstack((p0, p1, p2)))
+    assert len(dynamic_array) == 3
+    assert dynamic_array.capacity == 3
 
     p3 = np.random.random(3)
-    array.append(p3)
-    npt.assert_allclose(array.data, np.vstack((p0, p1, p2, p3)))
-    assert len(array) == 4
-    assert array.capacity == 6
+    dynamic_array.append(p3)
+    npt.assert_allclose(dynamic_array.data, np.vstack((p0, p1, p2, p3)))
+    assert len(dynamic_array) == 4
+    assert dynamic_array.capacity == 6

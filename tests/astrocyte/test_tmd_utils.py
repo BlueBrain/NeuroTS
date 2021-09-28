@@ -1,6 +1,8 @@
 import numpy as np
 from numpy import testing as npt
+
 from tns.astrocyte import tmd_utils as _tu
+
 
 def _barcode():
     return [

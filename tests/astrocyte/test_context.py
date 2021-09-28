@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import testing as npt
+
 from tns.astrocyte import context as tested
 
 
@@ -10,14 +11,14 @@ def _input_params():
             'point_cloud': np.array([[2., 0., 0.], [2., 1., 1.]]),
             'kill_distance_factor': 15.,
             'influence_distance_factor': 2.,
-            },
+        },
         'field': {
             'type': 'logit',
             'slope': 1.5,
             'intercept': 0.1
         },
         'collision_handle': 'collision_handle'
-}
+    }
 
 
 def test_constructor():

@@ -1,6 +1,5 @@
 from mock import Mock
 import numpy as np
-from numpy import testing as npt
 
 from tns.astrocyte.context import SpaceColonizationContext
 from tns.astrocyte.section import SectionSpatialGrower

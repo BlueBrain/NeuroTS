@@ -3,17 +3,18 @@
 import json
 import os
 import numpy as np
-from nose.tools import assert_dict_equal
-from nose.tools import assert_raises
+import pytest
 from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_array_equal
 from numpy.testing import assert_equal
+
 from tns.generate.algorithms.common import checks_bif_term
 from tns.generate.algorithms.common import TMDStop
 from tns.generate.algorithms.barcode import Barcode
 from tns.utils import TNSError
 
 _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+
 
 def test_barcode():
     '''Tests the barcode functionality'''
@@ -33,7 +34,7 @@ def test_barcode():
 
     assert_equal(barcode_test.bifs[1], 26.3027)
     assert_equal(barcode_test.terms[1], 204.0442)
-    assert_array_almost_equal(barcode_test.angles[1], [-0.279172, -0.138322,  1.598153,  0.672246])
+    assert_array_almost_equal(barcode_test.angles[1], [-0.279172, -0.138322, 1.598153, 0.672246])
 
     assert_array_almost_equal(barcode_test.get_bar(0), (0, 633.5966))
     assert_array_almost_equal(barcode_test.get_bar(1), (26.3027, 204.0442))
@@ -120,7 +121,9 @@ def test_TMDStop():
 
     parent_stop = TMDStop(1, 26.3027, 0, 10, 10.0)
     child_stop = TMDStop(1, 26.3027, 0, 999999, 10.0)
-    assert_raises(TNSError, barcode_test.curate_stop_criterion, parent_stop, child_stop)
+    with pytest.raises(TNSError):
+        barcode_test.curate_stop_criterion(parent_stop, child_stop)
 
     child_stop = TMDStop(1, 26.3027, 999999, 5, 10.0)
-    assert_raises(TNSError, barcode_test.curate_stop_criterion, parent_stop, child_stop)
+    with pytest.raises(TNSError):
+        barcode_test.curate_stop_criterion(parent_stop, child_stop)

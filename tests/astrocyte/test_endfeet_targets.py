@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import testing as npt
+
 from tns.astrocyte import context as tested
 
 

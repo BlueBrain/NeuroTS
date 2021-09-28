@@ -1,9 +1,8 @@
 import itertools
-from mock import Mock, patch
 
 import numpy as np
+from mock import Mock
 from numpy import testing as npt
-from scipy import stats
 
 from tns.astrocyte.section import SectionSpatialGrower
 from tns.generate.tree import SectionParameters

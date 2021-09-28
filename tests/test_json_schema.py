@@ -5,6 +5,7 @@ from jsonschema import validate
 
 _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
+
 def test_json_schema():
 
     with open(os.path.join(_PATH, 'dummy_distribution.json')) as f:
@@ -12,7 +13,7 @@ def test_json_schema():
 
     validate(data,
              schema={
-                 'definitions':{
+                 'definitions': {
                      'histogram': {
                          'type': 'object',
                          'additionalProperties': False,
@@ -82,22 +83,23 @@ def test_json_schema():
                      'diameter': {
                          'type' : 'object',
                          'additionalProperties': True,
-                         }
+                     }
                  },
 
                  'type': 'object',
                  'properties' : {
-                     'soma' : {'type' : 'object',
-                               'additionalProperties': False,
-                               'properties' : {
-                                   'size': {'$ref': '#/definitions/norm_distrib'}
-                               },
+                     'soma' : {
+                         'type' : 'object',
+                         'additionalProperties': False,
+                         'properties' : {
+                             'size': {'$ref': '#/definitions/norm_distrib'}
+                         },
                      },
                      'basal' : {'$ref': '#/definitions/dendrite'},
                      'apical' : {'$ref': '#/definitions/dendrite'},
                      'axon' : {'$ref': '#/definitions/dendrite'},
                      'diameter': {'$ref': '#/definitions/diameter'},
                  },
-                 'required': ['soma', 'axon', 'basal', 'apical','diameter'],
+                 'required': ['soma', 'axon', 'basal', 'apical', 'diameter'],
                  'additionalProperties': False,
              })

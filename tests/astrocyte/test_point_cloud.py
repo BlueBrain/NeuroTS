@@ -1,10 +1,10 @@
 import numpy as np
 from numpy import testing as npt
+
 from tns.astrocyte.point_cloud import PointCloud
 
 
 def point_array():
-
     return np.array([
         [-10.0, -10.0, -10.0], # 0
         [ -8.0,  -8.0,  -8.0], # 1
@@ -92,7 +92,7 @@ def test_partial_ball_query():
 
 
 def test_remove_ids():
-    
+
     to_remove = np.array([4, 3, 9, 1])
 
     point_cloud = create_point_cloud()

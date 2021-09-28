@@ -1,6 +1,8 @@
-from tns.morphmath import sample
 import numpy as np
-from numpy.testing import assert_equal, assert_raises
+import pytest
+from numpy.testing import assert_equal
+
+from tns.morphmath import sample
 
 
 def test_Distr():
@@ -100,7 +102,8 @@ def test_Distr():
     # Setup negative loc distribution
     params = {'uniform': {'min': -10, 'max': -10}}
     soma_d = sample.Distr(params)
-    assert_raises(ValueError, soma_d.draw_positive)
+    with pytest.raises(ValueError):
+        soma_d.draw_positive()
 
     # Setup negative val distribution
     params = {'uniform': {'min': -50, 'max': 10}}
