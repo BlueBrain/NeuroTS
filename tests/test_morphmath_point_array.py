@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from numpy import testing as npt
 
-from tns.morphmath import point_array as _pa
+from neurots.morphmath import point_array as _pa
 
 
 @pytest.fixture

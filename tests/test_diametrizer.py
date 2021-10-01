@@ -1,5 +1,5 @@
 
-'''Test tns.generate.diametrizer code'''
+'''Test neurots.generate.diametrizer code'''
 import os
 import copy
 
@@ -10,7 +10,7 @@ from morphio import SectionType
 from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_equal
 
-from tns.generate import diametrizer
+from neurots.generate import diametrizer
 
 
 _path = os.path.dirname(os.path.abspath(__file__))

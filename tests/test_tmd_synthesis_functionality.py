@@ -1,4 +1,4 @@
-'''Test tns.generate.section code'''
+'''Test neurots.generate.section code'''
 
 import json
 import os
@@ -8,10 +8,10 @@ from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_array_equal
 from numpy.testing import assert_equal
 
-from tns.generate.algorithms.common import checks_bif_term
-from tns.generate.algorithms.common import TMDStop
-from tns.generate.algorithms.barcode import Barcode
-from tns.utils import TNSError
+from neurots.generate.algorithms.common import checks_bif_term
+from neurots.generate.algorithms.common import TMDStop
+from neurots.generate.algorithms.barcode import Barcode
+from neurots.utils import NeuroTSError
 
 _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
@@ -121,9 +121,9 @@ def test_TMDStop():
 
     parent_stop = TMDStop(1, 26.3027, 0, 10, 10.0)
     child_stop = TMDStop(1, 26.3027, 0, 999999, 10.0)
-    with pytest.raises(TNSError):
+    with pytest.raises(NeuroTSError):
         barcode_test.curate_stop_criterion(parent_stop, child_stop)
 
     child_stop = TMDStop(1, 26.3027, 999999, 5, 10.0)
-    with pytest.raises(TNSError):
+    with pytest.raises(NeuroTSError):
         barcode_test.curate_stop_criterion(parent_stop, child_stop)

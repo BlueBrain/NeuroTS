@@ -1,6 +1,6 @@
 import numpy as np
 import copy
-import tns
+import neurots
 
 def tmd_scale(barcode, thickness):
     # only the two first points of each bar are modified
@@ -22,14 +22,14 @@ def identity(ph):
     return ph
 
 # Modify input parameters to scale barcode
-params = tns.extract_input.parameters(neurite_types=['apical', 'basal'], method='tmd')
-distr = tns.extract_input.distributions('./test_data/bio/', neurite_types=['apical', 'basal'])
+params = neurots.extract_input.parameters(neurite_types=['apical', 'basal'], method='tmd')
+distr = neurots.extract_input.distributions('./test_data/bio/', neurite_types=['apical', 'basal'])
 
 # The basal dendrite will not be modified
 params['basal'].update({'modify':{'funct':identity, 'kwargs': {}}})
 # The apical dendrite will be scaled down to 0.10 % of its length
 params['apical'].update({'modify':{'funct':modify_barcode, 'kwargs': {'thickness':100, 'thickness_reference':1000}}})
 
-N = tns.NeuronGrower(input_parameters=params, input_distributions=distr)
+N = neurots.NeuronGrower(input_parameters=params, input_distributions=distr)
 n = N.grow()
 n.write('test_scaling.h5')

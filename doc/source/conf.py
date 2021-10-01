@@ -9,18 +9,18 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
 from pkg_resources import get_distribution
+
+sys.path.insert(0, os.path.abspath('../..'))
 
 # -- Project information -----------------------------------------------------
 
-project = "TNS"
+project = "NeuroTS"
 
 # The short X.Y version
-version = get_distribution("tns").version
+version = get_distribution("neurots").version
 
 # The full version, including alpha/beta/rc tags
 release = version
@@ -34,10 +34,10 @@ release = version
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
-    "sphinx.ext.graphviz",
-    "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
+    "sphinx.ext.napoleon",
     "sphinx-jsonschema",
+    "m2r2",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -62,10 +62,10 @@ html_theme = "sphinx-bluebrain-theme"
 # html_static_path = ['_static']
 
 html_theme_options = {
-    "metadata_distribution": "TNS",
+    "metadata_distribution": "NeuroTS",
 }
 
-html_title = "TNS"
+html_title = "NeuroTS"
 
 # If true, links to the reST sources are added to the pages.
 html_show_sourcelink = False
@@ -75,7 +75,11 @@ autosummary_generate = True
 
 # autodoc settings
 autodoc_typehints = "signature"
-autodoc_default_options = {"members": True, "show-inheritance": True, "special-members": "__init__"}
+autodoc_default_options = {
+    "members": True,
+    "show-inheritance": True,
+    "special-members": "__init__",
+}
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),

@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from jsonschema.exceptions import ValidationError
 
-import tns.validator as tested
+import neurots.validator as tested
 
 DATA = Path(__file__).parent.resolve() / 'data'
 

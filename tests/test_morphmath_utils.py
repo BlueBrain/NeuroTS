@@ -1,7 +1,7 @@
 import numpy as np
 from numpy import testing as npt
 
-from tns.morphmath import utils as tested
+from neurots.morphmath import utils as tested
 
 
 def test_norm():

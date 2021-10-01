@@ -10,8 +10,8 @@ from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_array_equal
 from numpy.testing import assert_equal
 
-from tns import extract_input
-from tns import TNSError
+from neurots import extract_input
+from neurots import NeuroTSError
 
 
 _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'test_data')
@@ -108,7 +108,7 @@ def test_diameter_extract(POPUL, NEU):
     for key in expected.keys():
         assert_array_almost_equal(res['basal'][key], expected[key])
 
-    with pytest.raises(TNSError):
+    with pytest.raises(NeuroTSError):
         extract_input.from_diameter.model(load_morphologies(os.path.join(_PATH, 'simple.swc')))
 
     # Test on Population

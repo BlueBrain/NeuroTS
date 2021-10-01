@@ -5,10 +5,10 @@ import numpy as np
 import pytest
 from numpy import testing as npt
 
-from tns import NeuronGrower
-from tns.utils import TNSError
-from tns.generate.tree import _create_section_parameters
-from tns.generate.tree import TreeGrower
+from neurots import NeuronGrower
+from neurots.utils import NeuroTSError
+from neurots.generate.tree import _create_section_parameters
+from neurots.generate.tree import TreeGrower
 
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
@@ -46,7 +46,7 @@ def test_create_section_parameters__sum_to_one_error():
 
     input_dict = {'randomness': 2.0, 'targeting': 2.0}
 
-    with pytest.raises(TNSError):
+    with pytest.raises(NeuroTSError):
         _create_section_parameters(input_dict)
 
 

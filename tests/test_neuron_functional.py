@@ -1,5 +1,5 @@
 '''
-This test ensures that the radial and path distances are computed correctly through TNS,
+This test ensures that the radial and path distances are computed correctly through NeuroTS,
 so that the code is treating the input barcode, according to the given parameters.
 For this reason, we need to check that the same input distribution
 will generate cells with different properties, according to their input parameters.
@@ -18,7 +18,7 @@ from morph_tool import diff
 from numpy.testing import assert_almost_equal, assert_array_equal, assert_array_almost_equal
 from scipy.spatial.distance import cdist
 
-from tns.generate.grower import NeuronGrower
+from neurots.generate.grower import NeuronGrower
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 

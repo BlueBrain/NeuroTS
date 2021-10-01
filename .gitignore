@@ -10,11 +10,15 @@
 # Mac related stuff
 .DS_Store
 
+# Packaging builds
+build/
+dist/
+
 # tox
 .tox/
 
 # coverage
-.coverage
+.coverage*
 coverage.xml
 
 # test venv

@@ -5,4 +5,4 @@ API Documentation
     :toctree: generated
     :recursive:
 
-    tns
+    neurots

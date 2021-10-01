@@ -1,8 +1,8 @@
 import morphio, neurom, tmd
 
-from tns import extract_input
+from neurots import extract_input
 
-from tns.generate import diametrizer
+from neurots.generate import diametrizer
 
 k0 = neurom.load_morphology('../test_data/bio/C220197A-P2.h5')
 model0 = extract_input.from_diameter.model(k0)

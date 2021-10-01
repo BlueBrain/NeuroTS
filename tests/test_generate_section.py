@@ -1,11 +1,11 @@
-'''Test tns.generate.section code'''
+'''Test neurots.generate.section code'''
 import numpy as np
 import pytest
 from numpy.testing import assert_array_almost_equal
 
-from tns.generate import section
-from tns.generate.algorithms.common import TMDStop
-from tns.morphmath import sample
+from neurots.generate import section
+from neurots.generate.algorithms.common import TMDStop
+from neurots.morphmath import sample
 
 
 EXPECTED_WEIGHTS = np.array([0.01831564, 0.04978707, 0.13533528, 0.36787944, 1.])

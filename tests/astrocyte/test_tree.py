@@ -1,9 +1,9 @@
 from mock import Mock
 import numpy as np
 
-from tns.astrocyte.context import SpaceColonizationContext
-from tns.astrocyte.section import SectionSpatialGrower
-from tns.astrocyte.tree import TreeGrowerSpaceColonization
+from neurots.astrocyte.context import SpaceColonizationContext
+from neurots.astrocyte.section import SectionSpatialGrower
+from neurots.astrocyte.tree import TreeGrowerSpaceColonization
 
 from test_grower import _parameters, _distributions, _context
 

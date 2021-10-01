@@ -1,6 +1,6 @@
 from numpy.testing import assert_array_almost_equal
 
-import tns.morphmath.rotation as test_module
+import neurots.morphmath.rotation as test_module
 
 
 def test_vector_from_spherical():

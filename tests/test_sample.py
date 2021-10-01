@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from numpy.testing import assert_equal
 
-from tns.morphmath import sample
+from neurots.morphmath import sample
 
 
 def test_Distr():

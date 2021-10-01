@@ -3,8 +3,8 @@ import numpy as np
 import pytest
 from numpy import testing as npt
 
-from tns.generate import orientations as tested
-from tns.utils import TNSError
+from neurots.generate import orientations as tested
+from neurots.utils import NeuroTSError
 
 
 def test_orientation_manager__constructor():
@@ -122,22 +122,22 @@ def test_orientation_manager__tree_type_method_values():
 
     # check that method exists
     parameters['john']['orientation']['mode'] = 'non_existent_method'
-    with pytest.raises(TNSError):
+    with pytest.raises(NeuroTSError):
         om.compute_tree_type_orientations('john')
 
     # check that config keys are correct
     parameters['john']['orientation']['random_key'] = 'lol'
-    with pytest.raises(TNSError):
+    with pytest.raises(NeuroTSError):
         om.compute_tree_type_orientations('john')
 
     # check that config is not empty
     parameters['john']['orientation'] = {}
-    with pytest.raises(TNSError):
+    with pytest.raises(NeuroTSError):
         om.compute_tree_type_orientations('john')
 
     # check that orientation is not None
     parameters['john']['orientation'] = None
-    with pytest.raises(TNSError):
+    with pytest.raises(NeuroTSError):
         om.compute_tree_type_orientations('john')
 
 

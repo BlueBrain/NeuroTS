@@ -1,12 +1,12 @@
 Parameters and distributions
 ============================
 
-This page describes the format of the expected parameters and distributions used by TNS.
+This page describes the format of the expected parameters and distributions used by NeuroTS.
 
 Parameters
 ----------
 
-.. jsonschema:: ../../tns/schemas/parameters.json
+.. jsonschema:: ../../neurots/schemas/parameters.json
     :lift_definitions:
     :auto_reference:
     :auto_target:
@@ -15,7 +15,7 @@ Parameters
 Distributions
 -------------
 
-.. jsonschema:: ../../tns/schemas/distributions.json
+.. jsonschema:: ../../neurots/schemas/distributions.json
     :lift_definitions:
     :auto_reference:
     :auto_target:

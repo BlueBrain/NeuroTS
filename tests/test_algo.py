@@ -1,17 +1,17 @@
-'''Test tns.generate.section code'''
+'''Test neurots.generate.section code'''
 import json
 import os
 
 import numpy as np
 from numpy.testing import assert_array_almost_equal, assert_equal
 
-from tns.generate.algorithms.common import TMDStop
-from tns.generate.algorithms.tmdgrower import (TMDAlgo, TMDApicalAlgo, TMDGradientAlgo)
-from tns.generate.algorithms.basicgrower import TrunkAlgo
-from tns.generate.section import SectionGrowerPath
-from tns.generate.section import SectionGrowerTMD
-from tns.generate.tree import SectionParameters
-from tns.morphmath import sample
+from neurots.generate.algorithms.common import TMDStop
+from neurots.generate.algorithms.tmdgrower import (TMDAlgo, TMDApicalAlgo, TMDGradientAlgo)
+from neurots.generate.algorithms.basicgrower import TrunkAlgo
+from neurots.generate.section import SectionGrowerPath
+from neurots.generate.section import SectionGrowerTMD
+from neurots.generate.tree import SectionParameters
+from neurots.morphmath import sample
 
 _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 

@@ -4,7 +4,7 @@ from mock import Mock, patch
 import numpy as np
 from numpy import testing as npt
 
-from tns.astrocyte import space_colonization as tested
+from neurots.astrocyte import space_colonization as tested
 
 
 PCLOUD_POINTS = np.array([
@@ -104,7 +104,7 @@ def test_fallback_strategy():
     mock_dir1 = np.array([1., 0., 0.])
     mock_dir2 = np.array([0., 1., 0.])
 
-    with patch('tns.astrocyte.space_colonization.directional',
+    with patch('neurots.astrocyte.space_colonization.directional',
         return_value = (
             mock_dir1.copy(),
             mock_dir2.copy()
@@ -211,7 +211,7 @@ def test_colonization_split():
     )
     point_cloud = context.point_cloud
 
-    module = 'tns.astrocyte.space_colonization.'
+    module = 'neurots.astrocyte.space_colonization.'
 
     with patch(module + '_repulsion') as repulsion, \
          patch(module + 'upper_half_ball_query') as half_ball_query, \
@@ -332,7 +332,7 @@ def test_colonization_split_with_target_influence():
     point_cloud = None
     context = Mock(endfeet_targets=endfeet, point_cloud=point_cloud)
 
-    module = 'tns.astrocyte.space_colonization.'
+    module = 'neurots.astrocyte.space_colonization.'
 
     with patch(module + '_colonization_split') as mock_colonization_split, \
          patch(module + 'in_squared_proximity') as mock_in_squared_proximity, \

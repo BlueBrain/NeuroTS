@@ -11,9 +11,9 @@ from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_array_equal
 from numpy.testing import assert_equal
 
-from tns.utils import TNSError
-from tns.generate import soma as tested
-from tns import NeuronGrower
+from neurots.utils import NeuroTSError
+from neurots.generate import soma as tested
+from neurots import NeuronGrower
 
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
@@ -225,7 +225,7 @@ def test_soma_interpolate_exception():
 
     soma.points = [[1, 1, 1], [2, 2, 2], [3, 3, 3]]
 
-    with pytest.raises(TNSError):
+    with pytest.raises(NeuroTSError):
         soma_grower.interpolate(soma.points, interpolation=1)
 
 

@@ -7,5 +7,5 @@
 
    Home <self>
    params_and_distrs
-   changelog
    api
+   changelog

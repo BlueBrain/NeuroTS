@@ -4,8 +4,8 @@ import numpy as np
 from mock import Mock
 from numpy import testing as npt
 
-from tns.astrocyte.section import SectionSpatialGrower
-from tns.generate.tree import SectionParameters
+from neurots.astrocyte.section import SectionSpatialGrower
+from neurots.generate.tree import SectionParameters
 
 
 POINT_CLOUD_POINTS = np.array([

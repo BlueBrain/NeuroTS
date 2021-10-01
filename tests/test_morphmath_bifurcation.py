@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.testing import assert_array_almost_equal
 
-from tns.morphmath import bifurcation as _bf
+from neurots.morphmath import bifurcation as _bf
 
 
 def test_get_bif_directional():

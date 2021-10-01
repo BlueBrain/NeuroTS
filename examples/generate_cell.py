@@ -1,6 +1,6 @@
 import os
-import tns
-from tns import extract_input
+import neurots
+from neurots import extract_input
 def run():
     # Extract distributions from cells in input directory
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -11,7 +11,7 @@ def run():
                                           feature='path_distances', method='tmd', diameter_parameters='M5')
 
     # Initialize a neuron
-    N = tns.NeuronGrower(input_distributions=distr,
+    N = neurots.NeuronGrower(input_distributions=distr,
                          input_parameters=params)
 
     # Grow your neuron

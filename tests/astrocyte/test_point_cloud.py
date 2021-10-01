@@ -1,7 +1,7 @@
 import numpy as np
 from numpy import testing as npt
 
-from tns.astrocyte.point_cloud import PointCloud
+from neurots.astrocyte.point_cloud import PointCloud
 
 
 def point_array():

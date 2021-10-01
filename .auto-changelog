@@ -1,0 +1,12 @@
+{
+    "output": "CHANGELOG.md",
+    "template": ".auto-changelog-template.hbs",
+    "commitLimit": false,
+    "backfillLimit": false,
+    "ignoreCommitPattern": "Release [0-9]+\\.[0-9]+\\.[0-9]+|Update CHANGELOG.*|.*\\[skip-changelog\\].*",
+    "commitUrl": "https://bbpgitlab.epfl.ch/neuromath/neurots/commit/{id}",
+    "issueUrl": "https://bbpgitlab.epfl.ch/neuromath/neurots/issues/{id}",
+    "mergeUrl": "https://bbpgitlab.epfl.ch/neuromath/neurots/merge_requests/{id}",
+    "compareUrl": "https://bbpgitlab.epfl.ch/neuromath/neurots/compare/{from}...{to}",
+    "tagPrefix": "NeuroTS-v"
+}

@@ -1,5 +1,5 @@
 import os
-import tns
+import neurots
 
 
 def run():
@@ -12,11 +12,11 @@ def run():
 
     # Generate model from input cell
 
-    model = tns.extract_input.diameter_distributions(input_cell)
+    model = neurots.extract_input.diameter_distributions(input_cell)
 
     # Create the object to modify the input cell to be diametrized
     # Initialize tha cell with the output cell name
-    G = tns.NeuronGrower(input_parameters=None, input_distributions=model, name=output_cell_name)
+    G = neurots.NeuronGrower(input_parameters=None, input_distributions=model, name=output_cell_name)
 
     # Modify the diameters using the generated model
     G.diametrize()

@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 import numpy as np
 from numpy import testing as npt
-from tns.astrocyte.grower import AstrocyteGrower
+from neurots.astrocyte.grower import AstrocyteGrower
 from morph_tool import diff
 
 
@@ -202,7 +202,7 @@ def _legacy_rng():
     return np.random.RandomState(mt)
 
 
-def _check_tns_soma(soma):
+def _check_neurots_soma(soma):
 
     expected_points = np.array([
         [-5.76409792, 14.02191629, -1.90732855],
@@ -235,7 +235,7 @@ def test_grow__run():
 
         astro_grower.grow()
 
-        _check_tns_soma(astro_grower.soma_grower.soma)
+        _check_neurots_soma(astro_grower.soma_grower.soma)
 
         difference = diff(astro_grower.neuron, _path / 'astrocyte.h5')
         assert not difference, difference.info
