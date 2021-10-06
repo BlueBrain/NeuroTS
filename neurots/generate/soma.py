@@ -88,7 +88,7 @@ class Soma:
     def orientation_from_point(self, point):
         """Return the orientation from the soma center to a point on the soma surface."""
         if np.allclose(point, self.center):
-            raise ValueError("Point overlaps with soma center.")
+            raise ValueError("Point overlaps with soma center.", point, self.center)
 
         point = np.asarray([point])
         return orientations.points_to_orientations(self.center, point)[0]

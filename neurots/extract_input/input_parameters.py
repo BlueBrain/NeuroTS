@@ -15,7 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-tmd_algos = ("tmd", "tmd_gradient", "tmd_apical")
+
+def _sort_neurite_types(neurite_types):
+    """Sort neurite types to comply with internal requirements.
+
+    For now, only apical should be first, so it is placed first, and other neurite_types can be
+    placed with respect to it.
+    """
+    if "apical" in neurite_types:
+        return list(["apical"] + [t for t in neurite_types if t != "apical"])
+    return list(neurite_types)
 
 
 def parameters(
@@ -24,8 +33,9 @@ def parameters(
     neurite_types=("basal", "apical", "axon"),
     feature="path_distances",
     diameter_parameters=None,
+    trunk_method="simple",
 ):
-    """Returns a default set of input parameters to be used as input for synthesis.
+    """Return a default set of input parameters to be used as input for synthesis.
 
     Args:
         origin (list[float]): The origin point.
@@ -33,65 +43,58 @@ def parameters(
         neurite_types (list[str]): The neurite types to consider.
         feature (str): Use the specified TMD feature.
         diameter_parameters (dict or str): The parameters used for the diameters.
+        trunk_method (str): 'simple' for simple trunk method, or '3d_angles'
 
     Returns:
         dict: The parameters.
     """
-    input_parameters = {
-        "basal": {},
-        "apical": {},
-        "axon": {},
-        "origin": list(origin),
-        "grow_types": neurite_types,
+    if method not in ("trunk", "tmd", "tmd_gradient", "tmd_apical"):
+        raise KeyError(f"Method {method} not recognized!.")
+    if trunk_method not in ("simple", "3d_angles"):
+        raise KeyError(f"trunk_method {trunk_method} not understood")
+
+    base_params = {
+        "randomness": 0.15,
+        "targeting": 0.12,
+        "radius": 0.3,
+        "orientation": None
+        if trunk_method == "simple"
+        else {"mode": "apical_constraint", "values": None},
+        "growth_method": method,
+        "branching_method": "random" if method == "trunk" else "bio_oriented",
+        "modify": None,
+        "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
+        "metric": feature,
     }
 
-    def merged_params(data):
-        """Use input method to set branching."""
-        ret = {}
-        if method == "trunk":
-            branching = "random"
-        elif method in tmd_algos:
-            branching = "bio_oriented"
-        else:
-            raise KeyError(f"Method not recognized! Please select from: {tmd_algos}.")
+    input_parameters = {
+        "axon": {**base_params, "tree_type": 2},
+        "basal": {**base_params, "tree_type": 3},
+        "apical": {**base_params, "tree_type": 4},
+        "origin": list(origin),
+        "grow_types": neurite_types
+        if trunk_method == "simple"
+        else _sort_neurite_types(neurite_types),
+    }
 
-        ret.update(
-            {
-                "randomness": 0.24,
-                "targeting": 0.14,
-                "radius": 0.3,
-                "orientation": None,
-                "growth_method": method,
-                "branching_method": branching,
-                "modify": None,
-                "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
-                "metric": feature,
-            }
-        )
-        ret.update(data)
-        return ret
+    input_parameters["axon"].update(
+        {
+            "branching_method": "directional",
+            "orientation": [[0.0, 1.0, 0.0]]
+            if trunk_method == "simple"
+            else {"mode": "use_predefined", "values": {"orientations": [[0.0, -1.0, 0.0]]}},
+        }
+    )
 
-    if "axon" in neurite_types:
-        input_parameters["axon"] = merged_params(
-            {
-                "tree_type": 2,
-                "orientation": [[0.0, -1.0, 0.0]],
-            }
-        )
-
-    if "basal" in neurite_types:
-        input_parameters["basal"] = merged_params({"tree_type": 3})
-
-    if "apical" in neurite_types:
-        input_parameters["apical"] = merged_params(
-            {
-                "tree_type": 4,
-                "branching_method": "directional",
-                "orientation": [[0.0, 1.0, 0.0]],
-            }
-        )
-        if method == "tmd":
-            input_parameters["apical"]["growth_method"] = "tmd_apical"
+    input_parameters["apical"].update(
+        {
+            "branching_method": "directional",
+            "growth_method": "tmd_apical" if method == "tmd" else None,
+            "orientation": [[0.0, 1.0, 0.0]]
+            if trunk_method == "simple"
+            else {"mode": "use_predefined", "values": {"orientations": [[0.0, 1.0, 0.0]]}},
+        }
+    )
 
     input_parameters["diameter_params"] = {}
     if diameter_parameters is None:
