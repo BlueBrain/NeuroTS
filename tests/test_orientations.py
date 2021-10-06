@@ -303,3 +303,133 @@ def test_orientations_to_sphere_points():
         tested.orientations_to_sphere_points(oris, sphere_center, sphere_radius),
         expected_points,
     )
+
+
+def test_orientation_manager__mode_uniform():
+
+    parameters = {
+        "grow_types": ["basal"],
+        "basal": {
+            "orientation": {
+                "mode": "uniform",
+                "values": {},
+            }
+        },
+    }
+
+    distributions = {
+        "basal": {
+            "num_trees": {
+                "data": {"bins": [2], "weights": [1]},
+            }
+        }
+    }
+
+    om = tested.OrientationManager(
+        soma=None,
+        parameters=parameters,
+        distributions=distributions,
+        context=None,
+        rng=np.random.default_rng(seed=0),
+    )
+
+    for tree_type in parameters["grow_types"]:
+        om.compute_tree_type_orientations(tree_type)
+
+    actual = om.get_tree_type_orientations("basal")
+    expected = np.array([[-0.199474, 0.967017, 0.158396], [-0.368063, 0.248455, 0.895991]])
+
+    npt.assert_allclose(actual, expected, rtol=1e-5)
+
+
+def test_orientation_manager__pia_constraint():
+
+    parameters = {
+        "grow_types": ["basal"],
+        "basal": {
+            "orientation": {
+                "mode": "pia_constraint",
+                "values": {"pia": [0, 1, 0]},
+            }
+        },
+    }
+
+    # params obtained from fit to an L5_TPC:A population
+    distributions = {
+        "basal": {
+            "num_trees": {
+                "data": {"bins": [2], "weights": [1]},
+            },
+            "trunk": {"3d_angle": {"form": "step", "params": [1.5, 0.25]}},
+        }
+    }
+
+    om = tested.OrientationManager(
+        soma=None,
+        parameters=parameters,
+        distributions=distributions,
+        context=None,
+        rng=np.random.default_rng(seed=0),
+    )
+
+    for tree_type in parameters["grow_types"]:
+        om.compute_tree_type_orientations(tree_type)
+
+    actual = om.get_tree_type_orientations("basal")
+    expected = np.array([[-0.896702, -0.441664, 0.029284], [-0.14969, -0.852409, -0.500992]])
+
+    npt.assert_allclose(actual, expected, rtol=2e-5)
+
+
+def test_orientation_manager__apical_constraint():
+
+    parameters = {
+        "grow_types": ["apical", "basal"],
+        "apical": {
+            "orientation": {
+                "mode": "use_predefined",
+                "values": {"orientations": [[0.0, 1.0, 0.0]]},
+            }
+        },
+        "basal": {
+            "orientation": {
+                "mode": "apical_constraint",
+                "values": {},
+            }
+        },
+    }
+
+    # params obtained from fit to an L5_TPC:A population
+    distributions = {
+        "apical": {
+            "num_trees": {
+                "data": {"bins": [1], "weights": [1]},
+            }
+        },
+        "basal": {
+            "num_trees": {
+                "data": {"bins": [2], "weights": [1]},
+            },
+            "trunk": {"3d_angle": {"form": "step", "params": [1.5, 0.25]}},
+        },
+    }
+
+    om = tested.OrientationManager(
+        soma=None,
+        parameters=parameters,
+        distributions=distributions,
+        context=None,
+        rng=np.random.default_rng(seed=0),
+    )
+
+    for tree_type in parameters["grow_types"]:
+        om.compute_tree_type_orientations(tree_type)
+    om._sample_trunk_from_3d_angle("basal", [0, 0, 1], max_tries=-1)
+
+    actual = om.get_tree_type_orientations("basal")
+    expected = np.array([[0.761068, 0.124662, -0.636581], [0.741505, 0.538547, -0.400171]])
+
+    npt.assert_allclose(actual, expected, rtol=2e-5)
+
+    with pytest.raises(NotImplementedError):
+        tested.prob_function(0, {}, "UNKNOWN")

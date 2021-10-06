@@ -16,8 +16,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import inspect
+import warnings
+from functools import partial
 
+import neurom as nm
 import numpy as np
+from scipy.special import expit
 
 from neurots.morphmath import rotation
 from neurots.morphmath import sample
@@ -64,8 +68,11 @@ class OrientationManagerBase:
             dict: A dictionary mapping mode names without the '_modes_' prefix to the methods.
         """
         methods = inspect.getmembers(self, predicate=inspect.ismethod)
-        strip_mode = lambda name: name.replace("_mode_", "")
-        return {strip_mode(name): method for name, method in methods if name.startswith("_mode_")}
+        return {
+            name.replace("_mode_", ""): method
+            for name, method in methods
+            if name.startswith("_mode_")
+        }
 
     @property
     def mode_names(self):
@@ -142,11 +149,11 @@ class OrientationManager(OrientationManagerBase):
     def _mode_use_predefined(self, values_dict, tree_type):  # pylint: disable=no-self-use
         """Returns predefined orientations."""
         assert "orientations" in values_dict, "'orientations' key is missing"
-        tree_type_distrs = self._distributions[tree_type]
 
         # the reason of this sampling is to maintain the pseudorandom
         # sequence of the legacy implementation. Otherwise the functional tests
         # will break because the sequence will be slightly different.
+        tree_type_distrs = self._distributions[tree_type]
         sample.n_neurites(tree_type_distrs["num_trees"], self._rng)
         return normalize_vectors(np.asarray(values_dict["orientations"], dtype=np.float64))
 
@@ -193,6 +200,71 @@ class OrientationManager(OrientationManagerBase):
             )
             orientations_i.append(spherical_angles_to_orientations(phis, thetas))
         return np.vstack(orientations_i)
+
+    def _mode_uniform(self, _, tree_type):
+        """Uniformly distribute angles."""
+        n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
+        return np.asarray(
+            [sample_spherical_unit_vectors(rng=self._rng) for _ in range(n_orientations)]
+        )
+
+    def _mode_pia_constraint(self, _, tree_type):
+        """Create trunks from constraint with pia direction."""
+        n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
+        ref_dir = self._parameters[tree_type]["orientation"]["values"]["pia"]
+        return np.asarray(
+            [self._sample_trunk_from_3d_angle(tree_type, ref_dir) for _ in range(n_orientations)]
+        )
+
+    def _mode_apical_constraint(self, _, tree_type):
+        """Create trunks from constraint with apical direction."""
+        n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
+        ref_dir = self._orientations["apical"]
+        return np.asarray(
+            [self._sample_trunk_from_3d_angle(tree_type, ref_dir) for _ in range(n_orientations)]
+        )
+
+    def _sample_trunk_from_3d_angle(self, tree_type, ref_dir, max_tries=100):
+        """Method to sample trunk angles from 3d constraints to ref_dir."""
+        prob = partial(
+            prob_function,
+            params=self._distributions[tree_type]["trunk"]["3d_angle"]["params"],
+            form=self._distributions[tree_type]["trunk"]["3d_angle"]["form"],
+        )
+        n_try = 0
+        while n_try < max_tries + 1:
+            n_try += 1
+            propose = sample_spherical_unit_vectors(self._rng)
+            angle = nm.morphmath.angle_between_vectors(ref_dir, propose)
+            if self._rng.binomial(1, prob(angle)):
+                return propose
+        warnings.warn("Could not find a point, we take last attempt")
+        return sample_spherical_unit_vectors(self._rng)
+
+
+def trunk_absolute_orientation_to_spherical_angles(orientation, trunk_absolute_angles, z_angles):
+    """Generate spherical angles from a unit vector and a list of angles.
+
+    Args:
+        orientation (list[float]): The orientation vector.
+        trunk_absolute_angles (list[float]): The polar angles (phi in spherical coordinates).
+        z_angles (list[float]): The azimuthal angles (theta in spherical coordinates).
+
+    Returns:
+        tuple[numpy.ndarray[float], numpy.ndarray[float]]: The phi and theta angles.
+    """
+    # Sort angles
+    sort_ids = np.argsort(trunk_absolute_angles)
+    sorted_phis = np.asarray(trunk_absolute_angles)[sort_ids]
+    sorted_thetas = np.asarray(z_angles)[sort_ids]
+
+    # Convert orientation vector to angles
+    phi, theta = rotation.spherical_from_vector(orientation)
+
+    phis = phi + sorted_phis - 0.5 * np.pi
+    thetas = theta + sorted_thetas - 0.5 * np.pi
+
+    return phis, thetas
 
 
 def spherical_angles_to_orientations(phis, thetas):
@@ -277,29 +349,27 @@ def trunk_to_spherical_angles(trunk_angles, z_angles, phi_interval=None):
     return phis, thetas
 
 
-def trunk_absolute_orientation_to_spherical_angles(orientation, trunk_absolute_angles, z_angles):
-    """Generate spherical angles from a unit vector and a list of angles.
+def sample_spherical_unit_vectors(rng, bias=None):
+    """Prior uniform distribution on the sphere.
 
-    Args:
-        orientation (list[float]): The orientation vector.
-        trunk_absolute_angles (list[float]): The polar angles (phi in spherical coordinates).
-        z_angles (list[float]): The azimuthal angles (theta in spherical coordinates).
-
-    Returns:
-        tuple[numpy.ndarray[float], numpy.ndarray[float]]: The phi and theta angles.
+    If bias is tuple(direction, std), the sample will be along direction with normal std, improving
+    the efficiency of the Metropolos-Hastings for axon sampling, mostly oriented in [0, -1, 0].
     """
-    # Sort angles
-    sort_ids = np.argsort(trunk_absolute_angles)
-    sorted_phis = np.asarray(trunk_absolute_angles)[sort_ids]
-    sorted_thetas = np.asarray(z_angles)[sort_ids]
+    x = rng.normal(0, 1, 3) if bias is None else rng.normal(bias[0], bias[1], 3)
+    return x / np.linalg.norm(x)
 
-    # Convert orientation vector to angles
-    phi, theta = rotation.spherical_from_vector(orientation)
 
-    phis = phi + sorted_phis - 0.5 * np.pi
-    thetas = theta + sorted_thetas - 0.5 * np.pi
+def prob_function(angle, params, form):
+    """Probability function."""
+    if form == "step":
+        scale, rate = params
+        return expit((angle - scale) / rate)
 
-    return phis, thetas
+    if form == "double_step":
+        scale_low, rate_low, scale_high, rate_high = params
+        return expit((angle - scale_low) / rate_low) + expit((-angle - scale_high) / rate_high)
+
+    raise NotImplementedError(f"form {form} not implemented")
 
 
 def compute_interval_n_tree(soma, n_trees, rng=np.random):
