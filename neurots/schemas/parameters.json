@@ -70,7 +70,7 @@
                     "type": "integer"
                 },
                 "orientation": {
-                    "anyOf": [
+                    "oneOf": [
                         {
                             "$ref": "#/definitions/null_object"
                         },

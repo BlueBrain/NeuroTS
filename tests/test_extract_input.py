@@ -17,6 +17,7 @@
 
 # pylint: disable=missing-function-docstring
 # pylint: disable=redefined-outer-name
+# pylint: disable=protected-access
 import os
 
 import neurom
@@ -24,7 +25,7 @@ import numpy as np
 import pytest
 import tmd
 from neurom import load_morphologies
-from neurom import stats
+from neurom.core.population import Population
 from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_equal
 from pkg_resources import parse_version
@@ -336,23 +337,9 @@ class TestDistributions:
         )
         assert distr_external == distr_external_input
 
-
-def test_transform_distr():
-    ss = stats.fit([1, 2], distribution="norm")
-    tss = extract_input.from_neurom.transform_distr(ss)
-    assert_equal(tss, {"norm": {"mean": 1.5, "std": 0.5}})
-
-    ss = stats.fit([1, 2], distribution="uniform")
-    tss = extract_input.from_neurom.transform_distr(ss)
-    assert_equal(tss, {"uniform": {"min": 1, "max": 2}})
-
-    ss = stats.fit([1, 2], distribution="expon")
-    tss = extract_input.from_neurom.transform_distr(ss)
-    assert_equal(tss, {"expon": {"loc": 1.0, "lambda": 2.0}})
-
-    ss = stats.fit([1, 2], distribution="gamma")
-    tss = extract_input.from_neurom.transform_distr(ss)
-    assert_equal(tss, None)
+    def test_trunk_method(self, filename):
+        with pytest.raises(KeyError):
+            extract_input.distributions(filename, trunk_method="UNKNOWN")
 
 
 def test_number_neurites(POPUL):
@@ -497,7 +484,7 @@ def test_parameters():
                 "randomness": 0.24,
                 "targeting": 0.14,
                 "radius": 0.3,
-                "orientation": [[0.0, -1.0, 0.0]],
+                "orientation": None,
                 "growth_method": "tmd",
                 "branching_method": "bio_oriented",
                 "modify": None,
@@ -608,6 +595,37 @@ def test_parameters():
             diameter_parameters=object(),
         )
 
+    with pytest.raises(KeyError):
+        extract_input.parameters(neurite_types=["axon"], trunk_method="UNKNOWN METHOD")
+
+    extract_input.parameters(
+        neurite_types=["axon"],
+        method="trunk",
+        diameter_parameters={"some_external_diametrizer": None},
+    )
+
+    extract_input.parameters(
+        neurite_types=["axon"],
+        method="trunk",
+        diameter_parameters="some_diametrizer",
+    )
+
+
+def test__sort_neurite_types():
+    assert extract_input.input_parameters._sort_neurite_types(["basal", "apical"]) == [
+        "apical",
+        "basal",
+    ]
+    assert extract_input.input_parameters._sort_neurite_types(["apical", "basal"]) == [
+        "apical",
+        "basal",
+    ]
+
+    assert extract_input.input_parameters._sort_neurite_types(["axonal", "basal"]) == [
+        "axonal",
+        "basal",
+    ]
+
 
 def test_from_TMD():
     files = sorted([os.path.join(POP_PATH, neuron_dir) for neuron_dir in os.listdir(POP_PATH)])
@@ -711,3 +729,96 @@ def test_from_TMD():
     for a, b in zip(angles["persistence_diagram"], expected):
         for ai, bi in zip(a, b):
             assert_array_almost_equal(ai, bi, decimal=6 if not _OLD_NUMPY else 5)
+
+
+def test__step_fit_prob_function():
+    prob = extract_input.from_neurom._step_fit_prob_function(2.1, 0.5, 5)
+    assert_equal(prob, 0.45207555620825685)
+
+
+def test__double_step_fit_prob_function():
+    prob = extract_input.from_neurom._double_step_fit_prob_function(2.1, 0.5, 5, -0.5, 1)
+    assert_equal(prob, 0.38958150225104865)
+
+
+def test_get_fit_prob_function():
+    function, bound, form = extract_input.from_neurom.get_fit_prob_function(morph_class="PC")
+    assert function == extract_input.from_neurom._step_fit_prob_function
+    assert_array_almost_equal(bound[0], [0.0, 0.01])
+    assert_array_almost_equal(bound[1], [np.pi, 10])
+    assert form == "step"
+
+    function, bound, form = extract_input.from_neurom.get_fit_prob_function(
+        morph_class="IN", params={"axon": {"form": "double_step"}}
+    )
+    assert function == extract_input.from_neurom._double_step_fit_prob_function
+    assert_array_almost_equal(bound[0], [-np.pi, 0.01, -np.pi, 0.01])
+    assert_array_almost_equal(bound[1], [np.pi, 10, np.pi, 10])
+    assert form == "double_step"
+
+
+def test_trunk_vectors(POPUL):
+    vecs = extract_input.from_neurom.trunk_vectors(
+        POPUL[0], neurom.BASAL_DENDRITE, from_center_of_mass=True
+    )
+    assert_array_almost_equal(
+        vecs,
+        [
+            [-4.1488857, -1.5748149, -2.5870368],
+            [4.0211124, 0.8551851, 1.742963],
+            [-0.8288862, -4.844815, -10.847037],
+            [5.051111, -0.82481486, -3.967037],
+        ],
+    )
+    vecs = extract_input.from_neurom.trunk_vectors(
+        POPUL[0], neurom.BASAL_DENDRITE, from_center_of_mass=False
+    )
+    assert_array_almost_equal(
+        vecs,
+        [
+            [-4.1488857, -1.5748149, -2.5870368],
+            [4.0211124, 0.8551851, 1.742963],
+            [-0.8288862, -4.844815, -10.847037],
+            [5.051111, -0.82481486, -3.967037],
+        ],
+    )
+
+
+def test__have_apical_dendrites(POPUL, NEU):
+    morph_class = extract_input.from_neurom._have_apical_dendrites(POPUL)
+    assert morph_class == "PC"
+
+    morph_class = extract_input.from_neurom._have_apical_dendrites(NEU)
+    assert morph_class == "IN"
+
+    # test population of mixed morph_class
+    with pytest.raises(Exception):
+        morph_class = extract_input.from_neurom._have_apical_dendrites(
+            Population(list(POPUL.morphologies) + list(NEU.morphologies))
+        )
+
+
+def test__trunk_neurite(POPUL, NEU):
+    angles = extract_input.from_neurom._trunk_neurite(POPUL, neurom.APICAL_DENDRITE, bins=10)
+    assert angles == {"trunk": None}
+
+    _angles = extract_input.from_neurom.trunk_neurite(
+        POPUL, neurom.APICAL_DENDRITE, bins=10, method="new"
+    )
+    assert angles == _angles
+
+    angles = extract_input.from_neurom._trunk_neurite(POPUL, neurom.BASAL_DENDRITE, bins=10)
+
+    assert angles["trunk"]["3d_angle"]["form"] == "step"
+    assert_array_almost_equal(
+        angles["trunk"]["3d_angle"]["params"], [1.53621562e-06, 9.99998998e00]
+    )
+
+    _angles = extract_input.from_neurom.trunk_neurite(
+        POPUL, neurom.BASAL_DENDRITE, bins=10, method="new"
+    )
+    assert angles["trunk"]["3d_angle"]["form"] == _angles["trunk"]["3d_angle"]["form"]
+
+    angles = extract_input.from_neurom._trunk_neurite(NEU, neurom.BASAL_DENDRITE, bins=2)
+    assert angles["trunk"]["3d_angle"]["params"] is None
+>>>>>>> c79b72f (Feat: New trunk angle implementation (squashed))
