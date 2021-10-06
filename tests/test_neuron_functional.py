@@ -533,7 +533,7 @@ class TestBioRatL5Tpc1:
     def test_default(self):
         _test_full(
             "path_distances",
-            "bio_rat_L5_TPC_B.json",
+            "bio_rat_L5_TPC_B_distribution.json",
             "params1.json",
             "expected_bio_rat_L5_TPC_B_with_params1.h5",
             "expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json",
@@ -542,7 +542,7 @@ class TestBioRatL5Tpc1:
     def test_with_rng(self):
         _test_full(
             "path_distances",
-            "bio_rat_L5_TPC_B.json",
+            "bio_rat_L5_TPC_B_distribution.json",
             "params1.json",
             "expected_bio_rat_L5_TPC_B_with_params1.h5",
             "expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json",
@@ -552,7 +552,7 @@ class TestBioRatL5Tpc1:
     def test_skip_validation(self):
         _test_full(
             "path_distances",
-            "bio_rat_L5_TPC_B.json",
+            "bio_rat_L5_TPC_B_distribution.json",
             "params1_orientation_manager.json",
             "expected_bio_rat_L5_TPC_B_with_params1.h5",
             "expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json",
@@ -562,7 +562,7 @@ class TestBioRatL5Tpc1:
     def test_skip_rng_and_validation(self):
         _test_full(
             "path_distances",
-            "bio_rat_L5_TPC_B.json",
+            "bio_rat_L5_TPC_B_distribution.json",
             "params1_orientation_manager.json",
             "expected_bio_rat_L5_TPC_B_with_params1.h5",
             "expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json",
@@ -575,7 +575,7 @@ class TestBioRatL5Tpc2:
     def test_default(self):
         _test_full(
             "path_distances",
-            "bio_rat_L5_TPC_B.json",
+            "bio_rat_L5_TPC_B_distribution.json",
             "params2.json",
             "expected_bio_rat_L5_TPC_B_with_params2.h5",
             "expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json",
@@ -584,7 +584,7 @@ class TestBioRatL5Tpc2:
     def test_with_rng(self):
         _test_full(
             "path_distances",
-            "bio_rat_L5_TPC_B.json",
+            "bio_rat_L5_TPC_B_distribution.json",
             "params2.json",
             "expected_bio_rat_L5_TPC_B_with_params2.h5",
             "expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json",
@@ -594,7 +594,7 @@ class TestBioRatL5Tpc2:
     def test_skip_validation(self):
         _test_full(
             "path_distances",
-            "bio_rat_L5_TPC_B.json",
+            "bio_rat_L5_TPC_B_distribution.json",
             "params2_orientation_manager.json",
             "expected_bio_rat_L5_TPC_B_with_params2.h5",
             "expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json",
@@ -604,7 +604,7 @@ class TestBioRatL5Tpc2:
     def test_skip_rng_and_validation(self):
         _test_full(
             "path_distances",
-            "bio_rat_L5_TPC_B.json",
+            "bio_rat_L5_TPC_B_distribution.json",
             "params2_orientation_manager.json",
             "expected_bio_rat_L5_TPC_B_with_params2.h5",
             "expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json",
@@ -617,7 +617,7 @@ class TestBioRatL5Tpc3:
     def test_default(self):
         _test_full(
             "path_distances",
-            "bio_rat_L5_TPC_B.json",
+            "bio_rat_L5_TPC_B_distribution.json",
             "params3.json",
             "expected_bio_rat_L5_TPC_B_with_params3.h5",
             "expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json",
@@ -626,7 +626,7 @@ class TestBioRatL5Tpc3:
     def test_with_rng(self):
         _test_full(
             "path_distances",
-            "bio_rat_L5_TPC_B.json",
+            "bio_rat_L5_TPC_B_distribution.json",
             "params3.json",
             "expected_bio_rat_L5_TPC_B_with_params3.h5",
             "expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json",
@@ -636,7 +636,7 @@ class TestBioRatL5Tpc3:
     def test_skip_validation(self):
         _test_full(
             "path_distances",
-            "bio_rat_L5_TPC_B.json",
+            "bio_rat_L5_TPC_B_distribution.json",
             "params3_orientation_manager.json",
             "expected_bio_rat_L5_TPC_B_with_params3.h5",
             "expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json",
@@ -646,7 +646,7 @@ class TestBioRatL5Tpc3:
     def test_skip_rng_and_validation(self):
         _test_full(
             "path_distances",
-            "bio_rat_L5_TPC_B.json",
+            "bio_rat_L5_TPC_B_distribution.json",
             "params3_orientation_manager.json",
             "expected_bio_rat_L5_TPC_B_with_params3.h5",
             "expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json",
@@ -659,7 +659,7 @@ class TestBioRatL5Tpc4:
     def test_default(self):
         _test_full(
             "path_distances",
-            "bio_rat_L5_TPC_B.json",
+            "bio_rat_L5_TPC_B_distribution.json",
             "params4.json",
             "expected_bio_rat_L5_TPC_B_with_params4.h5",
             "expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json",
@@ -668,7 +668,7 @@ class TestBioRatL5Tpc4:
     def test_with_rng(self):
         _test_full(
             "path_distances",
-            "bio_rat_L5_TPC_B.json",
+            "bio_rat_L5_TPC_B_distribution.json",
             "params4.json",
             "expected_bio_rat_L5_TPC_B_with_params4.h5",
             "expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json",
@@ -678,7 +678,7 @@ class TestBioRatL5Tpc4:
     def test_skip_validation(self):
         _test_full(
             "path_distances",
-            "bio_rat_L5_TPC_B.json",
+            "bio_rat_L5_TPC_B_distribution.json",
             "params4_orientation_manager.json",
             "expected_bio_rat_L5_TPC_B_with_params4.h5",
             "expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json",
@@ -688,7 +688,7 @@ class TestBioRatL5Tpc4:
     def test_skip_rng_and_validation(self):
         _test_full(
             "path_distances",
-            "bio_rat_L5_TPC_B.json",
+            "bio_rat_L5_TPC_B_distribution.json",
             "params4_orientation_manager.json",
             "expected_bio_rat_L5_TPC_B_with_params4.h5",
             "expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json",

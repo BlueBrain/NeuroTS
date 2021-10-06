@@ -4,7 +4,7 @@
            "radius": 0.3,
            "orientation": {
                "mode": "sample_pairwise_angles",
-               "values": {}
+               "values": null
            },
            "growth_method": "tmd",
            "branching_method": "bio_oriented",
