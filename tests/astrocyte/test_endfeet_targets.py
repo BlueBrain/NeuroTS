@@ -3,12 +3,7 @@ from numpy import testing as npt
 
 from neurots.astrocyte import context as tested
 
-
-TARGET_POINTS = np.array([
-    [0., 1., 2.],
-    [2., 3., 4.],
-    [5., 6., 7.]
-])
+TARGET_POINTS = np.array([[0.0, 1.0, 2.0], [2.0, 3.0, 4.0], [5.0, 6.0, 7.0]])
 
 
 def test_constructor():

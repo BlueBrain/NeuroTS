@@ -1,3 +1,5 @@
+# pylint: disable=missing-module-docstring
+# pylint: disable=missing-function-docstring
 import numpy as np
 from numpy import testing as npt
 
@@ -15,7 +17,7 @@ def test_norm():
 def test_from_to_direction():
 
     point = np.array([0.51374375, 0.39753749, 0.27568173])
-    target = np.array([0.5932438 , 0.96379423, 0.49277981])
+    target = np.array([0.5932438, 0.96379423, 0.49277981])
 
     expected_length = 0.6116359455469541
     expected_direction = np.array([0.12997936, 0.92580684, 0.35494657])
@@ -30,11 +32,11 @@ def test_from_to_direction():
 
 def test_in_same_halfspace():
 
-    points = np.array([[0., 0., 0.], [1., 1., 1.], [2., 2., 2.]])
+    points = np.array([[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], [2.0, 2.0, 2.0]])
 
     ref_point = np.array([0.5, 0.5, 0.5])
 
-    direction = -np.array([1., 1., 1.])
+    direction = -np.array([1.0, 1.0, 1.0])
     direction /= np.linalg.norm(direction)
 
     mask = tested.in_same_halfspace(points - ref_point, direction)
@@ -43,14 +45,14 @@ def test_in_same_halfspace():
     mask, dots = tested.in_same_halfspace(points - ref_point, direction, return_dots=True)
     npt.assert_array_equal(mask, [True, False, False])
 
-    npt.assert_allclose(dots, - np.dot(ref_point, direction))
+    npt.assert_allclose(dots, -np.dot(ref_point, direction))
 
 
 def test_in_squared_proximity():
-    point1 = np.array([0., 0., 1.])
-    point2 = np.array([0., 0., 3.])
+    point1 = np.array([0.0, 0.0, 1.0])
+    point2 = np.array([0.0, 0.0, 3.0])
 
-    squared_proximity = 4.
+    squared_proximity = 4.0
     assert tested.in_squared_proximity(point1, point2, squared_proximity)
 
     squared_proximity = 3.9
@@ -59,36 +61,37 @@ def test_in_squared_proximity():
 
 def test_ball_query():
 
-    points = np.array([
-        [0., 0., -2.],
-        [0., 0., -1.],
-        [0., 0., 0.],
-        [0., 0., 1.],
-        [0., 0., 2.]
+    points = np.array(
+        [
+            [0.0, 0.0, -2.0],
+            [0.0, 0.0, -1.0],
+            [0.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0],
+            [0.0, 0.0, 2.0],
+        ]
+    )
 
-    ])
-
-    ids = tested.ball_query(points, np.array([0., 0., 0.]), 1.0)
+    ids = tested.ball_query(points, np.array([0.0, 0.0, 0.0]), 1.0)
     npt.assert_array_equal(ids, [1, 2, 3])
 
 
 def test_upper_half_ball_query():
 
-    points = np.array([[10., 10., 10.], [11., 11., 11.]])
-    ids = tested.upper_half_ball_query(
-        points, np.zeros(3), 0.1, np.array([1., 0., 0.]))
+    points = np.array([[10.0, 10.0, 10.0], [11.0, 11.0, 11.0]])
+    ids = tested.upper_half_ball_query(points, np.zeros(3), 0.1, np.array([1.0, 0.0, 0.0]))
     assert ids.size == 0
 
-    points = np.array([
-        [0., 0., -2.],
-        [0., 0., -1.],
-        [0., 0., 0.],
-        [0., 0., 1.],
-        [0., 0., 2.]
+    points = np.array(
+        [
+            [0.0, 0.0, -2.0],
+            [0.0, 0.0, -1.0],
+            [0.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0],
+            [0.0, 0.0, 2.0],
+        ]
+    )
 
-    ])
-
-    ids = tested.upper_half_ball_query(points, np.array([0., 0., 0.]), 1.0, np.array([-1., 0., -1.]))
+    ids = tested.upper_half_ball_query(
+        points, np.array([0.0, 0.0, 0.0]), 1.0, np.array([-1.0, 0.0, -1.0])
+    )
     npt.assert_array_equal(ids, [1])
-
-

@@ -1,20 +1,22 @@
-"""Class to collect all TMD related info used in NeuroTS"""
+"""Class to collect all TMD related info used in NeuroTS."""
 
 import copy
 from collections import OrderedDict
+
 import numpy as np
+
 from neurots.basic import round_num
 from neurots.utils import NeuroTSError
 
 
 class Barcode:
-    """Class to generate the barcode structure
-       which is essential for the TMD based growth
-       algorithms.
+    """Class to generate the barcode structure.
+
+    The barcode structure is essential for the TMD based growth algorithms.
     """
 
     def __init__(self, ph_angles):
-        '''Initialize the ph_angles into a barcode object.
+        """Initialize the ph_angles into a barcode object.
 
         Args:
             ph_angles (list of lists): list of barcodes and angles of 6 elements:
@@ -46,7 +48,7 @@ class Barcode:
                    bifs: {ID: start_point}
                    terms: {ID, end_point}
                }
-        '''
+        """
         # Sort persistence bars according to bifurcation
         ph_angles.sort(key=lambda x: x[1])
 
@@ -66,46 +68,45 @@ class Barcode:
 
     @staticmethod
     def validate_persistence(ph_angles):
-        '''Checks if data are in the expected format.
-           The input barcodes should follow the rules:
-           1. Bar: (start, end), end > start
-        '''
+        """Checks if data are in the expected format.
+
+        The input barcodes should follow the rules:
+        1. Bar: (start, end), end > start
+        """
         for p in ph_angles:
             if p[0] <= p[1]:
                 return False
         return True
 
     def get_bar(self, bar_id):
-        '''Returns the pair of (bifurcation, termination)
-           that corresponds to the input index
-           The trivial bifurcation of id=0 is not included.
-        '''
+        """Returns the pair of (bifurcation, termination) that corresponds to the input index.
+
+        The trivial bifurcation of id=0 is not included.
+        """
         if bar_id == 0:
             return (0, self.terms[bar_id])
         return (self.bifs[bar_id], self.terms[bar_id])
 
     def get_persistence_length(self):
-        '''Returns the maximum bar length'''
+        """Returns the maximum bar length."""
         return self.terms[0]
 
     def remove_bif(self, bar_id):
-        '''Remove a bifurcation that has been used
-           if bif_id is not None'''
+        """Remove a bifurcation that has been used if bif_id is not None."""
         if bar_id is not None:
             del self.bifs[bar_id]
 
     def remove_term(self, bar_id):
-        '''Remove a termination that has been used,
-           if term_id is not None'''
+        """Remove a termination that has been used, if term_id is not None."""
         if bar_id is not None:
             del self.terms[bar_id]
 
     def get_term(self, bar_id):
-        '''Returns a termination based on index,
-           if the input ID exists.
-           If it doesn't exist the branch will terminate
-           as it gets term = -infinity.
-        '''
+        """Returns a termination based on index if the input ID exists of infinity.
+
+        If it doesn't exist the branch will terminate
+        as it gets term = -infinity.
+        """
         try:
             return self.terms[bar_id]
         except KeyError:
@@ -113,12 +114,13 @@ class Barcode:
             return -np.inf
 
     def get_term_between(self, bar_id, above=0.0, below=np.inf):
-        '''Returns a termination based on index,
-           if it exists and its value is between the
-           above / below thresholds.
-           If it doesn't exist the branch will terminate
-           as it gets term = -infinity.
-        '''
+        """Returns a termination based on index.
+
+        If the index exists and its value is between the above / below thresholds, the termination
+        is returned.
+        If it doesn't exist the branch will terminate
+        as it gets term = -infinity.
+        """
         try:
             term = self.terms[bar_id]
             if above <= term <= below:
@@ -131,11 +133,10 @@ class Barcode:
             return (None, -np.inf)
 
     def min_bif(self, bif_above=0.0, bif_below=np.inf):
-        '''Returns the id and value of the minimum bifurcation
-           whose value is above / below the selected thresholds.
-           If no value is valid, returns infinity (np.inf)
-           and therefore the index is None
-        '''
+        """Returns the id and value of the minimum bifurcation whose value is in threshold range.
+
+        If no value is valid, returns infinity (np.inf) and therefore the index is None.
+        """
         if np.isinf(bif_above):
             bif_above = 0.0
         for bifurcation in self.bifs.items():
@@ -145,11 +146,11 @@ class Barcode:
         return (None, np.inf)
 
     def min_term(self, term_above=0.0, term_below=np.inf):
-        '''Returns the id and value of the minimum termination
-           whose value is above / below the selected thresholds.
-           If no value is valid, returns zero, the section will terminate
-           and therefore the index is None
-        '''
+        """Returns the id and value of the minimum termination whose value is in threshold range.
+
+        If no value is valid, returns zero, the section will terminate and therefore the index is
+        None.
+        """
         if np.isinf(term_above):
             term_above = 0.0
         for termination in self.terms.items():
@@ -159,15 +160,15 @@ class Barcode:
         return (None, 0)
 
     def max_term(self):
-        '''Returns the id and value of the maximum termination
-           Termination list cannot be empty. This means the growth
-           should have stoped, and therefore it will results in a
-           'StopIteration' error
-        '''
+        """Returns the id and value of the maximum termination.
+
+        Termination list cannot be empty. This means the growth should have stoped, and therefore
+        it will results in a 'StopIteration' error
+        """
         return next(reversed(self.terms.items()))
 
     def curate_stop_criterion(self, parent_stop, child_stop):
-        '''Checks if the children stop criterion is compatible with parent.
+        """Checks if the children stop criterion is compatible with parent.
 
         The child bar's length should be smaller than the current bar's length.
         This process ensures that each branch can only generate smaller branches.
@@ -184,7 +185,7 @@ class Barcode:
         Returns:
             The next bar for which the expected length of the child
             branch is smaller than current one for both bif and term.
-        '''
+        """
         MAX_ref = parent_stop.term
         target_stop = copy.deepcopy(child_stop)
 
@@ -192,33 +193,35 @@ class Barcode:
         # One of the assumed conditions is wrong
         # This should not happen, therefore growth should stop!
         if target_stop.term > MAX_ref:
-            raise NeuroTSError('broken pipeline')
+            raise NeuroTSError("broken pipeline")
         if (not np.isinf(target_stop.bif)) and (target_stop.bif > MAX_ref):
-            raise NeuroTSError('broken pipeline')
+            raise NeuroTSError("broken pipeline")
 
         # Case 1. Requirements fullfiled for inputs ref, bif, term
         if self.get_term(target_stop.bif_id) <= target_stop.term:
             return target_stop
 
         # Case 2. A new bifurcation needs to be identified
-        bif_id, bif = self.select_compatible_bif(below_bif=parent_stop.ref,
-                                                 above_bif=MAX_ref,
-                                                 below_term=parent_stop.ref,
-                                                 above_term=target_stop.term)
+        bif_id, bif = self.select_compatible_bif(
+            below_bif=parent_stop.ref,
+            above_bif=MAX_ref,
+            below_term=parent_stop.ref,
+            above_term=target_stop.term,
+        )
         target_stop.update_bif(bif_id, bif)
         return target_stop
 
     def select_compatible_bif(self, below_bif, above_bif, below_term, above_term):
-        '''Finds a bifurcation within the barcode for which both
-           bif and term fulfil the criteria / boundaries
-           below_bif <= bif <= above_bif
-           below_term <= term <= above_term
-        '''
+        """Finds a bifurcation within the barcode.
+
+        The bifurcation must fulfil both bif and term criteria / boundaries:
+        below_bif <= bif <= above_bif
+        below_term <= term <= above_term
+        """
         # Search bar according to minimum bifurcation
         for bif_id, bif in self.bifs.items():
             corresp_term = self.get_term(bif_id)
-            if (below_bif <= bif <= above_bif) and \
-               (below_term <= corresp_term <= above_term):
+            if (below_bif <= bif <= above_bif) and (below_term <= corresp_term <= above_term):
                 # Define new termination corresponding to bifurcation
                 return (bif_id, bif)
         return (None, np.inf)

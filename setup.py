@@ -1,9 +1,8 @@
-""" Distribution configuration for morphsynthesis
-"""
+"""Distribution configuration for the NeuroTS package."""
 import imp
 
-from setuptools import find_packages, setup
-
+from setuptools import find_packages
+from setuptools import setup
 
 VERSION = imp.load_source("neurots.version", "neurots/version.py").VERSION
 
@@ -25,31 +24,31 @@ test_reqs = [
 ]
 
 setup(
-    name='NeuroTS',
-    author='Lida Kanari',
-    author_email='lida.kanari@epfl.ch',
+    name="NeuroTS",
+    author="Lida Kanari",
+    author_email="lida.kanari@epfl.ch",
     version=VERSION,
-    description='Synthesis of artificial neurons using their topological profiles package',
+    description="Synthesis of artificial neurons using their topological profiles package",
     url="https://bbpteam.epfl.ch/documentation/projects/neurots",
     project_urls={
         "Tracker": "https://bbpteam.epfl.ch/project/issues/projects/CELLS/issues",
         "Source": "https://bbpgitlab.epfl.ch/neuromath/NeuroTS",
     },
-    license='BSD',
+    license="BSD",
     install_requires=[
-        'matplotlib>=1.3.1',
-        'tmd>=2.0.8',
-        'morphio>=3.0,<4.0',
+        "matplotlib>=1.3.1",
+        "tmd>=2.0.8",
+        "morphio>=3.0,<4.0",
         "neurom>=3.0,<4.0",
-        'scipy>=0.13.3',
-        'numpy>=1.15.0',
-        'jsonschema>=3.0.1',
+        "scipy>=0.13.3",
+        "numpy>=1.15.0",
+        "jsonschema>=3.0.1",
     ],
     extras_require={
         "docs": doc_reqs,
         "test": test_reqs,
     },
-    python_requires='>=3.6',
+    python_requires=">=3.6",
     packages=find_packages(include=["neurots*"]),
     include_package_data=True,
     classifiers=[

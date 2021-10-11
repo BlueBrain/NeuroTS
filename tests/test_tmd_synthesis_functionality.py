@@ -1,26 +1,27 @@
-'''Test neurots.generate.section code'''
+"""Test neurots.generate.section code"""
 
 import json
 import os
+
 import numpy as np
 import pytest
 from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_array_equal
 from numpy.testing import assert_equal
 
-from neurots.generate.algorithms.common import checks_bif_term
-from neurots.generate.algorithms.common import TMDStop
 from neurots.generate.algorithms.barcode import Barcode
+from neurots.generate.algorithms.common import TMDStop
+from neurots.generate.algorithms.common import checks_bif_term
 from neurots.utils import NeuroTSError
 
-_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
 def test_barcode():
-    '''Tests the barcode functionality'''
+    """Tests the barcode functionality"""
 
-    with open(os.path.join(_PATH, 'dummy_distribution.json')) as f:
-        ph_angles = json.load(f)['apical']['persistence_diagram'][0]
+    with open(os.path.join(_PATH, "dummy_distribution.json")) as f:
+        ph_angles = json.load(f)["apical"]["persistence_diagram"][0]
 
     barcode_test = Barcode(ph_angles)
     assert_equal(barcode_test.get_term_between(999), (None, -np.inf))
@@ -39,7 +40,7 @@ def test_barcode():
     assert_array_almost_equal(barcode_test.get_bar(0), (0, 633.5966))
     assert_array_almost_equal(barcode_test.get_bar(1), (26.3027, 204.0442))
 
-    assert_array_almost_equal(barcode_test.min_bif(),  (1, 26.3027))
+    assert_array_almost_equal(barcode_test.min_bif(), (1, 26.3027))
     assert_array_almost_equal(barcode_test.min_term(), (2, 155.8809))
     assert_array_almost_equal(barcode_test.max_term(), (0, 633.5966))
 
@@ -51,17 +52,17 @@ def test_barcode():
 
 
 def test_barcode_validate_persistence():
-    '''Tests the barcode functionality'''
+    """Tests the barcode functionality"""
 
-    with open(os.path.join(_PATH, 'dummy_distribution.json')) as f:
-        ph_angles = json.load(f)['apical']['persistence_diagram'][0]
+    with open(os.path.join(_PATH, "dummy_distribution.json")) as f:
+        ph_angles = json.load(f)["apical"]["persistence_diagram"][0]
     assert Barcode.validate_persistence(ph_angles)
     ph_angles[0][0] = 0
     assert not Barcode.validate_persistence(ph_angles)
 
 
 def test_checks_bif_term():
-    '''Test the checks_bif_term() function'''
+    """Test the checks_bif_term() function"""
     assert checks_bif_term(0, 1, 2, 10)
     assert not checks_bif_term(2, 1, 0, 10)
 
@@ -76,30 +77,30 @@ def test_checks_bif_term():
 
 
 def test_TMDStop():
-    '''Test the TMDStop class'''
+    """Test the TMDStop class"""
     tmd_stop = TMDStop(1, 26.3027, 0, 633.5966, 10.0)
     assert str(tmd_stop) == "(Ref: 10.0, BifID: 1, Bif: 26.3027, TermID: 0, Term: 633.5966)"
     assert_equal(tmd_stop.bif_id, 1)
     assert_equal(tmd_stop.term_id, 0)
     assert_equal(tmd_stop.bif, 26.3027)
     assert_equal(tmd_stop.term, 633.5966)
-    assert_equal(tmd_stop.ref, 10.)
+    assert_equal(tmd_stop.ref, 10.0)
     assert_equal(tmd_stop.child_length(), 607.2939)
     assert_equal(tmd_stop.expected_termination_length(), 623.5966)
     # Comparison should pass for same TMDstop
-    assert(tmd_stop == TMDStop(1, 26.3027, 0, 633.5966, 10.0))
+    assert tmd_stop == TMDStop(1, 26.3027, 0, 633.5966, 10.0)
     # Comparison should fail for not same TMDstop
-    assert(not tmd_stop == TMDStop(1, 20, 0, 633.5966, 10.0))
+    assert tmd_stop != TMDStop(1, 20, 0, 633.5966, 10.0)
     # Comparison should fail for other object
-    assert(not tmd_stop == 10)
+    assert tmd_stop != 10
 
-    tmd_stop.update_bif(0, 11.)
+    tmd_stop.update_bif(0, 11.0)
     assert_equal(tmd_stop.bif_id, 0)
-    assert_equal(tmd_stop.bif, 11.)
+    assert_equal(tmd_stop.bif, 11.0)
 
-    tmd_stop.update_term(10, 110.)
+    tmd_stop.update_term(10, 110.0)
     assert_equal(tmd_stop.term_id, 10)
-    assert_equal(tmd_stop.term, 110.)
+    assert_equal(tmd_stop.term, 110.0)
 
     assert tmd_stop.verify()
     assert_equal(tmd_stop.expected_bifurcation_length(), 1)
@@ -114,8 +115,8 @@ def test_TMDStop():
     tmd_stop.term = np.inf
     assert_equal(tmd_stop.expected_termination_length(), 0)
 
-    with open(os.path.join(_PATH, 'dummy_distribution.json')) as f:
-        ph_angles = json.load(f)['apical']['persistence_diagram'][0]
+    with open(os.path.join(_PATH, "dummy_distribution.json")) as f:
+        ph_angles = json.load(f)["apical"]["persistence_diagram"][0]
 
     barcode_test = Barcode(ph_angles)
 

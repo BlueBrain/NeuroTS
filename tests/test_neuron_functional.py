@@ -1,11 +1,14 @@
-'''
+"""
 This test ensures that the radial and path distances are computed correctly through NeuroTS,
 so that the code is treating the input barcode, according to the given parameters.
 For this reason, we need to check that the same input distribution
 will generate cells with different properties, according to their input parameters.
 Finally, we need to check the TMD of the produced cells.
-'''
-
+"""
+# pylint: disable=missing-function-docstring
+# pylint: disable=missing-class-docstring
+# pylint: disable=no-self-use
+# pylint: disable=protected-access
 import json
 import os
 from os.path import join
@@ -15,12 +18,14 @@ import numpy as np
 import pytest
 import tmd
 from morph_tool import diff
-from numpy.testing import assert_almost_equal, assert_array_equal, assert_array_almost_equal
+from numpy.testing import assert_almost_equal
+from numpy.testing import assert_array_almost_equal
+from numpy.testing import assert_array_equal
 from scipy.spatial.distance import cdist
 
 from neurots.generate.grower import NeuronGrower
 
-_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
 def build_random_generator(seed=None):
@@ -58,63 +63,74 @@ def _test_full(
     ref_persistence_diagram,
     save=False,
     rng_or_seed=None,
-    skip_validation=False
+    skip_validation=False,
 ):
     distributions, params = _load_inputs(join(_path, distributions), join(_path, parameters))
     if rng_or_seed is None:
         np.random.seed(0)
-        n = NeuronGrower(input_distributions=distributions, input_parameters=params, skip_validation=skip_validation).grow()
+        n = NeuronGrower(
+            input_distributions=distributions,
+            input_parameters=params,
+            skip_validation=skip_validation,
+        ).grow()
     else:
         n = NeuronGrower(
             input_distributions=distributions,
             input_parameters=params,
             rng_or_seed=rng_or_seed,
-            skip_validation=skip_validation
+            skip_validation=skip_validation,
         ).grow()
 
-    with TemporaryDirectory('test_grower') as folder:
-        out_neuron = os.path.join(folder, 'test_output_neuron_.h5')
+    with TemporaryDirectory("test_grower") as folder:
+        out_neuron = os.path.join(folder, "test_output_neuron_.h5")
         n.write(out_neuron)
 
         # For checking purposes, we can output the cells as swc
         if save:
-            n.write(ref_cell.replace('.h5', 'NEW.h5'))
+            n.write(ref_cell.replace(".h5", "NEW.h5"))
 
         if ref_persistence_diagram is not None:
             # Load with TMD and extract radial persistence
             n0 = tmd.io.load_neuron(out_neuron)
 
-            actual_persistence_diagram = tmd.methods.get_persistence_diagram(n0.apical[0], feature=feature)
+            actual_persistence_diagram = tmd.methods.get_persistence_diagram(
+                n0.apical[0], feature=feature
+            )
             if save:
                 print(actual_persistence_diagram)
 
             with open(join(_path, ref_persistence_diagram)) as f:
                 expected_persistence_diagram = json.load(f)
 
-            assert_close_persistent_diagram(actual_persistence_diagram,
-                                            expected_persistence_diagram)
+            assert_close_persistent_diagram(
+                actual_persistence_diagram, expected_persistence_diagram
+            )
 
         assert not diff(out_neuron, os.path.join(_path, ref_cell))
 
 
 def test_wrong_filtration():
-    '''Test filtration metric inconsistency in distrib and params: path != radial'''
-    distributions, parameters = _load_inputs(os.path.join(_path, 'bio_path_distribution.json'),
-                                             os.path.join(_path, 'bio_radial_params.json'))
+    """Test filtration metric inconsistency in distrib and params: path != radial"""
+    distributions, parameters = _load_inputs(
+        os.path.join(_path, "bio_path_distribution.json"),
+        os.path.join(_path, "bio_radial_params.json"),
+    )
     with pytest.raises(ValueError):
         NeuronGrower(parameters, distributions)
 
 
 def test_seeding():
-    '''Test seeding of internal random number generator'''
-    distributions, parameters = _load_inputs(os.path.join(_path, 'bio_path_distribution.json'),
-                                             os.path.join(_path, 'bio_path_params.json'))
+    """Test seeding of internal random number generator"""
+    distributions, parameters = _load_inputs(
+        os.path.join(_path, "bio_path_distribution.json"),
+        os.path.join(_path, "bio_path_params.json"),
+    )
     ng = NeuronGrower(parameters, distributions, rng_or_seed=0)
     assert ng._rng.bit_generator.state == {
         "bit_generator": "PCG64",
         "state": {
             "state": 80186449399738619878794082838194943960,
-            "inc": 87136372517582989555478159403783844777
+            "inc": 87136372517582989555478159403783844777,
         },
         "has_uint32": 0,
         "uinteger": 0,
@@ -125,51 +141,59 @@ def test_seeding():
 
 
 def test_grow_trunk_1_basal():
-    '''Test NeuronGrower._grow_trunk() with only 1 basal (should raise an Exception)'''
-    distributions, parameters = _load_inputs(os.path.join(_path, 'bio_path_distribution.json'),
-                                             os.path.join(_path, 'bio_path_params.json'))
-    distributions['basal']['num_trees']['data']['bins'] = [1]
+    """Test NeuronGrower._grow_trunk() with only 1 basal (should raise an Exception)"""
+    distributions, parameters = _load_inputs(
+        os.path.join(_path, "bio_path_distribution.json"),
+        os.path.join(_path, "bio_path_params.json"),
+    )
+    distributions["basal"]["num_trees"]["data"]["bins"] = [1]
     ng = NeuronGrower(parameters, distributions)
-    with pytest.raises(Exception, match=r'There should be at least 2 basal dendrites \(got 1\)'):
+    with pytest.raises(Exception, match=r"There should be at least 2 basal dendrites \(got 1\)"):
         ng.grow()
 
 
 def test_external_diametrizer():
-    '''Test external diametrizer'''
-    distributions, parameters = _load_inputs(os.path.join(_path, 'bio_path_distribution.json'),
-                                             os.path.join(_path, 'bio_path_params.json'))
-    distributions['diameter']['method'] = 'M1'
-    parameters['diameter_params']['method'] = 'M1'
+    """Test external diametrizer"""
+    distributions, parameters = _load_inputs(
+        os.path.join(_path, "bio_path_distribution.json"),
+        os.path.join(_path, "bio_path_params.json"),
+    )
+    distributions["diameter"]["method"] = "M1"
+    parameters["diameter_params"]["method"] = "M1"
     ng = NeuronGrower(parameters, distributions)
     ng.grow()
 
     # Inconsistent methods
-    distributions['diameter']['method'] = 'external'
-    parameters['diameter_params']['method'] = 'M1'
+    distributions["diameter"]["method"] = "external"
+    parameters["diameter_params"]["method"] = "M1"
     with pytest.raises(
         ValueError,
-        match='Diameters methods of parameters and distributions is inconsistent: M1 != external'
+        match="Diameters methods of parameters and distributions is inconsistent: M1 != external",
     ):
         NeuronGrower(parameters, distributions)
 
     # No external diametrizer provided
-    distributions['diameter']['method'] = 'external'
-    parameters['diameter_params']['method'] = 'external'
-    with pytest.raises(ValueError, match='External diametrizer is missing the diametrizer function.'):
+    distributions["diameter"]["method"] = "external"
+    parameters["diameter_params"]["method"] = "external"
+    with pytest.raises(
+        ValueError, match="External diametrizer is missing the diametrizer function."
+    ):
         NeuronGrower(parameters, distributions)
 
     bad_ng = NeuronGrower(parameters, distributions, external_diametrizer=object())
-    with pytest.raises(Exception, match='Please provide an external diametrizer!'):
+    with pytest.raises(Exception, match="Please provide an external diametrizer!"):
         bad_ng._init_diametrizer()
 
 
 def test_convert_orientation2points():
-    '''Test NeuronGrower._convert_orientation2points()'''
+    """Test NeuronGrower._convert_orientation2points()"""
     np.random.seed(0)
-    distributions, parameters = _load_inputs(os.path.join(_path, 'bio_path_distribution.json'),
-                                             os.path.join(_path, 'bio_path_params.json'))
-    distributions['diameter']['method'] = 'M1'
-    parameters['diameter_params']['method'] = 'M1'
+    distributions, parameters = _load_inputs(
+        os.path.join(_path, "bio_path_distribution.json"),
+        os.path.join(_path, "bio_path_params.json"),
+    )
+    distributions["diameter"]["method"] = "M1"
+    parameters["diameter_params"]["method"] = "M1"
     ng = NeuronGrower(parameters, distributions)
 
     pts = ng._convert_orientation2points([[0, 1, 0]], 1, distributions["apical"], {})
@@ -178,69 +202,57 @@ def test_convert_orientation2points():
     ng = NeuronGrower(parameters, distributions)
     pts = ng._convert_orientation2points(None, 2, distributions["apical"], {})
     assert_array_almost_equal(
-        pts,
-        [[-10.399604, -0.173343, 0.937449], [10.31932, 0.172005, -1.594578]]
+        pts, [[-10.399604, -0.173343, 0.937449], [10.31932, 0.172005, -1.594578]]
     )
 
     with pytest.raises(ValueError):
-        ng._convert_orientation2points(
-            "from_space",
-            1,
-            distributions["apical"],
-            {}
-        )
+        ng._convert_orientation2points("from_space", 1, distributions["apical"], {})
 
     with pytest.raises(ValueError):
-        ng._convert_orientation2points(
-            object(),
-            1,
-            distributions["apical"],
-            {}
-        )
+        ng._convert_orientation2points(object(), 1, distributions["apical"], {})
 
     with pytest.raises(ValueError):
-        ng._convert_orientation2points(
-            [[0, 1, 0]],
-            99,
-            distributions["apical"],
-            {}
-        )
+        ng._convert_orientation2points([[0, 1, 0]], 99, distributions["apical"], {})
 
     distributions, parameters = _load_inputs(
-        os.path.join(_path, 'axon_trunk_distribution.json'),
-        os.path.join(_path, 'axon_trunk_parameters_absolute.json')
+        os.path.join(_path, "axon_trunk_distribution.json"),
+        os.path.join(_path, "axon_trunk_parameters_absolute.json"),
     )
     with pytest.raises(ValueError):
         ng._convert_orientation2points(
             [[0, 1, 0], [0, 1, 0]],
             1,
             distributions["axon"],
-            {"trunk_absolute_orientation": True}
+            {"trunk_absolute_orientation": True},
         )
 
     del distributions["axon"]["trunk"]["absolute_elevation_deviation"]
     with pytest.raises(KeyError):
         ng._convert_orientation2points(
-            [[0, 1, 0]],
-            1,
-            distributions["axon"],
-            {"trunk_absolute_orientation": True}
+            [[0, 1, 0]], 1, distributions["axon"], {"trunk_absolute_orientation": True}
         )
 
 
 def test_breaker_of_tmd_algo():
-    '''Test example that could break tmd_algo. Test should fail if problem occurs.
-       Otherwise, this grower should run smoothly.
-    '''
-    distributions, params = _load_inputs(join(_path, 'bio_distr_breaker.json'),
-                                         join(_path, 'bio_params_breaker.json'))
+    """Test example that could break tmd_algo. Test should fail if problem occurs.
+    Otherwise, this grower should run smoothly.
+    """
+    distributions, params = _load_inputs(
+        join(_path, "bio_distr_breaker.json"), join(_path, "bio_params_breaker.json")
+    )
     np.random.seed(3367155)
     N = NeuronGrower(input_distributions=distributions, input_parameters=params)
     n = N.grow()
 
     assert_array_equal(N.apical_sections, [33])
-    assert_array_almost_equal(n.sections[169].points[-1], np.array([117.20551, -41.12157, 189.57013]), decimal=5)
-    assert_array_almost_equal(n.sections[122].points[-1], np.array([ 77.08879, 115.79825,  -0.99393]), decimal=5)
+    assert_array_almost_equal(
+        n.sections[169].points[-1],
+        np.array([117.20551, -41.12157, 189.57013]),
+        decimal=5,
+    )
+    assert_array_almost_equal(
+        n.sections[122].points[-1], np.array([77.08879, 115.79825, -0.99393]), decimal=5
+    )
 
     # Test with a specific random generator
     rng = build_random_generator(3367155)
@@ -249,85 +261,111 @@ def test_breaker_of_tmd_algo():
     n = N.grow()
 
     assert_array_equal(N.apical_sections, [33])
-    assert_array_almost_equal(n.sections[169].points[-1], np.array([117.20551, -41.12157, 189.57013]), decimal=5)
-    assert_array_almost_equal(n.sections[122].points[-1], np.array([ 77.08879, 115.79825,  -0.99393]), decimal=5)
+    assert_array_almost_equal(
+        n.sections[169].points[-1],
+        np.array([117.20551, -41.12157, 189.57013]),
+        decimal=5,
+    )
+    assert_array_almost_equal(
+        n.sections[122].points[-1], np.array([77.08879, 115.79825, -0.99393]), decimal=5
+    )
 
 
 def test_axon_grower():
-    '''Test axon grower, which should only grow trunks with 1 section to allow later axon grafting.
+    """Test axon grower, which should only grow trunks with 1 section to allow later axon grafting.
 
     The num_seg value in the parameters is set to 999 but only 1 segment should be synthesized.
-    '''
+    """
 
-    _test_full('radial_distances',
-               'axon_trunk_distribution.json',
-               'axon_trunk_parameters.json',
-               'test_axon_grower.h5',
-               None)
-    _test_full('radial_distances',
-               'axon_trunk_distribution.json',
-               'axon_trunk_parameters.json',
-               'test_axon_grower.h5',
-               None,
-               rng_or_seed=build_random_generator(0))
-    _test_full('radial_distances',
-               'axon_trunk_distribution.json',
-               'axon_trunk_parameters_orientation_manager.json',
-               'test_axon_grower.h5',
-               None,
-               skip_validation=True)
-    _test_full('radial_distances',
-               'axon_trunk_distribution.json',
-               'axon_trunk_parameters_orientation_manager.json',
-               'test_axon_grower.h5',
-               None,
-               rng_or_seed=build_random_generator(0),
-               skip_validation=True)
+    _test_full(
+        "radial_distances",
+        "axon_trunk_distribution.json",
+        "axon_trunk_parameters.json",
+        "test_axon_grower.h5",
+        None,
+    )
+    _test_full(
+        "radial_distances",
+        "axon_trunk_distribution.json",
+        "axon_trunk_parameters.json",
+        "test_axon_grower.h5",
+        None,
+        rng_or_seed=build_random_generator(0),
+    )
+    _test_full(
+        "radial_distances",
+        "axon_trunk_distribution.json",
+        "axon_trunk_parameters_orientation_manager.json",
+        "test_axon_grower.h5",
+        None,
+        skip_validation=True,
+    )
+    _test_full(
+        "radial_distances",
+        "axon_trunk_distribution.json",
+        "axon_trunk_parameters_orientation_manager.json",
+        "test_axon_grower.h5",
+        None,
+        rng_or_seed=build_random_generator(0),
+        skip_validation=True,
+    )
 
-    _test_full('radial_distances',
-               'axon_trunk_distribution.json',
-               'axon_trunk_parameters_absolute.json',
-               'test_axon_grower_absolute.h5',
-               None)
-    _test_full('radial_distances',
-               'axon_trunk_distribution.json',
-               'axon_trunk_parameters_absolute.json',
-               'test_axon_grower_absolute.h5',
-               None,
-               rng_or_seed=build_random_generator(0))
-    _test_full('radial_distances',
-               'axon_trunk_distribution.json',
-               'axon_trunk_parameters_absolute_orientation_manager.json',
-               'test_axon_grower_absolute.h5',
-               None,
-               skip_validation=True)
-    _test_full('radial_distances',
-               'axon_trunk_distribution.json',
-               'axon_trunk_parameters_absolute_orientation_manager.json',
-               'test_axon_grower_absolute.h5',
-               None,
-               rng_or_seed=build_random_generator(0),
-               skip_validation=True)
+    _test_full(
+        "radial_distances",
+        "axon_trunk_distribution.json",
+        "axon_trunk_parameters_absolute.json",
+        "test_axon_grower_absolute.h5",
+        None,
+    )
+    _test_full(
+        "radial_distances",
+        "axon_trunk_distribution.json",
+        "axon_trunk_parameters_absolute.json",
+        "test_axon_grower_absolute.h5",
+        None,
+        rng_or_seed=build_random_generator(0),
+    )
+    _test_full(
+        "radial_distances",
+        "axon_trunk_distribution.json",
+        "axon_trunk_parameters_absolute_orientation_manager.json",
+        "test_axon_grower_absolute.h5",
+        None,
+        skip_validation=True,
+    )
+    _test_full(
+        "radial_distances",
+        "axon_trunk_distribution.json",
+        "axon_trunk_parameters_absolute_orientation_manager.json",
+        "test_axon_grower_absolute.h5",
+        None,
+        rng_or_seed=build_random_generator(0),
+        skip_validation=True,
+    )
 
 
 def test_basic_grower():
-    _test_full('radial_distances',
-               'bio_trunk_distribution.json',
-               'trunk_parameters.json',
-               'test_trunk_grower.h5',
-               None)
-    _test_full('radial_distances',
-               'bio_trunk_distribution.json',
-               'trunk_parameters.json',
-               'test_trunk_grower.h5',
-               None,
-               rng_or_seed=build_random_generator(0))
+    _test_full(
+        "radial_distances",
+        "bio_trunk_distribution.json",
+        "trunk_parameters.json",
+        "test_trunk_grower.h5",
+        None,
+    )
+    _test_full(
+        "radial_distances",
+        "bio_trunk_distribution.json",
+        "trunk_parameters.json",
+        "test_trunk_grower.h5",
+        None,
+        rng_or_seed=build_random_generator(0),
+    )
 
 
 def test_basic_grower_with_generator():
     distributions, params = _load_inputs(
-      join(_path, 'bio_trunk_distribution.json'),
-      join(_path, 'trunk_parameters.json'),
+        join(_path, "bio_trunk_distribution.json"),
+        join(_path, "trunk_parameters.json"),
     )
     expected_pts = [
         [-0.7312348484992981, 7.604228973388672, 11.173797607421875],
@@ -355,205 +393,257 @@ def test_basic_grower_with_generator():
         NeuronGrower(params, distributions, rng_or_seed="NOT A SEED")
 
 
-class TestPathGrower():
-    '''test tmd_path and tmd_apical_path'''
+class TestPathGrower:
+    """test tmd_path and tmd_apical_path"""
 
     def test_default(self):
-        _test_full('path_distances',
-                   'bio_distribution.json',
-                   'bio_path_params.json',
-                   'path_grower.h5',
-                   'bio_path_persistence_diagram.json')
+        _test_full(
+            "path_distances",
+            "bio_distribution.json",
+            "bio_path_params.json",
+            "path_grower.h5",
+            "bio_path_persistence_diagram.json",
+        )
 
     def test_with_rng(self):
-        _test_full('path_distances',
-                   'bio_distribution.json',
-                   'bio_path_params.json',
-                   'path_grower.h5',
-                   'bio_path_persistence_diagram.json',
-                   rng_or_seed=build_random_generator(0))
+        _test_full(
+            "path_distances",
+            "bio_distribution.json",
+            "bio_path_params.json",
+            "path_grower.h5",
+            "bio_path_persistence_diagram.json",
+            rng_or_seed=build_random_generator(0),
+        )
 
     def test_skip_validation(self):
-        _test_full('path_distances',
-               'bio_distribution.json',
-               'bio_path_params_orientation_manager.json',
-               'path_grower.h5',
-               'bio_path_persistence_diagram.json',
-               skip_validation=True)
+        _test_full(
+            "path_distances",
+            "bio_distribution.json",
+            "bio_path_params_orientation_manager.json",
+            "path_grower.h5",
+            "bio_path_persistence_diagram.json",
+            skip_validation=True,
+        )
 
     def test_skip_rng_and_validation(self):
-        _test_full('path_distances',
-               'bio_distribution.json',
-               'bio_path_params_orientation_manager.json',
-               'path_grower.h5',
-               'bio_path_persistence_diagram.json',
-               skip_validation=True,
-               rng_or_seed=build_random_generator(0))
+        _test_full(
+            "path_distances",
+            "bio_distribution.json",
+            "bio_path_params_orientation_manager.json",
+            "path_grower.h5",
+            "bio_path_persistence_diagram.json",
+            skip_validation=True,
+            rng_or_seed=build_random_generator(0),
+        )
 
 
-class TestGradientPathGrower():
-    '''test tmd_path'''
+class TestGradientPathGrower:
+    """test tmd_path"""
 
     def test_default(self):
-        _test_full('path_distances',
-                  'bio_distribution.json',
-                  'bio_gradient_path_params.json',
-                  'gradient_path_grower.h5',
-                  'gradient_path_persistence_diagram.json')
+        _test_full(
+            "path_distances",
+            "bio_distribution.json",
+            "bio_gradient_path_params.json",
+            "gradient_path_grower.h5",
+            "gradient_path_persistence_diagram.json",
+        )
 
     def test_with_rng(self):
-        _test_full('path_distances',
-                  'bio_distribution.json',
-                  'bio_gradient_path_params.json',
-                  'gradient_path_grower.h5',
-                  'gradient_path_persistence_diagram.json',
-                   rng_or_seed=build_random_generator(0))
+        _test_full(
+            "path_distances",
+            "bio_distribution.json",
+            "bio_gradient_path_params.json",
+            "gradient_path_grower.h5",
+            "gradient_path_persistence_diagram.json",
+            rng_or_seed=build_random_generator(0),
+        )
 
     def test_skip_validation(self):
-        _test_full('path_distances',
-                  'bio_distribution.json',
-                  'bio_gradient_path_params_orientation_manager.json',
-                  'gradient_path_grower.h5',
-                  'gradient_path_persistence_diagram.json',
-                  skip_validation=True)
+        _test_full(
+            "path_distances",
+            "bio_distribution.json",
+            "bio_gradient_path_params_orientation_manager.json",
+            "gradient_path_grower.h5",
+            "gradient_path_persistence_diagram.json",
+            skip_validation=True,
+        )
 
     def test_skip_rng_and_validation(self):
-        _test_full('path_distances',
-                  'bio_distribution.json',
-                  'bio_gradient_path_params_orientation_manager.json',
-                  'gradient_path_grower.h5',
-                  'gradient_path_persistence_diagram.json',
-                   skip_validation=True,
-                   rng_or_seed=build_random_generator(0))
+        _test_full(
+            "path_distances",
+            "bio_distribution.json",
+            "bio_gradient_path_params_orientation_manager.json",
+            "gradient_path_grower.h5",
+            "gradient_path_persistence_diagram.json",
+            skip_validation=True,
+            rng_or_seed=build_random_generator(0),
+        )
 
-class TestBioRatL5Tpc1():
+
+class TestBioRatL5Tpc1:
     def test_default(self):
-        _test_full('path_distances',
-                   'bio_rat_L5_TPC_B.json',
-                   'params1.json',
-                   'expected_bio_rat_L5_TPC_B_with_params1.h5',
-                   'expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json')
+        _test_full(
+            "path_distances",
+            "bio_rat_L5_TPC_B.json",
+            "params1.json",
+            "expected_bio_rat_L5_TPC_B_with_params1.h5",
+            "expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json",
+        )
 
     def test_with_rng(self):
-        _test_full('path_distances',
-                   'bio_rat_L5_TPC_B.json',
-                   'params1.json',
-                   'expected_bio_rat_L5_TPC_B_with_params1.h5',
-                   'expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json',
-                   rng_or_seed=build_random_generator(0))
+        _test_full(
+            "path_distances",
+            "bio_rat_L5_TPC_B.json",
+            "params1.json",
+            "expected_bio_rat_L5_TPC_B_with_params1.h5",
+            "expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json",
+            rng_or_seed=build_random_generator(0),
+        )
 
     def test_skip_validation(self):
-        _test_full('path_distances',
-                   'bio_rat_L5_TPC_B.json',
-                   'params1_orientation_manager.json',
-                   'expected_bio_rat_L5_TPC_B_with_params1.h5',
-                   'expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json',
-                    skip_validation=True)
+        _test_full(
+            "path_distances",
+            "bio_rat_L5_TPC_B.json",
+            "params1_orientation_manager.json",
+            "expected_bio_rat_L5_TPC_B_with_params1.h5",
+            "expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json",
+            skip_validation=True,
+        )
 
     def test_skip_rng_and_validation(self):
-        _test_full('path_distances',
-                   'bio_rat_L5_TPC_B.json',
-                   'params1_orientation_manager.json',
-                   'expected_bio_rat_L5_TPC_B_with_params1.h5',
-                   'expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json',
-                   skip_validation=True,
-                   rng_or_seed=build_random_generator(0))
+        _test_full(
+            "path_distances",
+            "bio_rat_L5_TPC_B.json",
+            "params1_orientation_manager.json",
+            "expected_bio_rat_L5_TPC_B_with_params1.h5",
+            "expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json",
+            skip_validation=True,
+            rng_or_seed=build_random_generator(0),
+        )
 
 
-class TestBioRatL5Tpc2():
+class TestBioRatL5Tpc2:
     def test_default(self):
-        _test_full('path_distances',
-                   'bio_rat_L5_TPC_B.json',
-                   'params2.json',
-                   'expected_bio_rat_L5_TPC_B_with_params2.h5',
-                   'expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json')
+        _test_full(
+            "path_distances",
+            "bio_rat_L5_TPC_B.json",
+            "params2.json",
+            "expected_bio_rat_L5_TPC_B_with_params2.h5",
+            "expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json",
+        )
 
     def test_with_rng(self):
-        _test_full('path_distances',
-                   'bio_rat_L5_TPC_B.json',
-                   'params2.json',
-                   'expected_bio_rat_L5_TPC_B_with_params2.h5',
-                   'expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json',
-                   rng_or_seed=build_random_generator(0))
+        _test_full(
+            "path_distances",
+            "bio_rat_L5_TPC_B.json",
+            "params2.json",
+            "expected_bio_rat_L5_TPC_B_with_params2.h5",
+            "expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json",
+            rng_or_seed=build_random_generator(0),
+        )
 
     def test_skip_validation(self):
-        _test_full('path_distances',
-                   'bio_rat_L5_TPC_B.json',
-                   'params2_orientation_manager.json',
-                   'expected_bio_rat_L5_TPC_B_with_params2.h5',
-                   'expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json',
-                   skip_validation=True)
+        _test_full(
+            "path_distances",
+            "bio_rat_L5_TPC_B.json",
+            "params2_orientation_manager.json",
+            "expected_bio_rat_L5_TPC_B_with_params2.h5",
+            "expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json",
+            skip_validation=True,
+        )
 
     def test_skip_rng_and_validation(self):
-        _test_full('path_distances',
-                   'bio_rat_L5_TPC_B.json',
-                   'params2_orientation_manager.json',
-                   'expected_bio_rat_L5_TPC_B_with_params2.h5',
-                   'expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json',
-                   skip_validation=True,
-                   rng_or_seed=build_random_generator(0))
+        _test_full(
+            "path_distances",
+            "bio_rat_L5_TPC_B.json",
+            "params2_orientation_manager.json",
+            "expected_bio_rat_L5_TPC_B_with_params2.h5",
+            "expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json",
+            skip_validation=True,
+            rng_or_seed=build_random_generator(0),
+        )
 
 
-class TestBioRatL5Tpc3():
+class TestBioRatL5Tpc3:
     def test_default(self):
-        _test_full('path_distances',
-                   'bio_rat_L5_TPC_B.json',
-                   'params3.json',
-                   'expected_bio_rat_L5_TPC_B_with_params3.h5',
-                   'expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json')
+        _test_full(
+            "path_distances",
+            "bio_rat_L5_TPC_B.json",
+            "params3.json",
+            "expected_bio_rat_L5_TPC_B_with_params3.h5",
+            "expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json",
+        )
+
     def test_with_rng(self):
-        _test_full('path_distances',
-                   'bio_rat_L5_TPC_B.json',
-                   'params3.json',
-                   'expected_bio_rat_L5_TPC_B_with_params3.h5',
-                   'expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json',
-                   rng_or_seed=build_random_generator(0))
+        _test_full(
+            "path_distances",
+            "bio_rat_L5_TPC_B.json",
+            "params3.json",
+            "expected_bio_rat_L5_TPC_B_with_params3.h5",
+            "expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json",
+            rng_or_seed=build_random_generator(0),
+        )
+
     def test_skip_validation(self):
-        _test_full('path_distances',
-                   'bio_rat_L5_TPC_B.json',
-                   'params3_orientation_manager.json',
-                   'expected_bio_rat_L5_TPC_B_with_params3.h5',
-                   'expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json',
-                   skip_validation=True)
+        _test_full(
+            "path_distances",
+            "bio_rat_L5_TPC_B.json",
+            "params3_orientation_manager.json",
+            "expected_bio_rat_L5_TPC_B_with_params3.h5",
+            "expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json",
+            skip_validation=True,
+        )
+
     def test_skip_rng_and_validation(self):
-        _test_full('path_distances',
-                   'bio_rat_L5_TPC_B.json',
-                   'params3_orientation_manager.json',
-                   'expected_bio_rat_L5_TPC_B_with_params3.h5',
-                   'expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json',
-                   skip_validation=True,
-                   rng_or_seed=build_random_generator(0))
+        _test_full(
+            "path_distances",
+            "bio_rat_L5_TPC_B.json",
+            "params3_orientation_manager.json",
+            "expected_bio_rat_L5_TPC_B_with_params3.h5",
+            "expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json",
+            skip_validation=True,
+            rng_or_seed=build_random_generator(0),
+        )
 
 
-class TestBioRatL5Tpc4():
+class TestBioRatL5Tpc4:
     def test_default(self):
-        _test_full('path_distances',
-                   'bio_rat_L5_TPC_B.json',
-                   'params4.json',
-                   'expected_bio_rat_L5_TPC_B_with_params4.h5',
-                   'expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json')
+        _test_full(
+            "path_distances",
+            "bio_rat_L5_TPC_B.json",
+            "params4.json",
+            "expected_bio_rat_L5_TPC_B_with_params4.h5",
+            "expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json",
+        )
 
     def test_with_rng(self):
-        _test_full('path_distances',
-                   'bio_rat_L5_TPC_B.json',
-                   'params4.json',
-                   'expected_bio_rat_L5_TPC_B_with_params4.h5',
-                   'expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json',
-                   rng_or_seed=build_random_generator(0))
+        _test_full(
+            "path_distances",
+            "bio_rat_L5_TPC_B.json",
+            "params4.json",
+            "expected_bio_rat_L5_TPC_B_with_params4.h5",
+            "expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json",
+            rng_or_seed=build_random_generator(0),
+        )
 
     def test_skip_validation(self):
-        _test_full('path_distances',
-                   'bio_rat_L5_TPC_B.json',
-                   'params4_orientation_manager.json',
-                   'expected_bio_rat_L5_TPC_B_with_params4.h5',
-                   'expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json',
-                   skip_validation=True)
+        _test_full(
+            "path_distances",
+            "bio_rat_L5_TPC_B.json",
+            "params4_orientation_manager.json",
+            "expected_bio_rat_L5_TPC_B_with_params4.h5",
+            "expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json",
+            skip_validation=True,
+        )
 
     def test_skip_rng_and_validation(self):
-        _test_full('path_distances',
-                   'bio_rat_L5_TPC_B.json',
-                   'params4_orientation_manager.json',
-                   'expected_bio_rat_L5_TPC_B_with_params4.h5',
-                   'expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json',
-                   skip_validation=True,
-                   rng_or_seed=build_random_generator(0))
+        _test_full(
+            "path_distances",
+            "bio_rat_L5_TPC_B.json",
+            "params4_orientation_manager.json",
+            "expected_bio_rat_L5_TPC_B_with_params4.h5",
+            "expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json",
+            skip_validation=True,
+            rng_or_seed=build_random_generator(0),
+        )

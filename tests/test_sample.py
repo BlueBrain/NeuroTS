@@ -1,3 +1,6 @@
+# pylint: disable=missing-module-docstring
+# pylint: disable=missing-function-docstring
+# pylint: disable=protected-access
 import numpy as np
 import pytest
 from numpy.testing import assert_equal
@@ -6,6 +9,7 @@ from neurots.morphmath import sample
 
 
 def test_Distr():
+    # pylint: disable=too-many-statements
     # Test distributions
     assert_equal(sample.Distr.norm({"mean": 1, "std": 0.5}), ("standard_normal", 1, 0.5))
     assert_equal(sample.Distr.uniform({"min": 1, "max": 1.25}), ("uniform", 1, 0.25))
@@ -20,7 +24,7 @@ def test_Distr():
     mt2._legacy_seeding(0)
     rng_new = np.random.Generator(mt2)
 
-    params = {'norm': {'mean': 9.024144162609812, 'std': 3.5462697985669935}}
+    params = {"norm": {"mean": 9.024144162609812, "std": 3.5462697985669935}}
     soma_d = sample.Distr(params)
     soma_d_rng = sample.Distr(params, random_generator=rng)
     soma_d_new = sample.Distr(params, random_generator=rng_new)
@@ -43,7 +47,7 @@ def test_Distr():
     assert_equal(soma_d_new.draw(), 18.201541834082416)
 
     # Setup uniform distribution
-    params = {'uniform': {'min': 20, 'max': 30}}
+    params = {"uniform": {"min": 20, "max": 30}}
     soma_d = sample.Distr(params)
     soma_d_rng = sample.Distr(params, random_generator=rng)
     soma_d_new = sample.Distr(params, random_generator=rng_new)
@@ -69,7 +73,7 @@ def test_Distr():
     assert_equal(soma_d_new.draw(), expected)
 
     # Setup exponential distribution
-    params = {'expon': {'loc': 10, 'lambda': 5}}
+    params = {"expon": {"loc": 10, "lambda": 5}}
     soma_d = sample.Distr(params)
     soma_d_rng = sample.Distr(params, random_generator=rng)
     soma_d_new = sample.Distr(params, random_generator=rng_new)
@@ -92,7 +96,7 @@ def test_Distr():
     assert_equal(soma_d_new.draw(), 10.092614156264565)
 
     # Setup data distribution
-    params = {'data': {'weights': [0.1, 0.9], 'bins': [1, 2]}}
+    params = {"data": {"weights": [0.1, 0.9], "bins": [1, 2]}}
     soma_d = sample.Distr(params)
     assert_equal(soma_d.draw_positive(), 2)
 
@@ -100,13 +104,13 @@ def test_Distr():
     assert_equal(soma_d_rng.draw_positive(), 2)
 
     # Setup negative loc distribution
-    params = {'uniform': {'min': -10, 'max': -10}}
+    params = {"uniform": {"min": -10, "max": -10}}
     soma_d = sample.Distr(params)
     with pytest.raises(ValueError):
         soma_d.draw_positive()
 
     # Setup negative val distribution
-    params = {'uniform': {'min': -50, 'max': 10}}
+    params = {"uniform": {"min": -50, "max": 10}}
     soma_d = sample.Distr(params, random_generator=rng)
     assert_equal(soma_d.draw_positive(), 5.535798297559666)
 
@@ -114,7 +118,7 @@ def test_Distr():
 def test_soma_size():
     np.random.seed(0)
     rng = np.random.default_rng(0)
-    params = {'soma': {'size': {'norm': {'mean': 9.024144162609812, 'std': 3.5462697985669935}}}}
+    params = {"soma": {"size": {"norm": {"mean": 9.024144162609812, "std": 3.5462697985669935}}}}
 
     val1 = sample.soma_size(params)
     assert_equal(val1, 15.279949720206192)
