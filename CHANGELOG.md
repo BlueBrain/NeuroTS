@@ -1,6 +1,6 @@
 # Changelog
 
-## [NeuroTS-v3.0.0](https://bbpgitlab.epfl.ch/neuromath/neurots/compare/NeuroTS-v2.5.0...NeuroTS-v3.0.0)
+# [NeuroTS-v3.0.0](https://bbpgitlab.epfl.ch/neuromath/neurots/compare/NeuroTS-v2.5.0...NeuroTS-v3.0.0)
 
 > 12 October 2021
 
@@ -195,7 +195,7 @@
 - Consistency fixes for input distributions and parameters (kanari - [5cf48ba](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/5cf48ba1c6d9358a84f4191033f14ea9097c1d39))
 - Version update (kanari - [f671fba](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/f671fbaaa2e6521f7f2975c45ea0d6e37ffdfa8c))
 
-## [NeuroTS-v2.0.0](https://bbpgitlab.epfl.ch/neuromath/neurots/compare/NeuroTS-v1.0.8...NeuroTS-v2.0.0)
+# [NeuroTS-v2.0.0](https://bbpgitlab.epfl.ch/neuromath/neurots/compare/NeuroTS-v1.0.8...NeuroTS-v2.0.0)
 
 > 28 January 2020
 
@@ -209,7 +209,6 @@
 - Create TrunkAlgo tests (Benoît Coste - [5e0cd38](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/5e0cd38ffa673770abb5ad7845145171f3440014))
 - Introduce spatial (Benoît Coste - [4be6568](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/4be656814598bb3c820d790c9ddd4dcbf064802e))
 - Cleanup of SomaGrower, tests and a consistent interface for the soma points (Eleftherios Zisis - [96e4e58](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/96e4e588b55e952040c9fc30feb5176e6fbda8a1))
-- Merge "Ensure radial - path distances are not mixed" (Lida Kanari - [92202b9](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/92202b9020b2465f35aeb7afbf580fa682976196))
 - Create input_distributions.py and input_parameters.py (Benoît Coste - [d49c8c8](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/d49c8c8850fd4056d17ba7c4e70bcd0433d756ad))
 - Create tests for algorithms (Benoît Coste - [8a1a7f7](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/8a1a7f7d49abe501db0e3ad48e47ddb55e824229))
 - Rename SectionGrower::points3D to points (Benoît Coste - [b3d560c](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/b3d560c3e85dddff1b47edaec0b5c80404783bfd))
@@ -221,6 +220,7 @@
 - Complete list of possible input algorithms (kanari - [fa9f488](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/fa9f488c3abeaf7f5ba793fde12570c265dd9e3d))
 - Fix TMD version (Benoît Coste - [f09c48b](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/f09c48b908ffcf4041488c16b6f9854843d011b8))
 - Bumping TNS to v2.0.0 (Benoît Coste - [1d6094c](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/1d6094c7c6fd8639b13c411c642c0f1625f7b119))
+- Merge "Ensure radial - path distances are not mixed" (Lida Kanari - [92202b9](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/92202b9020b2465f35aeb7afbf580fa682976196))
 
 ## [NeuroTS-v1.0.8](https://bbpgitlab.epfl.ch/neuromath/neurots/compare/NeuroTS-v1.0.7...NeuroTS-v1.0.8)
 
@@ -247,11 +247,11 @@
 - Diameter model keys are section type names (axon, apical, etc.) (Benoît Coste - [8ac935d](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/8ac935d4bbebb76ca9110ef269d0304b716c9faf))
 - Add ability to pass contextual information to all growers (Benoît Coste - [79f342f](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/79f342fdf4ca1034845c2ffda00583b2ab767a07))
 - AbstractAlgo ctor initialize its arguments (Benoît Coste - [d00f0ad](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/d00f0ade2819b4a6e671ed657977f484e6b1f13a))
-- Use logging module (Benoît Coste - [3b991ca](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/3b991ca58ca4bd04536027068aaf62d65887d9cd))
-- Merge "AbstractAlgo ctor initialize its arguments" (Benoît Coste - [c907e15](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/c907e15b2f0e4543eab1eca6e70ac758a03693ca))
-- Merge "Add / correct diameter models, fix relevant tests." (Lida Kanari - [7a7fb91](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/7a7fb913c88857b60cf586b7a87a19316a4bffbf))
 - Bump version (Benoît Coste - [20464b3](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/20464b3a23c12bb7e30cda59811606d447e53a39))
+- Merge "AbstractAlgo ctor initialize its arguments" (Benoît Coste - [c907e15](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/c907e15b2f0e4543eab1eca6e70ac758a03693ca))
 - Merge "Use logging module" (Benoît Coste - [e8b54fe](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/e8b54febd83cc277e765c9d86580a3fa719df111))
+- Merge "Add / correct diameter models, fix relevant tests." (Lida Kanari - [7a7fb91](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/7a7fb913c88857b60cf586b7a87a19316a4bffbf))
+- Use logging module (Benoît Coste - [3b991ca](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/3b991ca58ca4bd04536027068aaf62d65887d9cd))
 
 ## [NeuroTS-v1.0.5](https://bbpgitlab.epfl.ch/neuromath/neurots/compare/NeuroTS-v1.0.4...NeuroTS-v1.0.5)
 
@@ -305,8 +305,8 @@
 - Cleaning up directories and restructuring. The new code implements the basic growth algorithms: trunk, tmd, tmd_apical-mockup. To be extended to include more algorithms in future versions. (kanari - [8154929](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/8154929de47beeb643ff1c2185ee5788bc08d905))
 - Ongoing refactoring of internal algorithms. (Lida Kanari - [29e658b](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/29e658b92aaa9c6b505f86ce93bf8edc7fb007fa))
 - Adding MorphIO + neurites now grow in parallel (kanari - [134627a](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/134627a69043eed7909c3beaaa3ac25801efb40b))
-- Cleaning up code: stage 1 (Lida Kanari - [a312ad0](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/a312ad095f7a4d736ea6913ab98c15e7dbaaa550))
 - Further cleaning up of code in lower level functionality (Lida Kanari - [09c8fa9](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/09c8fa91590932797730f7f561d6cb50871f61d8))
+- Cleaning up code: stage 1 (Lida Kanari - [a312ad0](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/a312ad095f7a4d736ea6913ab98c15e7dbaaa550))
 - Cleaning-up basic functionality. Add path distance and gradient based growth. (kanari - [0ace7a6](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/0ace7a6b222307a62dcdaa55826083fc2285a918))
 - Cleaning up basic growers (kanari - [8584048](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/85840489d99ca6ead7cfcea67b7d4f53360597bf))
 - Improve performances (Benoît Coste - [ce3d6e2](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/ce3d6e293f82c155b7dac53a96021728e7476f2c))
@@ -328,17 +328,15 @@
 - Update examples to consume test_data (Lida Kanari - [02c86d7](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/02c86d779b4250f8a45d99f86a1699eb53d3c068))
 - Fix small issue in section direction (kanari - [9c9c71d](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/9c9c71d457b78c17607a888b47a724f7d4b0f7e4))
 - Bump version number (Benoît Coste - [740e3e8](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/740e3e8b46f4fdc046f7bc7ed3109049f6d089a2))
-- Use correct version number (Benoît Coste - [3ba1d51](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/3ba1d513e7cd5bec0c747c0f740084c25c545e58))
 - Fix setup.py (Benoît Coste - [e3bf523](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/e3bf523ff68ff274f7fc6e618afaee0c9957929c))
-- Example for full synthesis of a cell (Lida Kanari - [f6a38d2](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/f6a38d29e903909c73d78447848e422e6b1b3ee1))
-- Commit to work on this (kanari - [9934a0a](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/9934a0ab1c153bd0a13643d98ac5605631212641))
-- Update to tmd directory (Lida Kanari - [dd847e4](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/dd847e4661d17f1556082f4ec44387d9519474ea))
+- Use correct version number (Benoît Coste - [3ba1d51](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/3ba1d513e7cd5bec0c747c0f740084c25c545e58))
 - Update setup.py and installation docs (Lida Kanari - [c4ee674](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/c4ee6743a8d14e8bb261d766683bfbc017bf89cf))
+- Commit to work on this (kanari - [9934a0a](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/9934a0ab1c153bd0a13643d98ac5605631212641))
+- Example for full synthesis of a cell (Lida Kanari - [f6a38d2](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/f6a38d29e903909c73d78447848e422e6b1b3ee1))
+- Update to tmd directory (Lida Kanari - [dd847e4](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/dd847e4661d17f1556082f4ec44387d9519474ea))
 - Fix small issue in section direction (kanari - [97d7c93](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/97d7c939a0d84a39b3f4417b67d9ae1229c7c746))
 - Bump version (Benoît Coste - [b4a9ecc](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/b4a9ecc86e995f464c97a1e9f5ac0d95c482ed80))
-- Add some test files (Lida Kanari - [aaabb81](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/aaabb8181e85fcddf7e5e4736599e4c2db73cc77))
-- test_commit (Eleftherios Zisis - [1ee9251](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/1ee92511851979b3b3ab6b5c5faad1b1c23fd748))
 - sorry (Eleftherios Zisis - [afe12d4](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/afe12d45f254f157aac8d2fcc95133984d28a878))
+- test_commit (Eleftherios Zisis - [1ee9251](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/1ee92511851979b3b3ab6b5c5faad1b1c23fd748))
+- Add some test files (Lida Kanari - [aaabb81](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/aaabb8181e85fcddf7e5e4736599e4c2db73cc77))
 - Initial empty repository (Julien Francioli - [e638bc7](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/e638bc7684097ad9da70ed8960e4ecbeebfc5a9d))
-
-Generated by [auto-changelog](https://github.com/CookPete/auto-changelog).
