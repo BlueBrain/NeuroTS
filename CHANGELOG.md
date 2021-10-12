@@ -2,9 +2,12 @@
 
 ## [NeuroTS-v3.0.0](https://bbpgitlab.epfl.ch/neuromath/neurots/compare/NeuroTS-v2.5.0...NeuroTS-v3.0.0)
 
+> 12 October 2021
+
+- Black the code (Adrien Berchet - [59dd107](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/59dd1072546baf55aa58c009812fbda1b747f0cc))
 - Refactor and introduce orientation manager (Eleftherios Zisis - [b9bbeeb](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/b9bbeeb3d7a335fedc63006b7d8c2d1e61e6a894))
 - Use pytest (Adrien Berchet - [1a790fb](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/1a790fba0d5a93e77c8be47c21d780d61029219b))
-- Rename TNS into NeuroTS (Adrien Berchet - [63db783](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/63db783de6faa63cb9646a924d151dcac1b97991))
+- Rename TNS into NeuroTS (Adrien Berchet - [bb08805](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/bb088051517ecc1fdb4bc081471059d156ac0620))
 
 ## [NeuroTS-v2.5.0](https://bbpgitlab.epfl.ch/neuromath/neurots/compare/NeuroTS-v2.4.5...NeuroTS-v2.5.0)
 
