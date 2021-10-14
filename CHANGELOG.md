@@ -1,5 +1,11 @@
 # Changelog
 
+## [NeuroTS-v3.0.1](https://bbpgitlab.epfl.ch/neuromath/neurots/compare/NeuroTS-v3.0.0...NeuroTS-v3.0.1)
+
+> 14 October 2021
+
+- Fix MANIFEST.in to package the JSON schemas (Adrien Berchet - [4c2d80c](https://bbpgitlab.epfl.ch/neuromath/neurots/commit/4c2d80cabe27a2e9faac81ca71abf83a3645b667))
+
 # [NeuroTS-v3.0.0](https://bbpgitlab.epfl.ch/neuromath/neurots/compare/NeuroTS-v2.5.0...NeuroTS-v3.0.0)
 
 > 12 October 2021
