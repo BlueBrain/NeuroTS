@@ -1,4 +1,19 @@
-"""NeuroTS section grower class."""
+"""NeuroTS class: Section grower."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from collections import deque
 
@@ -20,6 +35,19 @@ class SectionGrower:
 
     A section is a list of points in 4D space (x, y, x, r) that are sequentially connected to each
     other. This process generates a tubular morphology that resembles a random walk.
+
+    Args:
+        parent (morphio.Section): The parent of the section.
+        children (int): The number of children.
+        first_point (list[float]): The first point of the section.
+        direction (list[float]): The first point of the section.
+        parameters (SectionParameters): The parameters used to grow the section.
+        process (str): The process type.
+        stop_criteria (dict): The stop criteria used for this section.
+        step_size_distribution (Distr): The step size distribution.
+        pathlength (float): The path length of the section.
+        context (Any): The context used for the section.
+        random_generator (numpy.random.Generator): The random number generator to use.
     """
 
     # pylint: disable-msg=too-many-arguments

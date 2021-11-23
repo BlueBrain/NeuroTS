@@ -1,28 +1,25 @@
-"""Configuration file for the Sphinx documentation builder.
+"""Configuration file for the Sphinx documentation builder."""
 
-This file only contains a selection of the most common options. For a full
-list see the documentation:
-https://www.sphinx-doc.org/en/master/usage/configuration.html
+# This file only contains a selection of the most common options. For a full
+# list see the documentation:
+# https://www.sphinx-doc.org/en/master/usage/configuration.html
 
--- Path setup --------------------------------------------------------------
+# -- Path setup --------------------------------------------------------------
 
-If extensions (or modules to document with autodoc) are in another directory,
-add these directories to sys.path here. If the directory is relative to the
-documentation root, use os.path.abspath to make it absolute, like shown here.
-"""
-import os
-import sys
+# If extensions (or modules to document with autodoc) are in another directory,
+# add these directories to sys.path here. If the directory is relative to the
+# documentation root, use os.path.abspath to make it absolute, like shown here.
+
+import re
 
 from pkg_resources import get_distribution
-
-sys.path.insert(0, os.path.abspath("../.."))
 
 # -- Project information -----------------------------------------------------
 
 project = "NeuroTS"
 
 # The short X.Y version
-version = get_distribution("neurots").version
+version = get_distribution(project).version
 
 # The full version, including alpha/beta/rc tags
 release = version
@@ -64,7 +61,7 @@ html_theme = "sphinx-bluebrain-theme"
 # html_static_path = ['_static']
 
 html_theme_options = {
-    "metadata_distribution": "NeuroTS",
+    "metadata_distribution": project,
 }
 
 html_title = "NeuroTS"
@@ -80,9 +77,28 @@ autodoc_typehints = "signature"
 autodoc_default_options = {
     "members": True,
     "show-inheritance": True,
-    "special-members": "__init__",
 }
 
 intersphinx_mapping = {
+    "morphio": ("https://morphio.readthedocs.io/en/latest/", None),
+    "neurom": ("https://neurom.readthedocs.io/en/stable/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
     "python": ("https://docs.python.org/3", None),
 }
+
+
+def fix_signature(app, what, name, obj, options, signature, return_annotation):
+    """Remove the module locations from signatures."""
+    # pylint: disable=unused-argument
+    if signature:
+        module_pattern = r"(.*)<module '(.*)' from '.*'>(.*)"
+        match = re.match(module_pattern, signature)
+        if match:
+            return "".join(match.groups()), return_annotation
+
+    return None
+
+
+def setup(app):
+    """Setup Sphinx by connecting functions to events."""
+    app.connect("autodoc-process-signature", fix_signature)

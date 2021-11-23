@@ -1,5 +1,20 @@
 """Class to collect all TMD related info used in NeuroTS."""
 
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import copy
 from collections import OrderedDict
 
@@ -13,42 +28,41 @@ class Barcode:
     """Class to generate the barcode structure.
 
     The barcode structure is essential for the TMD based growth algorithms.
+
+    Args:
+        ph_angles (list of lists): list of barcodes and angles of 6 elements:
+
+            * either::
+
+                [
+                    end_point,
+                    start_point,
+                    4D_angles
+                ]
+
+            * or equivalent::
+
+                [
+                    Termination,
+                    Bifurcation,
+                    Angle parent - child (x-y),
+                    Angle parent - child (z),
+                    Angle child1 - child2 (x-y),
+                    Angle child1 - child2 (z)
+                ]
+
+    Returns:
+       The ph_angles will be decomposed in the following dictionaries::
+
+           {
+               angles: {ID: 4D_angles}
+               bifs: {ID: start_point}
+               terms: {ID, end_point}
+           }
     """
 
     def __init__(self, ph_angles):
-        """Initialize the ph_angles into a barcode object.
-
-        Args:
-            ph_angles (list of lists): list of barcodes and angles of 6 elements:
-
-                * either::
-
-                    [
-                        end_point,
-                        start_point,
-                        4D_angles
-                    ]
-
-                * or equivalent::
-
-                    [
-                        Termination,
-                        Bifurcation,
-                        Angle parent - child (x-y),
-                        Angle parent - child (z),
-                        Angle child1 - child2 (x-y),
-                        Angle child1 - child2 (z)
-                    ]
-
-        Returns:
-           The ph_angles will be decomposed in the following dictionaries::
-
-               {
-                   angles: {ID: 4D_angles}
-                   bifs: {ID: start_point}
-                   terms: {ID, end_point}
-               }
-        """
+        """Initialize the ph_angles into a barcode object."""
         # Sort persistence bars according to bifurcation
         ph_angles.sort(key=lambda x: x[1])
 
@@ -118,8 +132,7 @@ class Barcode:
 
         If the index exists and its value is between the above / below thresholds, the termination
         is returned.
-        If it doesn't exist the branch will terminate
-        as it gets term = -infinity.
+        If it doesn't exist the branch will terminate as it gets `term = -infinity`.
         """
         try:
             term = self.terms[bar_id]
@@ -172,19 +185,19 @@ class Barcode:
 
         The child bar's length should be smaller than the current bar's length.
         This process ensures that each branch can only generate smaller branches.
-        The criteria to ensure this statement is True are the following:
+        The criteria to ensure this statement is `True` are the following:
 
-           * parent_stop.ref <= child_stop.bif <= parent_stop.term or child_stop.bif = inf
-           * child_stop.term <= parent_stop.term
-           * term(child_stop.bif) <= parent_stop.term
+        * parent_stop.ref <= child_stop.bif <= parent_stop.term or child_stop.bif = inf
+        * child_stop.term <= parent_stop.term
+        * term(child_stop.bif) <= parent_stop.term
 
         Args:
-            parent_stop (TMDStop): stop criteria of parent section
+            parent_stop (TMDStop): stop criteria of parent section.
             target_stop (TMDStop): proposed stop criteria for child.
 
         Returns:
-            The next bar for which the expected length of the child
-            branch is smaller than current one for both bif and term.
+            TMDStop: The next bar for which the expected length of the child branch is smaller than
+            current one for both bif and term.
         """
         MAX_ref = parent_stop.term
         target_stop = copy.deepcopy(child_stop)

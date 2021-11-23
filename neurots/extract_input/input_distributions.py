@@ -1,4 +1,20 @@
 """Input distributions."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import logging
 
 import tmd
@@ -35,18 +51,21 @@ def distributions(
     The population is defined by a directory of swc or h5 files.
 
     Args:
-        filepath: the morphology file.
-        neurite_types: the neurite types to consider.
-        threshold_sec: defines the minimum accepted number of terminations.
-        diameter_input_morph: if input set of morphologies is provided it will be used for the
+        filepath (str): the morphology file.
+        neurite_types (list[str]): the neurite types to consider.
+        threshold_sec (int): defines the minimum accepted number of terminations.
+        diameter_input_morph (str): if input set of morphologies is provided it will be used for the
             generation of diameter model, if no input is provided no diameter model will be
             generated.
-        feature: defines the TMD feature that will be used to extract the persistence barcode (can
-            be `radial_distances`, `path_distances` or `trunk_length`). It is also possible to
+        feature (str): defines the TMD feature that will be used to extract the persistence barcode
+            (can be `radial_distances`, `path_distances` or `trunk_length`). It is also possible to
             define one different feature per neurite type using a dict like
             ``{<neurite type 1>: <feature 1>, ...}``.
-        diameter_model: model for diameters, internal models are `M1`, `M2`, `M3`, `M4`, `M5`, set
-            it to `external` for external model.
+        diameter_model (str): model for diameters, internal models are `M1`, `M2`, `M3`, `M4` and
+            `M5`. Can be set to `external` for external model.
+
+    Returns:
+        dict: The input distributions.
     """
     pop_tmd = tmd.io.load_population(filepath)
     pop_nm = load_morphologies(filepath)

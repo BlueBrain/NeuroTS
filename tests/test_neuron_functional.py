@@ -1,10 +1,27 @@
-"""
+"""Test the neurots.generate.grower.NeuronGrower class.
+
 This test ensures that the radial and path distances are computed correctly through NeuroTS,
 so that the code is treating the input barcode, according to the given parameters.
 For this reason, we need to check that the same input distribution
 will generate cells with different properties, according to their input parameters.
 Finally, we need to check the TMD of the produced cells.
 """
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 # pylint: disable=missing-function-docstring
 # pylint: disable=missing-class-docstring
 # pylint: disable=no-self-use
@@ -46,10 +63,10 @@ def assert_close_persistent_diagram(actual, expected):
 
 
 def _load_inputs(distributions, parameters):
-    with open(distributions) as f:
+    with open(distributions, encoding="utf-8") as f:
         distributions = json.load(f)
 
-    with open(parameters) as f:
+    with open(parameters, encoding="utf-8") as f:
         params = json.load(f)
 
     return distributions, params
@@ -99,7 +116,7 @@ def _test_full(
             if save:
                 print(actual_persistence_diagram)
 
-            with open(join(_path, ref_persistence_diagram)) as f:
+            with open(join(_path, ref_persistence_diagram), encoding="utf-8") as f:
                 expected_persistence_diagram = json.load(f)
 
             assert_close_persistent_diagram(

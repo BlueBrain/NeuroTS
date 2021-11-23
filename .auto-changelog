@@ -4,9 +4,8 @@
     "commitLimit": false,
     "backfillLimit": false,
     "ignoreCommitPattern": "Release [0-9]+\\.[0-9]+\\.[0-9]+|Update CHANGELOG.*|.*\\[skip-changelog\\].*",
-    "commitUrl": "https://bbpgitlab.epfl.ch/neuromath/neurots/commit/{id}",
-    "issueUrl": "https://bbpgitlab.epfl.ch/neuromath/neurots/issues/{id}",
-    "mergeUrl": "https://bbpgitlab.epfl.ch/neuromath/neurots/merge_requests/{id}",
-    "compareUrl": "https://bbpgitlab.epfl.ch/neuromath/neurots/compare/{from}...{to}",
-    "tagPrefix": "NeuroTS-v"
+    "commitUrl": "https://github.com/BlueBrain/neurots/commit/{id}",
+    "issueUrl": "https://github.com/BlueBrain/neurots/issues/{id}",
+    "mergeUrl": "https://github.com/BlueBrain/neurots/pull/{id}",
+    "compareUrl": "https://github.com/BlueBrain/neurots/compare/{from}..{to}"
 }

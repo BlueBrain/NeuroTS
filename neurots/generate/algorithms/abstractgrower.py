@@ -1,23 +1,39 @@
 """Abstract class for TreeGrower Algorithms."""
 
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import abc
 import copy
 
 
 class AbstractAlgo:
-    """TreeGrower abstract class."""
+    """TreeGrower abstract class.
+
+    Args:
+        input_data (dict): All the data required for the growth.
+        params (dict): The parameters required for growth.
+        start_point (list[float]): The first point of the trunk.
+        context (Any): An object containing contextual information.
+    """
 
     # meta class is used to define other classes
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, input_data, params, start_point, context):
-        """The TreeGrower Algorithm initialization.
-
-        input_data: dictionary in which data used by the algorithm are stored
-        params: parameters needed for growth, it should include the bif_method
-        bifurcation method, select from: bio_oriented, symmetric, directional
-        context: an object containing contextual information
-        """
+        """The TreeGrower Algorithm initialization."""
         self.context = context
         self.input_data = copy.deepcopy(input_data)
         self.params = copy.deepcopy(params)

@@ -1,12 +1,32 @@
 """Point array class."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import numpy as np
 
 
 class DynamicPointArray:
     """Store points in a numpy array and automatically resizes when its capacity is reached.
 
-    It is used by algorithms that require the points as an numpy array and append points
+    It is used by algorithms that require the points as a :class:`numpy.array` and append points
     incrementally.
+
+    Args:
+        initial_capacity (int): The initial capacity of the array.
+        resize_factor (float): The factor used to increase the capacity of the array.
     """
 
     def __init__(self, initial_capacity=100000, resize_factor=2.0):

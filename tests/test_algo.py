@@ -1,4 +1,20 @@
-"""Test neurots.generate.section code"""
+"""Test neurots.generate.section code."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 # pylint: disable=missing-function-docstring
 import json
 import os
@@ -21,10 +37,10 @@ _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
 def _setup_test(Algo, Grower, custom_parameters=None):
-    with open(os.path.join(_PATH, "dummy_distribution.json")) as f:
+    with open(os.path.join(_PATH, "dummy_distribution.json"), encoding="utf-8") as f:
         distributions = json.load(f)["basal"]
 
-    with open(os.path.join(_PATH, "dummy_params.json")) as f:
+    with open(os.path.join(_PATH, "dummy_params.json"), encoding="utf-8") as f:
         parameters = json.load(f)["basal"]
     parameters["bias_length"] = 0.5
     parameters["bias"] = 0.5
@@ -64,7 +80,7 @@ def _assert_dict_or_array(dict1, dict2):
         elif isinstance(dict1[key], dict):
             _assert_dict_or_array(dict1[key], dict2[key])
         else:
-            assert_equal(dict1[key], dict2[key], "Error for key: %s" % key)
+            assert_equal(dict1[key], dict2[key], f"Error for key: {key}")
 
 
 def test_TrunkAlgo():
@@ -163,7 +179,7 @@ def test_TMDAlgo_modify():
     def tmd_scale(barcode, thickness):
         # only the two first points of each bar are modified
         # because they correspond to spatial dimensions
-        scaling_factor = np.ones(len(barcode[0]), dtype=np.float)
+        scaling_factor = np.ones(len(barcode[0]), dtype=float)
         scaling_factor[:2] = thickness
         return np.multiply(barcode, scaling_factor).tolist()
 

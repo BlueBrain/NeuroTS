@@ -1,4 +1,20 @@
-"""NeuroTS class : Soma."""
+"""NeuroTS class: Soma."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import logging
 
 import numpy as np
@@ -18,14 +34,12 @@ class Soma:
     It contains the soma points and radius.
 
     Args:
-        center (np.ndarray):
-        radius (float): Radius of soma
-        points (Iterable, optional): An iterable of 3D points
-
+        center (numpy.ndarray): The center of the soma.
+        radius (float): The radius of the soma.
+        points (list[list[float]], optional): An iterable of 3D points.
     """
 
     def __init__(self, center, radius, points=None):
-
         self.radius = float(radius)
         self._center = np.asarray(center, dtype=np.float64)
         self.points = [] if points is None else points
@@ -42,7 +56,7 @@ class Soma:
 
     @property
     def center(self):
-        """Get center."""
+        """Get the center."""
         return self._center
 
     @center.setter
@@ -53,11 +67,9 @@ class Soma:
     def point_from_trunk_direction(self, phi, theta):
         """Return the coordinates of a point on the soma surface from the given theta, phi angles.
 
-        theta corresponds to the angle on the x-y plane.
-        phi corresponds to the angle diversion on the z-axis.
-
-        phis : polar angles
-        thetas: azimuthal angles
+        Args:
+            phi (list[float]): The polar angle (i.e. on the z-axis).
+            theta (list[float]): The azimuthal angle (i.e. on the x-y plane).
         """
         return np.array(
             [
@@ -86,7 +98,13 @@ class Soma:
 
 
 class SomaGrower:
-    """Soma class."""
+    """Soma class.
+
+    Args:
+        soma (Soma): The soma that will grow.
+        context (Any): The context used for the section.
+        rng (numpy.random.Generator): The random number generator to use.
+    """
 
     def __init__(self, soma, context=None, rng=np.random):
         """Constructor of the Soma class."""
@@ -97,10 +115,13 @@ class SomaGrower:
     def add_points_from_trunk_angles(self, trunk_angles, z_angles, phi_interval=None):
         """Generate points on the soma surface from a list of angles.
 
-        trunk angles correspond to polar angles, phi
-        z_angles correspond to azimuthal angles, theta
-        phi_interval correspond to the interval in which the trunk angles must fit (the values can
-        be in [-inf, inf] as a modulo '2 pi' is applied internaly)
+        Args:
+            trunk_angles (list[float]): The polar angles (phi in spherical coordinates).
+            z_angles (list[float]): The azimuthal angles (theta in spherical coordinates).
+            phi_interval (tuple[float, float]): The interval in which the trunks should be added.
+
+        Returns:
+            list[list[float]]: The new points.
         """
         phis, thetas = orientations.trunk_to_spherical_angles(trunk_angles, z_angles, phi_interval)
         new_directions = orientations.spherical_angles_to_orientations(phis, thetas)
@@ -109,7 +130,16 @@ class SomaGrower:
     def add_points_from_trunk_absolute_orientation(
         self, orientation, trunk_absolute_angles, z_angles
     ):
-        """Generate points on the soma surface from a direction and a list of angles."""
+        """Generate points on the soma surface from a direction and a list of angles.
+
+        Args:
+            orientation (list[float]): The trunk orientation.
+            trunk_absolute_angles (list[float]): The polar angles (phi in spherical coordinates).
+            z_angles (list[float]): The azimuthal angles (theta in spherical coordinates).
+
+        Returns:
+            list[list[float]]: The new points.
+        """
         phis, thetas = orientations.trunk_absolute_orientation_to_spherical_angles(
             orientation, trunk_absolute_angles, z_angles
         )
@@ -119,7 +149,11 @@ class SomaGrower:
     def add_points_from_orientations(self, vectors):
         """Generate points on the soma surface from a list of unit vectors.
 
-        The `vectors` argument is expected to be a list of orientations.
+        Args:
+            vectors (list[list[float]]): The list of orientations.
+
+        Returns:
+            list[list[float]]: The new points.
         """
         new_points = []
 
@@ -138,8 +172,12 @@ class SomaGrower:
         Finds the convex hull from a list of points and returns a number of interpolation points
         that belong on this convex hull.
 
-        interpolation: sets the minimum number of points to be generated.
-        points: initial set of points
+        Args:
+            points (list[float]): Initial set of points.
+            interpolation (int): The the minimum number of points to be generated.
+
+        Returns:
+            list[list[float]]: The list of interpolated points.
         """
         interpolation = np.max([3, interpolation])  # soma must have at least 3 points
 
@@ -173,6 +211,12 @@ class SomaGrower:
         The points will be saved into the neuron object and consist the first section of the cell.
         If interpolation is selected points will be generated until the expected number of soma
         points is reached.
+
+        Args:
+            method (str): The method used to build the soma.
+
+        Returns:
+            tuple[list[float], list[float]]: The points and diameters of the built soma.
         """
         if method == "contour":
             return self._contour_soma()
@@ -185,6 +229,9 @@ class SomaGrower:
         """Generate a single point soma.
 
         This kind of soma is represented by a sphere including the center and the diameter.
+
+        Returns:
+            tuple[list[float], list[float]]: The points and diameters of the built soma.
         """
         soma_points = [self.soma.center]
         soma_diameters = [2.0 * self.soma.radius]
@@ -194,11 +241,18 @@ class SomaGrower:
         """Generate a contour soma, that consists of all soma points.
 
         The contour must contain at least three points.
+
+        Returns:
+            tuple[list[float], list[float]]: The points and diameters of the built soma.
         """
         contour = [self.soma.contour_point(p) for p in self.soma.points]
         soma_pts = self.interpolate(contour)
         return soma_pts, np.zeros(len(soma_pts), dtype=np.float64)
 
     def _original_soma(self):
-        """Returns the original soma points."""
+        """Returns the original soma points.
+
+        Returns:
+            tuple[list[float], list[float]]: The points and diameters of the built soma.
+        """
         return self.soma.points, np.zeros(len(self.soma.points), dtype=np.float64)

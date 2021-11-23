@@ -1,9 +1,22 @@
 """Util functions useful for general purposes."""
 
-import numpy as np
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# TODO: use KDTree when python3.6 is dropped and scipy>=1.6 is available
-from scipy.spatial import cKDTree as KDTree
+import numpy as np
+from scipy.spatial import KDTree
 
 # The smallest representable positive number such that 1.0 + eps != 1.0
 # around 1e-7 for float32
@@ -84,7 +97,7 @@ def ball_query(points, ball_center, ball_radius):
         balanced_tree=False,
     )
 
-    return np.fromiter(tree.query_ball_point(ball_center, ball_radius), dtype=np.int)
+    return np.fromiter(tree.query_ball_point(ball_center, ball_radius), dtype=int)
 
 
 def upper_half_ball_query(points, ball_center, ball_radius, direction):

@@ -1,6 +1,20 @@
 """Functionality used by multiple algorithms."""
 
-# from collections import namedtuple
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import numpy as np
 
 from neurots.morphmath import bifurcation as _bif
@@ -16,11 +30,19 @@ bif_methods = {
 def checks_bif_term(ref, bif, term, target_length):
     """Check bif/term.
 
-    Returns True if:
-    1. Ref < Bif < Term unless Bif is infinite, then Ref < Term
-    2. Target_length >= (Bif - Ref)
-    3. Target_length >= (Term - Ref)
-    Otherwise returns False
+    Args:
+        bif (float): The bifurcation value.
+        term (float): The termination value.
+        target_length (float): The target value.
+
+    Returns:
+        bool: ``True`` if:
+
+        1. ``Ref < Bif < Term`` unless Bif is infinite, then ``Ref < Term``.
+        2. ``target_length >= (Bif - Ref)``.
+        3. ``target_length >= (Term - Ref)``.
+
+        Otherwise returns ``False``.
     """
     term_cond = 0 < term - ref <= target_length
 
@@ -33,7 +55,7 @@ def checks_bif_term(ref, bif, term, target_length):
 
 
 def section_data(direction, first_point, stop_criteria, process_type):
-    """Generates section data dictionary from arguments."""
+    """Generate section data dictionary from arguments."""
     return {
         "direction": direction,
         "first_point": first_point,
@@ -43,18 +65,18 @@ def section_data(direction, first_point, stop_criteria, process_type):
 
 
 class TMDStop:
-    """Class to define the data for stop criteria based on the TMD method."""
+    """Class to define the data for stop criteria based on the TMD method.
+
+    Args:
+        bif_id (int): The bifurcation ID.
+        bif (float): The bifurcation value.
+        term_id (int): The termination ID.
+        term (float): The termination value.
+        ref (float): The reference value (i.e for path or radial distances).
+    """
 
     def __init__(self, bif_id, bif, term_id, term, ref):
-        """Initialization of TMDStop class with parameters.
-
-        Args:
-            bif_id (int): bifurcation ID
-            bif (float): bifurcation value
-            term_id (int): termination ID
-            term (float): termination value
-            ref (float): reference value (i.e for path or radial distances)
-        """
+        """Initialization of TMDStop class with parameters."""
         self.bif_id = bif_id
         self.bif = bif
         self.term_id = term_id
@@ -63,20 +85,23 @@ class TMDStop:
         # self.verify()
 
     def __str__(self):
-        TMDtuple = self.ref, self.bif_id, self.bif, self.term_id, self.term
-        return "(Ref: {}, BifID: {}, Bif: {}, TermID: {}, Term: {})".format(*TMDtuple)
+        return (
+            f"(Ref: {self.ref}, BifID: {self.bif_id}, Bif: {self.bif}, TermID: {self.term_id}, "
+            f"Term: {self.term})"
+        )
 
     def printme(self):
-        """Prints all features."""
+        """Print all features."""
         print(self)  # pragma: no cover
 
     def verify(self):
-        """Returns True if stop is valid.
+        """Check the validity of the TMDStop.
 
-        Validity is defined by bif < term
-        unless bif in infinity.
-        Also both bif and term have to be
-        larger than the reference distance.
+        Validity is defined by ``bif < term`` unless bif in infinity.
+        Also both ``bif`` and ``term`` have to be larger than the reference distance.
+
+        Returns:
+            bool: ``True`` if stop is valid, ``False`` otherwise.
         """
         # If no bifurcation the bif comparison is meaningless
         if np.isinf(self.bif) and (self.ref <= self.term):
@@ -86,58 +111,56 @@ class TMDStop:
         return False
 
     def update_bif(self, bif_id, bif):
-        """Sets new values to bifurcation."""
+        """Set new values to bifurcation."""
         self.bif_id = bif_id
         self.bif = bif
 
     def update_term(self, term_id, term):
-        """Sets new values to termination."""
+        """Set new values to termination."""
         self.term_id = term_id
         self.term = term
 
     def child_length(self):
         """Return the child length.
 
-        Returns the absolute difference between bifurcation and termination, which defines the
+        Return the absolute difference between bifurcation and termination, which defines the
         length of the bar.
         """
         return abs(self.term - self.bif)
 
     def expected_bifurcation_length(self):
-        """Computes an estimate for the length of the branch if a bifurcation occurs.
+        """Compute an estimate for the length of the branch if a bifurcation occurs.
 
-        That will happen at distance
-        "bif" and therefore the expected length is:
-        (bifurcation - current length).
-        If bifurcation is inf, the expected length is zero.
+        That will happen at distance ``bif`` and therefore the expected length is:
+        ``(bifurcation - current length)``.
+        If ``bifurcation`` is ``inf``, the expected length is zero.
         """
         if np.isinf(self.bif):
             return 0.0
         return abs(self.bif - self.ref)
 
     def expected_termination_length(self):
-        """Computes an estimate for the length of the branch if a termination occurs.
+        """Compute an estimate for the length of the branch if a termination occurs.
 
-        That will happen at distance
-        "term" and therefore the expected length is:
-        (termination - current length).
-        If termination is inf, the expected length is zero.
+        That will happen at distance ``term`` and therefore the expected length is:
+        ``(termination - current length)``.
+        If ``termination`` is ``inf``, the expected length is zero.
         """
         if np.isinf(self.term):
             return 0.0
         return abs(self.term - self.ref)
 
     def expected_maximum_length(self):
-        """Returns the expected length of the current section.
+        """Return the expected length of the current section.
 
-        That is computed as the difference between reference value
-        and the expected bifurcation value.
-        If bifurcation < termination, then the reference value
-        minus the termination will be computed instead.
-        In real morphologies termination will be larger than
-        bifurcation, unless bifurcation is set to inf.
-        So the expected length will be computed based on term
-        only if the section will terminate before it bifurcates.
+        That is computed as the difference between reference value and the expected bifurcation
+        value.
+        If ``bifurcation < termination``, then the reference value minus the termination will be
+        computed instead.
+        In real morphologies termination will be larger than bifurcation, unless ``bifurcation`` is
+        set to ``inf``.
+        So the expected length will be computed based on term only if the section will terminate
+        before it bifurcates.
         """
         if np.isinf(self.bif):
             return abs(self.ref - self.term)

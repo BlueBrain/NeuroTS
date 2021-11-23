@@ -1,13 +1,24 @@
-"""NeuroTS package.
+"""NeuroTS package."""
 
-Author: Lida Kanari
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-Ecole Polytechnique Federale de Lausanne
-Blue Brain Project
+from pkg_resources import get_distribution
 
-(c) 2017-2019. All rights reserved.
-"""
-from neurots.astrocyte.grower import AstrocyteGrower
-from neurots.generate.grower import NeuronGrower
-from neurots.utils import NeuroTSError
-from neurots.version import VERSION as __version__
+from neurots.astrocyte.grower import AstrocyteGrower  # noqa
+from neurots.generate.grower import NeuronGrower  # noqa
+from neurots.utils import NeuroTSError  # noqa
+
+__version__ = get_distribution("NeuroTS").version

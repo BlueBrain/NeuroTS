@@ -1,12 +1,26 @@
-"""NeuroTS class : Grower object that contains the grower functionality."""
+"""NeuroTS class: Grower object that contains the grower functionality."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import logging
 from copy import deepcopy
 
 import numpy as np
 from morphio import SectionType
-
-# TODO: use KDTree when python3.6 is dropped and scipy>=1.6 is available
-from scipy.spatial import cKDTree as KDTree
+from scipy.spatial import KDTree
 
 from neurots.astrocyte.context import SpaceColonizationContext
 from neurots.astrocyte.section import grow_to_target
@@ -27,7 +41,7 @@ def _number_of_trees(tree_type, oris, distributions, random_generator=np.random)
         n_trees = len(oris)
 
     if tree_type == "basal" and n_trees < 2:
-        raise Exception("There should be at least 2 basal dendrites (got {})".format(n_trees))
+        raise Exception(f"There should be at least 2 basal dendrites (got {n_trees})")
 
     return n_trees
 

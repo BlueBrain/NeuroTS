@@ -1,3 +1,18 @@
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import itertools
 
 import numpy as np
@@ -222,8 +237,8 @@ def test_colonization_split():
         half_ball_query.return_value = []
 
         # not enough seed points will trigger the fallback strategy
-        point_cloud.partial_ball_query.return_value = np.array([0], dtype=np.int)
-        point_cloud.upper_half_ball_query.return_value = np.array([0], dtype=np.int)
+        point_cloud.partial_ball_query.return_value = np.array([0], dtype=int)
+        point_cloud.upper_half_ball_query.return_value = np.array([0], dtype=int)
 
         fallback_strategy.return_value = (
             np.array([0.0, 0.0, 1.0]),
@@ -251,8 +266,8 @@ def test_colonization_split():
         assert typ2 == "secondary"
 
         # 2 or more point ids and a major section will not trigger the fallback
-        point_cloud.partial_ball_query.return_value = np.array([0, 1], dtype=np.int)
-        point_cloud.upper_half_ball_query.return_value = np.array([0, 1], dtype=np.int)
+        point_cloud.partial_ball_query.return_value = np.array([0, 1], dtype=int)
+        point_cloud.upper_half_ball_query.return_value = np.array([0, 1], dtype=int)
 
         # major triggers primary strategy
         section.process = "major"
@@ -343,7 +358,7 @@ def test_colonization_split_with_target_influence():
     mock_dir3 = np.array([0.0, 0.0, 1.0])
 
     endfeet = Mock()
-    endfeet.active = np.ones(5, dtype=np.bool)
+    endfeet.active = np.ones(5, dtype=bool)
     endfeet.points = np.random.random((5, 3))
 
     point_cloud = None

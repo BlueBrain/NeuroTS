@@ -1,12 +1,67 @@
 """Extracts the distributions associated with NeuroM module."""
 
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import neurom as nm
 import numpy as np
 from neurom import stats
 
 
 def transform_distr(opt_distr):
-    """Transforms distributions."""
+    """Transform distributions.
+
+    Args:
+        opt_distr (neurom.stats.FitResults): The fitted distribution.
+
+    Returns:
+        dict: A dictionary whose structure depends on the type of distribution:
+
+        * if `type == "norm"`:
+
+        .. code-block:: bash
+
+            {
+                "norm": {
+                    "mean": <mean value>,
+                    "std": <std value>
+                }
+            }
+
+        * if `type == "uniform"`:
+
+        .. code-block:: bash
+
+            {
+                "uniform": {
+                    "min": <min value>,
+                    "max": <max value>
+                }
+            }
+
+        * if `type == "expon"`:
+
+        .. code-block:: bash
+
+            {
+                "expon": {
+                    "loc": <loc value>,
+                    "lambda": <lambda value>
+                }
+            }
+    """
     if opt_distr.type == "norm":
         return {"norm": {"mean": opt_distr.params[0], "std": opt_distr.params[1]}}
     elif opt_distr.type == "uniform":
@@ -22,7 +77,20 @@ def transform_distr(opt_distr):
 
 
 def soma_data(pop):
-    """Extract soma size."""
+    """Extract soma size.
+
+    Args:
+        pop (neurom.core.population.Population): The given population.
+
+    Returns:
+        dict: A dictionary with the following structure:
+
+        .. code-block:: bash
+
+            {
+                "size": <the soma size>
+            }
+    """
     # Extract soma size as a normal distribution
     # Returns a dictionary with the soma information
     soma_size = nm.get("soma_radius", pop)
@@ -32,7 +100,42 @@ def soma_data(pop):
 
 
 def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30):
-    """Extracts the trunk data for a specific tree type."""
+    """Extract the trunk data for a specific tree type.
+
+    Args:
+        pop (neurom.core.population.Population): The given population.
+        neurite_type (neurom.core.types.NeuriteType): Consider only the neurites of this type.
+        bins (int or list[int] or str, optional): The bins to use (this pararmeter is passed to
+            :func:`numpy.histogram`).
+
+    Returns:
+        dict: A dictionary with the following structure:
+
+        .. code-block:: bash
+
+            {
+                "trunk": {
+                    "orientation_deviation": {
+                        "data": {
+                            "bins": <bin values>,
+                            "weights": <weights>
+                        }
+                    },
+                    "azimuth": {
+                        "inuform": {
+                            "min": <min value>,
+                            "max": <max value>
+                        }
+                    },
+                    "absolute_elevation_deviation": {
+                        "data": {
+                            "bins": <bin values>,
+                            "weights": <weights>
+                        }
+                    }
+                }
+            }
+    """
     angles = [nm.get("trunk_angles", neuron, neurite_type=neurite_type) for neuron in pop]
     angles = np.concatenate(angles, axis=0)
     angle_heights, angle_bins = np.histogram(angles, bins=bins)
@@ -66,7 +169,26 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30):
 
 
 def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE):
-    """Extracts the number of trees for a specific tree type."""
+    """Extract the number of trees for a specific tree type from a given population.
+
+    Args:
+        pop (neurom.core.population.Population): The given population.
+        neurite_type (neurom.core.types.NeuriteType): Consider only the neurites of this type.
+
+    Returns:
+        dict: A dictionary with the following structure:
+
+        .. code-block:: bash
+
+            {
+                "num_trees": {
+                    "data": {
+                        "bins": <bin values>,
+                        "weights": <weights>
+                    }
+                }
+            }
+    """
     # Extract number of neurites as a precise distribution
     # The output is given in integer numbers which are
     # the permitted values for the number of trees.
