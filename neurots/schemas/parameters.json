@@ -72,9 +72,48 @@
                         {
                             "items": {
                                 "$ref": "#/definitions/point",
-                                "title": "test"
+                                "description": "The orientation vector"
                             },
                             "type": "array"
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "mode": {
+                                    "description": "The orientation mode to use",
+                                    "type": "string"
+                                },
+                                "values": {
+                                    "oneOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "orientations": {
+                                                    "items": {
+                                                        "$ref": "#/definitions/point",
+                                                        "description": "The orientation vector"
+                                                    },
+                                                    "type": "array"
+                                                }
+                                            },
+                                            "additionalProperties": false
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "primary_orientation": {
+                                                    "items": {
+                                                        "$ref": "#/definitions/point",
+                                                        "description": "The primary orientation vector"
+                                                    },
+                                                    "type": "array"
+                                                }
+                                            },
+                                            "additionalProperties": false
+                                        }
+                                    ]
+                                }
+                            }
                         }
                     ],
                     "description": "Defines the target orientation of a tree, as it emanates from the soma"

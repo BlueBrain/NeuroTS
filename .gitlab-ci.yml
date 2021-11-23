@@ -18,3 +18,29 @@ include:
         - /ci/jobs/py37.yml
         - /ci/jobs/py38.yml
         - /ci/jobs/coverage.yml
+
+.tox-template:
+  # Using the same image as DVF
+  image: docker-registry-default.ocp.bbp.epfl.ch/bbp-ou-cells/data-validation-framework:latest
+
+py36:
+   # Using Kubernetes runner with custom memory amount
+   tags:
+      - kubernetes
+   variables:
+      KUBERNETES_CPU_LIMIT: 4
+      KUBERNETES_CPU_REQUEST: 4
+      KUBERNETES_MEMORY_LIMIT: 4Gi
+      KUBERNETES_MEMORY_REQUEST: 4Gi
+      PYTEST_NPROCS: 4
+
+lint:
+   # Using Kubernetes runner with custom memory amount
+   tags:
+      - kubernetes
+   variables:
+      KUBERNETES_CPU_LIMIT: 1
+      KUBERNETES_CPU_REQUEST: 1
+      KUBERNETES_MEMORY_LIMIT: 4Gi
+      KUBERNETES_MEMORY_REQUEST: 4Gi
+      PYLINT_NPROCS: 1
