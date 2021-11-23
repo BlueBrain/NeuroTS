@@ -1,7 +1,5 @@
 """Util functions useful for general purposes."""
 
-from math import sqrt
-
 import numpy as np
 
 # TODO: use KDTree when python3.6 is dropped and scipy>=1.6 is available
@@ -32,7 +30,7 @@ def get_random_point(D=1.0, random_generator=np.random):
 
 def norm(vector):
     """Return the norm of the numpy array."""
-    return sqrt(vector.dot(vector))
+    return np.sqrt(vector.dot(vector))
 
 
 def normalize_inplace(vector):

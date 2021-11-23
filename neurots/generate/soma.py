@@ -94,16 +94,15 @@ class SomaGrower:
         self.context = context  # for future, hypothetical use
         self._rng = rng
 
-    def add_points_from_trunk_angles(self, trunk_angles, z_angles):
+    def add_points_from_trunk_angles(self, trunk_angles, z_angles, phi_interval=None):
         """Generate points on the soma surface from a list of angles.
-
-        trunk_angles correspond to the angles on the x-y plane,
-        while z_angles correspond to the equivalent z-direction.
 
         trunk angles correspond to polar angles, phi
         z_angles correspond to azimuthal angles, theta
+        phi_interval correspond to the interval in which the trunk angles must fit (the values can
+        be in [-inf, inf] as a modulo '2 pi' is applied internaly)
         """
-        phis, thetas = orientations.trunk_to_spherical_angles(trunk_angles, z_angles)
+        phis, thetas = orientations.trunk_to_spherical_angles(trunk_angles, z_angles, phi_interval)
         new_directions = orientations.spherical_angles_to_orientations(phis, thetas)
         return self.add_points_from_orientations(new_directions)
 

@@ -8,6 +8,7 @@ import pytest
 from numpy import testing as npt
 
 from neurots.generate import orientations as tested
+from neurots.generate.soma import Soma
 from neurots.utils import NeuroTSError
 
 
@@ -192,8 +193,8 @@ def test_orientation_manager__mode_sample_pairwise_angles():
                 "data": {"bins": [3], "weights": [1]},
             },
             "trunk": {
-                "azimuth": {"data": {"bins": [np.pi], "weights": [1]}},
-                "orientation_deviation": {"data": {"bins": [np.pi * 0.5], "weights": [1]}},
+                "azimuth": {"data": {"bins": [np.pi / 2], "weights": [1]}},
+                "orientation_deviation": {"data": {"bins": [0], "weights": [1]}},
             },
         }
     }
@@ -210,7 +211,41 @@ def test_orientation_manager__mode_sample_pairwise_angles():
         om.compute_tree_type_orientations(tree_type)
 
     actual = om.get_tree_type_orientations("john")
-    expected = np.array([[0.0, 0.0, -1.0], [0.0, 0.0, -1.0], [0.0, 0.0, -1]])
+    expected = np.array([[-0.5, np.sin(np.pi / 3), 0], [-0.5, -np.sin(np.pi / 3), 0], [1, 0, 0]])
+
+    npt.assert_allclose(actual, expected, atol=1e-6)
+
+    # Test with existing neurites in soma
+    soma = Soma(
+        (0.0, 0.0, 0.0),
+        6.0,
+        [
+            [-6.0, 0.0, 0.0],
+            [6.0, 0.0, 0.0],
+            [0.0, 6.0, 0.0],
+            [0.0, -6.0, 0.0],
+        ],
+    )
+
+    om = tested.OrientationManager(
+        soma=soma,
+        parameters=parameters,
+        distributions=distributions,
+        context=None,
+        rng=np.random.default_rng(seed=0),
+    )
+
+    for tree_type in parameters["grow_types"]:
+        om.compute_tree_type_orientations(tree_type)
+
+    actual = om.get_tree_type_orientations("john")
+    expected = np.array(
+        [
+            [0.5, -np.sin(2 * np.pi / 6), 0],
+            [np.sin(2 * np.pi / 6), -0.5, 0],
+            [np.sin(np.pi / 4), np.sin(np.pi / 4), 0],
+        ]
+    )
 
     npt.assert_allclose(actual, expected, atol=1e-6)
 

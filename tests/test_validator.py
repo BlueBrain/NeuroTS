@@ -33,6 +33,12 @@ def interneuron_distribs():
     return data
 
 
+def test_validate_params(dummy_params):
+    tested.validate_neuron_params(dummy_params)
+    dummy_params["apical"]["orientation"] = None
+    tested.validate_neuron_params(dummy_params)
+
+
 class TestValidateParams:
     """Test the parameter validation."""
 

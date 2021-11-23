@@ -207,6 +207,7 @@ class NeuronGrower:
             * None: creates a list of orientations according to the biological distributions.
             * 'from_space': generates orientations depending on spatial input (not implemented yet).
         """
+        # pylint: disable=too-many-locals
         if isinstance(orientation, list):  # Gets major orientations externally
             assert np.all(
                 np.linalg.norm(orientation, axis=1) > 0
@@ -240,10 +241,22 @@ class NeuronGrower:
                 else:
                     raise ValueError("Not enough orientation points!")
         elif orientation is None:  # Samples from trunk_angles
-            trunk_angles = sample.trunk_angles(distr, n_trees, self._rng)
-            trunk_z = sample.azimuth_angles(distr, n_trees, self._rng)
-            phis, thetas = _oris.trunk_to_spherical_angles(trunk_angles, trunk_z)
-            orientations = _oris.spherical_angles_to_orientations(phis, thetas)
+            phi_intervals, interval_n_trees = _oris.compute_interval_n_tree(
+                self.soma_grower.soma,
+                n_trees,
+                self._rng,
+            )
+
+            # Create trunks in each interval
+            orientations_i = []
+            for phi_interval, i_n_trees in zip(phi_intervals, interval_n_trees):
+                phis, thetas = _oris.trunk_to_spherical_angles(
+                    sample.trunk_angles(distr, i_n_trees, self._rng),
+                    sample.azimuth_angles(distr, i_n_trees, self._rng),
+                    phi_interval,
+                )
+                orientations_i.append(_oris.spherical_angles_to_orientations(phis, thetas))
+            orientations = np.vstack(orientations_i)
 
         elif orientation == "from_space":
             raise ValueError("Not implemented yet!")

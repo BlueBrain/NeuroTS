@@ -8,6 +8,8 @@ from neurots.morphmath import sample
 from neurots.morphmath.utils import normalize_vectors
 from neurots.utils import NeuroTSError
 
+_TWOPI = 2.0 * np.pi
+
 
 class OrientationManagerBase:
     """Base class that automatically registers orientation modes.
@@ -157,12 +159,22 @@ class OrientationManager(OrientationManagerBase):
 
         n_orientations = sample.n_neurites(tree_type_distrs["num_trees"], self._rng)
 
-        phis, thetas = trunk_to_spherical_angles(
-            trunk_angles=sample.trunk_angles(tree_type_distrs, n_orientations, self._rng),
-            z_angles=sample.azimuth_angles(tree_type_distrs, n_orientations, self._rng),
+        phi_intervals, interval_n_trees = compute_interval_n_tree(
+            self._soma,
+            n_orientations,
+            self._rng,
         )
 
-        return spherical_angles_to_orientations(phis, thetas)
+        # Create trunks in each interval
+        orientations_i = []
+        for phi_interval, i_n_trees in zip(phi_intervals, interval_n_trees):
+            phis, thetas = trunk_to_spherical_angles(
+                sample.trunk_angles(tree_type_distrs, i_n_trees, self._rng),
+                sample.azimuth_angles(tree_type_distrs, i_n_trees, self._rng),
+                phi_interval,
+            )
+            orientations_i.append(spherical_angles_to_orientations(phis, thetas))
+        return np.vstack(orientations_i)
 
 
 def spherical_angles_to_orientations(phis, thetas):
@@ -208,15 +220,24 @@ def orientations_to_sphere_points(oris, sphere_center, sphere_radius):
     return sphere_center + oris * sphere_radius
 
 
-def trunk_to_spherical_angles(trunk_angles, z_angles):
+def trunk_to_spherical_angles(trunk_angles, z_angles, phi_interval=None):
     """Generate spherical angles from a list of NeuroM angles.
 
-    trunk_angles correspond to the angles on the x-y plane,
-    while z_angles correspond to the equivalent z-direction.
-
-    trunk angles correspond to polar angles, phi
+    trunk_angles correspond to polar angles, phi
     z_angles correspond to azimuthal angles, theta
     """
+    if phi_interval is None:
+        phi_interval = (0.0, _TWOPI)
+
+        nb_intervals_min = 0
+    else:
+        assert len(phi_interval) == 2, "'phi_interval' must be a sequence of 2 elements."
+        assert phi_interval[0] < phi_interval[1], "'phi_interval' must be sorted ascending."
+
+        # Add 1 so the equiangle is computed such that angles are not equal to any boundary of the
+        # given interval
+        nb_intervals_min = 1
+
     trunk_angles = np.asarray(trunk_angles)
     z_angles = np.asarray(z_angles)
 
@@ -227,8 +248,8 @@ def trunk_to_spherical_angles(trunk_angles, z_angles):
 
     thetas = z_angles[sorted_ids]
 
-    equiangle = 2.0 * np.pi / n_angles
-    phis = np.arange(1, n_angles + 1) * equiangle + sorted_phi_devs
+    equiangle = (phi_interval[1] - phi_interval[0]) / (n_angles + nb_intervals_min)
+    phis = np.arange(1, n_angles + 1) * equiangle + sorted_phi_devs + phi_interval[0]
 
     return phis, thetas
 
@@ -247,3 +268,51 @@ def trunk_absolute_orientation_to_spherical_angles(orientation, trunk_absolute_a
     thetas = theta + sorted_thetas - 0.5 * np.pi
 
     return phis, thetas
+
+
+def compute_interval_n_tree(soma, n_trees, _rng=np.random):
+    """Compute the number of trunks to add between each pair of consecutive existing trunks.
+
+    If points already exist in the soma, the algorithm is the following:
+
+    - build the intervals between each pair of consecutive points.
+    - compute the size of each interval.
+    - randomly select the interval in which each new point will be added (the intervals are
+      weighted by their sizes to ensure the new trunks are created isotropically).
+    - count the number of new points in each interval.
+    - return the intervals in which at least one point must be added.
+
+    If no point exists in the soma, the interval [0, 2pi] contains all the new trunks.
+    """
+    if soma and len(soma.points) > 0:
+        # Get angles of existing trunk origins
+        phis = []
+        for pt in soma.points:
+            pt_orientation = soma.orientation_from_point(pt)
+            phi, _ = rotation.spherical_from_vector(pt_orientation)
+            phis.append(phi)
+
+        phis = sorted(phis)
+
+        # The last interval goes beyond 2 * pi but the function
+        # self.soma.add_points_from_trunk_angles can deal with it.
+        phis += [phis[0] + _TWOPI]
+        phi_intervals = np.column_stack((phis[:-1], phis[1:]))
+
+        # Compute the number of trunks to create in each interval: each interval is weighted by
+        # its size to ensure the new trunks are created isotropically.
+        sizes = phi_intervals[:, 1] - phi_intervals[:, 0]
+        interval_i, interval_i_n_trees = np.unique(
+            _rng.choice(range(len(sizes)), size=n_trees, p=sizes / sizes.sum()), return_counts=True
+        )
+
+        # Keep only intervals with n_trees > 0
+        phi_intervals = phi_intervals[interval_i].tolist()
+        interval_n_trees = interval_i_n_trees
+
+    else:
+        # If there is no existing trunk, we create a None interval
+        phi_intervals = [None]
+        interval_n_trees = np.array([n_trees])
+
+    return phi_intervals, interval_n_trees

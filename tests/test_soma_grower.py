@@ -288,6 +288,18 @@ def test_add_points_from_trunk_angles():
     assert_array_almost_equal(points, expected)
     assert_array_almost_equal(soma.points, expected)
 
+    # Test with interval [1, 4]
+    interval = [1, 4]
+    points = soma_grower.add_points_from_trunk_angles(trunk_angle_deviations, z_angles, interval)
+
+    expected = np.array(
+        [
+            [0.1503733, 3.45273127, 4.08060461],
+            [-0.68148648, 2.06997784, 4.08060461],
+            [0.03260466, 0.62288711, 4.08060461],
+        ]
+    )
+
 
 def test_add_points_from_trunk_absolute_orientation():
 

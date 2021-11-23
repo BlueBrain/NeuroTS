@@ -199,6 +199,7 @@ def test_convert_orientation2points():
     pts = ng._convert_orientation2points([[0, 1, 0]], 1, distributions["apical"], {})
     assert_array_almost_equal(pts, [[0, 15.27995, 0]])
 
+    # Test with no existing trunk
     ng = NeuronGrower(parameters, distributions)
     pts = ng._convert_orientation2points(None, 2, distributions["apical"], {})
     assert_array_almost_equal(
@@ -207,6 +208,12 @@ def test_convert_orientation2points():
 
     with pytest.raises(ValueError):
         ng._convert_orientation2points("from_space", 1, distributions["apical"], {})
+
+    # Test with existing trunks
+    ng.grow()
+    pts = ng._convert_orientation2points(None, 2, distributions["apical"], {})
+
+    assert_array_almost_equal(pts, [[2.770599, 4.868847, 8.813554], [-6.314678, 6.2103, 5.533321]])
 
     with pytest.raises(ValueError):
         ng._convert_orientation2points(object(), 1, distributions["apical"], {})
@@ -247,11 +254,11 @@ def test_breaker_of_tmd_algo():
     assert_array_equal(N.apical_sections, [33])
     assert_array_almost_equal(
         n.sections[169].points[-1],
-        np.array([117.20551, -41.12157, 189.57013]),
+        np.array([-220.93813, -21.49141, -55.93323]),
         decimal=5,
     )
     assert_array_almost_equal(
-        n.sections[122].points[-1], np.array([77.08879, 115.79825, -0.99393]), decimal=5
+        n.sections[122].points[-1], np.array([-17.31787, 151.4876, -6.67741]), decimal=5
     )
 
     # Test with a specific random generator
@@ -263,11 +270,11 @@ def test_breaker_of_tmd_algo():
     assert_array_equal(N.apical_sections, [33])
     assert_array_almost_equal(
         n.sections[169].points[-1],
-        np.array([117.20551, -41.12157, 189.57013]),
+        np.array([-220.93813, -21.49141, -55.93323]),
         decimal=5,
     )
     assert_array_almost_equal(
-        n.sections[122].points[-1], np.array([77.08879, 115.79825, -0.99393]), decimal=5
+        n.sections[122].points[-1], np.array([-17.31787, 151.4876, -6.67741]), decimal=5
     )
 
 

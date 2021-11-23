@@ -4,14 +4,15 @@ import math
 
 import numpy as np
 
+from neurots.morphmath.utils import norm
+
 
 def spherical_from_vector(vect):
     """Return the spherical coordinates of a vector: phi, theta."""
     x, y, z = vect
 
     phi = np.arctan2(y, x)
-    # pylint: disable=assignment-from-no-return
-    theta = np.arccos(z / np.linalg.norm(vect))
+    theta = np.arccos(z / norm(vect))
 
     return phi, theta
 
