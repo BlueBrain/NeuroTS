@@ -21,6 +21,4 @@ jobs:
       - name: Publish distribution package to PyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
-          user: ${{ secrets.DEVPI_USER }}
-          password: ${{ secrets.DEVPI_PASSWORD }}
-          repository_url: ${{ secrets.DEVPI_URL }}
+          password: ${{ secrets.PYPI_API_TOKEN }}
