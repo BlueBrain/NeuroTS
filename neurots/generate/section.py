@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from collections import deque
-
+from functools import partial
 import numpy as np
 from numpy.linalg import norm as vectorial_norm  # vectorial_norm used for array of vectors
 
@@ -93,15 +93,45 @@ class SectionGrower:
 
     def next_point(self, current_point):
         """Returns the next point depending on the growth method and the previous point."""
-        direction = (
-            self.params.targeting * self.direction
-            + self.params.randomness * get_random_point(random_generator=self._rng)
-            + self.params.history * self.history()
-        )
+        # to prevent recomputing this many times
+        history = self.history()
 
-        direction = direction / vectorial_norm(direction)
-        seg_length = self.step_size_distribution.draw_positive()
-        next_point = current_point + seg_length * direction
+        def propose(random_factor=1.0):
+            """Propose a new point, for context dependent growth.
+
+            Args:
+                random_factor (float): scaling of randomness to increase acceptance rate
+            """
+            point = get_random_point(random_generator=self._rng)
+            direction = (
+                self.params.targeting * self.direction
+                + random_factor * self.params.randomness * point
+                + self.params.history * history
+            )
+            direction = direction / vectorial_norm(direction)
+            seg_length = self.step_size_distribution.draw_positive()
+            next_point = current_point + seg_length * direction
+            return next_point, seg_length, direction
+
+        if self.context is not None and "growth_orientation" in self.context:
+            noise_increase = self.context.get("growth_orientation_noise_increase", 0.01)
+            # we try the proposal with context dependent acceptance function,
+            # and increase noise if it does not accept it
+            proposal = None
+            i = 0
+            while proposal is None:
+                proposal = self.context["growth_orientation"](
+                    current_point,
+                    partial(propose, random_factor=1.0 + noise_increase * i),
+                    self._rng,
+                )
+                i += 1
+                if proposal == "terminate":
+                    return "terminate", None
+            next_point, seg_length, direction = proposal
+        else:
+            next_point, seg_length, direction = propose()
+
         self.update_pathlength(seg_length)
         return next_point, direction
 
@@ -152,6 +182,9 @@ class SectionGrower:
         """Creates one point and returns the next state: bifurcate, terminate or continue."""
         curr_point = self.last_point
         point, direction = self.next_point(curr_point)
+        if isinstance(point, str) and point == "terminate":
+            return "terminate"
+
         self.latest_directions.append(direction)
         self.points.append(point)
         self.post_next_point()
