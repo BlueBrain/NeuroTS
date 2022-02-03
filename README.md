@@ -9,7 +9,7 @@
 
 # NeuroTS
 
-Generation of artificial neuronal trees based on the topology of biological cells and their
+Computational generation of artificial neuronal trees based on the topology of reconstructed cells and their
 statistical properties.
 
 
@@ -21,11 +21,35 @@ Use pip to install the package:
 pip install neurots
 ```
 
+## Dependencies
+
+```
+numpy>=1.15.0
+scipy>=1.6
+jsonschema>=3.0.1
+matplotlib>=1.3.1
+
+NeuroM >= 3.0 <= 4.0
+MorphIO >= 3.0 <= 4.0
+tmd >= 2.0.8
+diameter-synthesis
+```
+
 ## Main usage
+
+Neuronal morphologies provide the foundation for the electrical behavior of neurons, the connectomes they form, and the dynamical properties of the brain. Comprehensive neuron models are essential for defining cell types, discerning their functional roles, and investigating brain disease related dendritic alterations. However, a lack of understanding of the principles underlying neuron morphologies has hindered attempts to computationally synthesize morphologies for decades. We introduce a synthesis algorithm based on a topological descriptor of neurons, which enables the rapid digital reconstruction of entire brain regions from few reference cells. This topology-guided synthesis (NeuroTS) generates dendrites that are statistically similar to biological reconstructions in terms of morpho-electrical and connectivity properties and offers a significant opportunity to investigate the links between neuronal morphology and brain function across different spatio-temporal scales.
+
+NeuroTS can be used for the creation of neuronal morphologies from biological reconstructions. The user needs to extract the distributions of topological and statistical properties using the software in order to create the necessary synthesis inputs. Example for input distributions can be found in https://github.com/BlueBrain/NeuroTS/blob/main/tests/data/bio_rat_L5_TPC_B.json . The user can then choose from a set of input parameters depending on the type of neurons one wants to generate. Example for input parameters can be found in https://github.com/BlueBrain/NeuroTS/blob/main/tests/data/params1_orientation_manager.json .
+
+Once the input_parameters and input_distributions have been defined, the NeuroTS can generate one or multiple cells based on the respective inputs. The generated cells can be saved in a variety of file formats (SWC, ASC, H5) so that they can be analyzed and visualized by a variety of different software. You can find examples on how to extract distributions, generate cells and run basic validations below. 
 
 
 ## Examples
 
+## Citation
+
+(TBD)
+Kanari, Lida and Dictus, Hugo and Chalimourda, Athanassia and Van Geit, Werner and Coste, Benoît and Shillcock, Julian Charles and Hess, Kathryn and Markram, Henry, Computational Synthesis of Cortical Dendritic Morphologies. Available at SSRN: https://ssrn.com/abstract=3596620 or http://dx.doi.org/10.2139/ssrn.3596620 
 
 ## Funding & Acknowledgment
 
@@ -34,3 +58,4 @@ The development of this software was supported by funding to the Blue Brain Proj
 For license and authors, see `LICENSE.txt` and `AUTHORS.md` respectively.
 
 Copyright © 2021 Blue Brain Project/EPFL
+
