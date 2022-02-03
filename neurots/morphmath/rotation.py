@@ -1,5 +1,20 @@
 """Definition of basic rotation functionality."""
 
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import math
 
 import numpy as np
@@ -28,14 +43,14 @@ def vector_from_spherical(phi, theta):
 
 def rotation_around_axis(axis, angle):
     """Return a normalized vector rotated around the selected axis by an angle."""
-    d = np.array(axis, dtype=np.float) / np.linalg.norm(axis)
+    d = np.array(axis, dtype=float) / np.linalg.norm(axis)
 
     sn = np.sin(angle)
     cs = np.cos(angle)
 
-    eye = np.eye(3, dtype=np.float)
+    eye = np.eye(3, dtype=float)
     # ddt = np.outer(d, d)
-    skew = np.array([[0, -d[2], d[1]], [d[2], 0, -d[0]], [-d[1], d[0], 0]], dtype=np.float)
+    skew = np.array([[0, -d[2], d[1]], [d[2], 0, -d[0]], [-d[1], d[0], 0]], dtype=float)
 
     # mtx = ddt + cs * (eye - ddt) + sn * skew
     # mtx = cs * eye + sn * skew + (1. - cs) * ddt

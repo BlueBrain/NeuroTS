@@ -1,4 +1,20 @@
 """Space colonization context data structures."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import logging
 
 import numpy as np
@@ -19,15 +35,14 @@ class EndfeetTargets:
     If a point is deactivated then it will no longer affect the grower it is assigned to.
 
     Args:
-        coordinates (np.ndarray): float32
+        coordinates (numpy.ndarray):
             Array of 3D points.
 
     Attributes:
-        points (np.ndarray): float32
+        points (numpy.ndarray[numpy.single]):
             The coordinates of the 3D points that represent the endfeet
             targets.
-
-        active (np.ndarray): bool
+        active (numpy.ndarray[bool]):
             A boolean mask, the same size as the number of points. A point
             is active when its corresponding boolean value in the active array
             is True.
@@ -35,7 +50,7 @@ class EndfeetTargets:
 
     def __init__(self, coordinates):
         self.points = np.asarray(coordinates, dtype=np.float32)
-        self.active = np.ones(len(coordinates), dtype=np.bool)
+        self.active = np.ones(len(coordinates), dtype=bool)
 
     def __len__(self):
         return len(self.active)
@@ -66,7 +81,7 @@ class SpaceColonizationContext:
             how much influenced the splitting direction should by the presence of the target.
         point_cloud (PointCloud):
             Seed point cloud for the space colonization queries.
-        collision_handle (Callable[np.ndarray, float] -> bool):
+        collision_handle (Callable[numpy.ndarray, float] -> bool):
             A callable function that takes a point and the segment length as input an returns
             if there is a collision or not. The segment length is used by probabilistic checks
             that scale the probability of colliding (soft collision with exponential decay from

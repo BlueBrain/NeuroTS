@@ -1,3 +1,20 @@
+"""Test neurots.generate.soma code."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 # pylint: disable=missing-module-docstring
 # pylint: disable=missing-function-docstring
 # pylint: disable=protected-access
@@ -160,7 +177,7 @@ def test_soma_grower_interpolate():
     soma = tested.Soma((0.0, 0.0, 0.0), 6.0)
     soma_grower = tested.SomaGrower(soma)
 
-    soma.center = np.asarray([0.0, 0.0, 0.0], dtype=np.float)
+    soma.center = np.asarray([0.0, 0.0, 0.0], dtype=float)
     soma.points = [[0, 0, 0], [1, 0, 0], [0, 1, 1], [1, 0, 0]]
 
     np.random.seed(0)
@@ -258,7 +275,7 @@ def test_soma_interpolate_exception():
     soma = tested.Soma((0.0, 0.0, 0.0), 6.0)
     soma_grower = tested.SomaGrower(soma)
 
-    soma.center = np.asarray([0.0, 0.0, 0.0], dtype=np.float)
+    soma.center = np.asarray([0.0, 0.0, 0.0], dtype=float)
 
     soma.points = [[1, 1, 1], [2, 2, 2], [3, 3, 3]]
 
@@ -437,10 +454,10 @@ def test_soma_grower():
     # pylint: disable=no-member
     # pylint: disable=unsubscriptable-object
     np.random.seed(0)
-    with open(os.path.join(_path, "dummy_distribution.json")) as f:
+    with open(os.path.join(_path, "dummy_distribution.json"), encoding="utf-8") as f:
         distributions = json.load(f)
 
-    with open(os.path.join(_path, "dummy_params.json")) as f:
+    with open(os.path.join(_path, "dummy_params.json"), encoding="utf-8") as f:
         params = json.load(f)
 
     grower = NeuronGrower(input_distributions=distributions, input_parameters=params).grow()
@@ -456,10 +473,10 @@ def test_soma_grower():
 def test_apical_points():
     # Found apical point
     np.random.seed(0)
-    with open(os.path.join(_path, "bio_distribution.json")) as f:
+    with open(os.path.join(_path, "bio_distribution.json"), encoding="utf-8") as f:
         distributions = json.load(f)
 
-    with open(os.path.join(_path, "bio_path_params.json")) as f:
+    with open(os.path.join(_path, "bio_path_params.json"), encoding="utf-8") as f:
         params = json.load(f)
 
     grower = NeuronGrower(input_distributions=distributions, input_parameters=params)
@@ -471,10 +488,10 @@ def test_apical_points():
 
     # Found apical point
     np.random.seed(0)
-    with open(os.path.join(_path, "bio_path_distribution.json")) as f:
+    with open(os.path.join(_path, "bio_path_distribution.json"), encoding="utf-8") as f:
         distributions = json.load(f)
 
-    with open(os.path.join(_path, "bio_path_params.json")) as f:
+    with open(os.path.join(_path, "bio_path_params.json"), encoding="utf-8") as f:
         params = json.load(f)
 
     grower = NeuronGrower(input_distributions=distributions, input_parameters=params)
@@ -486,10 +503,10 @@ def test_apical_points():
 
     # Apical point not found so keep the last bifurcation
     np.random.seed(0)
-    with open(os.path.join(_path, "bio_distribution_apical_point.json")) as f:
+    with open(os.path.join(_path, "bio_distribution_apical_point.json"), encoding="utf-8") as f:
         distributions = json.load(f)
 
-    with open(os.path.join(_path, "bio_path_params.json")) as f:
+    with open(os.path.join(_path, "bio_path_params.json"), encoding="utf-8") as f:
         params = json.load(f)
 
     grower = NeuronGrower(input_distributions=distributions, input_parameters=params)
@@ -502,10 +519,10 @@ def test_apical_points():
 
 def test_null_orientation():
     np.random.seed(1)
-    with open(os.path.join(_path, "dummy_params.json")) as f:
+    with open(os.path.join(_path, "dummy_params.json"), encoding="utf-8") as f:
         params = json.load(f)
     params["apical"]["orientation"] = [[0, 0, 0], [1, 0, 0]]
-    with open(os.path.join(_path, "dummy_distribution.json")) as f:
+    with open(os.path.join(_path, "dummy_distribution.json"), encoding="utf-8") as f:
         distributions = json.load(f)
     N = NeuronGrower(input_distributions=distributions, input_parameters=params)
     with pytest.raises(AssertionError):

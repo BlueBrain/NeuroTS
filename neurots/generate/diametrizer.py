@@ -1,4 +1,20 @@
 """Models to create diameters of synthesized cells."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import numpy as np
 
 from neurots.morphio_utils import STR_TO_TYPES
@@ -8,17 +24,35 @@ from neurots.morphio_utils import section_filter
 
 
 def sample(data, random_generator=np.random):
-    """Returns a value according to the input data."""
+    """Returns a value according to the input data.
+
+    Args:
+        data (list): The data to sample from.
+        random_generator (numpy.random.Generator): The random number generator to use.
+    """
     return random_generator.choice(data)
 
 
 def section_lengths(section):
-    """Computes all segment lengths within section."""
+    """Computes all segment lengths within section.
+
+    Args:
+        section (morphio.Section): The section whose length is computed.
+
+    Returns:
+        float: The total length of the section.
+    """
     return np.linalg.norm(section.points[1:] - section.points[:-1], axis=1)
 
 
 def redefine_diameter_section(section, diam_ind, diam_new):
-    """Hack to replace one diameter at index diam_ind with value diam_new."""
+    """Hack to replace one diameter at index diam_ind with value diam_new.
+
+    Args:
+        section (morphio.mut.Section): The section whose diameter is updated.
+        diam_ind (int): The index to replace.
+        diam_new (flaot): The new diameter value.
+    """
     section.diameters = np.array(
         section.diameters.tolist()[:diam_ind]
         + [diam_new]
@@ -29,7 +63,14 @@ def redefine_diameter_section(section, diam_ind, diam_new):
 
 
 def bifurcator(initial_diam, num_children, rall_ratio, siblings_ratio):
-    """Returns the computed bifurcation diameter."""
+    """Returns the computed bifurcation diameter.
+
+    Args:
+        initial_diam (float): The initial diameter value.
+        num_children (int): The number of children.
+        rall_ratio (float): The rall ratio.
+        siblings_ratio (float): The sibling ratio.
+    """
     # pylint: disable=assignment-from-no-return
     reduction_factor = np.power(
         1.0 + (num_children - 1) * np.power(siblings_ratio, rall_ratio),
@@ -38,8 +79,14 @@ def bifurcator(initial_diam, num_children, rall_ratio, siblings_ratio):
     return initial_diam / reduction_factor
 
 
-def merger(section, trunk, rall_ratio):
-    """Returns the computed bifurcation diameter."""
+def merger(section, trunk_diam, rall_ratio):
+    """Returns the computed bifurcation diameter.
+
+    Args:
+        section (morphio.mut.Section): The section whose diameter is updated.
+        trunk_diam (float): The trunk diameter.
+        rall_ratio (float): The rall ratio.
+    """
     # pylint: disable=assignment-from-no-return
     # diameters[0] is the duplicate point
     diameters_children = [ch.diameters[1] for ch in section.children]
@@ -47,12 +94,20 @@ def merger(section, trunk, rall_ratio):
         np.sum([np.power(d, rall_ratio) for d in diameters_children]), 1.0 / rall_ratio
     )
 
-    diam_val = parent_d if parent_d <= trunk else np.max(diameters_children)
+    diam_val = parent_d if parent_d <= trunk_diam else np.max(diameters_children)
     redefine_diameter_section(section, len(section.diameters) - 1, diam_val)
 
 
 def taper_section_diam_from_root(section, initial_diam, taper, min_diam=0.07, max_diam=100.0):
-    """Corrects the diameters of a section."""
+    """Corrects the diameters of a section.
+
+    Args:
+        section (morphio.mut.Section): The section whose diameters are updated.
+        initial_diam (float): The initial diameter value.
+        taper (float): The taper value.
+        min_diam (float): The min diameter value.
+        max_diam (float): The max diameter value.
+    """
     diams = [initial_diam]
 
     if section.is_root:
@@ -79,7 +134,15 @@ def taper_section_diam_from_root(section, initial_diam, taper, min_diam=0.07, ma
 
 
 def taper_section_diam_from_tips(section, final_diam, taper, min_diam=0.07, max_diam=100.0):
-    """Corrects the diameters of a section."""
+    """Corrects the diameters of a section.
+
+    Args:
+        section (morphio.mut.Section): The section whose diameters are updated.
+        final_diam (float): The final diameter value.
+        taper (float): The taper value.
+        min_diam (float): The min diameter value.
+        max_diam (float): The max diameter value.
+    """
     diams = [final_diam]
     # lengths of each segments will be used for scaling of tapering
     lengths = section_lengths(section)
@@ -101,7 +164,12 @@ def taper_section_diam_from_tips(section, final_diam, taper, min_diam=0.07, max_
 
 
 def smooth_section_diam(section, min_diam=0.07):
-    """Corrects the diameters of a section by smoothing between initial and final diameters."""
+    """Corrects the diameters of a section by smoothing between initial and final diameters.
+
+    Args:
+        section (morphio.mut.Section): The section whose diameters are updated.
+        min_diam (float): The min diameter value.
+    """
 
     def sec_mean_taper(sec):
         """Returns the mean tapering of section."""
@@ -135,6 +203,12 @@ def diametrize_from_root(
     """Corrects the diameters of a morphio-neuron according to the model.
 
     Starts from the root and moves towards the tips.
+
+    Args:
+        neuron (morphio.mut.Morphology): The morphology that will be diametrized.
+        neurite_type (morphio.SectionType): Only the neurites of this type are diametrized.
+        model_all (dict): The model parameters.
+        random_generator (numpy.random.Generator): The random number generator to use.
     """
     for r in root_section_filter(neuron, tree_type=neurite_type):
 
@@ -190,6 +264,12 @@ def diametrize_from_tips(neuron, neurite_type=None, *, model_all, random_generat
     """Corrects the diameters of a morphio-neuron according to the model.
 
     Starts from the tips and moves towards the root.
+
+    Args:
+        neuron (morphio.mut.Morphology): The morphology that will be diametrized.
+        neurite_type (morphio.SectionType): Only the neurites of this type are diametrized.
+        model_all (dict): The model parameters.
+        random_generator (numpy.random.Generator): The random number generator to use.
     """
     for r in root_section_filter(neuron, tree_type=neurite_type):
         model = model_all[TYPE_TO_STR[r.type]]  # Selected by the root type.
@@ -237,14 +317,24 @@ def diametrize_from_tips(neuron, neurite_type=None, *, model_all, random_generat
 
 
 def diametrize_constant_per_section(neuron, neurite_type=None, **_):
-    """Corrects the diameters of a morphio-neuron to make them constant per section."""
+    """Corrects the diameters of a morphio-neuron to make them constant per section.
+
+    Args:
+        neuron (morphio.mut.Morphology): The morphology that will be diametrized.
+        neurite_type (morphio.SectionType): Only the neurites of this type are diametrized.
+    """
     for sec in section_filter(neuron, neurite_type):
         mean_diam = np.mean(sec.diameters)
         sec.diameters = mean_diam * np.ones(len(sec.diameters))
 
 
 def diametrize_constant_per_neurite(neuron, neurite_type=None, **_):
-    """Corrects the diameters of a morphio-neuron to make them constant per neurite."""
+    """Corrects the diameters of a morphio-neuron to make them constant per neurite.
+
+    Args:
+        neuron (morphio.mut.Morphology): The morphology that will be diametrized.
+        neurite_type (morphio.SectionType): Only the neurites of this type are diametrized.
+    """
     roots = root_section_filter(neuron, neurite_type)
 
     for root in roots:
@@ -254,7 +344,12 @@ def diametrize_constant_per_neurite(neuron, neurite_type=None, **_):
 
 
 def diametrize_smoothing(neuron, neurite_type=None, **_):
-    """Corrects the diameters of a morphio-neuron, by smoothing them within each section."""
+    """Corrects the diameters of a morphio-neuron, by smoothing them within each section.
+
+    Args:
+        neuron (morphio.mut.Morphology): The morphology that will be diametrized.
+        neurite_type (morphio.SectionType): Only the neurites of this type are diametrized.
+    """
     for sec in section_filter(neuron, neurite_type):
         smooth_section_diam(sec)
 
@@ -268,14 +363,24 @@ def build(
 ):
     """Diametrize according to the selected method.
 
-    If diam_method is a string matching the models below it will use an
-    internal diametrizer. If it a function is provided, it will use the
-    function to diametrize cells. This function should have the following
-    arguments: neuron, diameter model, type of neurite (str), and only update
-    the neuron object.
+    If diam_method is a string matching the models below it will use an internal diametrizer. If
+    a function is provided, it will use this function to diametrize the cells. This function should
+    have the following arguments:
+    * neuron
+    * diameter model
+    * type of neurite (str)
+
+    and should only update the neuron object.
+
+    Args:
+        neuron (morphio.mut.Morphology): The morphology that will be diametrized.
+        input_model (dict): The model parameters.
+        neurite_types (list[str]): Only the neurites of these types are diametrized.
+        diam_method (str): The name of the diametrization method.
+        random_generator (numpy.random.Generator): The random number generator to use.
     """
     if neurite_types is None:
-        neurite_types = ["apical", "basal"]
+        neurite_types = [STR_TO_TYPES.get(tree_type) for tree_type in ["apical", "basal"]]
 
     if isinstance(diam_method, str):
         methods = {
@@ -289,7 +394,7 @@ def build(
         diam_method = methods[diam_method]
 
     elif not hasattr(diam_method, "__call__"):
-        raise ValueError("Diameter method not understood, we got {}".format(diam_method))
+        raise ValueError(f"Diameter method not understood, we got {diam_method}")
 
     for tree_type in neurite_types:
         if isinstance(tree_type, str):

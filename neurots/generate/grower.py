@@ -1,4 +1,20 @@
-"""NeuroTS class : Grower object that contains the grower functionality."""
+"""NeuroTS class: Grower object that contains the grower functionality."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import copy
 import logging
 
@@ -31,6 +47,20 @@ class NeuronGrower:
     A Grower object is a container for a Neuron, encoded in the (groups, points) structure,
     as a morphIO Morphology object. A set of input distributions that store the data
     consumed by the algorithms and the user-selected parameters are also stored.
+
+    Args:
+        input_parameters (dict): The user-defined parameters.
+        input_distributions (dict): Distributions extracted from biological data.
+        context (Any): An object containing contextual information.
+        external_diametrizer (Callable): Diametrizer function for external diametrizer module
+        skip_validation (bool): If set to ``False``, the parameters and distributions are
+            validated.
+        rng_or_seed (int or numpy.random.Generator): A random number generator to use. If an
+            int is given, it is passed to :func:`numpy.random.default_rng()` to create a new
+            random number generator.
+        trunk_orientations_class (typing.Generic[OrientationManagerBase]): The class used to
+            build the trunk orientation manager. This class should inherit from
+            :class:`neurots.generate.orientations.OrientationManagerBase`.
     """
 
     def __init__(
@@ -43,16 +73,7 @@ class NeuronGrower:
         rng_or_seed=np.random,
         trunk_orientations_class=OrientationManager,
     ):
-        """Constructor of the NeuronGrower class.
-
-        input_parameters: the user-defined parameters
-        input_distributions: distributions extracted from biological data
-        context: an object containing contextual information
-        external_diametrizer: diametrizer function for external diametrizer module
-        skip_validation: if set to False, the parameters and distributions are validated
-        rng_or_seed: should be a `numpy.random.Generator` or an object that can be used as a seed
-        for the `numpy.random.default_rng()` function.
-        """
+        """Constructor of the NeuronGrower class."""
         self.neuron = Morphology()
         self.context = context
         if rng_or_seed is None or isinstance(
@@ -84,7 +105,7 @@ class NeuronGrower:
             if metric1 not in ["trunk_length", metric2]:
                 raise ValueError(
                     "Metric of parameters and distributions is inconsistent:"
-                    + " {} != {}".format(metric1, metric2)
+                    + f" {metric1} != {metric2}"
                 )
 
         method1 = self.input_parameters["diameter_params"]["method"]
@@ -92,7 +113,7 @@ class NeuronGrower:
         if method1 != method2:
             raise ValueError(
                 "Diameters methods of parameters and distributions is inconsistent:"
-                + " {} != {}".format(method1, method2)
+                + f" {method1} != {method2}"
             )
 
         if (
@@ -103,7 +124,7 @@ class NeuronGrower:
 
         # A list of trees with the corresponding orientations
         # and initial points on the soma surface will be initialized.
-        self.active_neurites = list()
+        self.active_neurites = []
         self.soma_grower = SomaGrower(
             Soma(
                 center=self.input_parameters["origin"],
@@ -115,7 +136,7 @@ class NeuronGrower:
         # Create a list to expose apical sections for each apical tree in the neuron,
         # the user can call NeuronGrower.apical_sections to get section IDs whose the last
         # point is the apical point of each generated apical tree.
-        self.apical_sections = list()
+        self.apical_sections = []
 
         # initialize diametrizer
         self._init_diametrizer(external_diametrizer=external_diametrizer)
@@ -153,7 +174,8 @@ class NeuronGrower:
         and a list of trees encoded in the h5 format as a set of points
         and groups.
 
-        Returns the grown neuron
+        Returns:
+            morphio.mut.Morphology: The grown neuron.
         """
         self._grow_soma()
         while self.active_neurites:
@@ -203,9 +225,9 @@ class NeuronGrower:
         corresponding selection.
 
         Currently accepted orientations include the following options:
-            * list of 3D points: select the orientation externally
-            * None: creates a list of orientations according to the biological distributions.
-            * 'from_space': generates orientations depending on spatial input (not implemented yet).
+        * list of 3D points: select the orientation externally.
+        * ``None``: creates a list of orientations according to the biological distributions.
+        * ``from_space``: generates orientations depending on spatial input (not implemented yet).
         """
         # pylint: disable=too-many-locals
         if isinstance(orientation, list):  # Gets major orientations externally
@@ -272,8 +294,8 @@ class NeuronGrower:
         Generates the initial points of each tree, which depend on the selectedS
         tree types and the soma surface. All the trees start growing from the surface
         of the soma. The outgrowth direction is either specified in the input parameters,
-        as parameters['type']['orientation'] or it is randomly chosen according to the
-        biological distribution of trunks on the soma surface if 'orientation' is None.
+        as ``parameters['type']['orientation']`` or it is randomly chosen according to the
+        biological distribution of trunks on the soma surface if ``orientation`` is ``None``.
         """
         tree_types = self.input_parameters["grow_types"]
 
@@ -299,9 +321,7 @@ class NeuronGrower:
                 n_trees = sample.n_neurites(distr["num_trees"], random_generator=self._rng)
 
                 if type_of_tree == "basal" and n_trees < 2:
-                    raise Exception(
-                        "There should be at least 2 basal dendrites (got {})".format(n_trees)
-                    )
+                    raise Exception(f"There should be at least 2 basal dendrites (got {n_trees})")
 
                 orientation = params["orientation"]
                 points = self._convert_orientation2points(orientation, n_trees, distr, params)
@@ -314,9 +334,7 @@ class NeuronGrower:
                 n_trees = len(orientations)
 
                 if type_of_tree == "basal" and n_trees < 2:
-                    raise Exception(
-                        "There should be at least 2 basal dendrites (got {})".format(n_trees)
-                    )
+                    raise Exception(f"There should be at least 2 basal dendrites (got {n_trees})")
 
                 points = self.soma_grower.add_points_from_orientations(orientations)
 

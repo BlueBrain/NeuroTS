@@ -1,4 +1,19 @@
-"""Test neurots.generate.section code"""
+"""Test neurots.generate.section code."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import json
 import os
@@ -20,7 +35,7 @@ _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 def test_barcode():
     """Tests the barcode functionality"""
 
-    with open(os.path.join(_PATH, "dummy_distribution.json")) as f:
+    with open(os.path.join(_PATH, "dummy_distribution.json"), encoding="utf-8") as f:
         ph_angles = json.load(f)["apical"]["persistence_diagram"][0]
 
     barcode_test = Barcode(ph_angles)
@@ -54,7 +69,7 @@ def test_barcode():
 def test_barcode_validate_persistence():
     """Tests the barcode functionality"""
 
-    with open(os.path.join(_PATH, "dummy_distribution.json")) as f:
+    with open(os.path.join(_PATH, "dummy_distribution.json"), encoding="utf-8") as f:
         ph_angles = json.load(f)["apical"]["persistence_diagram"][0]
     assert Barcode.validate_persistence(ph_angles)
     ph_angles[0][0] = 0
@@ -115,7 +130,7 @@ def test_TMDStop():
     tmd_stop.term = np.inf
     assert_equal(tmd_stop.expected_termination_length(), 0)
 
-    with open(os.path.join(_PATH, "dummy_distribution.json")) as f:
+    with open(os.path.join(_PATH, "dummy_distribution.json"), encoding="utf-8") as f:
         ph_angles = json.load(f)["apical"]["persistence_diagram"][0]
 
     barcode_test = Barcode(ph_angles)

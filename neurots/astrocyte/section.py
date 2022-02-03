@@ -1,4 +1,20 @@
 """Astrocyte section growers."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import logging
 from collections import namedtuple
 
@@ -20,17 +36,17 @@ def grow_to_target(start_point, start_direction, target_point, segment_length, p
     """Grow towards the target_point with segment_length step from the given point and direction.
 
     Args:
-        start_point (np.ndarray): Starting point of the grower
-        start_direction (np.ndarray): Normalized initial direction
-        target_point (np.nadarray): Target point to grow to
-        segment_length (np.ndarray): The step size of the grower
+        start_point (numpy.ndarray): Starting point of the grower.
+        start_direction (numpy.ndarray): Normalized initial direction.
+        target_point (numpy.ndarray): Target point to grow to.
+        segment_length (numpy.ndarray): The step size of the grower.
         p (float, optional): Influence from the target.
             If zero the grower will grow a straight line
             from the start point along the initial direction, and if 1.0 it will grow
             a straight line from the start point to the target point. Defaults to 0.5
 
     Returns:
-        list: A list of np.ndarray representing the generated 3D points
+        list[numpy.ndarray]: A list of the generated 3D points.
     """
     target_proximity = (1.5 * segment_length) ** 2
 
@@ -140,10 +156,10 @@ class SectionSpatialGrower(SectionGrowerPath):
         in the point cloud.
 
         Args:
-            current_point (np.ndarray)
+            current_point (numpy.ndarray): The current point.
 
         Returns:
-            normalized direction (np.ndarray)
+            numpy.ndarray: The normalized direction.
         """
         return normalize_inplace(
             self.params.targeting * self.direction

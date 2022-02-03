@@ -1,3 +1,20 @@
+"""Test tree generation."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 # pylint: disable=missing-module-docstring
 # pylint: disable=missing-function-docstring
 # pylint: disable=protected-access
@@ -54,10 +71,10 @@ def test_create_section_parameters__sum_to_one_error():
 
 def test_TreeGrower():
     np.random.seed(0)
-    with open(os.path.join(_path, "bio_distribution.json")) as f:
+    with open(os.path.join(_path, "bio_distribution.json"), encoding="utf-8") as f:
         distributions = json.load(f)
 
-    with open(os.path.join(_path, "bio_path_params.json")) as f:
+    with open(os.path.join(_path, "bio_path_params.json"), encoding="utf-8") as f:
         params = json.load(f)
 
     grower = NeuronGrower(input_distributions=distributions, input_parameters=params)

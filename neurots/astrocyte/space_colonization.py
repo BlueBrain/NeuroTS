@@ -1,4 +1,20 @@
 """Basic class for TreeGrower Algorithms for space colonization."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import logging
 
 import numpy as np
@@ -29,9 +45,9 @@ def _majorize_process(process, stop, target_distance):
         will be returned. Otherwise, the initial type process will be returned.
 
     Args:
-        process (str): Process type
-        stop (StopCriteria): Section stop criteria
-        target_distance (float): Target distance to check the stop criteria against
+        process (str): Process type.
+        stop (StopCriteria): Section stop criteria.
+        target_distance (float): Target distance to check the stop criteria against.
 
     Returns:
         str: process type
@@ -51,12 +67,12 @@ def _repulsion(points, current_point, length_constant):
     same halfspace as section_radius are taken into account.
 
     Args:
-        points (np.ndarray): Seed points, the sources of the repulsion force
-        current_point (np.ndarray): Reference point on which the repulsion will be applied
-        length_constant (float): Exponential's decay length constant for repulsion strength
+        points (numpy.ndarray): Seed points, the sources of the repulsion force.
+        current_point (numpy.ndarray): Reference point on which the repulsion will be applied.
+        length_constant (float): Exponential's decay length constant for repulsion strength.
 
     Returns:
-        np.ndarray: The average absolute repulsion contribution
+        numpy.ndarray: The average absolute repulsion contribution.
     """
     if len(points) == 0:
         return np.zeros(3, dtype=np.float32)
@@ -75,16 +91,15 @@ def _fallback_strategy(section_direction, angles, repulsion):
     """Directional splitting.
 
     dir1 is always same as section_direction plus the repulsion.
-    dir2 is determined by the angles and the repulsion
+    dir2 is determined by the angles and the repulsion.
 
     Args:
-        section_direction (np.ndarray): The direction of the section
-        angles (list): The list angle distribution to sample from
-        repulsion (np.ndarray): The absolute repulsion contribution
+        section_direction (numpy.ndarray): The direction of the section.
+        angles (list): The list angle distribution to sample from.
+        repulsion (numpy.ndarray): The absolute repulsion contribution.
 
     Returns:
-        np.ndarray: first split direction
-        np.ndarray: second split direction
+        tuple[numpy.ndarray, numpy.ndarray]: first and second split directions.
     """
     dir1 = section_direction - repulsion
     dir1 /= vectorial_norm(dir1)
@@ -102,17 +117,18 @@ def _colonization_strategy_primary(previous_direction, vectors_to_seeds, repulsi
 
     .. note::
         dir1 is calculated by the mean direction from the vectors_to_seeds.
+
         dir2 is determined by the direction that maximized its angle to dir1.
-        Both dir1 and dir2 and dir2 are affected by repulsion
+
+        Both dir1 and dir2 and dir2 are affected by repulsion.
 
     Args:
-        previous_direction (np.ndarray): The previous section direction
-        vectors_to_seeds (np.ndarray): Vectors from current point to seeds
-        repulsion (np.ndarray): Absolute repulsion contribution
+        previous_direction (numpy.ndarray): The previous section direction.
+        vectors_to_seeds (numpy.ndarray): Vectors from current point to seeds.
+        repulsion (numpy.ndarray): Absolute repulsion contribution.
 
     Returns:
-        np.ndarray: first split direction
-        np.ndarray: second split direction
+        tuple[numpy.ndarray, numpy.ndarray]: first and second split directions.
     """
     vectors_to_seeds = vectors_to_seeds - repulsion
     lengths = np.linalg.norm(vectors_to_seeds, axis=1)
@@ -133,16 +149,17 @@ def _colonization_strategy_secondary(vectors_to_seeds, repulsion):
 
     .. note::
         dir1 is calculated by the mean direction from the vectors_to_seeds.
+
         dir2 is determined by the direction that maximized its angle to dir1.
+
         Both dir1 and dir2 and dir2 are affected by repulsion.
 
     Args:
-        vectors_to_seeds (np.ndarray): Vectors from current point to seeds
-        repulsion (np.ndarray): Absolute repulsion contribution
+        vectors_to_seeds (numpy.ndarray): Vectors from current point to seeds.
+        repulsion (numpy.ndarray): Absolute repulsion contribution.
 
     Returns:
-        np.ndarray: first split direction
-        np.ndarray: second split direction
+        tuple[numpy.ndarray, numpy.ndarray]: The first and second split directions.
     """
     vectors_to_seeds = vectors_to_seeds - repulsion
     lengths = np.linalg.norm(vectors_to_seeds, axis=1)
@@ -168,12 +185,15 @@ def _colonization_split(section, angles, parameters, context):
         context (SpaceColonizationContext): External space colonization data
 
     Returns:
-        np.ndarray: first direction
-        str: first section type
-        np.ndarray: second direction
-        str: second section type
+        tuple[numpy.ndarray, str, numpy.ndarray, str]:
+            A tuple containing the following values:
 
-    Notes:
+            * first direction
+            * first section type
+            * second direction
+            * second section type
+
+    .. note::
         A repulsion contribution is calculated first from the morphology points
         that are around the bifurcation point. If there are no points available
         the repulsion will be zero.
@@ -264,14 +284,14 @@ def _add_attraction_bias(
     point to the target over the total distance of the target from the soma.
 
     Args:
-        current_point (np.ndarray): The reference point
-        target_point (np.ndarray): The attractor point
-        max_target_distance (float): The distance from soma center to attraction point
-        direction (np.ndarray): Section direction
-        attraction_function (Callable[float] -> float): Attraction strength function handle
+        current_point (numpy.ndarray): The reference point.
+        target_point (numpy.ndarray): The attractor point.
+        max_target_distance (float): The distance from soma center to attraction point.
+        direction (numpy.ndarray): Section direction.
+        attraction_function (Callable[float] -> float): Attraction strength function handle.
 
     Returns:
-        np.ndarray: The new direction
+        numpy.ndarray: The new direction.
     """
     target_direction, magnitude = from_to_direction(current_point, target_point, return_length=True)
 
@@ -288,18 +308,21 @@ def _colonization_split_with_target_influence(section, angles, parameters, conte
     """Creates a bifurcation using the space colonization algorithm.
 
     Args:
-        section (SectionGrower): The current section
-        angles (list): Angle distribution for sampling
-        parameters (dict): Algorithm's parameters
-        context (SpaceColonizationContext): External space colonization data
+        section (SectionGrower): The current section.
+        angles (list): Angle distribution for sampling.
+        parameters (dict): Algorithm's parameters.
+        context (SpaceColonizationContext): External space colonization data.
 
     Returns:
-        np.ndarray: first direction
-        str: first section type
-        np.ndarray: second direction
-        str: second section type
+        tuple[numpy.ndarray, str, numpy.ndarray, str]:
+            A tuple containing the following values:
 
-    Notes:
+            * first direction
+            * first section type
+            * second direction
+            * second section type
+
+    .. note::
         Bifurcation directions are calculated based on the space colonization split. If
         the endfoot target is active and is close to the bifurcation point, then the the
         second section type will become an endfoot and the target will be exclusive to it,
@@ -362,9 +385,9 @@ class SpaceColonization(TMDAlgo):
 
     The neurots space colonization algorithm operates using the following data:
 
-        - SpaceColonizationContext
-            - Seeds point cloud
-            - Space colonization parameters (kill and influence distance)
+    - SpaceColonizationContext
+        - Seeds point cloud
+        - Space colonization parameters (kill and influence distance)
     """
 
     def select_persistence(self, input_data, random_generator=np.random):
@@ -374,10 +397,11 @@ class SpaceColonization(TMDAlgo):
         is greater or equal to the distance from the soma to the domain face.
 
         Args:
-            input_data (dict): The input data parameters
+            input_data (dict): The input data parameters.
+            random_generator (numpy.random.Generator): The random number generator to use.
 
         Returns:
-            Barcode: The topology barcode
+            Barcode: The topology barcode.
         """
         if "distance_to_domain" not in self.params:
             return super().select_persistence(input_data, random_generator)
@@ -432,10 +456,10 @@ class SpaceColonizationTarget(SpaceColonization):
 
         Args:
             input_data (dict): The input data parameters.
-            random_generator: Then random number generator to use.
+            random_generator (numpy.random.Generator): The random number generator to use.
 
         Returns:
-            Barcode: The topology barcode
+            Barcode: The topology barcode.
         """
         target_distance = self.params["distance_soma_target"]
 

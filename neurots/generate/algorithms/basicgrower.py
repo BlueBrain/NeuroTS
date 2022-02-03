@@ -1,4 +1,20 @@
 """Basic class for TreeGrower Algorithms."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import logging
 
 import numpy as np
@@ -11,16 +27,17 @@ logger = logging.getLogger(__name__)
 
 
 class TrunkAlgo(AbstractAlgo):
-    """TreeGrower basic growth of trunks class."""
+    """TreeGrower basic growth of trunks class.
+
+    Args:
+        input_data (dict): All the data required for the growth.
+        params (dict): The parameters required for growth.
+        start_point (list[float]): The first point of the trunk.
+        context (Any): An object containing contextual information.
+    """
 
     def __init__(self, input_data, params, start_point, context=None, **_):
-        """Constructor of the TrunkAlgo class.
-
-        input_data: saves all the data required for the growth
-        params: parameters needed for growth, it should include the bif_method
-        bifurcation method, select from: bio_oriented, symmetric, directional
-        context: an object containing contextual information
-        """
+        """Constructor of the TrunkAlgo class."""
         super().__init__(input_data, params, start_point, context)
         self.bif_method = bif_methods[params["branching_method"]]
 
@@ -39,6 +56,12 @@ class TrunkAlgo(AbstractAlgo):
 
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
+
+        Args:
+            current_section (neurots.generate.section.SectionGrowerPath): The current section.
+
+        Returns:
+            tuple[dict, dict]: Two dictionaries containing the two children sections data.
         """
         dir1, dir2 = self.bif_method()
         first_point = np.array(current_section.last_point)

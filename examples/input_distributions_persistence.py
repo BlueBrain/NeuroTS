@@ -1,3 +1,20 @@
+"""Example of input distributions."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 p_apical1 = [[734.0, 692.0, 0.0, 0.0, 2.0943951023931953, 0.0],
  [747.0, 695.0, 0.0, 0.0, 1.5707963267948966, 0.0],
  [710.0, 684.0, 0.0, 0.0, 1.3962634015954636, 0.0],

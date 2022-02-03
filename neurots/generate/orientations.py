@@ -1,4 +1,20 @@
 """Module for handling the calculation of neurite orientations."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import inspect
 
 import numpy as np
@@ -15,17 +31,19 @@ class OrientationManagerBase:
     """Base class that automatically registers orientation modes.
 
     Args:
-        soma (Soma): NeuroTS Soma
-        parameters (dict): NeuroTS parameters dict
-        distributions (dict): NeuroTS distributions dict
-        context (dict): Context dict
-        rng (Generator): numpy's random generator
+        soma (Soma): The soma on which the trees should be attached.
+        parameters (dict): The parameters used to compute the orientations.
+        distributions (dict): The distributions used to compute the orientations.
+        context (any): An object containing contextual information.
+        rng (numpy.random.Generator): The random number generator to use.
 
     .. note::
         To register an orientation mode, derive from this base class and
         create a method with the following signature:
 
-        def _mode_{name}(self, values_dict, tree_type)
+        .. code-block:: python
+
+            def _mode_{name}(self, values_dict, tree_type)
     """
 
     def __init__(self, soma, parameters, distributions, context, rng):
@@ -95,11 +113,11 @@ class OrientationManager(OrientationManagerBase):
     """Class to generate the tree orientations starting from the soma of the cell.
 
     Args:
-        soma (Soma): NeuroTS Soma
-        parameters (dict): NeuroTS parameters dict
-        distributions (dict): NeuroTS distributions dict
-        context (dict): Context dict
-        rng (Generator): numpy's random generator
+        soma (Soma): The soma on which the trees should be attached.
+        parameters (dict): The parameters used to compute the orientations.
+        distributions (dict): The distributions used to compute the orientations.
+        context (any): An object containing contextual information.
+        rng (numpy.random.Generator): The random number generator to use.
 
     .. note::
         All orientation mode dicts:
@@ -181,11 +199,11 @@ def spherical_angles_to_orientations(phis, thetas):
     """Compute orientation from spherical angles.
 
     Args:
-        phis (np.ndarray): polar angles
-        thetas (np.ndarray): azimuthal angles
+        phis (numpy.ndarray): Polar angles.
+        thetas (numpy.ndarray): Azimuthal angles.
 
     Returns:
-        np.array: The orientation vectors where each row correspnds to a phi-theta pair.
+        numpy.ndarray: The orientation vectors where each row correspnds to a phi-theta pair.
     """
     return np.column_stack(
         (np.cos(phis) * np.sin(thetas), np.sin(phis) * np.sin(thetas), np.cos(thetas))
@@ -196,11 +214,11 @@ def points_to_orientations(origin, points):
     """Returns the unit vector that corresponds to the orientation of a point on the soma surface.
 
     Args:
-        origin (np.ndarray): The origin of the vectors
-        points (np.ndarray): Points to calculate the vectors to
+        origin (numpy.ndarray): The origin of the vectors.
+        points (numpy.ndarray): Points to calculate the vectors to.
 
     Returns:
-        np.ndarray: Normalized orientations from origin to points
+        numpy.ndarray: Normalized orientations from origin to points.
     """
     return normalize_vectors(points - origin)
 
@@ -209,13 +227,13 @@ def orientations_to_sphere_points(oris, sphere_center, sphere_radius):
     """Compute points on a sphere from the given directions.
 
     Args:
-        oris (np.ndarray): Normalized orientation vectors
-        sphere_center (np.ndarray): Center of sphere
-        sphere_radius (float): Radius of sphere
+        oris (numpy.ndarray): Normalized orientation vectors.
+        sphere_center (numpy.ndarray): Center of sphere.
+        sphere_radius (float): Radius of sphere.
 
     Returns:
-        np.ndarray: Points on the surface of the sphere corresponding
-            to the given orientations
+        numpy.ndarray: Points on the surface of the sphere corresponding
+        to the given orientations.
     """
     return sphere_center + oris * sphere_radius
 
@@ -223,8 +241,13 @@ def orientations_to_sphere_points(oris, sphere_center, sphere_radius):
 def trunk_to_spherical_angles(trunk_angles, z_angles, phi_interval=None):
     """Generate spherical angles from a list of NeuroM angles.
 
-    trunk_angles correspond to polar angles, phi
-    z_angles correspond to azimuthal angles, theta
+    Args:
+        trunk_angles (list[float]): The polar angles (phi in spherical coordinates).
+        z_angles (list[float]): The azimuthal angles (theta in spherical coordinates).
+        phi_interval (tuple[float, float]): The interval in which the trunks should be added.
+
+    Returns:
+        tuple[numpy.ndarray[float], numpy.ndarray[float]]: The phi and theta angles.
     """
     if phi_interval is None:
         phi_interval = (0.0, _TWOPI)
@@ -255,7 +278,16 @@ def trunk_to_spherical_angles(trunk_angles, z_angles, phi_interval=None):
 
 
 def trunk_absolute_orientation_to_spherical_angles(orientation, trunk_absolute_angles, z_angles):
-    """Generate spherical angles from a unit vector and a list of angles."""
+    """Generate spherical angles from a unit vector and a list of angles.
+
+    Args:
+        orientation (list[float]): The orientation vector.
+        trunk_absolute_angles (list[float]): The polar angles (phi in spherical coordinates).
+        z_angles (list[float]): The azimuthal angles (theta in spherical coordinates).
+
+    Returns:
+        tuple[numpy.ndarray[float], numpy.ndarray[float]]: The phi and theta angles.
+    """
     # Sort angles
     sort_ids = np.argsort(trunk_absolute_angles)
     sorted_phis = np.asarray(trunk_absolute_angles)[sort_ids]
@@ -270,7 +302,7 @@ def trunk_absolute_orientation_to_spherical_angles(orientation, trunk_absolute_a
     return phis, thetas
 
 
-def compute_interval_n_tree(soma, n_trees, _rng=np.random):
+def compute_interval_n_tree(soma, n_trees, rng=np.random):
     """Compute the number of trunks to add between each pair of consecutive existing trunks.
 
     If points already exist in the soma, the algorithm is the following:
@@ -283,6 +315,15 @@ def compute_interval_n_tree(soma, n_trees, _rng=np.random):
     - return the intervals in which at least one point must be added.
 
     If no point exists in the soma, the interval [0, 2pi] contains all the new trunks.
+
+    Args:
+        soma (Soma): The soma on which the trunks should be added.
+        n_trees (int): The number of trees that should be added.
+        rng (numpy.random.Generator): The random number generator to use.
+
+    Returns:
+        tuple[numpy.ndarray[float], numpy.ndarray[int]]: The phi intervals and the number of trees
+        in each of them.
     """
     if soma and len(soma.points) > 0:
         # Get angles of existing trunk origins
@@ -303,7 +344,7 @@ def compute_interval_n_tree(soma, n_trees, _rng=np.random):
         # its size to ensure the new trunks are created isotropically.
         sizes = phi_intervals[:, 1] - phi_intervals[:, 0]
         interval_i, interval_i_n_trees = np.unique(
-            _rng.choice(range(len(sizes)), size=n_trees, p=sizes / sizes.sum()), return_counts=True
+            rng.choice(range(len(sizes)), size=n_trees, p=sizes / sizes.sum()), return_counts=True
         )
 
         # Keep only intervals with n_trees > 0

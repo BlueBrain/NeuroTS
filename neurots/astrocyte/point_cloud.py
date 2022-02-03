@@ -1,10 +1,24 @@
 """Point cloud class for synapses."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import logging
 
 import numpy as np
-
-# TODO: use KDTree when python3.6 is dropped and scipy>=1.6 becomes available
-from scipy.spatial import cKDTree as KDTree
+from scipy.spatial import KDTree
 
 from neurots.morphmath.utils import norm as vectorial_norm
 
@@ -40,7 +54,7 @@ class PointCloud:
 
     def __init__(self, points):
         self._tree = KDTree(np.asarray(points, dtype=np.float32), copy_data=False)
-        self._available = np.ones(len(points), dtype=np.bool)
+        self._available = np.ones(len(points), dtype=bool)
 
     @property
     def points(self):

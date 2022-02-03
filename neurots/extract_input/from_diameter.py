@@ -1,4 +1,20 @@
 """Module to extract morphometrics about diameters of cells."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 from collections import defaultdict
 from itertools import chain
 
@@ -84,10 +100,10 @@ def model(input_object):
         trunk_taper = trunk_taper[np.where(trunk_taper >= 0.0)[0]]
 
         values[key] = {
-            "taper": taper_c,
+            "taper": taper_c.tolist(),
             "term": list(chain(*term_diams[neurite_type])),
             "trunk": trunk_diams[neurite_type],
-            "trunk_taper": trunk_taper,
+            "trunk_taper": trunk_taper.tolist(),
         }
 
         _check(values[key])

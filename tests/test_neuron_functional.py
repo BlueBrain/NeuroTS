@@ -1,10 +1,27 @@
-"""
+"""Test the neurots.generate.grower.NeuronGrower class.
+
 This test ensures that the radial and path distances are computed correctly through NeuroTS,
 so that the code is treating the input barcode, according to the given parameters.
 For this reason, we need to check that the same input distribution
 will generate cells with different properties, according to their input parameters.
 Finally, we need to check the TMD of the produced cells.
 """
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 # pylint: disable=missing-function-docstring
 # pylint: disable=missing-class-docstring
 # pylint: disable=no-self-use
@@ -18,11 +35,13 @@ import numpy as np
 import pytest
 import tmd
 from morph_tool import diff
+from neurom.core import Morphology
 from numpy.testing import assert_almost_equal
 from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_array_equal
 from scipy.spatial.distance import cdist
 
+from neurots.generate.diametrizer import diametrize_constant_per_neurite
 from neurots.generate.grower import NeuronGrower
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -46,10 +65,10 @@ def assert_close_persistent_diagram(actual, expected):
 
 
 def _load_inputs(distributions, parameters):
-    with open(distributions) as f:
+    with open(distributions, encoding="utf-8") as f:
         distributions = json.load(f)
 
-    with open(parameters) as f:
+    with open(parameters, encoding="utf-8") as f:
         params = json.load(f)
 
     return distributions, params
@@ -99,7 +118,7 @@ def _test_full(
             if save:
                 print(actual_persistence_diagram)
 
-            with open(join(_path, ref_persistence_diagram)) as f:
+            with open(join(_path, ref_persistence_diagram), encoding="utf-8") as f:
                 expected_persistence_diagram = json.load(f)
 
             assert_close_persistent_diagram(
@@ -160,7 +179,7 @@ def test_external_diametrizer():
     )
     distributions["diameter"]["method"] = "M1"
     parameters["diameter_params"]["method"] = "M1"
-    ng = NeuronGrower(parameters, distributions)
+    ng = NeuronGrower(parameters, distributions, rng_or_seed=0)
     ng.grow()
 
     # Inconsistent methods
@@ -183,6 +202,20 @@ def test_external_diametrizer():
     bad_ng = NeuronGrower(parameters, distributions, external_diametrizer=object())
     with pytest.raises(Exception, match="Please provide an external diametrizer!"):
         bad_ng._init_diametrizer()
+
+    # Test with an external diametrizer and neurite_types in diameter_params
+    distributions["diameter"]["method"] = "external"
+    parameters["diameter_params"]["method"] = "external"
+    parameters["diameter_params"]["neurite_types"] = parameters["grow_types"]
+    ng_external = NeuronGrower(
+        parameters,
+        distributions,
+        external_diametrizer=diametrize_constant_per_neurite,
+        rng_or_seed=0,
+    )
+    ng_external.grow()
+
+    assert (Morphology(ng.neuron).points == Morphology(ng_external.neuron).points).all()
 
 
 def test_convert_orientation2points():

@@ -1,4 +1,20 @@
-"""NeuroTS class : Tree."""
+"""NeuroTS class: Tree."""
+
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import copy
 import json
 import logging
@@ -46,11 +62,10 @@ def _create_section_parameters(input_dict):
     """Create section parameters from input dictionary.
 
     Args:
-        input_dict: dict
-            Input dictionary with 'randomness' and 'targeting' entries
+        input_dict (dict): Input dictionary with ``randomness`` and ``targeting`` entries.
 
     Returns:
-        SectionParameters namedtuple
+        SectionParameters: The section parameters.
     """
     randomness = np.clip(input_dict["randomness"], 0.0, 1.0)
     targeting = np.clip(input_dict["targeting"], 0.0, 1.0)
@@ -66,13 +81,24 @@ def _create_section_parameters(input_dict):
         return parameters
 
     except AssertionError as err:
-        msg = "Parameters randomness, targeting and history do not sum to 1:\n{}".format(parameters)
+        msg = f"Parameters randomness, targeting and history do not sum to 1:\n{parameters}"
         L.error(msg)
         raise NeuroTSError(msg) from err
 
 
 class TreeGrower:
-    """Tree class."""
+    """Tree class.
+
+    Args:
+        neuron (morphio.mut.Morphology): The morphology in which groups and points are stored.
+        initial_direction (list[float]): 3D vector that defines the starting direction of the tree.
+        initial_point (list[float]): 3D vector that defines the starting point of the tree.
+        parameters (dict): A dictionary with ``tree_type``, ``radius``, ``randomness`` and
+            ``targeting`` keys.
+        distributions (dict): The distributions used.
+        context (Any): The context used for the tree.
+        random_generator (numpy.random.Generator): The random number generator to use.
+    """
 
     def __init__(
         self,
@@ -84,24 +110,14 @@ class TreeGrower:
         context=None,
         random_generator=np.random,
     ):
-        """Constructor ot TreeGrower object.
-
-        Args:
-            neuron: Obj neuron where groups and points are stored.
-            initial_direction: 3D vector.
-            initial_point: 3D vector that defines the starting point of the tree.
-            parameters: tree_type, radius, randomness, targeting.
-            distributions: the distributions used.
-            context: an object containing contextual information.
-            random_generator: the random number generator to use.
-        """
+        """Constructor ot TreeGrower object."""
         self.neuron = neuron
         self.direction = initial_direction
         self.point = initial_point
         self.type = parameters["tree_type"]  # 2: axon, 3: basal, 4: apical, 5: other
         self.params = parameters
         self.distr = distributions
-        self.active_sections = list()
+        self.active_sections = []
         self.context = context
         self._rng = random_generator
 
@@ -145,6 +161,15 @@ class TreeGrower:
         """Generates a section from the parent section "act" from all the required information.
 
         The section is added to the neuron.sections and activated.
+
+        Args:
+            parent (morphio.Section): The parent of the section.
+            direction (list[float]): The direction of the section.
+            first_point (list[float]): The first point of the section.
+            stop (dict):The stop criteria used for this section.
+            pathlength (float): The path length of the section.
+            process (str): The process type.
+            children (int): The number of children.
         """
         SGrower = section_growers[self.params["metric"]]
 
@@ -181,7 +206,14 @@ class TreeGrower:
         return np.copy(secs)[ordered_list]
 
     def append_section(self, section):
-        """Append section to the MorphIO neuron."""
+        """Append section to the MorphIO neuron.
+
+        Args:
+            section (SectionGrowerPath): The section that is going to be appended.
+
+        Returns:
+            section (morphio.Section): The new appended section.
+        """
         if section.parent:
             append_fun = section.parent.append_section
         else:
@@ -241,3 +273,7 @@ class TreeGrower:
                     # the current section_grower terminates
                     self.growth_algo.terminate(section_grower)
                     self.active_sections.remove(section_grower)
+
+                # TODO: Can the state be something else than "bifurcate" or "terminate" here?
+                # If not we could add an else statement to raise a warning or an exception if the
+                # value is anything else.

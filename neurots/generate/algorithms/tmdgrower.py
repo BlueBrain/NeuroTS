@@ -1,5 +1,20 @@
 """Basic class for TreeGrower Algorithms."""
 
+# Copyright (C) 2021  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import copy
 import logging
 
@@ -18,18 +33,21 @@ L = logging.getLogger(__name__)
 
 
 class TMDAlgo(AbstractAlgo):
-    """TreeGrower of TMD basic growth."""
+    """TreeGrower of TMD basic growth.
+
+    Args:
+        input_data (dict): All the data required for the growth.
+        params (dict): The parameters required for growth. It should include the
+            ``branching_method`` selected from: ``|bio_oriented, symmetric, directional]``.
+        start_point (list[float]): The first point of the trunk.
+        context (Any): An object containing contextual information.
+        random_generator (numpy.random.Generator): The random number generator to use.
+    """
 
     def __init__(
         self, input_data, params, start_point, context=None, random_generator=np.random, **_
     ):
-        """TMD basic grower.
-
-        input_data: saves all the data required for the growth
-        params: parameters needed for growth, it should include the bif_method
-        bifurcation method, select from: bio_oriented, symmetric, directional
-        context: an object containing contextual information
-        """
+        """TMD basic grower."""
         super().__init__(input_data, params, start_point, context)
         self.bif_method = bif_methods[params["branching_method"]]
         self.params = copy.deepcopy(params)
@@ -48,7 +66,7 @@ class TMDAlgo(AbstractAlgo):
     def select_persistence(self, input_data, random_generator=np.random):
         """Select the persistence.
 
-        Samples one persistence diagram from a list of diagrams and modifies according to input
+        Sample one persistence diagram from a list of diagrams and modifies according to input
         parameters.
         """
         list_of_persistences = input_data["persistence_diagram"]
@@ -82,14 +100,8 @@ class TMDAlgo(AbstractAlgo):
         """Return stop criteria that are the commonly shared by all TMDPath algorithms.
 
         Returns:
-            A tuple of two dictionaries containing a "TMD" entry, formatted as the following::
-
-                stop["TMD"] = {
-                    ref: the current path distance
-                    bif: the smallest appropriate bifurcation path length
-                    term: the appropriate termination path length
-
-                }
+            tuple[dict, dict]: Two dictionaries, each containing one entry whose key is ``TMD`` and
+            value is a :class:`neurots.generate.algorithms.common.TMDStop` object.
         """
         # Ensure that reference is correctly assigned
         current_section.stop_criteria["TMD"].ref = self.metric_ref(current_section)
@@ -134,6 +146,10 @@ class TMDAlgo(AbstractAlgo):
         """Generates the data to be used for the initialization of the first section to be grown.
 
         Saves the extracted input data into the corresponding structures.
+
+        Returns:
+            tuple[TMDStop, int]: A :class:`neurots.generate.algorithms.common.TMDStop` object and
+            the number of sections.
         """
         b0_id, b0 = self.barcode.min_bif()
         t0_id, t0 = self.barcode.max_term()
@@ -150,6 +166,9 @@ class TMDAlgo(AbstractAlgo):
 
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
+
+        Returns:
+            tuple[dict, dict]: Two dictionaries containing the data of the two children sections.
         """
         self.barcode.remove_bif(current_section.stop_criteria["TMD"].bif_id)
         ang = self.barcode.angles[current_section.stop_criteria["TMD"].bif_id]
@@ -232,6 +251,9 @@ class TMDApicalAlgo(TMDAlgo):
 
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
+
+        Returns:
+            tuple[dict, dict]: Two dictionaries containing the data of the two children sections.
         """
         self.barcode.remove_bif(current_section.stop_criteria["TMD"].bif_id)
         ang = self.barcode.angles[current_section.stop_criteria["TMD"].bif_id]
@@ -291,6 +313,9 @@ class TMDGradientAlgo(TMDApicalAlgo):
 
         This method computes from the current state the data required for the
         generation of two new sections and returns the corresponding dictionaries.
+
+        Returns:
+            tuple[dict, dict]: Two dictionaries containing the two children sections data.
         """
         s1, s2 = super().bifurcate(current_section)
 
