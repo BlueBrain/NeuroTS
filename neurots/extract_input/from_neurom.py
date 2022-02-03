@@ -208,4 +208,4 @@ def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE):
     )
 
     # pylint: disable=no-member
-    return {"num_trees": {"data": {"bins": bins[:-1], "weights": heights}}}
+    return {"num_trees": {"data": {"bins": bins[:-1].tolist(), "weights": heights.tolist()}}}

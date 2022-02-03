@@ -100,10 +100,10 @@ def model(input_object):
         trunk_taper = trunk_taper[np.where(trunk_taper >= 0.0)[0]]
 
         values[key] = {
-            "taper": taper_c,
+            "taper": taper_c.tolist(),
             "term": list(chain(*term_diams[neurite_type])),
             "trunk": trunk_diams[neurite_type],
-            "trunk_taper": trunk_taper,
+            "trunk_taper": trunk_taper.tolist(),
         }
 
         _check(values[key])

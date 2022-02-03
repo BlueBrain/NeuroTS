@@ -41,7 +41,7 @@ def parameters(
         "basal": {},
         "apical": {},
         "axon": {},
-        "origin": origin,
+        "origin": list(origin),
         "grow_types": neurite_types,
     }
 
@@ -75,7 +75,7 @@ def parameters(
         input_parameters["axon"] = merged_params(
             {
                 "tree_type": 2,
-                "orientation": [(0.0, -1.0, 0.0)],
+                "orientation": [[0.0, -1.0, 0.0]],
             }
         )
 
@@ -87,7 +87,7 @@ def parameters(
             {
                 "tree_type": 4,
                 "branching_method": "directional",
-                "orientation": [(0.0, 1.0, 0.0)],
+                "orientation": [[0.0, 1.0, 0.0]],
             }
         )
         if method == "tmd":

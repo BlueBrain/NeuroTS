@@ -380,7 +380,7 @@ def build(
         random_generator (numpy.random.Generator): The random number generator to use.
     """
     if neurite_types is None:
-        neurite_types = ["apical", "basal"]
+        neurite_types = [STR_TO_TYPES.get(tree_type) for tree_type in ["apical", "basal"]]
 
     if isinstance(diam_method, str):
         methods = {

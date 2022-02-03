@@ -108,7 +108,7 @@ class TestValidateParams:
         tested.validate_neuron_params(dummy_params)
 
 
-def test_empty_params_raises():
+def test_empty_params():
     data = {
         "apical": {},
         "axon": {},
@@ -117,8 +117,7 @@ def test_empty_params_raises():
         "grow_types": [],
         "origin": [0.0, 0.0, 0.0],
     }
-    with pytest.raises(tested.ValidationError):
-        tested.validate_neuron_params(data)
+    tested.validate_neuron_params(data)
 
 
 def test_validate_neuron_distribs(dummy_distribs, interneuron_distribs):

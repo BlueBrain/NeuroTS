@@ -35,11 +35,13 @@ import numpy as np
 import pytest
 import tmd
 from morph_tool import diff
+from neurom.core import Morphology
 from numpy.testing import assert_almost_equal
 from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_array_equal
 from scipy.spatial.distance import cdist
 
+from neurots.generate.diametrizer import diametrize_constant_per_neurite
 from neurots.generate.grower import NeuronGrower
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -177,7 +179,7 @@ def test_external_diametrizer():
     )
     distributions["diameter"]["method"] = "M1"
     parameters["diameter_params"]["method"] = "M1"
-    ng = NeuronGrower(parameters, distributions)
+    ng = NeuronGrower(parameters, distributions, rng_or_seed=0)
     ng.grow()
 
     # Inconsistent methods
@@ -200,6 +202,20 @@ def test_external_diametrizer():
     bad_ng = NeuronGrower(parameters, distributions, external_diametrizer=object())
     with pytest.raises(Exception, match="Please provide an external diametrizer!"):
         bad_ng._init_diametrizer()
+
+    # Test with an external diametrizer and neurite_types in diameter_params
+    distributions["diameter"]["method"] = "external"
+    parameters["diameter_params"]["method"] = "external"
+    parameters["diameter_params"]["neurite_types"] = parameters["grow_types"]
+    ng_external = NeuronGrower(
+        parameters,
+        distributions,
+        external_diametrizer=diametrize_constant_per_neurite,
+        rng_or_seed=0,
+    )
+    ng_external.grow()
+
+    assert (Morphology(ng.neuron).points == Morphology(ng_external.neuron).points).all()
 
 
 def test_convert_orientation2points():

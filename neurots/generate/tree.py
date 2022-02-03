@@ -273,3 +273,7 @@ class TreeGrower:
                     # the current section_grower terminates
                     self.growth_algo.terminate(section_grower)
                     self.active_sections.remove(section_grower)
+
+                # TODO: Can the state be something else than "bifurcate" or "terminate" here?
+                # If not we could add an else statement to raise a warning or an exception if the
+                # value is anything else.

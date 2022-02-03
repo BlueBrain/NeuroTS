@@ -220,8 +220,15 @@
             ]
         },
         "basal": {
-            "$ref": "#/definitions/neurite",
-            "description": "Specific parameters for basals"
+            "description": "Specific parameters for basals",
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/empty_object"
+                },
+                {
+                    "$ref": "#/definitions/neurite"
+                }
+            ]
         },
         "diameter_params": {
             "description": "Parameters used to generate the diameters",
