@@ -41,6 +41,7 @@ doc_reqs = [
 test_reqs = [
     "mock",
     "morph-tool>=0.1.12",
+    "numpy>=1.22",
     "pytest",
     "pytest-cov",
     "pytest-html",
