@@ -1,3 +1,5 @@
+"""Test neurots.astrocyte.tree code."""
+
 # Copyright (C) 2021  Blue Brain Project, EPFL
 #
 # This program is free software: you can redistribute it and/or modify
@@ -13,15 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# pylint: disable=missing-function-docstring
 import numpy as np
 from mock import Mock
-from test_grower import _context
-from test_grower import _distributions
-from test_grower import _parameters
 
 from neurots.astrocyte.context import SpaceColonizationContext
 from neurots.astrocyte.section import SectionSpatialGrower
 from neurots.astrocyte.tree import TreeGrowerSpaceColonization
+
+from .test_grower import _context
+from .test_grower import _distributions
+from .test_grower import _parameters
 
 
 def test_tree_grower_space_colonization_constructor():

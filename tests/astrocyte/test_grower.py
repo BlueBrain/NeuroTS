@@ -1,3 +1,5 @@
+"""Test neurots.astrocyte.grower code."""
+
 # Copyright (C) 2021  Blue Brain Project, EPFL
 #
 # This program is free software: you can redistribute it and/or modify
@@ -80,7 +82,7 @@ def _parameters():
 def _distributions():
 
     path = _path / "bio_path_distribution.json"
-    with open(path, "r") as f:
+    with open(path, "r", encoding="utf-8") as f:
         distributions = json.load(f)
     return distributions
 
@@ -207,6 +209,7 @@ def _global_rng():
 
 
 def _legacy_rng():
+    # pylint: disable=protected-access
     mt = np.random.MT19937()
     mt._legacy_seeding(0)  # Use legacy seeding to get the same result as with np.random.seed()
     return np.random.RandomState(mt)
@@ -251,6 +254,7 @@ def _rounded_arccos(x):
     ],
 )
 def test_grow__run(rng_type, monkeypatch):
+    """Test the astrocyte grower."""
     parameters = _parameters()
     distributions = _distributions()
 
@@ -263,6 +267,9 @@ def test_grow__run(rng_type, monkeypatch):
     else:
         raise ValueError("Bad rng_type")
 
+    # In this test all the cos and arccos values are rounded because np.cos and np.arccos
+    # functions can return different value, depending on the system libraries used to actually
+    # compute these values.
     monkeypatch.setattr(np, "cos", _rounded_cos)
     monkeypatch.setattr(np, "arccos", _rounded_arccos)
 

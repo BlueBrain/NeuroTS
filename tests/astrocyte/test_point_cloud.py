@@ -1,3 +1,5 @@
+"""Test neurots.astrocyte.point_cloud code."""
+
 # Copyright (C) 2021  Blue Brain Project, EPFL
 #
 # This program is free software: you can redistribute it and/or modify
@@ -13,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# pylint: disable=missing-function-docstring
 import numpy as np
 from numpy import testing as npt
 
@@ -35,8 +38,6 @@ def point_array():
             [10.0, 10.0, 10.0],  # 10
         ]
     )
-
-    return np.column_stack((x, y, z))
 
 
 def create_point_cloud():
