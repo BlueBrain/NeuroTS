@@ -1,3 +1,5 @@
+"""Test neurots.astrocyte.grower code."""
+
 # Copyright (C) 2021  Blue Brain Project, EPFL
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,6 +19,7 @@ import json
 from pathlib import Path
 
 import numpy as np
+import pytest
 from morph_tool import diff
 from numpy import testing as npt
 
@@ -79,7 +82,7 @@ def _parameters():
 def _distributions():
 
     path = _path / "bio_path_distribution.json"
-    with open(path, "r") as f:
+    with open(path, "r", encoding="utf-8") as f:
         distributions = json.load(f)
     return distributions
 
@@ -191,7 +194,7 @@ def _context():
                     [0.13690027, 0.82211773, 0.18984791],
                     [0.51131898, 0.22431703, 0.09784448],
                     [0.86219152, 0.97291949, 0.96083466],
-                ]
+                ],
             ),
             "kill_distance_factor": 15.0,
             "influence_distance_factor": 25.0,
@@ -206,6 +209,7 @@ def _global_rng():
 
 
 def _legacy_rng():
+    # pylint: disable=protected-access
     mt = np.random.MT19937()
     mt._legacy_seeding(0)  # Use legacy seeding to get the same result as with np.random.seed()
     return np.random.RandomState(mt)
@@ -215,14 +219,14 @@ def _check_neurots_soma(soma):
 
     expected_points = np.array(
         [
-            [-5.763823910330764, 14.022028925737136, -1.9073285476078194],
-            [-8.781039336837525, -3.6094893795519964, 11.97254350736896],
-            [5.275178863226481, -2.207935703615467, 14.169487335175466],
-            [-5.561186309125837, 13.77904627048671, -3.5620154636114347],
-            [8.821883254228803, 8.821883254228803, 8.821882925827792],
-            [10.804555878435187, 0.0, 10.804556789191162],
-            [15.279949720206192, 0.0, -6.679078152217655e-07],
-            [8.821882610227087, 8.821882610227087, 8.821883836583767],
+            [-5.760930017396721, 14.022942101967232, -1.909993715025774],
+            [-8.776987059455903, -3.6071655668748166, 11.979480580641654],
+            [5.277860312875229, -2.2110910286946135, 14.164513390631141],
+            [-5.5573577403571255, 13.780668646687944, -3.560228284808043],
+            [8.818575915415094, 8.819907456966908, 8.831811076714088],
+            [10.800253467208064, 0.0, 10.802924714483499],
+            [15.279949720206192, 0.0, 0.0],
+            [8.818575915415094, 8.819907456966908, 8.831811076714088],
         ]
     )
 
@@ -230,24 +234,54 @@ def _check_neurots_soma(soma):
     npt.assert_equal(soma.radius, 15.279949720206192)
 
 
-def test_grow__run():
+_default_cos = np.cos
+_default_arccos = np.arccos
+
+
+def _rounded_cos(x):
+    return np.round(_default_cos(x), 3)
+
+
+def _rounded_arccos(x):
+    return np.round(_default_arccos(x), 3)
+
+
+@pytest.mark.parametrize(
+    "rng_type",
+    [
+        pytest.param("global", id="Use global numpy random seed"),
+        pytest.param("legacy", id="Use RNG instance with legacy constructor"),
+    ],
+)
+def test_grow__run(rng_type, monkeypatch):
+    """Test the astrocyte grower."""
     parameters = _parameters()
     distributions = _distributions()
 
     context = _context()
 
-    for rng in [_global_rng(), _legacy_rng()]:
+    if rng_type == "global":
+        rng = _global_rng()
+    elif rng_type == "legacy":
+        rng = _legacy_rng()
+    else:
+        raise ValueError("Bad rng_type")
 
-        astro_grower = AstrocyteGrower(
-            input_distributions=distributions,
-            input_parameters=parameters,
-            context=context,
-            rng_or_seed=rng,
-        )
+    # In this test all the cos and arccos values are rounded because np.cos and np.arccos
+    # functions can return different value, depending on the system libraries used to actually
+    # compute these values.
+    monkeypatch.setattr(np, "cos", _rounded_cos)
+    monkeypatch.setattr(np, "arccos", _rounded_arccos)
 
-        astro_grower.grow()
+    astro_grower = AstrocyteGrower(
+        input_distributions=distributions,
+        input_parameters=parameters,
+        context=context,
+        rng_or_seed=rng,
+    )
+    astro_grower.grow()
 
-        _check_neurots_soma(astro_grower.soma_grower.soma)
+    _check_neurots_soma(astro_grower.soma_grower.soma)
 
-        difference = diff(astro_grower.neuron, _path / "astrocyte.h5")
-        assert not difference, difference.info
+    difference = diff(astro_grower.neuron, _path / "astrocyte.h5")
+    assert not difference, difference.info

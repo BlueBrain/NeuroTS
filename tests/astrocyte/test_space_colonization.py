@@ -1,3 +1,5 @@
+"""Test neurots.astrocyte.space_colonization code."""
+
 # Copyright (C) 2021  Blue Brain Project, EPFL
 #
 # This program is free software: you can redistribute it and/or modify
@@ -13,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# pylint: disable=missing-function-docstring
+# pylint: disable=protected-access
 import itertools
 
 import numpy as np
@@ -352,10 +356,6 @@ def test_colonization_split_with_target_influence():
 
     section = _section("major")
     section.target = Mock(available=True, xyz=np.array([2.0, 2.0, 2.0]))
-
-    mock_dir1 = np.array([1.0, 0.0, 0.0])
-    mock_dir2 = np.array([0.0, 1.0, 0.0])
-    mock_dir3 = np.array([0.0, 0.0, 1.0])
 
     endfeet = Mock()
     endfeet.active = np.ones(5, dtype=bool)

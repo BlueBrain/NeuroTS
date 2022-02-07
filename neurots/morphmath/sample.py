@@ -92,13 +92,13 @@ class Distr:
         return val
 
 
-def d_transform(distr, funct):
-    """Transform a distribuion according to a selected function."""
+def d_transform(distr, funct, **kwargs):
+    """Transform a distribution according to a selected function."""
     transf = {}
     for k in distr.keys():
         transf[k] = {}
         for j in distr[k].keys():
-            transf[k][j] = funct(distr[k][j])
+            transf[k][j] = funct(distr[k][j], **kwargs)
 
     return transf
 
@@ -136,7 +136,8 @@ def trunk_absolute_angles(distrib, N, random_generator=np.random):
 def azimuth_angles(distrib, N, random_generator=np.random):
     """Return N azimuth angles, depending on the input distribution."""
     trunks_d = Distr(d_transform(distrib["trunk"]["azimuth"], np.cos), random_generator)
-    angles = [np.arccos(trunks_d.draw()) for _ in range(N)]
+    tmp = np.array([trunks_d.draw() for _ in range(N)])
+    angles = np.arccos(tmp)
     return angles
 
 
