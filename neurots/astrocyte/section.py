@@ -125,7 +125,7 @@ class SectionSpatialGrower(SectionGrowerPath):
 
         .. warning::
             The first point should be always called from the initialization when the section grower
-            is added in the active list. It guarrantees at least two point sections.
+            is added in the active list. It guarantees at least two point sections.
         """
         new_direction = normalize_inplace(0.8 * self.direction + 0.2 * self.history())
         segment_length = self.step_size_distribution.draw_positive()
@@ -190,7 +190,7 @@ class SectionSpatialGrower(SectionGrowerPath):
         return self._add_new_data(new_point, new_direction, segment_length)
 
     def _grow_endfoot_section(self, initial_point, initial_direction, segment_length):
-        """Creates all the points of the endfoot section at onece and makes the relevant updates."""
+        """Creates all the points of the endfoot section at once and makes the relevant updates."""
         target_point = self.context.endfeet_targets.points[self.stop_criteria["target_id"]]
 
         grown_points = grow_to_target(

@@ -414,7 +414,7 @@ def test_colonization_split_with_target_influence():
         assert typ1 == "major"
         assert typ2 == "endfoot"
 
-        # target is deactivated when an endfoot is asigned to it
+        # target is deactivated when an endfoot is assigned to it
         assert not endfeet.active[target_id]
 
         # if point not in proximity of the target and the section is

@@ -175,7 +175,7 @@ class Barcode:
     def max_term(self):
         """Returns the id and value of the maximum termination.
 
-        Termination list cannot be empty. This means the growth should have stoped, and therefore
+        Termination list cannot be empty. This means the growth should have stopped, and therefore
         it will results in a 'StopIteration' error
         """
         return next(reversed(self.terms.items()))
@@ -210,7 +210,7 @@ class Barcode:
         if (not np.isinf(target_stop.bif)) and (target_stop.bif > MAX_ref):
             raise NeuroTSError("broken pipeline")
 
-        # Case 1. Requirements fullfiled for inputs ref, bif, term
+        # Case 1. Requirements fulfilled for inputs ref, bif, term
         if self.get_term(target_stop.bif_id) <= target_stop.term:
             return target_stop
 

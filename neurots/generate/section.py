@@ -127,7 +127,7 @@ class SectionGrower:
         self.post_next_point()
 
     def check_stop(self):
-        """Checks if any num_seg criteria is fullfiled.
+        """Checks if any num_seg criteria is fulfilled.
 
         If it is, it returns False and the growth stops.
         """
@@ -140,13 +140,13 @@ class SectionGrower:
         if n_points == 0:
             return np.zeros(3)
 
-        hist = np.dot(WEIGHTS[MEMORY - n_points :], self.latest_directions)
+        history = np.dot(WEIGHTS[MEMORY - n_points :], self.latest_directions)
 
-        distance = vectorial_norm(hist)
+        distance = vectorial_norm(history)
         if distance > DISTANCE_MIN:
-            hist /= distance
+            history /= distance
 
-        return hist
+        return history
 
     def next(self):
         """Creates one point and returns the next state: bifurcate, terminate or continue."""

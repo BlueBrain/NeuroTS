@@ -51,7 +51,7 @@ def redefine_diameter_section(section, diam_ind, diam_new):
     Args:
         section (morphio.mut.Section): The section whose diameter is updated.
         diam_ind (int): The index to replace.
-        diam_new (flaot): The new diameter value.
+        diam_new (float): The new diameter value.
     """
     section.diameters = np.array(
         section.diameters.tolist()[:diam_ind]
@@ -256,7 +256,7 @@ def diametrize_from_root(
 
         for section in r.iter():
             if not section.is_root:  # if section is not root replace diameter with parent
-                # Ensures duplicate points consistency. First point will be removed while writen.
+                # Ensures duplicate points consistency. First point will be removed while written.
                 redefine_diameter_section(section, 0, section.parent.diameters[-1])
 
 
@@ -312,7 +312,7 @@ def diametrize_from_tips(neuron, neurite_type=None, *, model_all, random_generat
 
         for section in r.iter():
             if not section.is_root:  # if section is not root replace diameter with parent
-                # Ensures duplicate points consistency. First point will be removed while writen.
+                # Ensures duplicate points consistency. First point will be removed while written.
                 redefine_diameter_section(section, 0, section.parent.diameters[-1])
 
 

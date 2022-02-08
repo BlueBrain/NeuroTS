@@ -326,7 +326,7 @@ def _colonization_split_with_target_influence(section, angles, parameters, conte
         Bifurcation directions are calculated based on the space colonization split. If
         the endfoot target is active and is close to the bifurcation point, then the the
         second section type will become an endfoot and the target will be exclusive to it,
-        rendering it not active. The second direction will be overriden with the direction
+        rendering it not active. The second direction will be overridden with the direction
         to the target.
 
         If the target is not in proximity and the section has a major type, an attraction bias
@@ -442,7 +442,7 @@ class SpaceColonization(TMDAlgo):
 
 
 class SpaceColonizationTarget(SpaceColonization):
-    """A target is specified fot this algorithm.
+    """A target is specified for this algorithm.
 
     The tree grows biased from the target and when it reaches it, it stops being influenced by the
     point.

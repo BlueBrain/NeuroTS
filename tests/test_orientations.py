@@ -62,7 +62,7 @@ def test_orientation_manager__constructor():
     for mode, method in om._modes.items():
         assert mode == method.__name__.replace(
             "_mode_", ""
-        ), f"Mode name missmatch: {mode} -> {method.__name__}"
+        ), f"Mode name mismatch: {mode} -> {method.__name__}"
 
     # then check that all there are no new methods that are unregistered
     str_modes = "\n".join(om._modes)
