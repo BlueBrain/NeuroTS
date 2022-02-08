@@ -15,7 +15,7 @@ statistical properties.
 
 ## Installation
 
-Use pip to install the package:
+It is recommended to install ``NeuroTS`` using [pip](https://pip.pypa.io/en/stable/):
 
 ```bash
 pip install neurots
