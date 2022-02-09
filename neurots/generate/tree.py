@@ -110,7 +110,7 @@ class TreeGrower:
         context=None,
         random_generator=np.random,
     ):
-        """Constructor ot TreeGrower object."""
+        """Constructor of TreeGrower object."""
         self.neuron = neuron
         self.direction = initial_direction
         self.point = initial_point

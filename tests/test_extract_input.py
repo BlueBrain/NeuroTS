@@ -245,7 +245,7 @@ class TestDistributions:
         )
         assert_equal(distr["basal"]["filtration_metric"], "radial_distances")
 
-        # Check that the returned distributions are valide according to the JSON schema
+        # Check that the returned distributions are valid according to the JSON schema
         validator.validate_neuron_distribs(distr)
 
     def test_path_distances(self, filename):
