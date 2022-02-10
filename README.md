@@ -39,9 +39,46 @@ diameter-synthesis
 
 Neuronal morphologies provide the foundation for the electrical behavior of neurons, the connectomes they form, and the dynamical properties of the brain. Comprehensive neuron models are essential for defining cell types, discerning their functional roles, and investigating brain disease related dendritic alterations. However, a lack of understanding of the principles underlying neuron morphologies has hindered attempts to computationally synthesize morphologies for decades. We introduce a synthesis algorithm based on a topological descriptor of neurons, which enables the rapid digital reconstruction of entire brain regions from few reference cells. This topology-guided synthesis (NeuroTS) generates dendrites that are statistically similar to biological reconstructions in terms of morpho-electrical and connectivity properties and offers a significant opportunity to investigate the links between neuronal morphology and brain function across different spatio-temporal scales.
 
-NeuroTS can be used for the creation of neuronal morphologies from biological reconstructions. The user needs to extract the distributions of topological and statistical properties using the software in order to create the necessary synthesis inputs. Example for input distributions can be found in https://github.com/BlueBrain/NeuroTS/blob/main/tests/data/bio_rat_L5_TPC_B.json . The user can then choose from a set of input parameters depending on the type of neurons one wants to generate. Example for input parameters can be found in https://github.com/BlueBrain/NeuroTS/blob/main/tests/data/params1_orientation_manager.json .
+NeuroTS can be used for the creation of neuronal morphologies from biological reconstructions. The user needs to extract the distributions of topological and statistical properties using the software in order to create the necessary synthesis inputs. 
 
-Once the input_parameters and input_distributions have been defined, the NeuroTS can generate one or multiple cells based on the respective inputs. The generated cells can be saved in a variety of file formats (SWC, ASC, H5) so that they can be analyzed and visualized by a variety of different software. You can find examples on how to extract distributions, generate cells and run basic validations below. 
+
+Parameters and distributions
+============================
+
+This page describes the format of the expected parameters and distributions used by NeuroTS.
+
+Parameters
+----------
+
+.. jsonschema:: ../../neurots/schemas/parameters.json
+    :lift_definitions:
+    :auto_reference:
+    :auto_target:
+
+
+Example
+~~~~~~~
+
+.. literalinclude:: ../../tests/data/params1_orientation_manager.json
+   :linenos:
+
+
+Distributions
+-------------
+
+.. jsonschema:: ../../neurots/schemas/distributions.json
+    :lift_definitions:
+    :auto_reference:
+    :auto_target:
+
+
+Example
+~~~~~~~
+
+.. literalinclude:: ../../tests/data/bio_distribution_apical_point.json
+   :linenos:
+
+Once the input_parameters and input_distributions have been defined, the NeuroTS can generate one or multiple cells based on the respective inputs. The generated cells can be saved in a variety of file formats (SWC, ASC, H5) so that they can be analyzed and visualized by a variety of different software. You can find examples on how to extract distributions, generate cells and run basic validations below.
 
 
 ## Examples
