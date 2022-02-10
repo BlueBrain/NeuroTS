@@ -1,3 +1,5 @@
+![NeuroTS Logo](doc/source/logo/BBP-NeuroTS.jpg)
+
 [![Version](https://img.shields.io/pypi/v/neurots)](https://github.com/BlueBrain/NeuroTS/releases)
 [![Build status](https://github.com/BlueBrain/NeuroTS/actions/workflows/run-tox.yml/badge.svg?branch=main)](https://github.com/BlueBrain/NeuroTS/actions)
 [![Codecov.io](https://codecov.io/github/BlueBrain/NeuroTS/coverage.svg?branch=main)](https://codecov.io/github/BlueBrain/NeuroTS?branch=main)
