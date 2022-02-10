@@ -21,20 +21,6 @@ Use pip to install the package:
 pip install neurots
 ```
 
-## Dependencies
-
-```
-numpy>=1.15.0
-scipy>=1.6
-jsonschema>=3.0.1
-matplotlib>=1.3.1
-
-NeuroM >= 3.0 <= 4.0
-MorphIO >= 3.0 <= 4.0
-tmd >= 2.0.8
-diameter-synthesis
-```
-
 ## Main usage
 
 Neuronal morphologies provide the foundation for the electrical behavior of neurons, the connectomes they form, and the dynamical properties of the brain. Comprehensive neuron models are essential for defining cell types, discerning their functional roles, and investigating brain disease related dendritic alterations. However, a lack of understanding of the principles underlying neuron morphologies has hindered attempts to computationally synthesize morphologies for decades. We introduce a synthesis algorithm based on a topological descriptor of neurons, which enables the rapid digital reconstruction of entire brain regions from few reference cells. This topology-guided synthesis (NeuroTS) generates dendrites that are statistically similar to biological reconstructions in terms of morpho-electrical and connectivity properties and offers a significant opportunity to investigate the links between neuronal morphology and brain function across different spatio-temporal scales.
