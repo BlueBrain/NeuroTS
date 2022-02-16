@@ -67,7 +67,7 @@ def distributions(
     Returns:
         dict: The input distributions.
     """
-    pop_tmd = tmd.io.load_population(filepath)
+    pop_tmd = tmd.io.load_population(filepath, use_morphio=True)
     pop_nm = load_morphologies(filepath)
 
     input_distributions = {"soma": {}, "basal": {}, "apical": {}, "axon": {}}
