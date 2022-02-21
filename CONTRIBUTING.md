@@ -1,6 +1,6 @@
 # Contributing
 
-We would love for you to contribute to the luigi-tools package and help make it even better
+We would love for you to contribute to this package and help make it even better
 than it is today! As a contributor, here are the guidelines we would like you to follow:
 * [Issues and Bugs](#issue)
 * [Feature Requests](#feature)
