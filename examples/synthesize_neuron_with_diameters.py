@@ -16,29 +16,32 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
+import json
 import neurots
-
+from neurots import extract_input
 
 def run():
-    # Cell to use as input for the diameter model
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    input_cell = os.path.join(dir_path, '../test_data/bio/C220197A-P2.h5')
+    # Extract distributions with diameters
+    distr = extract_input.distributions(
+            "data/neurons/", feature="path_distances",
+            diameter_model="M5")
 
-    # Outputcell to be saved
-    output_cell_name = os.path.join(dir_path, './local/Neuron_diam')
+    # Load default parameters dictionary
+    with open("data/bio_params.json", "r") as F:
+        params = json.load(F)
+    params["diameter_params"]["method"] = "M5"
 
-    # Generate model from input cell
+    # Initialize a neuron
+    N = neurots.NeuronGrower(input_distributions=distr,
+                         input_parameters=params)
 
-    model = neurots.extract_input.diameter_distributions(input_cell)
+    # Grow your neuron
+    neuron = N.grow()
+    # Correct the diameters
+    N._diametrize()
 
-    # Create the object to modify the input cell to be diametrized
-    # Initialize tha cell with the output cell name
-    G = neurots.NeuronGrower(input_parameters=None, input_distributions=model, name=output_cell_name)
-
-    # Modify the diameters using the generated model
-    G.diametrize()
-
-    G.neuron.write_asc('fixed_diameters.asc')
-
+    neuron.write('generated_cell.asc')
+    neuron.write('generated_cell.swc')
+    neuron.write('generated_cell.h5')
 
 run()

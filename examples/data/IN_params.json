@@ -1,0 +1,45 @@
+{
+    "apical": {},
+    "axon": {},
+    "basal": {
+        "branching_method": "bio_oriented",
+        "growth_method": "tmd",
+        "metric": "path_distances",
+        "modify": null,
+        "orientation": null,
+        "radius": 0.3,
+        "randomness": 0.24,
+        "step_size": {
+            "norm": {
+                "mean": 1.0,
+                "std": 0.2
+            }
+        },
+        "targeting": 0.14,
+        "tree_type": 3
+    },
+    "diameter_params": {
+        "asymmetry_threshold": {
+            "apical": 0.2,
+            "basal": 1.0
+        },
+        "method": "external",
+        "models": [
+            "generic"
+        ],
+        "n_samples": 2,
+        "neurite_types": [
+            "basal",
+            "apical"
+        ],
+        "trunk_max_tries": 100
+    },
+    "grow_types": [
+        "basal"
+    ],
+    "origin": [
+        0.0,
+        0.0,
+        0.0
+    ]
+}

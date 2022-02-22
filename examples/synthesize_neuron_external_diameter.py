@@ -1,4 +1,4 @@
-"""Generate a cell with M5 diameter model."""
+"""Generate a cell."""
 
 # Copyright (C) 2021  Blue Brain Project, EPFL
 #
@@ -16,20 +16,32 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
+import json
 import neurots
 from neurots import extract_input
+from diameter_synthesis import build_diameters
+
 def run():
-    # Extract distributions from cells in input directory
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    filename = os.path.join(dir_path, '../test_data/bio/')
-    distr = extract_input.distributions(filename, feature='path_distances', diameter_model='M5')
-    # Generate default parameters dictionary
-    params = extract_input.parameters(neurite_types=['basal', 'apical'],
-                                          feature='path_distances', method='tmd', diameter_parameters='M5')
+
+    def external_diametrizer(neuron, model, neurite_type):
+        return build_diameters.build(
+            neuron,
+            model,
+            [neurite_type],
+            params["diameter_params"]
+        )
+
+    # Load distributions from cells in input directory
+    with open("data/IN_distr.json", "r") as F:
+        distr = json.load(F)
+    # Load default parameters dictionary
+    with open("data/IN_params.json", "r") as F:
+        params = json.load(F)
 
     # Initialize a neuron
     N = neurots.NeuronGrower(input_distributions=distr,
-                         input_parameters=params)
+                             input_parameters=params,
+                             external_diametrizer=external_diametrizer)
 
     # Grow your neuron
     neuron = N.grow()
