@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import inspect
+
 import numpy as np
 
 from neurots.morphio_utils import STR_TO_TYPES
@@ -199,7 +201,6 @@ def diametrize_from_root(
     *,
     model_params,
     random_generator=np.random,
-    **_,
 ):  # pylint: disable=too-many-locals
     """Corrects the diameters of a morphio-neuron according to the model.
 
@@ -261,9 +262,7 @@ def diametrize_from_root(
                 redefine_diameter_section(section, 0, section.parent.diameters[-1])
 
 
-def diametrize_from_tips(
-    neuron, neurite_type=None, *, model_params, random_generator=np.random, **_
-):
+def diametrize_from_tips(neuron, neurite_type=None, *, model_params, random_generator=np.random):
     """Corrects the diameters of a morphio-neuron according to the model.
 
     Starts from the tips and moves towards the root.
@@ -319,7 +318,7 @@ def diametrize_from_tips(
                 redefine_diameter_section(section, 0, section.parent.diameters[-1])
 
 
-def diametrize_constant_per_section(neuron, neurite_type=None, **_):
+def diametrize_constant_per_section(neuron, neurite_type=None):
     """Corrects the diameters of a morphio-neuron to make them constant per section.
 
     Args:
@@ -331,7 +330,7 @@ def diametrize_constant_per_section(neuron, neurite_type=None, **_):
         sec.diameters = mean_diam * np.ones(len(sec.diameters))
 
 
-def diametrize_constant_per_neurite(neuron, neurite_type=None, **_):
+def diametrize_constant_per_neurite(neuron, neurite_type=None):
     """Corrects the diameters of a morphio-neuron to make them constant per neurite.
 
     Args:
@@ -346,7 +345,7 @@ def diametrize_constant_per_neurite(neuron, neurite_type=None, **_):
             sec.diameters = mean_diam * np.ones(len(sec.diameters))
 
 
-def diametrize_smoothing(neuron, neurite_type=None, **_):
+def diametrize_smoothing(neuron, neurite_type=None):
     """Corrects the diameters of a morphio-neuron, by smoothing them within each section.
 
     Args:
@@ -390,7 +389,7 @@ def build(
 
     * **neuron** (*morphio.mut.Morphology*): The morphology that will be diametrized.
     * **tree_type** (*str*): Only the neurites of this type are diametrized.
-    * **model_params** (*dict*): The model parameters.
+    * **model_params** (*dict*): The model parameters (optional).
     * **diam_params** (*dict*): The parameters passed to the diametrization method (optional).
     * **random_generator** (*numpy.random.Generator*): The random number generator to use
         (optional).
@@ -415,10 +414,12 @@ def build(
     for tree_type in neurite_types:
         if isinstance(tree_type, str):
             tree_type = STR_TO_TYPES.get(tree_type)
-        diam_method(
-            neuron,
-            tree_type,
-            model_params=input_model,
-            diam_params=diam_params,
-            random_generator=random_generator,
-        )
+        param_signature = list(inspect.signature(diam_method).parameters.keys())
+        optional_kw = {}
+        if "model_params" in param_signature:
+            optional_kw["model_params"] = input_model
+        if "diam_params" in param_signature:
+            optional_kw["diam_params"] = diam_params
+        if "random_generator" in param_signature:
+            optional_kw["random_generator"] = random_generator
+        diam_method(neuron, tree_type, **optional_kw)
