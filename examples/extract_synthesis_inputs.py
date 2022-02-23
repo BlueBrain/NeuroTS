@@ -1,11 +1,4 @@
 # noqa
-"""
-Extract inputs for synthesis
-============================
-
-This example shows how to extract the inputs required for synthesis from a set of existing
-morphologies.
-"""
 
 # Copyright (C) 2022  Blue Brain Project, EPFL
 #
@@ -22,6 +15,14 @@ morphologies.
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""
+Extract inputs for synthesis
+============================
+
+This example shows how to extract the inputs required for synthesis from a set of existing
+morphologies.
+"""
+
 import json
 from pathlib import Path
 
@@ -30,12 +31,8 @@ from neurots import extract_input
 from neurots.utils import NumpyEncoder
 
 
-def run(output_dir="results_extract_synthesis_inputs", data_dir="data"):
+def run(output_dir, data_dir):
     """Run the example for extracting inputs for synthesis."""
-    output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    data_dir = Path(data_dir)
-
     # Generate distribution from directory of neurons
     distr = extract_input.distributions(
         data_dir / "neurons", feature="path_distances", diameter_model="default"
@@ -54,17 +51,18 @@ def run(output_dir="results_extract_synthesis_inputs", data_dir="data"):
     with open(output_dir / "test_params.json", "w", encoding="utf-8") as f:
         json.dump(params, f, sort_keys=True, indent=2)
 
-    # Re-load data from saved files
+    # Re-load data from saved distributions
     with open(output_dir / "test_distr.json", "r", encoding="utf-8") as F:
         distr = json.load(F)
-    # Load default parameters dictionary
+
+    # Re-load data from saved parameters
     with open(output_dir / "test_params.json", "r", encoding="utf-8") as F:
         params = json.load(F)
 
     # Initialize a neuron
     N = neurots.NeuronGrower(input_distributions=distr, input_parameters=params)
 
-    # Grow your neuron
+    # Grow the neuron
     neuron = N.grow()
 
     # Export the synthesized cell
@@ -74,4 +72,7 @@ def run(output_dir="results_extract_synthesis_inputs", data_dir="data"):
 
 
 if __name__ == "__main__":
-    run()
+    result_dir = Path("results_extract_synthesis_inputs")
+    result_dir.mkdir(parents=True, exist_ok=True)
+
+    run(result_dir, Path("data"))
