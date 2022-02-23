@@ -15,25 +15,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import json
-
 import numpy as np
-
-
-class NumpyEncoder(json.JSONEncoder):
-    """Encoder to save distributions on json."""
-
-    def default(self, o):
-        """Check and replace for json."""
-        if isinstance(o, np.ndarray):
-            return o.tolist()
-        if isinstance(o, np.floating):
-            return float(o)
-        return json.JSONEncoder.default(self, o)
 
 
 class NeuroTSError(Exception):
     """Raises NeuroTS error."""
+
+
+def format_values(obj):
+    """Format values of an object recursively."""
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    if isinstance(obj, np.floating):
+        return float(obj)
+    if isinstance(obj, np.integer):
+        return int(obj)
+    if isinstance(obj, (np.bool8, np.bool_)):
+        return bool(obj)
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            obj[k] = format_values(v)
+    if isinstance(obj, list):
+        for num, i in enumerate(obj):
+            obj[num] = format_values(i)
+    return obj
 
 
 def _check(data):
