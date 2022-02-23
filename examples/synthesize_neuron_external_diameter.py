@@ -1,6 +1,9 @@
-"""Generate a cell."""
+"""Generate a cell with external diametrizer.
 
-# Copyright (C) 2021  Blue Brain Project, EPFL
+The ``diameter-synthesis`` package must be installed.
+"""
+
+# Copyright (C) 2022  Blue Brain Project, EPFL
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,23 +19,29 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import json
+from pathlib import Path
+
+from diameter_synthesis import build_diameters  # pylint: disable=import-error
+
 import neurots
-from diameter_synthesis import build_diameters
 
 
-def run():
-    # an external diametrizer should have the following signature,
-    # the code diameter_synthesis provides an example of such external diametrizer
-    def external_diametrizer(neuron, neurite_type, model_all, random_generator):
-        return build_diameters.build(
-            neuron, model_all, [neurite_type], params["diameter_params"], random_generator
-        )
+def run(output_dir="results_neuron_external_diameter", data_dir="data"):
+    """Run the example for generating a cell with external diametrizer."""
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    data_dir = Path(data_dir)
+
+    # An external diametrizer should have the signature described in
+    # ``neurots.generate.diametrizer.build``.
+    # The code ``diameter_synthesis`` provides an example of such external diametrizer.
+    external_diametrizer = build_diameters.build
 
     # Load distributions from cells in input directory
-    with open("data/IN_distr.json", "r") as F:
+    with open(data_dir / "IN_distr.json", "r", encoding="utf-8") as F:
         distr = json.load(F)
     # Load default parameters dictionary
-    with open("data/IN_params.json", "r") as F:
+    with open(data_dir / "IN_params.json", "r", encoding="utf-8") as F:
         params = json.load(F)
 
     # Initialize a neuron
@@ -45,9 +54,10 @@ def run():
     # Grow your neuron
     neuron = N.grow()
 
-    neuron.write("generated_cell.asc")
-    neuron.write("generated_cell.swc")
-    neuron.write("generated_cell.h5")
+    # Export the synthesized cell
+    neuron.write(output_dir / "generated_cell.asc")
+    neuron.write(output_dir / "generated_cell.swc")
+    neuron.write(output_dir / "generated_cell.h5")
 
 
 if __name__ == "__main__":

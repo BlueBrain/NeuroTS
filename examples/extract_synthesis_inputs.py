@@ -1,6 +1,6 @@
-"""Generate a cell."""
+"""Extract inputs for synthesis."""
 
-# Copyright (C) 2021  Blue Brain Project, EPFL
+# Copyright (C) 2022  Blue Brain Project, EPFL
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,54 +15,56 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import numpy as np
 import json
+from pathlib import Path
+
 import neurots
 from neurots import extract_input
+from neurots.utils import NumpyEncoder
 
 
-class NumpyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        if type(obj) is np.float32:
-            return np.float64(obj)
-        return json.JSONEncoder.default(self, obj)
-
-
-def run():
+def run(output_dir="results_extract_synthesis_inputs", data_dir="data"):
+    """Run the example for extracting inputs for synthesis."""
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    data_dir = Path(data_dir)
 
     # Generate distribution from directory of neurons
     distr = extract_input.distributions(
-        "data/neurons/", feature="path_distances", diameter_model="default")
+        data_dir / "neurons", feature="path_distances", diameter_model="default"
+    )
 
     # Save distributions in a json file
-    with open("./test_distr.json", "w") as f: json.dump(distr, f, sort_keys=True, indent=2, cls=NumpyEncoder)
+    with open(output_dir / "test_distr.json", "w", encoding="utf-8") as f:
+        json.dump(distr, f, sort_keys=True, indent=2, cls=NumpyEncoder)
 
-    # Generate defaukt parameters for topological synthesis of basal dendrites
+    # Generate default parameters for topological synthesis of basal dendrites
     params = extract_input.parameters(
-        neurite_types=["basal"], feature="path_distances", method="tmd")
+        neurite_types=["basal"], feature="path_distances", method="tmd"
+    )
 
     # Save parameters in a json file
-    with open("./test_params.json", "w") as f: json.dump(params, f, sort_keys=True, indent=2)
-
+    with open(output_dir / "test_params.json", "w", encoding="utf-8") as f:
+        json.dump(params, f, sort_keys=True, indent=2)
 
     # Re-load data from saved files
-    with open("test_distr.json", "r") as F:
+    with open(output_dir / "test_distr.json", "r", encoding="utf-8") as F:
         distr = json.load(F)
     # Load default parameters dictionary
-    with open("test_params.json", "r") as F:
+    with open(output_dir / "test_params.json", "r", encoding="utf-8") as F:
         params = json.load(F)
 
     # Initialize a neuron
-    N = neurots.NeuronGrower(input_distributions=distr,
-                         input_parameters=params)
+    N = neurots.NeuronGrower(input_distributions=distr, input_parameters=params)
 
     # Grow your neuron
     neuron = N.grow()
 
-    neuron.write('generated_cell.asc')
-    neuron.write('generated_cell.swc')
-    neuron.write('generated_cell.h5')
+    # Export the synthesized cell
+    neuron.write(output_dir / "generated_cell.asc")
+    neuron.write(output_dir / "generated_cell.swc")
+    neuron.write(output_dir / "generated_cell.h5")
 
-run()
+
+if __name__ == "__main__":
+    run()

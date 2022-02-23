@@ -1,6 +1,6 @@
-"""Generate a cell."""
+"""Synthesize a single neuron."""
 
-# Copyright (C) 2021  Blue Brain Project, EPFL
+# Copyright (C) 2022  Blue Brain Project, EPFL
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,29 +15,36 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import os
 import json
-import neurots
-from neurots import extract_input
+from pathlib import Path
 
-def run():
+import neurots
+
+
+def run(output_dir="results_single_neuron", data_dir="data"):
+    """Run the example for generating a single cell."""
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    data_dir = Path(data_dir)
+
     # Load default distributions dictionary
-    with open("data/bio_distr.json", "r") as F:
+    with open(data_dir / "bio_distr.json", "r", encoding="utf-8") as F:
         distr = json.load(F)
     # Load default parameters dictionary
-    with open("data/bio_params.json", "r") as F:
+    with open(data_dir / "bio_params.json", "r", encoding="utf-8") as F:
         params = json.load(F)
 
     # Initialize a neuron
-    N = neurots.NeuronGrower(input_distributions=distr,
-                         input_parameters=params)
+    N = neurots.NeuronGrower(input_distributions=distr, input_parameters=params)
 
     # Grow your neuron
     neuron = N.grow()
 
-    neuron.write('generated_cell.asc')
-    neuron.write('generated_cell.swc')
-    neuron.write('generated_cell.h5')
+    # Export the synthesized cell
+    neuron.write(output_dir / "generated_cell.asc")
+    neuron.write(output_dir / "generated_cell.swc")
+    neuron.write(output_dir / "generated_cell.h5")
 
 
-run()
+if __name__ == "__main__":
+    run()

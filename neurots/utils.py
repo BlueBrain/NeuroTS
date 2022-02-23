@@ -15,6 +15,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import json
+
+import numpy as np
+
+
+class NumpyEncoder(json.JSONEncoder):
+    """Encoder to save distributions on json."""
+
+    def default(self, o):
+        """Check and replace for json."""
+        if isinstance(o, np.ndarray):
+            return o.tolist()
+        if isinstance(o, np.floating):
+            return float(o)
+        return json.JSONEncoder.default(self, o)
+
 
 class NeuroTSError(Exception):
     """Raises NeuroTS error."""
