@@ -1,10 +1,4 @@
 # noqa
-"""
-Synthesize neuron with a simple diameter model
-==============================================
-
-This example shows how to synthesize a cell with one of the simple provided diameter models.
-"""
 
 # Copyright (C) 2022  Blue Brain Project, EPFL
 #
@@ -21,6 +15,13 @@ This example shows how to synthesize a cell with one of the simple provided diam
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""
+Synthesize neuron with a simple diameter model
+==============================================
+
+This example shows how to synthesize a cell with one of the simple provided diameter models.
+"""
+
 import json
 from pathlib import Path
 
@@ -28,12 +29,8 @@ import neurots
 from neurots import extract_input
 
 
-def run(output_dir="results_neuron_with_diameters", data_dir="data"):
+def run(output_dir, data_dir):
     """Run the example for generating a cell with a simple diameter model."""
-    output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    data_dir = Path(data_dir)
-
     # Extract distributions with diameters
     distr = extract_input.distributions(
         data_dir / "neurons", feature="path_distances", diameter_model="M5"
@@ -42,12 +39,14 @@ def run(output_dir="results_neuron_with_diameters", data_dir="data"):
     # Load default parameters dictionary
     with open(data_dir / "bio_params.json", "r", encoding="utf-8") as F:
         params = json.load(F)
+
+    # Set the diameter method
     params["diameter_params"]["method"] = "M5"
 
     # Initialize a neuron
     N = neurots.NeuronGrower(input_distributions=distr, input_parameters=params)
 
-    # Grow your neuron
+    # Grow the neuron
     neuron = N.grow()
 
     # Export the synthesized cell
@@ -57,4 +56,7 @@ def run(output_dir="results_neuron_with_diameters", data_dir="data"):
 
 
 if __name__ == "__main__":
-    run()
+    result_dir = Path("results_neuron_with_diameters")
+    result_dir.mkdir(parents=True, exist_ok=True)
+
+    run(result_dir, Path("data"))

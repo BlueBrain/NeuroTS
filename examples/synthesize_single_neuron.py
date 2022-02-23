@@ -1,10 +1,4 @@
 # noqa
-"""
-Synthesize a single neuron
-==========================
-
-This example shows how to synthesize a single cell with simple parameters.
-"""
 
 # Copyright (C) 2022  Blue Brain Project, EPFL
 #
@@ -21,29 +15,27 @@ This example shows how to synthesize a single cell with simple parameters.
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import json
+"""
+Synthesize a single neuron
+==========================
+
+This example shows how to synthesize a single cell with simple parameters.
+"""
+
 from pathlib import Path
 
 import neurots
 
 
-def run(output_dir="results_single_neuron", data_dir="data"):
+def run(output_dir, data_dir):
     """Run the example for generating a single cell."""
-    output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    data_dir = Path(data_dir)
-
-    # Load default distributions dictionary
-    with open(data_dir / "bio_distr.json", "r", encoding="utf-8") as F:
-        distr = json.load(F)
-    # Load default parameters dictionary
-    with open(data_dir / "bio_params.json", "r", encoding="utf-8") as F:
-        params = json.load(F)
-
     # Initialize a neuron
-    N = neurots.NeuronGrower(input_distributions=distr, input_parameters=params)
+    N = neurots.NeuronGrower(
+        input_distributions=data_dir / "bio_distr.json",
+        input_parameters=data_dir / "bio_params.json",
+    )
 
-    # Grow your neuron
+    # Grow the neuron
     neuron = N.grow()
 
     # Export the synthesized cell
@@ -53,4 +45,7 @@ def run(output_dir="results_single_neuron", data_dir="data"):
 
 
 if __name__ == "__main__":
-    run()
+    result_dir = Path("results_single_neuron")
+    result_dir.mkdir(parents=True, exist_ok=True)
+
+    run(result_dir, Path("data"))

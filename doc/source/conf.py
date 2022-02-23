@@ -13,6 +13,7 @@
 import re
 
 from pkg_resources import get_distribution
+from sphinx_gallery.sorting import ExampleTitleSortKey  # pylint: disable=import-error
 
 # -- Project information -----------------------------------------------------
 
@@ -93,6 +94,7 @@ sphinx_gallery_conf = {
     "gallery_dirs": "examples",
     "line_numbers": True,
     "plot_gallery": False,
+    "within_subsection_order": ExampleTitleSortKey,
 }
 
 
