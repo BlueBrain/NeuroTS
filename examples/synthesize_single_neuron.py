@@ -1,4 +1,10 @@
-"""Synthesize a single neuron."""
+# noqa
+"""
+Synthesize a single neuron
+==========================
+
+This example shows how to synthesize a single cell with simple parameters.
+"""
 
 # Copyright (C) 2022  Blue Brain Project, EPFL
 #

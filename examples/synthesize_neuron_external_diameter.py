@@ -1,6 +1,11 @@
-"""Generate a cell with external diametrizer.
+# noqa
+"""
+Synthesize a cell with external diametrizer
+===========================================
 
-The ``diameter-synthesis`` package must be installed.
+This example shows how to synthesize a cell with an external diametrizer.
+
+Note that the ``diameter-synthesis`` package must be installed.
 """
 
 # Copyright (C) 2022  Blue Brain Project, EPFL

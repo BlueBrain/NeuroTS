@@ -1,4 +1,10 @@
-"""Synthesize neuron with a simple diameter model."""
+# noqa
+"""
+Synthesize neuron with a simple diameter model
+==============================================
+
+This example shows how to synthesize a cell with one of the simple provided diameter models.
+"""
 
 # Copyright (C) 2022  Blue Brain Project, EPFL
 #

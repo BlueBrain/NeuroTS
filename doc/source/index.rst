@@ -10,6 +10,7 @@
 
    Home <self>
    params_and_distrs
+   examples/index
    api
    changelog
    contributing

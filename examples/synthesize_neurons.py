@@ -1,4 +1,10 @@
-"""Generate a population of neurons with the same parameters."""
+# noqa
+"""
+Synthesize a population of neurons with the same parameters
+===========================================================
+
+This example shows how to synthesize a population of cells with the same parameters for all of them.
+"""
 
 # Copyright (C) 2022  Blue Brain Project, EPFL
 #

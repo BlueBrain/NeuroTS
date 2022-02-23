@@ -1,4 +1,11 @@
-"""Extract inputs for synthesis."""
+# noqa
+"""
+Extract inputs for synthesis
+============================
+
+This example shows how to extract the inputs required for synthesis from a set of existing
+morphologies.
+"""
 
 # Copyright (C) 2022  Blue Brain Project, EPFL
 #

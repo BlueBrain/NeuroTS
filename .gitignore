@@ -27,6 +27,7 @@ test_venv/
 # doc
 doc/build
 doc/source/generated
+doc/source/examples
 
 # reports
 reports
