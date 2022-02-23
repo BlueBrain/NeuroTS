@@ -213,6 +213,7 @@ class NeuronGrower:
                     self.input_distributions["diameter"],
                     neurite_types=neurite_types,
                     diam_method=diam_method,
+                    diam_params=self.input_parameters.get("diameter_params", {}),
                     random_generator=self._rng,
                 )
 

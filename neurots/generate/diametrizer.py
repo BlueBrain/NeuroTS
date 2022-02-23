@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import inspect
+
 import numpy as np
 
 from neurots.morphio_utils import STR_TO_TYPES
@@ -197,7 +199,7 @@ def diametrize_from_root(
     neuron,
     neurite_type=None,
     *,
-    model_all,
+    model_params,
     random_generator=np.random,
 ):  # pylint: disable=too-many-locals
     """Corrects the diameters of a morphio-neuron according to the model.
@@ -207,12 +209,12 @@ def diametrize_from_root(
     Args:
         neuron (morphio.mut.Morphology): The morphology that will be diametrized.
         neurite_type (morphio.SectionType): Only the neurites of this type are diametrized.
-        model_all (dict): The model parameters.
+        model_params (dict): The model parameters.
         random_generator (numpy.random.Generator): The random number generator to use.
     """
     for r in root_section_filter(neuron, tree_type=neurite_type):
 
-        model = model_all[TYPE_TO_STR[r.type]]  # Selected by the root type.
+        model = model_params[TYPE_TO_STR[r.type]]  # Selected by the root type.
         trunk_diam = sample(model["trunk"], random_generator)
         min_diam = np.min(model["term"])
         status = {s.id: False for s in r.iter()}
@@ -260,7 +262,7 @@ def diametrize_from_root(
                 redefine_diameter_section(section, 0, section.parent.diameters[-1])
 
 
-def diametrize_from_tips(neuron, neurite_type=None, *, model_all, random_generator=np.random):
+def diametrize_from_tips(neuron, neurite_type=None, *, model_params, random_generator=np.random):
     """Corrects the diameters of a morphio-neuron according to the model.
 
     Starts from the tips and moves towards the root.
@@ -268,11 +270,11 @@ def diametrize_from_tips(neuron, neurite_type=None, *, model_all, random_generat
     Args:
         neuron (morphio.mut.Morphology): The morphology that will be diametrized.
         neurite_type (morphio.SectionType): Only the neurites of this type are diametrized.
-        model_all (dict): The model parameters.
+        model_params (dict): The model parameters.
         random_generator (numpy.random.Generator): The random number generator to use.
     """
     for r in root_section_filter(neuron, tree_type=neurite_type):
-        model = model_all[TYPE_TO_STR[r.type]]  # Selected by the root type.
+        model = model_params[TYPE_TO_STR[r.type]]  # Selected by the root type.
         trunk_diam = sample(model["trunk"], random_generator)
         min_diam = np.min(model["term"])
         tips = [s for s in r.iter() if not s.children]
@@ -316,7 +318,7 @@ def diametrize_from_tips(neuron, neurite_type=None, *, model_all, random_generat
                 redefine_diameter_section(section, 0, section.parent.diameters[-1])
 
 
-def diametrize_constant_per_section(neuron, neurite_type=None, **_):
+def diametrize_constant_per_section(neuron, neurite_type=None):
     """Corrects the diameters of a morphio-neuron to make them constant per section.
 
     Args:
@@ -328,7 +330,7 @@ def diametrize_constant_per_section(neuron, neurite_type=None, **_):
         sec.diameters = mean_diam * np.ones(len(sec.diameters))
 
 
-def diametrize_constant_per_neurite(neuron, neurite_type=None, **_):
+def diametrize_constant_per_neurite(neuron, neurite_type=None):
     """Corrects the diameters of a morphio-neuron to make them constant per neurite.
 
     Args:
@@ -343,7 +345,7 @@ def diametrize_constant_per_neurite(neuron, neurite_type=None, **_):
             sec.diameters = mean_diam * np.ones(len(sec.diameters))
 
 
-def diametrize_smoothing(neuron, neurite_type=None, **_):
+def diametrize_smoothing(neuron, neurite_type=None):
     """Corrects the diameters of a morphio-neuron, by smoothing them within each section.
 
     Args:
@@ -354,44 +356,57 @@ def diametrize_smoothing(neuron, neurite_type=None, **_):
         smooth_section_diam(sec)
 
 
+diam_methods = {
+    "M1": diametrize_constant_per_neurite,
+    "M2": diametrize_constant_per_section,
+    "M3": diametrize_smoothing,
+    "M4": diametrize_from_root,
+    "M5": diametrize_from_tips,
+}
+
+
 def build(
     neuron,
     input_model=None,
     neurite_types=None,
     diam_method=None,
+    diam_params=None,
     random_generator=np.random,
 ):
     """Diametrize according to the selected method.
-
-    If diam_method is a string matching the models below it will use an internal diametrizer. If
-    a function is provided, it will use this function to diametrize the cells. This function should
-    have the following arguments:
-    * neuron
-    * diameter model
-    * type of neurite (str)
-
-    and should only update the neuron object.
 
     Args:
         neuron (morphio.mut.Morphology): The morphology that will be diametrized.
         input_model (dict): The model parameters.
         neurite_types (list[str]): Only the neurites of these types are diametrized.
-        diam_method (str): The name of the diametrization method.
+        diam_method (str or callable): The name of the diametrization method.
+        diam_params (dict): The parameters passed to the diametrization method.
         random_generator (numpy.random.Generator): The random number generator to use.
+
+    If ``diam_method`` is a string matching the models in ``diam_methods`` it will use an internal
+    diametrizer. If a function is provided, it will use this function to diametrize the cells. This
+    function should have the following arguments:
+
+    * **neuron** (*morphio.mut.Morphology*): The morphology that will be diametrized.
+    * **tree_type** (*str*): Only the neurites of this type are diametrized.
+    * **model_params** (*dict*): The model parameters (optional).
+    * **diam_params** (*dict*): The parameters passed to the diametrization method (optional).
+    * **random_generator** (*numpy.random.Generator*): The random number generator to use
+        (optional).
+
+    and should only update the neuron object.
     """
     if neurite_types is None:
         neurite_types = [STR_TO_TYPES.get(tree_type) for tree_type in ["apical", "basal"]]
 
     if isinstance(diam_method, str):
-        methods = {
-            "M1": diametrize_constant_per_neurite,
-            "M2": diametrize_constant_per_section,
-            "M3": diametrize_smoothing,
-            "M4": diametrize_from_root,
-            "M5": diametrize_from_tips,
-        }
-
-        diam_method = methods[diam_method]
+        try:
+            diam_method = diam_methods[diam_method]
+        except KeyError as exc:
+            raise KeyError(
+                "The name of the diametrization method is unknown: "
+                f"'{diam_method}' is not in {list(diam_methods.keys())}"
+            ) from exc
 
     elif not hasattr(diam_method, "__call__"):
         raise ValueError(f"Diameter method not understood, we got {diam_method}")
@@ -399,4 +414,12 @@ def build(
     for tree_type in neurite_types:
         if isinstance(tree_type, str):
             tree_type = STR_TO_TYPES.get(tree_type)
-        diam_method(neuron, tree_type, model_all=input_model, random_generator=random_generator)
+        param_signature = list(inspect.signature(diam_method).parameters.keys())
+        optional_kw = {}
+        if "model_params" in param_signature:
+            optional_kw["model_params"] = input_model
+        if "diam_params" in param_signature:
+            optional_kw["diam_params"] = diam_params
+        if "random_generator" in param_signature:
+            optional_kw["random_generator"] = random_generator
+        diam_method(neuron, tree_type, **optional_kw)

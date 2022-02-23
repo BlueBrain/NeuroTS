@@ -177,7 +177,7 @@ def test_diametrize_smoothing(neu1):
 
 def test_diametrize_from_root(neu1):
     np.random.seed(0)  # ensure constant random number for sampling
-    diametrizer.diametrize_from_root(neu1, model_all=MODEL)
+    diametrizer.diametrize_from_root(neu1, model_params=MODEL)
     assert_array_almost_equal(
         morphio.Morphology(neu1).diameters,
         [
@@ -206,7 +206,7 @@ def test_diametrize_from_root(neu1):
 
 def test_diametrize_from_root_axon(neu3):
     np.random.seed(0)  # ensure constant random number for sampling
-    diametrizer.diametrize_from_root(neu3, SectionType.axon, model_all=MODEL)
+    diametrizer.diametrize_from_root(neu3, SectionType.axon, model_params=MODEL)
     assert_array_almost_equal(
         morphio.Morphology(neu3).diameters,
         [
@@ -243,7 +243,7 @@ def test_diametrize_from_root_axon(neu3):
 
 def test_diametrize_from_tips(neu1):
     np.random.seed(0)  # ensure constant random number for sampling
-    diametrizer.diametrize_from_tips(neu1, model_all=MODEL)
+    diametrizer.diametrize_from_tips(neu1, model_params=MODEL)
     assert_array_almost_equal(
         morphio.Morphology(neu1).diameters,
         [
@@ -272,7 +272,7 @@ def test_diametrize_from_tips(neu1):
 
 def test_diametrize_from_tips_axon(neu3):
     np.random.seed(0)  # ensure constant random number for sampling
-    diametrizer.diametrize_from_tips(neu3, model_all=MODEL, neurite_type=SectionType.axon)
+    diametrizer.diametrize_from_tips(neu3, model_params=MODEL, neurite_type=SectionType.axon)
     assert_array_almost_equal(
         morphio.Morphology(neu3).diameters,
         [
@@ -422,7 +422,13 @@ def test_build_M4_rng(neu1):
 
 
 def test_build_unknown_model(neu1):
-    with pytest.raises(KeyError):
+    with pytest.raises(
+        KeyError,
+        match=(
+            "The name of the diametrization method is unknown: 'UNKNOWN' is not in "
+            r"\['M1', 'M2', 'M3', 'M4', 'M5'\]"
+        ),
+    ):
         diametrizer.build(neu1, None, None, "UNKNOWN")
 
 
