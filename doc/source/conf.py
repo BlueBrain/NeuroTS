@@ -93,6 +93,7 @@ sphinx_gallery_conf = {
     "examples_dirs": "../../examples",
     "gallery_dirs": "examples",
     "line_numbers": True,
+    "min_reported_time": 999,
     "plot_gallery": False,
     "within_subsection_order": ExampleTitleSortKey,
 }
