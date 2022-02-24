@@ -34,6 +34,16 @@ Once the `input_parameters` and `input_distributions` have been defined, then Ne
 
 ## Examples
 
+We provide some basic examples to showcase the basic functionality of ``NeuroTS``:
+* synthesize a single neuron from a basic set of inputs
+* synthesize many neurons with the same input parameters and distributions
+* synthesize a single neuron with its diameters using a simple method
+* synthesize a single neuron with its diameters using an external diametrizer
+* extract parameters and distributions that can be used as synthesis inputs
+
+More information can be found in [Examples](https://neurots.readthedocs.io/en/stable/examples/index.html) page of the doc.
+
+
 ## Citation
 
 (TBD)

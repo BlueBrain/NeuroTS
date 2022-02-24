@@ -16,6 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
+import json
 import logging
 
 import numpy as np
@@ -39,6 +40,16 @@ from neurots.validator import validate_neuron_params
 L = logging.getLogger(__name__)
 
 bifurcation_methods = ["symmetric", "bio_oriented", "directional", "bio_smoothed"]
+
+
+def _load_json(path_or_json):
+    """Copy the given data if it is a dictionary or a list or load it if it is a file path."""
+    if isinstance(path_or_json, (dict, list)):
+        data = copy.deepcopy(path_or_json)
+    else:
+        with open(path_or_json, encoding="utf-8") as f:
+            data = json.load(f)
+    return data
 
 
 class NeuronGrower:
@@ -88,10 +99,10 @@ class NeuronGrower:
                 "following types: [int, SeedSequence, BitGenerator, RandomState, Generator]."
             )
 
-        self.input_parameters = copy.deepcopy(input_parameters)
-        L.debug("Input Parameters: %s", input_parameters)
+        self.input_parameters = _load_json(input_parameters)
+        L.debug("Input Parameters: %s", self.input_parameters)
 
-        self.input_distributions = copy.deepcopy(input_distributions)
+        self.input_distributions = _load_json(input_distributions)
 
         # Validate parameters and distributions
         if not skip_validation:

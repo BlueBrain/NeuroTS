@@ -35,10 +35,12 @@ doc_reqs = [
     "m2r2",
     "sphinx",
     "sphinx-bluebrain-theme",
+    "sphinx-gallery",
     "sphinx-jsonschema",
 ]
 
 test_reqs = [
+    "diameter-synthesis>=0.4",
     "mock",
     "morph-tool>=0.1.12",
     "numpy>=1.22",

@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# pylint: disable=missing-module-docstring
 # pylint: disable=missing-function-docstring
 import numpy as np
 from numpy.testing import assert_array_almost_equal

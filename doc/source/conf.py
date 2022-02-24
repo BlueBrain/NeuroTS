@@ -13,6 +13,7 @@
 import re
 
 from pkg_resources import get_distribution
+from sphinx_gallery.sorting import ExampleTitleSortKey  # pylint: disable=import-error
 
 # -- Project information -----------------------------------------------------
 
@@ -35,6 +36,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
+    "sphinx_gallery.gen_gallery",
     "sphinx-jsonschema",
     "m2r2",
 ]
@@ -84,6 +86,15 @@ intersphinx_mapping = {
     "neurom": ("https://neurom.readthedocs.io/en/stable/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "python": ("https://docs.python.org/3", None),
+}
+
+sphinx_gallery_conf = {
+    "download_all_examples": False,
+    "examples_dirs": "../../examples",
+    "gallery_dirs": "examples",
+    "line_numbers": True,
+    "plot_gallery": False,
+    "within_subsection_order": ExampleTitleSortKey,
 }
 
 
