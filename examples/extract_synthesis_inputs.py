@@ -28,7 +28,6 @@ from pathlib import Path
 
 import neurots
 from neurots import extract_input
-from neurots.utils import NumpyEncoder
 
 
 def run(output_dir, data_dir):
@@ -40,7 +39,7 @@ def run(output_dir, data_dir):
 
     # Save distributions in a json file
     with open(output_dir / "test_distr.json", "w", encoding="utf-8") as f:
-        json.dump(distr, f, sort_keys=True, indent=2, cls=NumpyEncoder)
+        json.dump(distr, f, sort_keys=True, indent=2)
 
     # Generate default parameters for topological synthesis of basal dendrites
     params = extract_input.parameters(

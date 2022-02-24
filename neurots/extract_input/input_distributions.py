@@ -26,6 +26,7 @@ from neurots.extract_input.from_neurom import soma_data
 from neurots.extract_input.from_neurom import trunk_neurite
 from neurots.extract_input.from_TMD import persistent_homology_angles
 from neurots.morphio_utils import STR_TO_NEUROM_TYPES
+from neurots.utils import format_values
 
 L = logging.getLogger(__name__)
 
@@ -111,4 +112,4 @@ def distributions(
                 ),
                 {"filtration_metric": type_feature},
             )
-    return input_distributions
+    return format_values(input_distributions)
