@@ -46,8 +46,7 @@ More information can be found in [Examples](https://neurots.readthedocs.io/en/st
 
 ## Citation
 
-(TBD)
-Kanari, Lida and Dictus, Hugo and Chalimourda, Athanassia and Van Geit, Werner and Coste, Benoît and Shillcock, Julian Charles and Hess, Kathryn and Markram, Henry, Computational Synthesis of Cortical Dendritic Morphologies. Available at SSRN: https://ssrn.com/abstract=3596620 or http://dx.doi.org/10.2139/ssrn.3596620 
+When you use the ``NeuroTS`` software or method for your research, we ask you to cite the publication associated to this repository (use the `Cite this repository` button on the [main page](https://github.com/BlueBrain/NeuroTS) of the code).
 
 ## Funding & Acknowledgment
 

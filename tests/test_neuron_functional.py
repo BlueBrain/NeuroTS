@@ -170,6 +170,14 @@ def test_grow_trunk_1_basal():
     with pytest.raises(Exception, match=r"There should be at least 2 basal dendrites \(got 1\)"):
         ng.grow()
 
+    parameters["basal"]["orientation"] = {
+        "mode": "use_predefined",
+        "values": {"orientations": [[0.0, 1.0, 0.0]]},
+    }
+    ng = NeuronGrower(parameters, distributions)
+    with pytest.raises(Exception, match=r"There should be at least 2 basal dendrites \(got 1\)"):
+        ng.grow()
+
 
 def test_external_diametrizer():
     """Test external diametrizer"""
