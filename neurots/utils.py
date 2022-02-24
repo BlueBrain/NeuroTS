@@ -22,22 +22,22 @@ class NeuroTSError(Exception):
     """Raises NeuroTS error."""
 
 
-def format_values(obj):
+def format_values(obj, decimals=None):
     """Format values of an object recursively."""
     if isinstance(obj, np.ndarray):
-        return obj.tolist()
-    if isinstance(obj, np.floating):
-        return float(obj)
-    if isinstance(obj, np.integer):
-        return int(obj)
-    if isinstance(obj, (np.bool8, np.bool_)):
-        return bool(obj)
-    if isinstance(obj, dict):
-        for k, v in obj.items():
-            obj[k] = format_values(v)
-    if isinstance(obj, list):
-        for num, i in enumerate(obj):
-            obj[num] = format_values(i)
+        obj = obj.tolist()
+    elif isinstance(obj, np.floating):
+        obj = float(obj)
+        if decimals is not None:
+            obj = round(obj, ndigits=decimals)
+    elif isinstance(obj, np.integer):
+        obj = int(obj)
+    elif isinstance(obj, (np.bool8, np.bool_)):
+        obj = bool(obj)
+    elif isinstance(obj, dict):
+        obj = {k: format_values(v, decimals=decimals) for k, v in obj.items()}
+    elif isinstance(obj, (list, tuple, set)):
+        obj = type(obj)([format_values(i, decimals=decimals) for i in obj])
     return obj
 
 

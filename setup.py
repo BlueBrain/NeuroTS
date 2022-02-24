@@ -41,6 +41,7 @@ doc_reqs = [
 
 test_reqs = [
     "diameter-synthesis>=0.4",
+    "dictdiffer",
     "mock",
     "morph-tool>=0.1.12",
     "numpy>=1.22",
