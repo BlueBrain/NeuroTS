@@ -4,8 +4,8 @@
     "commitLimit": false,
     "backfillLimit": false,
     "ignoreCommitPattern": "Release [0-9]+\\.[0-9]+\\.[0-9]+|Update CHANGELOG.*|.*\\[skip-changelog\\].*",
-    "commitUrl": "https://github.com/BlueBrain/neurots/commit/{id}",
-    "issueUrl": "https://github.com/BlueBrain/neurots/issues/{id}",
-    "mergeUrl": "https://github.com/BlueBrain/neurots/pull/{id}",
-    "compareUrl": "https://github.com/BlueBrain/neurots/compare/{from}..{to}"
+    "commitUrl": "https://github.com/BlueBrain/NeuroTS/commit/{id}",
+    "issueUrl": "https://github.com/BlueBrain/NeuroTS/issues/{id}",
+    "mergeUrl": "https://github.com/BlueBrain/NeuroTS/pull/{id}",
+    "compareUrl": "https://github.com/BlueBrain/NeuroTS/compare/{from}..{to}"
 }
