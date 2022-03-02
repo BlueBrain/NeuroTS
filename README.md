@@ -32,6 +32,8 @@ We provide some basic examples to showcase the basic functionality of ``NeuroTS`
 * synthesize a single neuron with its diameters using an external diametrizer
 * extract parameters and distributions that can be used as synthesis inputs
 
+All the scripts of these examples and the required input data are located in the `examples` directory of the repository.
+
 More information can be found in [Examples](https://neurots.readthedocs.io/en/stable/examples/index.html) page of the doc.
 
 
