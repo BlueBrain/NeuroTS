@@ -1,4 +1,5 @@
 # data
+.eggs
 *.png
 *.pdf
 
@@ -31,3 +32,6 @@ doc/source/examples
 
 # reports
 reports
+
+# examples
+examples/.ipynb_checkpoints/
