@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.1.1](https://github.com/BlueBrain/NeuroTS/compare/3.1.0..3.1.1)
+
+> 2 March 2022
+
+- Setup CodeCov [#20](https://github.com/BlueBrain/NeuroTS/pull/20)
+
 ## [3.1.0](https://github.com/BlueBrain/NeuroTS/compare/3.0.1..3.1.0)
 
 > 1 March 2022
