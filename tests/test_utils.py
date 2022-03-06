@@ -29,10 +29,10 @@ def test_format_values():
     data = {
         "array_int": np.array([1, 2]),
         "array_float": np.array([1.1, 2.2]),
-        "array_obj": np.array(["a", [1, 2]]),
+        "array_obj": np.array(["a", [1, 2]], dtype=object),
         "2d_array_int": np.array([[1, 2]], ndmin=2),
         "2d_array_float": np.array([[1.1, 2.2]], ndmin=2),
-        "2d_array_obj": np.array([["a", [1, 2]]], ndmin=2),
+        "2d_array_obj": np.array([["a", [1, 2]]], ndmin=2, dtype=object),
         "float32": np.float32(1.1),
         "float64": np.float64(1.1),
         "int32": np.int32(1),

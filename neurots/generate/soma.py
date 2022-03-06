@@ -19,7 +19,7 @@ import logging
 
 import numpy as np
 from scipy.spatial import ConvexHull  # pylint: disable=no-name-in-module
-from scipy.spatial.qhull import QhullError  # pylint: disable=no-name-in-module
+from scipy.spatial import QhullError  # pylint: disable=no-name-in-module
 
 from neurots.generate import orientations
 from neurots.morphmath import rotation
