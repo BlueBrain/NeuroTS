@@ -21,7 +21,7 @@ Neuronal morphologies provide the foundation for the electrical behavior of neur
 
 NeuroTS can be used for the creation of neuronal morphologies from biological reconstructions. The user needs to extract the distributions of topological and statistical properties using the software in order to create the necessary synthesis inputs. Examples of parameters and distributions can be found in the [Parameters and distributions](https://neurots.readthedocs.io/en/stable/params_and_distrs.html) page of the doc.
 
-Once the `input_parameters` and `input_distributions` have been defined, then NeuroTS can generate one or multiple cells based on the respective inputs. The generated cells can be saved in a variety of file formats (SWC, ASC, H5) so that they can be analyzed and visualized by a variety of different softwares. You can find examples on how to extract distributions, generate cells and run basic validations below.
+Once the `input_parameters` and `input_distributions` have been defined, then NeuroTS can generate one or multiple cells based on the respective inputs. The generated cells can be saved in a variety of file formats (SWC, ASC, H5) so that they can be analyzed and visualized by a variety of different software packages. You can find examples on how to extract distributions, generate cells and run basic validations below.
 
 ## Examples
 

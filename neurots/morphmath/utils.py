@@ -93,7 +93,7 @@ def ball_query(points, ball_center, ball_radius):
         points,
         compact_nodes=False,
         copy_data=False,
-        leafsize=2 ** 10,
+        leafsize=2**10,
         balanced_tree=False,
     )
 

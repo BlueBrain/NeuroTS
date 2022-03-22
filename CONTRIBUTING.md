@@ -48,7 +48,17 @@ When you wish to contribute to the code base, please consider the following guid
 
 * Create your patch, **including appropriate test cases** (please note that the coverage must
   always be equal to 100%).
-* Run the full test suite, and ensure that all tests pass.
+* Run the full test suite, and ensure that all tests pass (at least with one of the required
+  python interpreters from py38 to py39):
+  ```shell
+  tox
+  ```
+
+  or
+  ```shell
+  tox -e py38 -e lint -e docs -e check-packaging
+  ```
+
 * Commit your changes using a descriptive commit message.
   ```shell
   git commit -a
@@ -58,7 +68,7 @@ When you wish to contribute to the code base, please consider the following guid
   files.
 * Push your branch to GitHub:
   ```shell
-  git push origin my-fix-branch
+  git push --set-upstream origin my-fix-branch
   ```
 
 * In GitHub, send a Pull Request to the `main` branch of the upstream repository of the relevant
@@ -67,7 +77,6 @@ When you wish to contribute to the code base, please consider the following guid
   * Make the required updates.
   * Re-run the test suites to ensure tests are still passing.
   * Rebase your branch and force push to your GitHub repository (this will update your Pull Request):
-
     ```shell
     git rebase main -i
     git push -f
@@ -115,34 +124,28 @@ The release process is the following:
   git checkout -b release_X.Y.Z
   ```
 
-* Create a new temporary tag locally:
-  ```shell
-  git tag X.Y.Z
-  ```
-
 * Update the CHANGELOG file using auto-changelog:
   ```shell
-  auto-changelog
+  auto-changelog -v X.Y.Z
   ```
 
-* Commit the new changelog and remove the tag:
+* Commit and push the new changelog:
   ```shell
   git commit -m "Release X.Y.Z"
-  git tag -d X.Y.Z
-  git push origin
+  git push --set-upstream origin release_X.Y.Z
   ```
 
 * Open a new pull request from this branch and merge it.
+* Create a new release on GitHub.
 * Checkout the main branch and update it:
   ```shell
   git checkout main
   git pull
   ```
 
-* Create the final tag and push it:
+* Remove your local branch:
   ```shell
-  git tag X.Y.Z
-  git push origin X.Y.Z
+  git branch -D release_X.Y.Z
   ```
 
 After these steps the CI should automatically build the wheel and push it to pypi.

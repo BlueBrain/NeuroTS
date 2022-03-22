@@ -15,5 +15,5 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from neurots.extract_input.input_distributions import distributions
-from neurots.extract_input.input_parameters import parameters
+from neurots.extract_input.input_distributions import distributions  # noqa
+from neurots.extract_input.input_parameters import parameters  # noqa
