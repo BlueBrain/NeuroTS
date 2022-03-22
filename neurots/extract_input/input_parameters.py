@@ -57,8 +57,8 @@ def parameters(
 
         ret.update(
             {
-                "randomness": 0.15,
-                "targeting": 0.12,
+                "randomness": 0.24,
+                "targeting": 0.14,
                 "radius": 0.3,
                 "orientation": None,
                 "growth_method": method,
