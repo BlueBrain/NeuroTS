@@ -76,53 +76,100 @@ Example Definitions
     {{summary}}
   {{/if}}
 
-  {{#each merges}}
-    - {{#if commit.breaking}}**Breaking change:** {{/if}}{{message}} ({{author}}{{#if href}} - [#{{id}}]({{href}})){{/if}}
-  {{/each}}
-
+  {{! List commits that fix a given issues}}
   {{#each fixes}}
     - {{#if commit.breaking}}**Breaking change:** {{/if}}{{commit.subject}}{{#each fixes}} ({{author}}{{#if href}} - [#{{id}}]({{href}}){{/if}}){{/each}}
   {{/each}}
 
   {{! List commits with 'breaking:' or 'Breaking change:' anywhere in the message under a heading}}
-  {{#commit-list commits heading='### Breaking Changes :warning:' message='[bB]reaking [cC]hange:|[bB]reaking:' }}
-    - {{subject}} @{{author}}  <!--[`{{shorthash}}`]({{href}}) -->
+  {{#commit-list merges heading='### Breaking Changes :warning:' message='[bB]reaking [cC]hange:|[bB]reaking:' exclude='\[skip-changelog\]'}}
+    - {{message}} @{{author}}  <!--[`#{{id}}`]({{href}}) -->
   {{/commit-list}}
 
   {{! List commits organised under a heading, but not those already listed in the breaking section }}
-      {{#commit-list commits heading='### New Features' message='^[fF]eat:|[fF]eat\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:'}}
+      {{#commit-list merges heading='### New Features' message='^[fF]eat:|[fF]eat\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
+        - {{message}} ({{author}}{{#if href}} - [#{{id}}]({{href}}){{/if}})
+      {{/commit-list}}
+
+      {{#commit-list merges heading='### Fixes' message='^[fF]ix:|^[fF]ix\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
+        - {{message}} ({{author}}{{#if href}} - [#{{id}}]({{href}}){{/if}})
+      {{/commit-list}}
+
+      {{#commit-list merges heading='### Chores And Housekeeping' message='^[cC]hore:|^[cC]hore\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
+        - {{message}} ({{author}}{{#if href}} - [#{{id}}]({{href}}){{/if}})
+      {{/commit-list}}
+
+      {{#commit-list merges heading='### Documentation Changes' message='^[dD]ocs:|^[dD]ocs\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
+        - {{message}} ({{author}}{{#if href}} - [#{{id}}]({{href}}){{/if}})
+      {{/commit-list}}
+
+      {{#commit-list merges heading='### Refactoring and Updates' message='^[rR]efactor:|^[rR]efactor\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
+        - {{message}} ({{author}}{{#if href}} - [#{{id}}]({{href}}){{/if}})
+      {{/commit-list}}
+
+      {{#commit-list merges heading='### Changes to Test Assests' message='^[tT]est:|^[tT]est\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
+        - {{message}} ({{author}}{{#if href}} - [#{{id}}]({{href}}){{/if}})
+      {{/commit-list}}
+
+      {{#commit-list merges heading='### Tidying of Code eg Whitespace' message='^[sS]tyle:|^[sS]tyle\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
+        - {{message}} ({{author}}{{#if href}} - [#{{id}}]({{href}}){{/if}})
+      {{/commit-list}}
+
+      {{#commit-list merges heading='### Performance Improvements' message='^[pP]erf:|^[pP]erf\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
+        - {{message}} ({{author}}{{#if href}} - [#{{id}}]({{href}}){{/if}})
+      {{/commit-list}}
+
+      {{#commit-list merges heading='### CI Improvements' message='^[cC][iI]:|^[cC][iI]\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
+        - {{message}} ({{author}}{{#if href}} - [#{{id}}]({{href}}){{/if}})
+      {{/commit-list}}
+
+      {{#commit-list merges heading='### Uncategorized Changes' exclude='[bB]reaking [cC]hange:|[bB]reaking:|^[fF]eat:|^[fF]eat\(|^[fF]ix:|^[fF]ix\(|^[cC]hore:|^[cC]hore\(|^[dD]ocs:|^[dD]ocs\(|^[rR]efactor:|^[rR]efactor\(|^[tT]est:|^[tT]est\(|^[sS]tyle:|^[sS]tyle\(|^[pP]erf:|^[pP]erf\(|\[skip-changelog\]'}}
+        - {{message}} ({{author}}{{#if href}} - [#{{id}}]({{href}}){{/if}})
+      {{/commit-list}}
+
+  {{! List commits with 'breaking:' or 'Breaking change:' anywhere in the message under a heading}}
+  {{#commit-list commits heading='### Breaking Changes :warning:' message='[bB]reaking [cC]hange:|[bB]reaking:' exclude='\[skip-changelog\]'}}
+    - {{subject}} ({{author}}{{#if href}} - [{{shorthash}}]({{href}}){{/if}})
+  {{/commit-list}}
+
+  {{! List commits organised under a heading, but not those already listed in the breaking section }}
+      {{#commit-list commits heading='### New Features' message='^[fF]eat:|[fF]eat\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
         - {{subject}} ({{author}}{{#if href}} - [{{shorthash}}]({{href}}){{/if}})
       {{/commit-list}}
 
-      {{#commit-list commits heading='### Fixes' message='^[fF]ix:|^[fF]ix\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:'}}
+      {{#commit-list commits heading='### Fixes' message='^[fF]ix:|^[fF]ix\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
         - {{subject}} ({{author}}{{#if href}} - [{{shorthash}}]({{href}}){{/if}})
       {{/commit-list}}
 
-      {{#commit-list commits heading='### Chores And Housekeeping' message='^[cC]hore:|^[cC]hore\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:'}}
+      {{#commit-list commits heading='### Chores And Housekeeping' message='^[cC]hore:|^[cC]hore\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
         - {{subject}} ({{author}}{{#if href}} - [{{shorthash}}]({{href}}){{/if}})
       {{/commit-list}}
 
-      {{#commit-list commits heading='### Documentation Changes' message='^[dD]ocs:|^[dD]ocs\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:'}}
+      {{#commit-list commits heading='### Documentation Changes' message='^[dD]ocs:|^[dD]ocs\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
         - {{subject}} ({{author}}{{#if href}} - [{{shorthash}}]({{href}}){{/if}})
       {{/commit-list}}
 
-      {{#commit-list commits heading='### Refactoring and Updates' message='^[rR]efactor:|^[rR]efactor\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:'}}
+      {{#commit-list commits heading='### Refactoring and Updates' message='^[rR]efactor:|^[rR]efactor\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
         - {{subject}} ({{author}}{{#if href}} - [{{shorthash}}]({{href}}){{/if}})
       {{/commit-list}}
 
-      {{#commit-list commits heading='### Changes to Test Assests' message='^[tT]est:|^[tT]est\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:'}}
+      {{#commit-list commits heading='### Changes to Test Assests' message='^[tT]est:|^[tT]est\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
         - {{subject}} ({{author}}{{#if href}} - [{{shorthash}}]({{href}}){{/if}})
       {{/commit-list}}
 
-      {{#commit-list commits heading='### Tidying of Code eg Whitespace' message='^[sS]tyle:|^[sS]tyle\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:'}}
+      {{#commit-list commits heading='### Tidying of Code eg Whitespace' message='^[sS]tyle:|^[sS]tyle\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
         - {{subject}} ({{author}}{{#if href}} - [{{shorthash}}]({{href}}){{/if}})
       {{/commit-list}}
 
-      {{#commit-list commits heading='### Performance Improvments' message='^[pP]erf:|^[pP]erf\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:'}}
+      {{#commit-list commits heading='### Performance Improvements' message='^[pP]erf:|^[pP]erf\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
         - {{subject}} ({{author}}{{#if href}} - [{{shorthash}}]({{href}}){{/if}})
       {{/commit-list}}
 
-      {{#commit-list commits heading='### Other Changes' exclude='[bB]reaking [cC]hange:|[bB]reaking:|^[fF]eat:|^[fF]eat\(|^[fF]ix:|^[fF]ix\(|^[cC]hore:|^[cC]hore\(|^[dD]ocs:|^[dD]ocs\(|^[rR]efactor:|^[rR]efactor\(|^[tT]est:|^[tT]est\(|^[sS]tyle:|^[sS]tyle\(|^[pP]erf:|^[pP]erf\('}}
+      {{#commit-list commits heading='### CI Improvements' message='^[cC][iI]:|^[cC][iI]\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
+        - {{subject}} ({{author}}{{#if href}} - [{{shorthash}}]({{href}}){{/if}})
+      {{/commit-list}}
+
+      {{#commit-list commits heading='### Uncategorized Changes' exclude='[bB]reaking [cC]hange:|[bB]reaking:|^[fF]eat:|^[fF]eat\(|^[fF]ix:|^[fF]ix\(|^[cC]hore:|^[cC]hore\(|^[cC][iI]:|^[cC][iI]\(|^[dD]ocs:|^[dD]ocs\(|^[rR]efactor:|^[rR]efactor\(|^[tT]est:|^[tT]est\(|^[sS]tyle:|^[sS]tyle\(|^[pP]erf:|^[pP]erf\(|\[skip-changelog\]'}}
         - {{subject}} ({{author}}{{#if href}} - [{{shorthash}}]({{href}}){{/if}})
       {{/commit-list}}
 
