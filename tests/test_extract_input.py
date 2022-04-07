@@ -367,8 +367,8 @@ def test_parameters():
         params,
         {
             "basal": {
-                "randomness": 0.15,
-                "targeting": 0.12,
+                "randomness": 0.24,
+                "targeting": 0.14,
                 "radius": 0.3,
                 "orientation": None,
                 "growth_method": "tmd",
@@ -379,8 +379,8 @@ def test_parameters():
                 "metric": "radial_distances",
             },
             "apical": {
-                "randomness": 0.15,
-                "targeting": 0.12,
+                "randomness": 0.24,
+                "targeting": 0.14,
                 "radius": 0.3,
                 "orientation": [[0.0, 1.0, 0.0]],
                 "growth_method": "tmd_apical",
@@ -404,8 +404,8 @@ def test_parameters():
         params_path,
         {
             "basal": {
-                "randomness": 0.15,
-                "targeting": 0.12,
+                "randomness": 0.24,
+                "targeting": 0.14,
                 "radius": 0.3,
                 "orientation": None,
                 "growth_method": "tmd",
@@ -416,8 +416,8 @@ def test_parameters():
                 "metric": "path_distances",
             },
             "apical": {
-                "randomness": 0.15,
-                "targeting": 0.12,
+                "randomness": 0.24,
+                "targeting": 0.14,
                 "radius": 0.3,
                 "orientation": [[0.0, 1.0, 0.0]],
                 "growth_method": "tmd_apical",
@@ -443,8 +443,8 @@ def test_parameters():
             "basal": {},
             "apical": {},
             "axon": {
-                "randomness": 0.15,
-                "targeting": 0.12,
+                "randomness": 0.24,
+                "targeting": 0.14,
                 "radius": 0.3,
                 "orientation": [[0.0, -1.0, 0.0]],
                 "growth_method": "tmd",
@@ -469,8 +469,8 @@ def test_parameters():
             "basal": {},
             "apical": {},
             "axon": {
-                "randomness": 0.15,
-                "targeting": 0.12,
+                "randomness": 0.24,
+                "targeting": 0.14,
                 "radius": 0.3,
                 "orientation": [[0.0, -1.0, 0.0]],
                 "growth_method": "trunk",
@@ -497,8 +497,8 @@ def test_parameters():
             "basal": {},
             "apical": {},
             "axon": {
-                "randomness": 0.15,
-                "targeting": 0.12,
+                "randomness": 0.24,
+                "targeting": 0.14,
                 "radius": 0.3,
                 "orientation": [[0.0, -1.0, 0.0]],
                 "growth_method": "trunk",
@@ -527,8 +527,8 @@ def test_parameters():
             "basal": {},
             "apical": {},
             "axon": {
-                "randomness": 0.15,
-                "targeting": 0.12,
+                "randomness": 0.24,
+                "targeting": 0.14,
                 "radius": 0.3,
                 "orientation": [[0.0, -1.0, 0.0]],
                 "growth_method": "trunk",
