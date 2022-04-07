@@ -31,6 +31,9 @@ authors:
   - family-names: Markram
     given-names: Henry
     orcid: 'https://orcid.org/0000-0001-6164-2590'
+  - family-names: Arnaudon
+    given-names: Alexis
+    orcid: 'https://orcid.org/0000-0001-9486-1458'
 identifiers:
   - type: doi
     value: 10.1016/j.celrep.2022.110586
