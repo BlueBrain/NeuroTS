@@ -81,6 +81,7 @@ add-ignore = [
 	"D107",
 ]
 convention = "google"
+match = "[neurots, tests, doc/source/conf.py, setup.py, examples]"
 
 # ISORT
 [tool.isort]

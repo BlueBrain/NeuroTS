@@ -1,29 +1,51 @@
 # Changelog
 
+## [Unreleased](https://github.com/BlueBrain/NeuroTS/compare/3.1.1..HEAD)
+
+> 6 April 2022
+
+### Uncategorized Changes
+
+- Fix warnings (Eleftherios Zisis - [#25](https://github.com/BlueBrain/NeuroTS/pull/25))
+- Update build-system (Eleftherios Zisis - [#26](https://github.com/BlueBrain/NeuroTS/pull/26))
+- Explicitely states where the examples and related data are located (Adrien Berchet - [#24](https://github.com/BlueBrain/NeuroTS/pull/24))
+- Remove useless installation of several packages in Github CI (Adrien Berchet - [#23](https://github.com/BlueBrain/NeuroTS/pull/23))
+- Setup MyBinder (Adrien Berchet - [#22](https://github.com/BlueBrain/NeuroTS/pull/22))
+- Fix auto-changelog configuration (Adrien Berchet - [ddfc476](https://github.com/BlueBrain/NeuroTS/commit/ddfc476549712d8b2e1e28de06a1d30d48b5d1a9))
+- Allow empty type (Adrien Berchet - [5aa5d9c](https://github.com/BlueBrain/NeuroTS/commit/5aa5d9c4096fc83edfcc874cbd237067fa39ace0))
+
+### CI Improvements
+
+- Move black, codespell, isort, pycodestyle and pydocstyle from tox to pre-commit (Adrien Berchet - [90b0667](https://github.com/BlueBrain/NeuroTS/commit/90b0667a6f87bb72bc7fe76cb9688747437d2607))
+
 ## [3.1.1](https://github.com/BlueBrain/NeuroTS/compare/3.1.0..3.1.1)
 
 > 2 March 2022
 
-- Setup CodeCov [#20](https://github.com/BlueBrain/NeuroTS/pull/20)
+### Uncategorized Changes
+
+- Setup CodeCov (Adrien Berchet - [#20](https://github.com/BlueBrain/NeuroTS/pull/20))
+
+<!-- auto-changelog-above -->
 
 ## [3.1.0](https://github.com/BlueBrain/NeuroTS/compare/3.0.1..3.1.0)
 
 > 1 March 2022
 
-- Update README.md [#18](https://github.com/BlueBrain/NeuroTS/pull/18)
-- Remove run time from gallery pages [#17](https://github.com/BlueBrain/NeuroTS/pull/17)
-- Make citation more clear and slightly improve coverage [#16](https://github.com/BlueBrain/NeuroTS/pull/16)
-- Update examples [#12](https://github.com/BlueBrain/NeuroTS/pull/12)
-- Can pass parameters to the external diametrizer [#13](https://github.com/BlueBrain/NeuroTS/pull/13)
-- Update CONTRIBUTING.md [#11](https://github.com/BlueBrain/NeuroTS/pull/11)
-- Improve readme file [#5](https://github.com/BlueBrain/NeuroTS/pull/5)
-- default to use_morphio [#10](https://github.com/BlueBrain/NeuroTS/pull/10)
-- Fix banner in doc [#9](https://github.com/BlueBrain/NeuroTS/pull/9)
-- Adding logo for NeuroTS [#8](https://github.com/BlueBrain/NeuroTS/pull/8)
-- Add codespell in lint [#7](https://github.com/BlueBrain/NeuroTS/pull/7)
-- Improve installation section in README [#4](https://github.com/BlueBrain/NeuroTS/pull/4)
-- Fix tests/astrocyte/test_grower.py::test_grow__run test [#6](https://github.com/BlueBrain/NeuroTS/pull/6)
-- Change license and open the sources [#1](https://github.com/BlueBrain/NeuroTS/pull/1)
+- Update README.md (alex4200 - [#18](https://github.com/BlueBrain/NeuroTS/pull/18))
+- Remove run time from gallery pages (Adrien Berchet - [#17](https://github.com/BlueBrain/NeuroTS/pull/17))
+- Make citation more clear and slightly improve coverage (Adrien Berchet - [#16](https://github.com/BlueBrain/NeuroTS/pull/16))
+- Update examples (lidakanari - [#12](https://github.com/BlueBrain/NeuroTS/pull/12))
+- Can pass parameters to the external diametrizer (Adrien Berchet - [#13](https://github.com/BlueBrain/NeuroTS/pull/13))
+- Update CONTRIBUTING.md (alex4200 - [#11](https://github.com/BlueBrain/NeuroTS/pull/11))
+- Improve readme file (lidakanari - [#5](https://github.com/BlueBrain/NeuroTS/pull/5))
+- default to use_morphio (Alexis Arnaudon - [#10](https://github.com/BlueBrain/NeuroTS/pull/10))
+- Fix banner in doc (alex4200 - [#9](https://github.com/BlueBrain/NeuroTS/pull/9))
+- Adding logo for NeuroTS (alex4200 - [#8](https://github.com/BlueBrain/NeuroTS/pull/8))
+- Add codespell in lint (Adrien Berchet - [#7](https://github.com/BlueBrain/NeuroTS/pull/7))
+- Improve installation section in README (Adrien Berchet - [#4](https://github.com/BlueBrain/NeuroTS/pull/4))
+- Fix tests/astrocyte/test_grower.py::test_grow__run test (Adrien Berchet - [#6](https://github.com/BlueBrain/NeuroTS/pull/6))
+- Change license and open the sources (Adrien Berchet - [#1](https://github.com/BlueBrain/NeuroTS/pull/1))
 - Fix distributions for trunk length feature (Adrien Berchet - [fd5235d](https://github.com/BlueBrain/NeuroTS/commit/fd5235d07e4faab523e7fd8fd18bdb34705e8a22))
 - Take into account existing points when adding new trunks with no given orientation (Adrien Berchet - [14e11b2](https://github.com/BlueBrain/NeuroTS/commit/14e11b2095c71c902e1200f6bd4c0944c1ca7afa))
 - Fix the parameter schema for the new orientation manager (Adrien Berchet - [a384c1c](https://github.com/BlueBrain/NeuroTS/commit/a384c1c1993a261a08cf46db2547f9cc9e55063f))
@@ -243,7 +265,6 @@
 - Create TrunkAlgo tests (Benoît Coste - [5e0cd38](https://github.com/BlueBrain/NeuroTS/commit/5e0cd38ffa673770abb5ad7845145171f3440014))
 - Introduce spatial (Benoît Coste - [4be6568](https://github.com/BlueBrain/NeuroTS/commit/4be656814598bb3c820d790c9ddd4dcbf064802e))
 - Cleanup of SomaGrower, tests and a consistent interface for the soma points (Eleftherios Zisis - [96e4e58](https://github.com/BlueBrain/NeuroTS/commit/96e4e588b55e952040c9fc30feb5176e6fbda8a1))
-- Merge "Ensure radial - path distances are not mixed" (Lida Kanari - [92202b9](https://github.com/BlueBrain/NeuroTS/commit/92202b9020b2465f35aeb7afbf580fa682976196))
 - Create input_distributions.py and input_parameters.py (Benoît Coste - [d49c8c8](https://github.com/BlueBrain/NeuroTS/commit/d49c8c8850fd4056d17ba7c4e70bcd0433d756ad))
 - Create tests for algorithms (Benoît Coste - [8a1a7f7](https://github.com/BlueBrain/NeuroTS/commit/8a1a7f7d49abe501db0e3ad48e47ddb55e824229))
 - Rename SectionGrower::points3D to points (Benoît Coste - [b3d560c](https://github.com/BlueBrain/NeuroTS/commit/b3d560c3e85dddff1b47edaec0b5c80404783bfd))
@@ -255,6 +276,7 @@
 - Complete list of possible input algorithms (kanari - [fa9f488](https://github.com/BlueBrain/NeuroTS/commit/fa9f488c3abeaf7f5ba793fde12570c265dd9e3d))
 - Fix TMD version (Benoît Coste - [f09c48b](https://github.com/BlueBrain/NeuroTS/commit/f09c48b908ffcf4041488c16b6f9854843d011b8))
 - Bumping TNS to v2.0.0 (Benoît Coste - [1d6094c](https://github.com/BlueBrain/NeuroTS/commit/1d6094c7c6fd8639b13c411c642c0f1625f7b119))
+- Merge "Ensure radial - path distances are not mixed" (Lida Kanari - [92202b9](https://github.com/BlueBrain/NeuroTS/commit/92202b9020b2465f35aeb7afbf580fa682976196))
 
 ## [1.0.8](https://github.com/BlueBrain/NeuroTS/compare/1.0.7..1.0.8)
 
@@ -281,11 +303,11 @@
 - Diameter model keys are section type names (axon, apical, etc.) (Benoît Coste - [8ac935d](https://github.com/BlueBrain/NeuroTS/commit/8ac935d4bbebb76ca9110ef269d0304b716c9faf))
 - Add ability to pass contextual information to all growers (Benoît Coste - [79f342f](https://github.com/BlueBrain/NeuroTS/commit/79f342fdf4ca1034845c2ffda00583b2ab767a07))
 - AbstractAlgo ctor initialize its arguments (Benoît Coste - [d00f0ad](https://github.com/BlueBrain/NeuroTS/commit/d00f0ade2819b4a6e671ed657977f484e6b1f13a))
-- Use logging module (Benoît Coste - [3b991ca](https://github.com/BlueBrain/NeuroTS/commit/3b991ca58ca4bd04536027068aaf62d65887d9cd))
-- Merge "AbstractAlgo ctor initialize its arguments" (Benoît Coste - [c907e15](https://github.com/BlueBrain/NeuroTS/commit/c907e15b2f0e4543eab1eca6e70ac758a03693ca))
-- Merge "Add / correct diameter models, fix relevant tests." (Lida Kanari - [7a7fb91](https://github.com/BlueBrain/NeuroTS/commit/7a7fb913c88857b60cf586b7a87a19316a4bffbf))
 - Bump version (Benoît Coste - [20464b3](https://github.com/BlueBrain/NeuroTS/commit/20464b3a23c12bb7e30cda59811606d447e53a39))
+- Merge "AbstractAlgo ctor initialize its arguments" (Benoît Coste - [c907e15](https://github.com/BlueBrain/NeuroTS/commit/c907e15b2f0e4543eab1eca6e70ac758a03693ca))
 - Merge "Use logging module" (Benoît Coste - [e8b54fe](https://github.com/BlueBrain/NeuroTS/commit/e8b54febd83cc277e765c9d86580a3fa719df111))
+- Merge "Add / correct diameter models, fix relevant tests." (Lida Kanari - [7a7fb91](https://github.com/BlueBrain/NeuroTS/commit/7a7fb913c88857b60cf586b7a87a19316a4bffbf))
+- Use logging module (Benoît Coste - [3b991ca](https://github.com/BlueBrain/NeuroTS/commit/3b991ca58ca4bd04536027068aaf62d65887d9cd))
 
 ## [1.0.5](https://github.com/BlueBrain/NeuroTS/compare/1.0.4..1.0.5)
 
@@ -319,8 +341,8 @@
 - Correct bugs in code and remove unused code (kanari - [e8769ab](https://github.com/BlueBrain/NeuroTS/commit/e8769abb979aabae32a7d80ffa4b9d22acb719af))
 - Activate tox -e py27/35 (Benoît Coste - [d4713f9](https://github.com/BlueBrain/NeuroTS/commit/d4713f95a5f2339d285c2f2c0e04ff8b56f0679f))
 - Fix TMD version and update README (Benoît Coste - [0266d21](https://github.com/BlueBrain/NeuroTS/commit/0266d2163b098550d0817692f04ee6115ffee594))
-- Reduce exp overflow occurence rate (Arseny V. Povolotsky - [a446abe](https://github.com/BlueBrain/NeuroTS/commit/a446abebe6037276cdfcd241d8bbdc6e9aba0c8f))
-- Reduce exp overflow occurence rate - 2 (Arseny V. Povolotsky - [aa32258](https://github.com/BlueBrain/NeuroTS/commit/aa322582fc0e360882998fa42ec2c241825815b1))
+- Reduce exp overflow occurrence rate (Arseny V. Povolotsky - [a446abe](https://github.com/BlueBrain/NeuroTS/commit/a446abebe6037276cdfcd241d8bbdc6e9aba0c8f))
+- Reduce exp overflow occurrence rate - 2 (Arseny V. Povolotsky - [aa32258](https://github.com/BlueBrain/NeuroTS/commit/aa322582fc0e360882998fa42ec2c241825815b1))
 - Release tns==1.0.3 (Arseny V. Povolotsky - [816a49e](https://github.com/BlueBrain/NeuroTS/commit/816a49ee54b0464116e3afaa1ac782942626462f))
 - Use dev version (Benoît Coste - [848d9fe](https://github.com/BlueBrain/NeuroTS/commit/848d9fe0da6e42b3d11b875774ee48365ca59d47))
 
@@ -339,8 +361,8 @@
 - Cleaning up directories and restructuring. The new code implements the basic growth algorithms: trunk, tmd, tmd_apical-mockup. To be extended to include more algorithms in future versions. (kanari - [8154929](https://github.com/BlueBrain/NeuroTS/commit/8154929de47beeb643ff1c2185ee5788bc08d905))
 - Ongoing refactoring of internal algorithms. (Lida Kanari - [29e658b](https://github.com/BlueBrain/NeuroTS/commit/29e658b92aaa9c6b505f86ce93bf8edc7fb007fa))
 - Adding MorphIO + neurites now grow in parallel (kanari - [134627a](https://github.com/BlueBrain/NeuroTS/commit/134627a69043eed7909c3beaaa3ac25801efb40b))
-- Cleaning up code: stage 1 (Lida Kanari - [a312ad0](https://github.com/BlueBrain/NeuroTS/commit/a312ad095f7a4d736ea6913ab98c15e7dbaaa550))
 - Further cleaning up of code in lower level functionality (Lida Kanari - [09c8fa9](https://github.com/BlueBrain/NeuroTS/commit/09c8fa91590932797730f7f561d6cb50871f61d8))
+- Cleaning up code: stage 1 (Lida Kanari - [a312ad0](https://github.com/BlueBrain/NeuroTS/commit/a312ad095f7a4d736ea6913ab98c15e7dbaaa550))
 - Cleaning-up basic functionality. Add path distance and gradient based growth. (kanari - [0ace7a6](https://github.com/BlueBrain/NeuroTS/commit/0ace7a6b222307a62dcdaa55826083fc2285a918))
 - Cleaning up basic growers (kanari - [8584048](https://github.com/BlueBrain/NeuroTS/commit/85840489d99ca6ead7cfcea67b7d4f53360597bf))
 - Improve performances (Benoît Coste - [ce3d6e2](https://github.com/BlueBrain/NeuroTS/commit/ce3d6e293f82c155b7dac53a96021728e7476f2c))
@@ -362,15 +384,15 @@
 - Update examples to consume test_data (Lida Kanari - [02c86d7](https://github.com/BlueBrain/NeuroTS/commit/02c86d779b4250f8a45d99f86a1699eb53d3c068))
 - Fix small issue in section direction (kanari - [9c9c71d](https://github.com/BlueBrain/NeuroTS/commit/9c9c71d457b78c17607a888b47a724f7d4b0f7e4))
 - Bump version number (Benoît Coste - [740e3e8](https://github.com/BlueBrain/NeuroTS/commit/740e3e8b46f4fdc046f7bc7ed3109049f6d089a2))
-- Use correct version number (Benoît Coste - [3ba1d51](https://github.com/BlueBrain/NeuroTS/commit/3ba1d513e7cd5bec0c747c0f740084c25c545e58))
 - Fix setup.py (Benoît Coste - [e3bf523](https://github.com/BlueBrain/NeuroTS/commit/e3bf523ff68ff274f7fc6e618afaee0c9957929c))
-- Example for full synthesis of a cell (Lida Kanari - [f6a38d2](https://github.com/BlueBrain/NeuroTS/commit/f6a38d29e903909c73d78447848e422e6b1b3ee1))
-- Commit to work on this (kanari - [9934a0a](https://github.com/BlueBrain/NeuroTS/commit/9934a0ab1c153bd0a13643d98ac5605631212641))
-- Update to tmd directory (Lida Kanari - [dd847e4](https://github.com/BlueBrain/NeuroTS/commit/dd847e4661d17f1556082f4ec44387d9519474ea))
+- Use correct version number (Benoît Coste - [3ba1d51](https://github.com/BlueBrain/NeuroTS/commit/3ba1d513e7cd5bec0c747c0f740084c25c545e58))
 - Update setup.py and installation docs (Lida Kanari - [c4ee674](https://github.com/BlueBrain/NeuroTS/commit/c4ee6743a8d14e8bb261d766683bfbc017bf89cf))
+- Commit to work on this (kanari - [9934a0a](https://github.com/BlueBrain/NeuroTS/commit/9934a0ab1c153bd0a13643d98ac5605631212641))
+- Example for full synthesis of a cell (Lida Kanari - [f6a38d2](https://github.com/BlueBrain/NeuroTS/commit/f6a38d29e903909c73d78447848e422e6b1b3ee1))
+- Update to tmd directory (Lida Kanari - [dd847e4](https://github.com/BlueBrain/NeuroTS/commit/dd847e4661d17f1556082f4ec44387d9519474ea))
 - Fix small issue in section direction (kanari - [97d7c93](https://github.com/BlueBrain/NeuroTS/commit/97d7c939a0d84a39b3f4417b67d9ae1229c7c746))
 - Bump version (Benoît Coste - [b4a9ecc](https://github.com/BlueBrain/NeuroTS/commit/b4a9ecc86e995f464c97a1e9f5ac0d95c482ed80))
-- Add some test files (Lida Kanari - [aaabb81](https://github.com/BlueBrain/NeuroTS/commit/aaabb8181e85fcddf7e5e4736599e4c2db73cc77))
-- test_commit (Eleftherios Zisis - [1ee9251](https://github.com/BlueBrain/NeuroTS/commit/1ee92511851979b3b3ab6b5c5faad1b1c23fd748))
 - sorry (Eleftherios Zisis - [afe12d4](https://github.com/BlueBrain/NeuroTS/commit/afe12d45f254f157aac8d2fcc95133984d28a878))
+- test_commit (Eleftherios Zisis - [1ee9251](https://github.com/BlueBrain/NeuroTS/commit/1ee92511851979b3b3ab6b5c5faad1b1c23fd748))
+- Add some test files (Lida Kanari - [aaabb81](https://github.com/BlueBrain/NeuroTS/commit/aaabb8181e85fcddf7e5e4736599e4c2db73cc77))
 - Initial empty repository (Julien Francioli - [e638bc7](https://github.com/BlueBrain/NeuroTS/commit/e638bc7684097ad9da70ed8960e4ecbeebfc5a9d))

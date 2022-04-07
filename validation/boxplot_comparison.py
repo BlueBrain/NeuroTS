@@ -1,35 +1,40 @@
-'''Example for comparing a neuron to a population
-   using their morphometrics'''
+"""Example for comparing a neuron to a population
+   using their morphometrics"""
 import neurom as nm
 import numpy as np
 import pylab as plt
 
 # Set a list of features to be extracted
-feat_list = ['number_of_neurites',
-             'number_of_sections_per_neurite',
-             'number_of_leaves',
-             'number_of_bifurcations',
-             'section_lengths',
-             'section_tortuosity',
-             'section_radial_distances',
-             'section_path_distances',
-             'section_branch_orders',
-             'remote_bifurcation_angles']
+feat_list = [
+    "number_of_neurites",
+    "number_of_sections_per_neurite",
+    "number_of_leaves",
+    "number_of_bifurcations",
+    "section_lengths",
+    "section_tortuosity",
+    "section_radial_distances",
+    "section_path_distances",
+    "section_branch_orders",
+    "remote_bifurcation_angles",
+]
 
 # Set a list of names for the previous features
-feat_names = ['Number of neurites',
-              'Number of sections',
-              'Number of terminations',
-              'Number of bifurcations',
-              'Section lengths',
-              'Section tortuosity',
-              'Section radial distances',
-              'Section path distances',
-              'Section branch orders',
-              'Remote bif angles']
+feat_names = [
+    "Number of neurites",
+    "Number of sections",
+    "Number of terminations",
+    "Number of bifurcations",
+    "Section lengths",
+    "Section tortuosity",
+    "Section radial distances",
+    "Section path distances",
+    "Section branch orders",
+    "Remote bif angles",
+]
+
 
 def get_features(object1, object2, flist=feat_list, neurite_type=nm.BASAL_DENDRITE):
-    '''Computes features from module mod'''
+    """Computes features from module mod"""
     collect_all = []
 
     for feat in flist:
@@ -43,7 +48,7 @@ def get_features(object1, object2, flist=feat_list, neurite_type=nm.BASAL_DENDRI
 
 
 def get_features_median(object1, object2, flist=feat_list, neurite_type=nm.BASAL_DENDRITE):
-    '''Computes features from module mod'''
+    """Computes features from module mod"""
     collect_all = []
 
     for feat in flist:
@@ -63,11 +68,19 @@ def mvs_score(data, percent=50):
     divided by the maximum visible spread.
     """
     median_diff = np.abs(np.median(data[0]) - np.median(data[1]))
-    max_percentile = np.max([np.percentile(data[0], 100 - percent / 2., axis=0),
-                             np.percentile(data[1], 100 - percent / 2., axis=0)])
+    max_percentile = np.max(
+        [
+            np.percentile(data[0], 100 - percent / 2.0, axis=0),
+            np.percentile(data[1], 100 - percent / 2.0, axis=0),
+        ]
+    )
 
-    min_percentile = np.min([np.percentile(data[0], percent / 2., axis=0),
-                             np.percentile(data[1], percent / 2., axis=0)])
+    min_percentile = np.min(
+        [
+            np.percentile(data[0], percent / 2.0, axis=0),
+            np.percentile(data[1], percent / 2.0, axis=0),
+        ]
+    )
 
     max_vis_spread = max_percentile - min_percentile
 
@@ -102,7 +115,7 @@ def score_mvs_test(data, threshold=0.3):
 
 
 def boxplots(data, fnames=feat_names, threshold=0.5):
-    '''Plots a list of boxplots for each feature in feature_list for object 1.
+    """Plots a list of boxplots for each feature in feature_list for object 1.
     Then presents the value of object 2 for each feature as an colored objected
     in the same boxplot.
 
@@ -119,7 +132,7 @@ def boxplots(data, fnames=feat_names, threshold=0.5):
     Returns:
         fig:\
             A figure which contains the list of boxplots.
-    '''
+    """
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
@@ -127,21 +140,21 @@ def boxplots(data, fnames=feat_names, threshold=0.5):
 
     ax.boxplot(np.array(norm_data)[:, 0], vert=False)
 
-    for i, d in enumerate(norm_data): 
+    for i, d in enumerate(norm_data):
         if score_mvs_test(data[i], threshold):
-            col = 'r'
-            mark = 'h'
+            col = "r"
+            mark = "h"
         else:
-            col = 'g'
-            mark = 's'
+            col = "g"
+            mark = "s"
 
         ax.scatter(np.median(d[1]), len(norm_data) - i, s=100, color=col, marker=mark)
 
     ax.set_yticklabels(fnames)
 
-    ax.set_xlabel('Normalized units (dimensionless)')
-    ax.set_ylabel('')
-    ax.set_title('Summarizing validation features')
+    ax.set_xlabel("Normalized units (dimensionless)")
+    ax.set_ylabel("")
+    ax.set_title("Summarizing validation features")
 
     plt.tight_layout(True)
 
@@ -152,7 +165,7 @@ def dict_mvs_scores(data, feat_list):
     """Creates a dictionary with the mvs scores
     of a neuron compared to a population.
     """
-    dictionary = {feat_list[i]: mvs_score(d) for i,d in enumerate(data)}
+    dictionary = {feat_list[i]: mvs_score(d) for i, d in enumerate(data)}
 
     return dictionary
 
@@ -165,7 +178,7 @@ def dict_mvs_scores_population(population1, population2, feat_list):
 
     for n2 in population2.neurons:
         data = get_features(population1, n2, feat_list)
-        for i,d in enumerate(data):
+        for i, d in enumerate(data):
             dictionary[feat_list[i]].append(mvs_score(d))
 
     return dictionary
@@ -176,18 +189,19 @@ def write_mvs_scores(dictionary, names, feat_list, output_file):
     for each neuron using its name as an identifier.
     """
     import csv
-    
-    F = open(output_file, 'wb')
-    Fcsv = csv.writer(F)
-    Fcsv.writerow(['CellID'] + dictionary.keys())
 
-    for i,n in enumerate(names):
-        Fcsv.writerow([n]+ list(np.array(dictionary.values())[:, i]))
+    F = open(output_file, "wb")
+    Fcsv = csv.writer(F)
+    Fcsv.writerow(["CellID"] + dictionary.keys())
+
+    for i, n in enumerate(names):
+        Fcsv.writerow([n] + list(np.array(dictionary.values())[:, i]))
     F.close()
 
 
 def load_csv(filename):
     import csv
+
     F = open(filename)
     csv_reader = csv.reader(F)
     data = []
