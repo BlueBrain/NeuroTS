@@ -54,8 +54,8 @@ def parameters(
         raise KeyError(f"trunk_method {trunk_method} not understood")
 
     base_params = {
-        "randomness": 0.15,
-        "targeting": 0.12,
+        "randomness": 0.24,
+        "targeting": 0.14,
         "radius": 0.3,
         "orientation": None
         if trunk_method == "simple"
@@ -77,14 +77,16 @@ def parameters(
         else _sort_neurite_types(neurite_types),
     }
 
+    """
     input_parameters["axon"].update(
         {
-            "branching_method": "directional",
-            "orientation": [[0.0, 1.0, 0.0]]
+            "branching_method": "bio_oriented",
+            "orientation": [[0.0, -1.0, 0.0]]
             if trunk_method == "simple"
-            else {"mode": "use_predefined", "values": {"orientations": [[0.0, -1.0, 0.0]]}},
+            else {"mode": "use_predefined", "values": {"orientations": [[0.0, 1.0, 0.0]]}},
         }
     )
+    """
 
     input_parameters["apical"].update(
         {
