@@ -743,7 +743,7 @@ def test__double_step_fit_prob_function():
 
 def test_get_fit_prob_function():
     function, bound, form = extract_input.from_neurom.get_fit_prob_function(morph_class="PC")
-    assert function == extract_input.from_neurom._step_fit_prob_function
+    assert function is extract_input.from_neurom._step_fit_prob_function
     assert_array_almost_equal(bound[0], [0.0, 0.01])
     assert_array_almost_equal(bound[1], [np.pi, 10])
     assert form == "step"
@@ -751,7 +751,7 @@ def test_get_fit_prob_function():
     function, bound, form = extract_input.from_neurom.get_fit_prob_function(
         morph_class="IN", params={"axon": {"form": "double_step"}}
     )
-    assert function == extract_input.from_neurom._double_step_fit_prob_function
+    assert function is extract_input.from_neurom._double_step_fit_prob_function
     assert_array_almost_equal(bound[0], [-np.pi, 0.01, -np.pi, 0.01])
     assert_array_almost_equal(bound[1], [np.pi, 10, np.pi, 10])
     assert form == "double_step"
