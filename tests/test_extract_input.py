@@ -430,33 +430,7 @@ def test_parameters():
                 "radius": 0.3,
                 "orientation": [[0.0, -1.0, 0.0]],
                 "growth_method": "tmd",
-                "branching_method": "bio_oriented",
-                "modify": None,
-                "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
-                "tree_type": 2,
-                "metric": "path_distances",
-            },
-            "origin": [0.0, 0.0, 0.0],
-            "grow_types": ["axon"],
-            "diameter_params": {"method": "default"},
-        },
-    )
-    validator.validate_neuron_params(params_axon)
-
-    params_axon = extract_input.parameters(neurite_types=["axon"], method="trunk")
-
-    assert_equal(
-        params_axon,
-        {
-            "basal": {},
-            "apical": {},
-            "axon": {
-                "randomness": 0.24,
-                "targeting": 0.14,
-                "radius": 0.3,
-                "orientation": [[0.0, -1.0, 0.0]],
-                "growth_method": "trunk",
-                "branching_method": "random",
+                "branching_method": "directional",
                 "modify": None,
                 "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
                 "tree_type": 2,
@@ -467,65 +441,7 @@ def test_parameters():
             "diameter_params": {"method": "default"},
         },
     )
-    validator.validate_neuron_params(params)
-
-    params_diameter = extract_input.parameters(
-        neurite_types=["axon"], method="trunk", diameter_parameters="M1"
-    )
-
-    assert_equal(
-        params_diameter,
-        {
-            "basal": {},
-            "apical": {},
-            "axon": {
-                "randomness": 0.24,
-                "targeting": 0.14,
-                "radius": 0.3,
-                "orientation": [[0.0, -1.0, 0.0]],
-                "growth_method": "trunk",
-                "branching_method": "random",
-                "modify": None,
-                "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
-                "tree_type": 2,
-                "metric": "path_distances",
-            },
-            "origin": [0.0, 0.0, 0.0],
-            "grow_types": ["axon"],
-            "diameter_params": {"method": "M1"},
-        },
-    )
-    validator.validate_neuron_params(params_diameter)
-
-    params_diameter_dict = extract_input.parameters(
-        neurite_types=["axon"],
-        method="trunk",
-        diameter_parameters={"a": 1, "b": 2},
-    )
-
-    assert_equal(
-        params_diameter_dict,
-        {
-            "basal": {},
-            "apical": {},
-            "axon": {
-                "randomness": 0.24,
-                "targeting": 0.14,
-                "radius": 0.3,
-                "orientation": [[0.0, -1.0, 0.0]],
-                "growth_method": "trunk",
-                "branching_method": "random",
-                "modify": None,
-                "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
-                "tree_type": 2,
-                "metric": "path_distances",
-            },
-            "origin": [0.0, 0.0, 0.0],
-            "grow_types": ["axon"],
-            "diameter_params": {"method": "external", "a": 1, "b": 2},
-        },
-    )
-    validator.validate_neuron_params(params_diameter_dict)
+    validator.validate_neuron_params(params_path)
 
     with pytest.raises(KeyError):
         extract_input.parameters(
