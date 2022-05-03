@@ -77,16 +77,14 @@ def parameters(
         else _sort_neurite_types(neurite_types),
     }
 
-    """
     input_parameters["axon"].update(
         {
-            "branching_method": "bio_oriented",
-            "orientation": [[0.0, -1.0, 0.0]]
+            "branching_method": "directional",
+            "orientation": [[0.0, 1.0, 0.0]]
             if trunk_method == "simple"
             else {"mode": "use_predefined", "values": {"orientations": [[0.0, 1.0, 0.0]]}},
         }
     )
-    """
 
     input_parameters["apical"].update(
         {
