@@ -31,38 +31,32 @@ authors:
   - family-names: Markram
     given-names: Henry
     orcid: 'https://orcid.org/0000-0001-6164-2590'
+  - family-names: Arnaudon
+    given-names: Alexis
+    orcid: 'https://orcid.org/0000-0001-9486-1458'
 identifiers:
   - type: doi
-    value: 10.1101/2020.04.15.040410
-    description: The DOI of the preprint version.
+    value: 10.1016/j.celrep.2022.110586
+    description: The DOI of the related article.
 repository-code: 'https://github.com/BlueBrain/NeuroTS'
 abstract: >-
-  Neuronal morphologies provide the foundation for
-  the electrical behavior of neurons, the connectomes
-  they form, and the dynamical properties of the
-  brain. Comprehensive neuron models are essential
-  for defining cell types, discerning their
-  functional roles and investigating structural
-  alterations associated with diseased brain states.
-  Recently, we introduced a topological descriptor
-  that reliably categorizes dendritic morphologies.
-  We apply this descriptor to digitally synthesize
-  dendrites to address the challenge of insufficient
-  biological reconstructions. The synthesized
-  cortical dendrites are statistically
-  indistinguishable from the corresponding
-  reconstructed dendrites in terms of
-  morpho-electrical properties and connectivity. This
-  topology-guided synthesis enables the rapid digital
-  reconstruction of entire brain regions from
-  relatively few reference cells, thereby allowing
-  the investigation of links between neuronal
-  morphologies and brain function across different
-  spatio-temporal scales. We synthesized cortical
-  networks based on structural alterations of
-  dendrites associated with medical conditions and
-  revealed principles linking branching properties to
-  the structure of large-scale networks.
+  Neuronal morphologies provide the foundation for the electrical behavior of
+  neurons, the connectomes they form, and the dynamical properties of the brain.
+  Comprehensive neuron models are essential for defining cell types, discerning
+  their functional roles, and investigating brain-disease-related dendritic
+  alterations. However, a lack of understanding of the principles underlying
+  neuron morphologies has hindered attempts to computationally synthesize
+  morphologies for decades. We introduce a synthesis algorithm based on a
+  topological descriptor of neurons, which enables the rapid digital
+  reconstruction of entire brain regions from few reference cells. This
+  topology-guided synthesis generates dendrites that are statistically similar to
+  biological reconstructions in terms of morpho-electrical and connectivity
+  properties and offers a significant opportunity to investigate the links between
+  neuronal morphology and brain function across different spatiotemporal scales.
+  Synthesized cortical networks based on structurally altered dendrites associated
+  with diverse brain pathologies revealed principles linking branching properties
+  to the structure of large-scale
+  networks.
 keywords:
   - Dendritic morphology
   - Topological synthesis

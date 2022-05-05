@@ -6,7 +6,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License](https://img.shields.io/badge/License-GPLv3-blue)](https://github.com/BlueBrain/NeuroTS/blob/main/LICENSE.txt)
 [![Documentation status](https://readthedocs.org/projects/neurots/badge/?version=latest)](https://neurots.readthedocs.io/)
-[![DOI](https://img.shields.io/badge/DOI-10.1101/2020.04.15.040410-blue)](https://doi.org/10.1101/2020.04.15.040410)
+[![DOI](https://img.shields.io/badge/DOI-10.1016/j.celrep.2022.110586-blue)](https://doi.org/10.1016/j.celrep.2022.110586)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BlueBrain/NeuroTS/main?labpath=examples%2Fexplore_example_results.ipynb)
 
 
