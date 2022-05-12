@@ -352,6 +352,10 @@ def trunk_to_spherical_angles(trunk_angles, z_angles, phi_interval=None):
 def sample_spherical_unit_vectors(rng, bias=None):
     """Prior uniform distribution on the sphere.
 
+    Args:
+        rng: random number generator
+        bias: bias the sampling along a direction
+
     If bias is tuple(direction, std), the sample will be along direction with normal std, improving
     the efficiency of the Metropolos-Hastings for axon sampling, mostly oriented in [0, -1, 0].
     """
@@ -369,7 +373,7 @@ def prob_function(angle, params, form):
         scale_low, rate_low, scale_high, rate_high = params
         return expit((angle - scale_low) / rate_low) + expit((-angle - scale_high) / rate_high)
 
-    raise NotImplementedError(f"form {form} not implemented")
+    raise NotImplementedError(f"The form '{form}' is not implemented")
 
 
 def compute_interval_n_tree(soma, n_trees, rng=np.random):
