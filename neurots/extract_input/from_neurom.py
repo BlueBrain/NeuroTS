@@ -109,7 +109,7 @@ def _get_hist(data, bins=50):
 
 
 def trunk_vectors(morph, neurite_type, from_center_of_mass=True):
-    """This is neurom.get('trunk_vectors') but wrt to [0, 0, 0] if from_center_of_mass=False.
+    """This is `neurom.get('trunk_vectors')` but wrt to `[0, 0, 0]` if `from_center_of_mass=False`.
 
     If one uses some.center (which is center of mass of soma points), it
     may not corresponds to [0, 0, 0], from which the trunk angles should be computed.
