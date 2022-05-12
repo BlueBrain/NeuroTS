@@ -96,6 +96,12 @@ def get_fit_prob_function(morph_class="PC", neurite_type=nm.BASAL_DENDRITE, para
     if params is not None:
         default_params.update(params)
 
+    if morph_class not in default_params:
+        raise ValueError(f"{morph_class} is not in fit parameters {list(default_params.keys())}.")
+    if neurite_type.name not in default_params[morph_class]:
+        _keys = list(default_params[morph_class].keys())
+        raise ValueError(f"{neurite_type.name} is not in fit parameters {_keys}.")
+
     bound = default_params[morph_class][neurite_type.name]["bounds"]
     form = default_params[morph_class][neurite_type.name]["form"]
     function = _step_fit_prob_function if form == "step" else _double_step_fit_prob_function
