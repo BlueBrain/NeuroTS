@@ -46,7 +46,7 @@ def parameters(
         neurite_types (list[str]): The neurite types to consider.
         feature (str): Use the specified TMD feature.
         diameter_parameters (dict or str): The parameters used for the diameters.
-        trunk_method (str): 'simple' for simple trunk method, or '3d_angles'
+        trunk_method (str): 'simple' for simple trunk method, or '3d_angles'.
 
     Returns:
         dict: The parameters.
