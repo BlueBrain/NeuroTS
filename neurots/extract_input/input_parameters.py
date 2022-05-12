@@ -23,7 +23,7 @@ def _sort_neurite_types(neurite_types):
     placed with respect to it.
     """
     if "apical" in neurite_types:
-        return list(["apical"] + [t for t in neurite_types if t != "apical"])
+        return ["apical"] + [t for t in neurite_types if t != "apical"]
     return list(neurite_types)
 
 
