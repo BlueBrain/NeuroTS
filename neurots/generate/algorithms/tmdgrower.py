@@ -298,14 +298,19 @@ class TMDGradientAlgo(TMDApicalAlgo):
     """TreeGrower of TMD apical growth."""
 
     def _majorize_process(self, section, stop, process, input_dir):
-        """Currates the non-major processes to apply a gradient to large components."""
+        """Currates the non-major processes to apply a gradient to large components.
+
+        WARNING: do not use bias=0.5, as it may result in direction = [0, 0, 0]
+        """
         bias_length = self.params["bias_length"] * self.persistence_length
         difference = stop.expected_maximum_length()
+        bias_length = 0.8
+        # self.params['bias'] = -0.7
         if difference > bias_length:
-            direction1 = (1.0 - self.params["bias"]) * np.array(input_dir)
+            direction1 = (1.0 - abs(self.params["bias"])) * np.array(input_dir)
             direction2 = self.params["bias"] * np.array(section.direction)
             direct = np.add(direction1, direction2)
-            return "major", direct / norm(direct)
+            return process, direct / norm(direct)
         return process, input_dir
 
     def bifurcate(self, current_section):
@@ -318,12 +323,11 @@ class TMDGradientAlgo(TMDApicalAlgo):
             tuple[dict, dict]: Two dictionaries containing the two children sections data.
         """
         s1, s2 = super().bifurcate(current_section)
-
-        if s1["process"] != "major":
+        if s1["process"] != "major" and s2["process"] == "major":
             s1["process"], s1["direction"] = self._majorize_process(
                 current_section, s1["stop"]["TMD"], s1["process"], s1["direction"]
             )
-        if s2["process"] != "major":
+        if s2["process"] != "major" and s1["process"] == "major":
             s2["process"], s2["direction"] = self._majorize_process(
                 current_section, s2["stop"]["TMD"], s2["process"], s2["direction"]
             )
