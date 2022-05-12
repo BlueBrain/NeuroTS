@@ -75,7 +75,7 @@ def get_fit_prob_function(morph_class="PC", neurite_type=nm.BASAL_DENDRITE, para
     Args:
         morph_class (str): morphological class (PC or IN)
         neurite_type (nm.NeuriteType): type of neurite to consider
-        params (dict): is not None, can be used to overwrite the fit functions/bounds
+        params (dict): if not None, can be used to overwrite the fit functions/bounds
     """
     # this is the form of the expected parameter dict.
     # The bounds correspond to the function's parameter min/max bounds for the fit
