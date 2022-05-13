@@ -117,6 +117,17 @@
                                             },
                                             "additionalProperties": false,
                                             "required": ["primary_orientation"]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "pia": {
+                                                    "$ref": "#/definitions/point",
+                                                    "description": "The pia direction"
+                                                }
+                                            },
+                                            "additionalProperties": false,
+                                            "required": ["pia"]
                                         }
                                     ]
                                 }

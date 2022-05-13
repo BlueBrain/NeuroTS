@@ -371,7 +371,9 @@ def prob_function(angle, params, form):
 
     if form == "double_step":
         scale_low, rate_low, scale_high, rate_high = params
-        return expit((angle - scale_low) / rate_low) + expit((-angle - scale_high) / rate_high)
+        return 0.5 * (
+            expit((angle - scale_low) / rate_low) + expit((-angle - scale_high) / rate_high)
+        )
 
     raise NotImplementedError(f"The form '{form}' is not implemented")
 

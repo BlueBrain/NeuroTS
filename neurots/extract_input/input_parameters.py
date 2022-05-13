@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from copy import deepcopy
+
 
 def _sort_neurite_types(neurite_types):
     """Sort neurite types to comply with internal requirements.
@@ -59,7 +61,7 @@ def parameters(
         "radius": 0.3,
         "orientation": None
         if trunk_method == "simple"
-        else {"mode": "apical_constraint", "values": None},
+        else {"mode": "pia_constraint", "values": {"pia": [0, 1, 0]}},
         "growth_method": method,
         "branching_method": "random" if method == "trunk" else "bio_oriented",
         "modify": None,
@@ -68,24 +70,34 @@ def parameters(
     }
 
     input_parameters = {
-        "axon": {**base_params, "tree_type": 2},
-        "basal": {**base_params, "tree_type": 3},
-        "apical": {**base_params, "tree_type": 4},
         "origin": list(origin),
         "grow_types": neurite_types
         if trunk_method == "simple"
         else _sort_neurite_types(neurite_types),
     }
+    if "axon" in neurite_types:
+        input_parameters["axon"] = deepcopy(base_params)
+        input_parameters["axon"]["tree_type"] = 2
+        if "apical" in neurite_types and trunk_method == "3d_angles":
+            input_parameters["axon"]["orientation"] = {"mode": "apical_constraint", "values": None}
 
-    input_parameters["apical"].update(
-        {
-            "branching_method": "directional",
-            "growth_method": "tmd_apical" if method == "tmd" else None,
-            "orientation": [[0.0, 1.0, 0.0]]
-            if trunk_method == "simple"
-            else {"mode": "use_predefined", "values": {"orientations": [[0.0, 1.0, 0.0]]}},
-        }
-    )
+    if "basal" in neurite_types:
+        input_parameters["basal"] = deepcopy(base_params)
+        input_parameters["basal"]["tree_type"] = 3
+        if "apical" in neurite_types and trunk_method == "3d_angles":
+            input_parameters["basal"]["orientation"] = {"mode": "apical_constraint", "values": None}
+    if "apical" in neurite_types:
+        input_parameters["apical"] = deepcopy(base_params)
+        input_parameters["apical"]["tree_type"] = 4
+        input_parameters["apical"].update(
+            {
+                "branching_method": "directional",
+                "growth_method": "tmd_apical" if method == "tmd" else None,
+                "orientation": [[0.0, 1.0, 0.0]]
+                if trunk_method == "simple"
+                else {"mode": "use_predefined", "values": {"orientations": [[0.0, 1.0, 0.0]]}},
+            }
+        )
 
     input_parameters["diameter_params"] = {}
     if diameter_parameters is None:
