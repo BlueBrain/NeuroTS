@@ -56,7 +56,9 @@ class TMDAlgo(AbstractAlgo):
         barSZ = np.min(get_lengths(self.ph_angles))
         stepSZ = self.params["step_size"]["norm"]["mean"]
         if stepSZ >= barSZ:
-            L.warning("Selected step size %f is too big for bars of size %f", stepSZ, barSZ)
+            if barSZ > 0.1:
+                self.params["step_size"]["norm"]["mean"] = barSZ
+            L.debug("Selected step size %f is too big for bars of size %f", stepSZ, barSZ)
         self.barcode = Barcode(list(self.ph_angles))
         self.start_point = start_point
         self.apical_section = None
