@@ -20,9 +20,9 @@
                     "type": "number"
                 },
                 "bias": {
-                    "description": "The branches that are major inherit a bias towards the target orientation of the tree. Bias defines the weight. If bias = 0 the growth is isotropic, and if bias = 1 it goes straight along orientation.",
+                    "description": "The branches that are major inherit a bias towards the target orientation of the tree. Bias defines the weight. If bias = 0 the growth is isotropic, and if bias = 1 it goes straight along orientation. If the bias is negative, it goes opposite to the orientation.",
                     "maximum": 1,
-                    "minimum": 0,
+                    "minimum": -1,
                     "type": "number"
                 },
                 "bias_length": {

@@ -274,6 +274,7 @@ class NeuronGrower:
 
                 else:
                     raise ValueError("Not enough orientation points!")
+            return self.soma_grower.add_points_from_orientations(orientations)
         elif orientation is None:  # Samples from trunk_angles
             phi_intervals, interval_n_trees = _oris.compute_interval_n_tree(
                 self.soma_grower.soma,
@@ -291,13 +292,9 @@ class NeuronGrower:
                 )
                 orientations_i.append(_oris.spherical_angles_to_orientations(phis, thetas))
             orientations = np.vstack(orientations_i)
+            return self.soma_grower.add_points_from_orientations(orientations)
 
-        elif orientation == "from_space":
-            raise ValueError("Not implemented yet!")
-        else:
-            raise ValueError("Input orientation format is not correct!")
-
-        return self.soma_grower.add_points_from_orientations(orientations)
+        raise ValueError("Input orientation format is not correct!")
 
     def _simple_grow_trunks(self):
         """Simple _grow_trunks function."""
