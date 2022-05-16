@@ -274,7 +274,7 @@ class NeuronGrower:
 
                 else:
                     raise ValueError("Not enough orientation points!")
-            pts = self.soma_grower.add_points_from_orientations(orientations)
+            return self.soma_grower.add_points_from_orientations(orientations)
         elif orientation is None:  # Samples from trunk_angles
             phi_intervals, interval_n_trees = _oris.compute_interval_n_tree(
                 self.soma_grower.soma,
@@ -292,33 +292,9 @@ class NeuronGrower:
                 )
                 orientations_i.append(_oris.spherical_angles_to_orientations(phis, thetas))
             orientations = np.vstack(orientations_i)
-            pts = self.soma_grower.add_points_from_orientations(orientations)
+            return self.soma_grower.add_points_from_orientations(orientations)
 
-        elif orientation == "from_space":
-            raise ValueError("Not implemented yet!")
-
-        elif orientation == "context":
-
-            def propose():
-                # merge this with latest trunk angle code
-                # _trunk_angle = sample.trunk_absolute_angles(distr, 1, self._rng)[0]
-                # _trunk_z = sample.azimuth_angles(distr, 1, self._rng)[0]
-                _trunk_angle = self._rng.uniform(0, np.pi)
-                _trunk_z = self._rng.uniform(0, 2 * np.pi)
-                return [self.soma_grower.soma.point_from_trunk_direction(_trunk_angle, _trunk_z)]
-
-            pts = [
-                self.context["trunk_orientation"](self.soma_grower.soma.center, propose, self._rng)[
-                    0
-                ]
-                for _ in range(n_trees)
-            ]
-            self.soma_grower.soma.points.extend(pts)
-
-        else:
-            raise ValueError("Input orientation format is not correct!")
-
-        return self.soma_grower.add_points_from_orientations(orientations)
+        raise ValueError("Input orientation format is not correct!")
 
     def _simple_grow_trunks(self):
         """Simple _grow_trunks function."""

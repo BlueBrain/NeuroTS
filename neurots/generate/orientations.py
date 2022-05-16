@@ -231,15 +231,27 @@ class OrientationManager(OrientationManagerBase):
             params=self._distributions[tree_type]["trunk"]["3d_angle"]["params"],
             form=self._distributions[tree_type]["trunk"]["3d_angle"]["form"],
         )
-        n_try = 0
-        while n_try < max_tries + 1:
-            n_try += 1
-            propose = sample_spherical_unit_vectors(self._rng)
-            angle = nm.morphmath.angle_between_vectors(ref_dir, propose)
-            if self._rng.binomial(1, prob(angle)):
-                return propose
-        warnings.warn("Could not find a point, we take last attempt")
-        return sample_spherical_unit_vectors(self._rng)
+
+        def _propose():
+            """Internal proposal for context handling."""
+            n_try = 0
+            while n_try < max_tries + 1:
+                n_try += 1
+                _proposal = sample_spherical_unit_vectors(self._rng)
+                angle = nm.morphmath.angle_between_vectors(ref_dir, _proposal)
+                if self._rng.binomial(1, prob(angle)):
+                    return {"point": _proposal + self._soma.center}
+            warnings.warn("Could not find a point, we sample randomly")
+            return {"point": sample_spherical_unit_vectors(self._rng) + self._soma.center}
+
+        if "trunk_orientation" in self._context:
+            proposal = self._context["trunk_orientation"](self._soma.center, _propose, self._rng)
+            if proposal is None or proposal == "terminate":
+                warnings.warn("Could not find a trunk angle with context, we sample without")
+                proposal = _propose()
+            return proposal["point"] - self._soma.center
+
+        return _propose()["point"] - self._soma.center
 
 
 def trunk_absolute_orientation_to_spherical_angles(orientation, trunk_absolute_angles, z_angles):

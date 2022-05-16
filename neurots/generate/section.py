@@ -17,6 +17,7 @@
 
 from collections import deque
 from functools import partial
+
 import numpy as np
 from numpy.linalg import norm as vectorial_norm  # vectorial_norm used for array of vectors
 
@@ -108,19 +109,32 @@ class SectionGrower:
                 + random_factor * self.params.randomness * point
                 + self.params.history * history
             )
+            if (
+                self.context is not None
+                and "direction_bias" in self.context
+                and self.process == self.context["direction_bias"]["process_type"]
+            ):
+                bias = self.context["direction_bias"]["function"](current_point)
+                if bias is not None:
+                    direction = (
+                        self.context["direction_bias"]["strength"] * bias
+                        + (1 - self.context["direction_bias"]["strength"]) * direction
+                    )
             direction = direction / vectorial_norm(direction)
             seg_length = self.step_size_distribution.draw_positive()
             next_point = current_point + seg_length * direction
-            return next_point, seg_length, direction
+            return {"point": next_point, "length": seg_length, "direction": direction}
 
         if self.context is not None and "growth_orientation" in self.context:
-            noise_increase = self.context.get("growth_orientation_noise_increase", 0.01)
+            noise_increase = self.context["growth_orientation"].get(
+                "growth_orientation_noise_increase", 0.01
+            )
             # we try the proposal with context dependent acceptance function,
             # and increase noise if it does not accept it
             proposal = None
             i = 0
             while proposal is None:
-                proposal = self.context["growth_orientation"](
+                proposal = self.context["growth_orientation"]["function"](
                     current_point,
                     partial(propose, random_factor=1.0 + noise_increase * i),
                     self._rng,
@@ -128,12 +142,11 @@ class SectionGrower:
                 i += 1
                 if proposal == "terminate":
                     return "terminate", None
-            next_point, seg_length, direction = proposal
         else:
-            next_point, seg_length, direction = propose()
+            proposal = propose()
 
-        self.update_pathlength(seg_length)
-        return next_point, direction
+        self.update_pathlength(proposal["length"])
+        return proposal["point"], proposal["direction"]
 
     def first_point(self):
         """Generates the first point of the section from the growth method and the previous point.

@@ -56,7 +56,8 @@ class TMDAlgo(AbstractAlgo):
         barSZ = np.min(get_lengths(self.ph_angles))
         stepSZ = self.params["step_size"]["norm"]["mean"]
         if stepSZ >= barSZ:
-            L.warning("Selected step size %f is too big for bars of size %f", stepSZ, barSZ)
+            self.params["step_size"]["norm"]["mean"] = barSZ
+            L.debug("Selected step size %f is too big for bars of size %f", stepSZ, barSZ)
         self.barcode = Barcode(list(self.ph_angles))
         self.start_point = start_point
         self.apical_section = None
@@ -304,8 +305,6 @@ class TMDGradientAlgo(TMDApicalAlgo):
         """
         bias_length = self.params["bias_length"] * self.persistence_length
         difference = stop.expected_maximum_length()
-        bias_length = 0.8
-        # self.params['bias'] = -0.7
         if difference > bias_length:
             direction1 = (1.0 - abs(self.params["bias"])) * np.array(input_dir)
             direction2 = self.params["bias"] * np.array(section.direction)
