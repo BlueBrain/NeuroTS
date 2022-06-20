@@ -25,6 +25,8 @@ import numpy as np
 import pytest
 import tmd
 from neurom import load_morphologies
+from neurom import load_morphology
+from neurom import stats
 from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_equal
 from packaging import version
@@ -424,8 +426,17 @@ def test_number_neurites_cut_pop(POPUL):
         smallest = 0
         biggest = 1
 
-    for i in list(range(0, len(neurons[biggest].root_sections) - 1))[::-1]:
-        neurons[biggest].delete_section(neurons[biggest].root_sections[i], recursive=True)
+    # neurom>=4.0
+    if hasattr(neurom_obj, "to_morphio"):
+        morphio_obj = neurom_obj.to_morphio().as_mutable()
+    else:
+        morphio_obj = neurom_obj
+
+    for i in list(range(2, len(morphio_obj.root_sections) - 1))[::-1]:
+        morphio_obj.delete_section(morphio_obj.root_sections[i], recursive=True)
+
+    # convert it back to neurom obj
+    neurons[biggest] = load_morphology(morphio_obj)
 
     POPUL = neurom.core.population.Population(neurons)
     assert_equal(len(neurons), 2)
