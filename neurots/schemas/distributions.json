@@ -24,11 +24,16 @@
                             "type": "array"
                         }
                     },
-                    "required": ["bins", "weights"],
+                    "required": [
+                        "bins",
+                        "weights"
+                    ],
                     "type": "object"
                 }
             },
-            "required": ["data"],
+            "required": [
+                "data"
+            ],
             "title": "Data distribution",
             "type": "object"
         },
@@ -36,77 +41,6 @@
             "additionalProperties": false,
             "description": "An object without any property",
             "title": "Empty distribution",
-            "type": "object"
-        },
-        "neurite_distrib": {
-            "additionalProperties": false,
-            "description": "The distributions of a type of neurite",
-            "properties": {
-                "filtration_metric": {
-                    "type": "string"
-                },
-                "num_trees": {
-                    "$ref": "#/definitions/data_distr",
-                    "description": "The data distribution used for the number of trees to synthesize"
-                },
-                "persistence_diagram": {
-                    "description": "The persistence diagram",
-                    "items": {
-                        "items": {
-                            "items": {
-                                "type": "number"
-                            },
-                            "type": "array"
-                        },
-                        "type": "array"
-                    },
-                    "type": "array"
-                },
-                "trunk": {
-                    "additionalProperties": false,
-                    "description": "The distributions used to synthesize the trunk",
-                    "properties": {
-                        "absolute_elevation_deviation": {
-                            "$ref": "#/definitions/data_distr",
-                            "description": "The data distribution used for the absolute elevation deviation"
-                        },
-                        "azimuth": {
-                            "additionalProperties": false,
-                            "description": "The uniform distribution used for the azimuth",
-                            "properties": {
-                                "uniform": {
-                                    "additionalProperties": false,
-                                    "description": "The properties of the uniform distribution",
-                                    "properties": {
-                                        "max": {
-                                            "type": "number"
-                                        },
-                                        "min": {
-                                            "type": "number"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            },
-                            "type": "object"
-                        },
-                        "orientation_deviation": {
-                            "$ref": "#/definitions/data_distr",
-                            "description": "The data distribution used for the orientation deviation"
-                        }
-                    },
-                    "required": [
-                        "absolute_elevation_deviation",
-                        "azimuth",
-                        "orientation_deviation"
-                    ],
-                    "type": "object"
-                }
-            },
-            "required": [
-                "trunk"
-            ],
-            "title": "Neurite distribution",
             "type": "object"
         },
         "neurite_diameter": {
@@ -145,6 +79,115 @@
                 }
             },
             "title": "Neurite diameter distribution",
+            "type": "object"
+        },
+        "neurite_distrib": {
+            "additionalProperties": false,
+            "description": "The distributions of a type of neurite",
+            "properties": {
+                "filtration_metric": {
+                    "type": "string"
+                },
+                "num_trees": {
+                    "$ref": "#/definitions/data_distr",
+                    "description": "The data distribution used for the number of trees to synthesize"
+                },
+                "persistence_diagram": {
+                    "description": "The persistence diagram",
+                    "items": {
+                        "items": {
+                            "items": {
+                                "type": "number"
+                            },
+                            "type": "array"
+                        },
+                        "type": "array"
+                    },
+                    "type": "array"
+                },
+                "trunk": {
+                    "oneOf": [
+                        {
+                            "description": "No trunk distribution provided",
+                            "type": "null"
+                        },
+                        {
+                            "additionalProperties": false,
+                            "description": "The distributions used to synthesize the trunk using orientation deviation",
+                            "properties": {
+                                "absolute_elevation_deviation": {
+                                    "$ref": "#/definitions/data_distr",
+                                    "description": "The data distribution used for the absolute elevation deviation"
+                                },
+                                "azimuth": {
+                                    "additionalProperties": false,
+                                    "description": "The uniform distribution used for the azimuth",
+                                    "properties": {
+                                        "uniform": {
+                                            "additionalProperties": false,
+                                            "description": "The properties of the uniform distribution",
+                                            "properties": {
+                                                "max": {
+                                                    "type": "number"
+                                                },
+                                                "min": {
+                                                    "type": "number"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "orientation_deviation": {
+                                    "$ref": "#/definitions/data_distr",
+                                    "description": "The data distribution used for the orientation deviation"
+                                }
+                            },
+                            "required": [
+                                "absolute_elevation_deviation",
+                                "azimuth",
+                                "orientation_deviation"
+                            ],
+                            "type": "object"
+                        },
+                        {
+                            "additionalProperties": false,
+                            "description": "The distributions used to synthesize the trunk using 3d angles",
+                            "properties": {
+                                "3d_angle": {
+                                    "additionalProperties": false,
+                                    "description": "Distribution of 3d angles",
+                                    "properties": {
+                                        "form": {
+                                            "type": "string"
+                                        },
+                                        "params": {
+                                            "items": {
+                                                "type": "number"
+                                            },
+                                            "type": "array"
+                                        }
+                                    },
+                                    "required": [
+                                        "form",
+                                        "params"
+                                    ],
+                                    "type": "object"
+                                }
+                            },
+                            "required": [
+                                "3d_angle"
+                            ],
+                            "type": "object"
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "trunk"
+            ],
+            "title": "Neurite distribution",
             "type": "object"
         }
     },
@@ -193,6 +236,15 @@
                 {
                     "additionalProperties": false,
                     "properties": {
+                        "apical": {
+                            "$ref": "#/definitions/neurite_diameter"
+                        },
+                        "axon": {
+                            "$ref": "#/definitions/neurite_diameter"
+                        },
+                        "basal": {
+                            "$ref": "#/definitions/neurite_diameter"
+                        },
                         "method": {
                             "not": {
                                 "enum": [
@@ -200,15 +252,6 @@
                                 ]
                             },
                             "type": "string"
-                        },
-                        "apical": {
-                            "$ref": "#/definitions/neurite_diameter"
-                        },
-                        "basal": {
-                            "$ref": "#/definitions/neurite_diameter"
-                        },
-                        "axon": {
-                            "$ref": "#/definitions/neurite_diameter"
                         }
                     }
                 }

@@ -18,96 +18,32 @@
 # pylint: disable=missing-function-docstring
 import json
 import os
+from pathlib import Path
 
-from jsonschema import validate
+from neurots import validator
 
 _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
+def _validation(file, func, kind, data):
+    try:
+        func(data)
+    except Exception as err:
+        raise ValueError(f"The file {file} is not valid according to the {kind} schema") from err
+
+
 def test_json_schema():
 
-    with open(os.path.join(_PATH, "dummy_distribution.json"), encoding="utf-8") as f:
-        data = json.load(f)
+    for i in Path(_PATH).iterdir():
+        if i.suffix != ".json" or "persistence_diagram" in str(i):
+            continue
 
-    validate(
-        data,
-        schema={
-            "definitions": {
-                "histogram": {
-                    "type": "object",
-                    "additionalProperties": False,
-                    "properties": {
-                        "data": {
-                            "type": "object",
-                            "additionalProperties": False,
-                            "properties": {"bins": {"type": "array"}, "weights": {"type": "array"}},
-                        }
-                    },
-                },
-                "dendrite": {
-                    "type": "object",
-                    "additionalProperties": False,
-                    "properties": {
-                        "trunk": {
-                            "type": "object",
-                            "additionalProperties": False,
-                            "properties": {
-                                "orientation_deviation": {"$ref": "#/definitions/histogram"},
-                                "absolute_elevation_deviation": {"$ref": "#/definitions/histogram"},
-                                "azimuth": {"$ref": "#/definitions/uniform_distrib"},
-                            },
-                        },
-                        "num_trees": {"type": "object"},
-                        "persistence_diagram": {"type": "array"},
-                        "filtration_metric": {"type": "string"},
-                    },
-                },
-                "norm_distrib": {
-                    "type": "object",
-                    "additionalProperties": False,
-                    "properties": {
-                        "norm": {
-                            "type": "object",
-                            "additionalProperties": False,
-                            "properties": {
-                                "mean": {"type": "number"},
-                                "std": {"type": "number"},
-                            },
-                        }
-                    },
-                },
-                "uniform_distrib": {
-                    "type": "object",
-                    "additionalProperties": False,
-                    "properties": {
-                        "uniform": {
-                            "type": "object",
-                            "additionalProperties": False,
-                            "properties": {
-                                "min": {"type": "number"},
-                                "max": {"type": "number"},
-                            },
-                        }
-                    },
-                },
-                "diameter": {
-                    "type": "object",
-                    "additionalProperties": True,
-                },
-            },
-            "type": "object",
-            "properties": {
-                "soma": {
-                    "type": "object",
-                    "additionalProperties": False,
-                    "properties": {"size": {"$ref": "#/definitions/norm_distrib"}},
-                },
-                "basal": {"$ref": "#/definitions/dendrite"},
-                "apical": {"$ref": "#/definitions/dendrite"},
-                "axon": {"$ref": "#/definitions/dendrite"},
-                "diameter": {"$ref": "#/definitions/diameter"},
-            },
-            "required": ["soma", "axon", "basal", "apical", "diameter"],
-            "additionalProperties": False,
-        },
-    )
+        with i.open(encoding="utf-8") as f:
+            data = json.load(f)
+
+        if "param" in str(i):
+            _validation(i, validator.validate_neuron_params, "parameters", data)
+        elif "distr" in str(i):
+            _validation(i, validator.validate_neuron_distribs, "distributions", data)
+        else:
+            raise ValueError(f"The file {i} does not contain 'param' nor 'distr'")

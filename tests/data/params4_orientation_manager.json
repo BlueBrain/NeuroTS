@@ -19,7 +19,7 @@
           "modify": null,
           "orientation": {
               "mode": "sample_pairwise_angles",
-              "values": {}
+              "values": null
           },
           "radius": 0.3,
           "randomness": 0.15,

@@ -14,7 +14,7 @@
           "growth_method": "tmd",
           "metric": "path_distances",
           "modify": null,
-          "orientation": {"mode": "sample_pairwise_angles", "values": {}},
+          "orientation": {"mode": "sample_pairwise_angles", "values": null},
           "radius": 0.3,
           "randomness": 0.15,
           "targeting": 0.12,

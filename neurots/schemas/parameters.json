@@ -6,6 +6,11 @@
             "title": "Empty object",
             "type": "object"
         },
+        "null_object": {
+            "description": "A null object",
+            "title": "Null object",
+            "type": "null"
+        },
         "neurite": {
             "additionalProperties": false,
             "description": "The properties of a neurite",
@@ -55,7 +60,7 @@
                             "type": "object"
                         },
                         {
-                            "type": "null"
+                            "$ref": "#/definitions/null_object"
                         }
                     ]
                 },
@@ -65,9 +70,9 @@
                     "type": "integer"
                 },
                 "orientation": {
-                    "anyOf": [
+                    "oneOf": [
                         {
-                            "type": "null"
+                            "$ref": "#/definitions/null_object"
                         },
                         {
                             "items": {
@@ -86,6 +91,9 @@
                                 "values": {
                                     "oneOf": [
                                         {
+                                            "$ref": "#/definitions/null_object"
+                                        },
+                                        {
                                             "type": "object",
                                             "properties": {
                                                 "orientations": {
@@ -96,24 +104,35 @@
                                                     "type": "array"
                                                 }
                                             },
-                                            "additionalProperties": false
+                                            "additionalProperties": false,
+                                            "required": ["orientations"]
                                         },
                                         {
                                             "type": "object",
                                             "properties": {
                                                 "primary_orientation": {
-                                                    "items": {
-                                                        "$ref": "#/definitions/point",
-                                                        "description": "The primary orientation vector"
-                                                    },
-                                                    "type": "array"
+                                                    "$ref": "#/definitions/point",
+                                                    "description": "The primary orientation vector"
                                                 }
                                             },
-                                            "additionalProperties": false
+                                            "additionalProperties": false,
+                                            "required": ["primary_orientation"]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "pia": {
+                                                    "$ref": "#/definitions/point",
+                                                    "description": "The pia direction"
+                                                }
+                                            },
+                                            "additionalProperties": false,
+                                            "required": ["pia"]
                                         }
                                     ]
                                 }
-                            }
+                            },
+                            "additionalProperties": false
                         }
                     ],
                     "description": "Defines the target orientation of a tree, as it emanates from the soma"

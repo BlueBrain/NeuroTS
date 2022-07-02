@@ -2,7 +2,7 @@
            "randomness": 0.0,
            "targeting": 0.2,
            "radius": 0.3,
-           "orientation": {"mode": "sample_pairwise_angles", "values": {}},
+           "orientation": {"mode": "sample_pairwise_angles", "values": null},
            "growth_method": "tmd",
            "branching_method": "bio_oriented",
            "modify": null,
