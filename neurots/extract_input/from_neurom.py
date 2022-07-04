@@ -260,7 +260,7 @@ def _simple_trunk_neurite(pop, neurite_type, bins):
     }
 
 
-def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30, params=None, method="simple"):
+def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30, params=None):
     """Extract the trunk data for a specific tree type.
 
     Args:
@@ -268,14 +268,13 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30, params=None, met
         neurite_type (neurom.core.types.NeuriteType): Consider only the neurites of this type.
         bins (int or list[int] or str, optional): The bins to use (this pararmeter is passed to
             :func:`numpy.histogram`).
-        method (str): Method to use.
 
     Returns:
         dict: A dictionary with the trunk data.
     """
-    if method == "simple":
-        return _simple_trunk_neurite(pop, neurite_type=neurite_type, bins=bins)
-    return _trunk_neurite(pop, neurite_type=neurite_type, bins=bins, params=params)
+    return _simple_trunk_neurite(pop, neurite_type=neurite_type, bins=bins), _trunk_neurite(
+        pop, neurite_type=neurite_type, bins=bins, params=params
+    )
 
 
 def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE):
