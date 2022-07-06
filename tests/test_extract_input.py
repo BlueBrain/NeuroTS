@@ -310,10 +310,6 @@ class TestDistributions:
         )
         assert distr_external == distr_external_input
 
-    def test_trunk_method(self, filename):
-        with pytest.raises(KeyError):
-            extract_input.distributions(filename, trunk_method="UNKNOWN")
-
 
 def test_number_neurites(POPUL):
     res = extract_input.from_neurom.number_neurites(POPUL)
@@ -637,9 +633,7 @@ def test__trunk_neurite(POPUL, NEU):
     angles = extract_input.from_neurom._trunk_neurite(POPUL, neurom.APICAL_DENDRITE, bins=10)
     assert angles == {"trunk": None}
 
-    _angles = extract_input.from_neurom.trunk_neurite(
-        POPUL, neurom.APICAL_DENDRITE, bins=10, method="new"
-    )
+    _angles = extract_input.from_neurom.trunk_neurite(POPUL, neurom.APICAL_DENDRITE, bins=10)[1]
     assert angles == _angles
 
     angles = extract_input.from_neurom._trunk_neurite(POPUL, neurom.BASAL_DENDRITE, bins=10)
@@ -649,9 +643,7 @@ def test__trunk_neurite(POPUL, NEU):
         angles["trunk"]["3d_angle"]["params"], [1.53621562e-06, 9.99998998e00]
     )
 
-    _angles = extract_input.from_neurom.trunk_neurite(
-        POPUL, neurom.BASAL_DENDRITE, bins=10, method="new"
-    )
+    _angles = extract_input.from_neurom.trunk_neurite(POPUL, neurom.BASAL_DENDRITE, bins=10)[1]
     assert angles["trunk"]["3d_angle"]["form"] == _angles["trunk"]["3d_angle"]["form"]
 
     angles = extract_input.from_neurom._trunk_neurite(NEU, neurom.BASAL_DENDRITE, bins=2)
