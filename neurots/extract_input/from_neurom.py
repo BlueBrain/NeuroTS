@@ -23,8 +23,7 @@ from neurom.check.morphology_checks import has_apical_dendrite
 from neurom.core.types import tree_type_checker as is_type
 from scipy.integrate import quad
 from scipy.optimize import curve_fit
-
-from neurots.generate.orientations import prob_function
+from scipy.special import expit
 
 
 def transform_distr(opt_distr):
@@ -104,6 +103,21 @@ def soma_data(pop):
     ss = stats.fit(soma_size, distribution="norm")
 
     return {"size": transform_distr(ss)}
+
+
+def prob_function(angle, params, form):
+    """Probability function."""
+    if form == "step":
+        scale, rate = params
+        return expit((angle - scale) / rate)
+
+    if form == "double_step":
+        scale_low, rate_low, scale_high, rate_high = params
+        return 0.5 * (
+            expit((angle - scale_low) / rate_low) + expit((-angle - scale_high) / rate_high)
+        )
+
+    raise NotImplementedError(f"The form '{form}' is not implemented")
 
 
 def _step_fit_prob_function(angle, scale, rate):
