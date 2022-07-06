@@ -16,7 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # pylint: disable=missing-function-docstring
-# pylint: disable=no-self-use
 # pylint: disable=redefined-outer-name
 import json
 from pathlib import Path
