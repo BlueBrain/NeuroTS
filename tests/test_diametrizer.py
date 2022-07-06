@@ -17,7 +17,6 @@
 
 # pylint: disable=missing-function-docstring
 # pylint: disable=no-member
-# pylint: disable=no-self-use
 # pylint: disable=redefined-outer-name
 import copy
 import os

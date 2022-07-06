@@ -324,7 +324,8 @@ def test_add_attraction_bias():
     target_point = np.array([0.0, 0.0, 100.0])
     current_point = np.array([0.0, 0.0, 0.0])
 
-    attraction_function = lambda x: 1.0 - x
+    def attraction_function(x):
+        return 1.0 - x
 
     max_target_distance = 100.0
 

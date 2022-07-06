@@ -36,11 +36,9 @@ def section_mean_taper(s):
     min_diam = min(s.points[:, 3])
 
     di_li = sum(
-        [
-            segment_radius([s.points[i], s.points[i + 1]])
-            * segment_length([s.points[i], s.points[i + 1]])
-            for i in range(len(s.points) - 1)
-        ]
+        segment_radius([s.points[i], s.points[i + 1]])
+        * segment_length([s.points[i], s.points[i + 1]])
+        for i in range(len(s.points) - 1)
     )
 
     return (di_li - min_diam * s.length) / s.length

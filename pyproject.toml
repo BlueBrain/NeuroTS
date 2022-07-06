@@ -13,7 +13,6 @@ target-version = ["py38"]
 # PYLINT
 [tool.pylint.messages-control]
 disable=[
-	"bad-continuation",
 	"empty-docstring",
 	"fixme",
 	"invalid-name",
@@ -22,7 +21,6 @@ disable=[
 	"no-member",
 	"too-many-ancestors",
 	"too-many-lines",
-    "no-self-use",
 ]
 
 [tool.pylint.format]

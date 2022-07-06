@@ -24,7 +24,6 @@ Finally, we need to check the TMD of the produced cells.
 
 # pylint: disable=missing-function-docstring
 # pylint: disable=missing-class-docstring
-# pylint: disable=no-self-use
 # pylint: disable=protected-access
 import json
 import os

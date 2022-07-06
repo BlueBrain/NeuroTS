@@ -64,8 +64,11 @@ class OrientationManagerBase:
             dict: A dictionary mapping mode names without the '_modes_' prefix to the methods.
         """
         methods = inspect.getmembers(self, predicate=inspect.ismethod)
-        strip_mode = lambda name: name.replace("_mode_", "")
-        return {strip_mode(name): method for name, method in methods if name.startswith("_mode_")}
+        return {
+            name.replace("_mode_", ""): method
+            for name, method in methods
+            if name.startswith("_mode_")
+        }
 
     @property
     def mode_names(self):
@@ -139,7 +142,7 @@ class OrientationManager(OrientationManagerBase):
 
     """
 
-    def _mode_use_predefined(self, values_dict, tree_type):  # pylint: disable=no-self-use
+    def _mode_use_predefined(self, values_dict, tree_type):
         """Returns predefined orientations."""
         assert "orientations" in values_dict, "'orientations' key is missing"
         tree_type_distrs = self._distributions[tree_type]

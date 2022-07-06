@@ -1,13 +1,19 @@
-name: Lint Commit Messages
+name: Check PR titles using commitlint
 
 on:
   pull_request:
+    types: [edited, opened, reopened, synchronize]
 
 jobs:
-  commitlint:
+  check-pr-title:
+    name: Check PR title
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v2
         with:
-          fetch-depth: 0
-      - uses: wagoid/commitlint-github-action@v4
+          node-version: '14'
+      - run: npm install -g --force commitlint @commitlint/cli commitlint-plugin-cleanfeet
+      - run: npm install conventional-changelog-conventionalcommits
+      - run: touch .git/COMMIT_EDITMSG
+      - run: echo ${{ github.event.pull_request.title }} | commitlint
