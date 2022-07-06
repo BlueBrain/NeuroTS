@@ -325,6 +325,7 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30, params=None):
         neurite_type (neurom.core.types.NeuriteType): Consider only the neurites of this type.
         bins (int or list[int] or str, optional): The bins to use (this pararmeter is passed to
             :func:`numpy.histogram`).
+        params (dict): parameter to pass to fit functions to set the bounds
 
     Returns:
         dict: A dictionary with the trunk data.
