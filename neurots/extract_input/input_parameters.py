@@ -37,7 +37,7 @@ def parameters(
     diameter_parameters=None,
     trunk_method="simple",
 ):
-    """Return a default set of input parameters to be used as input for synthesis.
+    """Returns a default set of input parameters to be used as input for synthesis.
 
     Args:
         origin (list[float]): The origin point.

@@ -27,6 +27,62 @@ from scipy.optimize import curve_fit
 from neurots.generate.orientations import prob_function
 
 
+def transform_distr(opt_distr):
+    """Transform distributions.
+
+    Args:
+        opt_distr (neurom.stats.FitResults): The fitted distribution.
+
+    Returns:
+        dict: A dictionary whose structure depends on the type of distribution:
+
+        * if `type == "norm"`:
+
+        .. code-block:: bash
+
+            {
+                "norm": {
+                    "mean": <mean value>,
+                    "std": <std value>
+                }
+            }
+
+        * if `type == "uniform"`:
+
+        .. code-block:: bash
+
+            {
+                "uniform": {
+                    "min": <min value>,
+                    "max": <max value>
+                }
+            }
+
+        * if `type == "expon"`:
+
+        .. code-block:: bash
+
+            {
+                "expon": {
+                    "loc": <loc value>,
+                    "lambda": <lambda value>
+                }
+            }
+    """
+    if opt_distr.type == "norm":
+        return {"norm": {"mean": opt_distr.params[0], "std": opt_distr.params[1]}}
+    elif opt_distr.type == "uniform":
+        return {
+            "uniform": {
+                "min": opt_distr.params[0],
+                "max": opt_distr.params[1] + opt_distr.params[0],
+            }
+        }
+    elif opt_distr.type == "expon":
+        return {"expon": {"loc": opt_distr.params[0], "lambda": 1.0 / opt_distr.params[1]}}
+    return None
+
+
 def soma_data(pop):
     """Extract soma size.
 
@@ -45,8 +101,9 @@ def soma_data(pop):
     # Extract soma size as a normal distribution
     # Returns a dictionary with the soma information
     soma_size = nm.get("soma_radius", pop)
-    params = stats.fit(soma_size, distribution="norm").params
-    return {"size": {"norm": {"mean": params[0], "std": params[1]}}}
+    ss = stats.fit(soma_size, distribution="norm")
+
+    return {"size": transform_distr(ss)}
 
 
 def _step_fit_prob_function(angle, scale, rate):
