@@ -142,19 +142,7 @@
                                 "orientation_deviation": {
                                     "$ref": "#/definitions/data_distr",
                                     "description": "The data distribution used for the orientation deviation"
-                                }
-                            },
-                            "required": [
-                                "absolute_elevation_deviation",
-                                "azimuth",
-                                "orientation_deviation"
-                            ],
-                            "type": "object"
-                        },
-                        {
-                            "additionalProperties": false,
-                            "description": "The distributions used to synthesize the trunk using 3d angles",
-                            "properties": {
+                                },
                                 "3d_angle": {
                                     "additionalProperties": false,
                                     "description": "Distribution of 3d angles",
@@ -177,7 +165,9 @@
                                 }
                             },
                             "required": [
-                                "3d_angle"
+                                "absolute_elevation_deviation",
+                                "azimuth",
+                                "orientation_deviation"
                             ],
                             "type": "object"
                         }

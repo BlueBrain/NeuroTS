@@ -344,9 +344,11 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30, params=None):
     Returns:
         dict: A dictionary with the trunk data.
     """
-    return _simple_trunk_neurite(pop, neurite_type=neurite_type, bins=bins), _trunk_neurite(
-        pop, neurite_type=neurite_type, bins=bins, params=params
-    )
+    data = _simple_trunk_neurite(pop, neurite_type=neurite_type, bins=bins)
+    _data = _trunk_neurite(pop, neurite_type=neurite_type, bins=bins, params=params)
+    if _data["trunk"] is not None:
+        data["trunk"].update(_data["trunk"])
+    return data
 
 
 def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE):
