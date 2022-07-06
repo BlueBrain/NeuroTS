@@ -110,8 +110,8 @@ def test_trunk_distr(POPUL):
 
     trunkAP = extract_input.from_neurom.trunk_neurite(
         POPUL, neurite_type=neurom.APICAL_DENDRITE, bins=1
-    )
-    trunkBAS = extract_input.from_neurom.trunk_neurite(POPUL, bins=10)
+    )[0]
+    trunkBAS = extract_input.from_neurom.trunk_neurite(POPUL, bins=10)[0]
 
     assert_array_almost_equal(trunkBAS["trunk"]["orientation_deviation"]["data"]["bins"], bins_BAS)
     assert_array_almost_equal(
