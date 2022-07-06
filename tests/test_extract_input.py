@@ -98,6 +98,7 @@ def test_trunk_distr(POPUL):
             "azimuth": {"uniform": {"max": 0.0, "min": np.pi}},
             "orientation_deviation": {"data": {"weights": [4, 3, 1, 2, 0, 1, 0, 0, 0, 2]}},
             "absolute_elevation_deviation": absolute_elevation_deviation_BAS,
+            "3d_angle": {"form": "step", "params": [0.0, 9.99999]},
         }
     }
     target_trunkAPIC = {
@@ -110,8 +111,8 @@ def test_trunk_distr(POPUL):
 
     trunkAP = extract_input.from_neurom.trunk_neurite(
         POPUL, neurite_type=neurom.APICAL_DENDRITE, bins=1
-    )[0]
-    trunkBAS = extract_input.from_neurom.trunk_neurite(POPUL, bins=10)[0]
+    )
+    trunkBAS = extract_input.from_neurom.trunk_neurite(POPUL, bins=10)
 
     assert_array_almost_equal(trunkBAS["trunk"]["orientation_deviation"]["data"]["bins"], bins_BAS)
     assert_array_almost_equal(
@@ -125,7 +126,7 @@ def test_trunk_distr(POPUL):
     del trunkBAS["trunk"]["orientation_deviation"]["data"]["bins"]
     del trunkBAS["trunk"]["absolute_elevation_deviation"]["data"]["bins"]
     del trunkAP["trunk"]["absolute_elevation_deviation"]["data"]["bins"]
-
+    trunkBAS["trunk"]["3d_angle"]["params"] = np.around(trunkBAS["trunk"]["3d_angle"]["params"], 5)
     assert_equal(trunkBAS, target_trunkBAS)
     assert_equal(trunkAP, target_trunkAPIC)
 
@@ -631,10 +632,7 @@ def test__have_apical_dendrites(POPUL, NEU):
 
 def test__trunk_neurite(POPUL, NEU):
     angles = extract_input.from_neurom._trunk_neurite(POPUL, neurom.APICAL_DENDRITE, bins=10)
-    assert angles == {"trunk": None}
-
-    _angles = extract_input.from_neurom.trunk_neurite(POPUL, neurom.APICAL_DENDRITE, bins=10)[1]
-    assert angles == _angles
+    assert "3d_angles" not in angles
 
     angles = extract_input.from_neurom._trunk_neurite(POPUL, neurom.BASAL_DENDRITE, bins=10)
 
@@ -643,7 +641,7 @@ def test__trunk_neurite(POPUL, NEU):
         angles["trunk"]["3d_angle"]["params"], [1.53621562e-06, 9.99998998e00]
     )
 
-    _angles = extract_input.from_neurom.trunk_neurite(POPUL, neurom.BASAL_DENDRITE, bins=10)[1]
+    _angles = extract_input.from_neurom.trunk_neurite(POPUL, neurom.BASAL_DENDRITE, bins=10)
     assert angles["trunk"]["3d_angle"]["form"] == _angles["trunk"]["3d_angle"]["form"]
 
     angles = extract_input.from_neurom._trunk_neurite(NEU, neurom.BASAL_DENDRITE, bins=2)
