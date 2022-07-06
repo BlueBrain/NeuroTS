@@ -46,6 +46,7 @@ def distributions(
     diameter_input_morph=None,
     feature="path_distances",
     diameter_model=None,
+    trunk_parameters=None,
 ):
     """Extracts the input distributions from an input population.
 
@@ -98,7 +99,7 @@ def distributions(
             type_feature = feature.get(neurite_type, "path_distances")
         nm_type = STR_TO_NEUROM_TYPES[neurite_type]
         input_distributions[neurite_type] = _append_dicts(
-            trunk_neurite(pop_nm, nm_type),
+            trunk_neurite(pop_nm, nm_type, params=trunk_parameters),
             number_neurites(pop_nm, nm_type),
         )
         if type_feature in ["path_distances", "radial_distances"]:
