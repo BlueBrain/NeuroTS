@@ -407,9 +407,7 @@ def build(
     and should only update the neuron object.
     """
     if neurite_types is None:
-        neurite_types = [
-            getattr(SectionType, tree_type) for tree_type in ["apical_dendrite", "basal_dendrite"]
-        ]
+        neurite_types = [SectionType.apical_dendrite, SectionType.basal_dendrite]
 
     if isinstance(diam_method, str):
         try:
