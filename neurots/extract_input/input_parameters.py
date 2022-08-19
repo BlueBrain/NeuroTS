@@ -21,7 +21,7 @@ tmd_algos = ("tmd", "tmd_gradient", "tmd_apical")
 def parameters(
     origin=(0.0, 0.0, 0.0),
     method="tmd",
-    neurite_types=("basal", "apical", "axon"),
+    neurite_types=("basal_dendrite", "apical_dendrite", "axon"),
     feature="path_distances",
     diameter_parameters=None,
 ):
@@ -38,8 +38,8 @@ def parameters(
         dict: The parameters.
     """
     input_parameters = {
-        "basal": {},
-        "apical": {},
+        "basal_dendrite": {},
+        "apical_dendrite": {},
         "axon": {},
         "origin": list(origin),
         "grow_types": neurite_types,
@@ -79,11 +79,11 @@ def parameters(
             }
         )
 
-    if "basal" in neurite_types:
-        input_parameters["basal"] = merged_params({"tree_type": 3})
+    if "basal_dendrite" in neurite_types:
+        input_parameters["basal_dendrite"] = merged_params({"tree_type": 3})
 
-    if "apical" in neurite_types:
-        input_parameters["apical"] = merged_params(
+    if "apical_dendrite" in neurite_types:
+        input_parameters["apical_dendrite"] = merged_params(
             {
                 "tree_type": 4,
                 "branching_method": "directional",
@@ -91,7 +91,7 @@ def parameters(
             }
         )
         if method == "tmd":
-            input_parameters["apical"]["growth_method"] = "tmd_apical"
+            input_parameters["apical_dendrite"]["growth_method"] = "tmd_apical"
 
     input_parameters["diameter_params"] = {}
     if diameter_parameters is None:

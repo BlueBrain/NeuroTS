@@ -181,8 +181,8 @@
         "neurite_type": {
             "description": "Type of neurite",
             "enum": [
-                "basal",
-                "apical",
+                "basal_dendrite",
+                "apical_dendrite",
                 "axon"
             ],
             "type": "string"
@@ -197,7 +197,7 @@
     },
     "description": "The parameters used to synthesize new cells",
     "properties": {
-        "apical": {
+        "apical_dendrite": {
             "description": "Specific parameters for apicals",
             "oneOf": [
                 {
@@ -269,8 +269,8 @@
             "description": "Select which tree types will be generated",
             "items": {
                 "enum": [
-                    "basal",
-                    "apical",
+                    "basal_dendrite",
+                    "apical_dendrite",
                     "axon"
                 ],
                 "type": "string"

@@ -18,6 +18,7 @@
 import logging
 
 import tmd
+from neurom import NeuriteType
 from neurom import load_morphologies
 
 from neurots.extract_input import from_diameter
@@ -25,7 +26,6 @@ from neurots.extract_input.from_neurom import number_neurites
 from neurots.extract_input.from_neurom import soma_data
 from neurots.extract_input.from_neurom import trunk_neurite
 from neurots.extract_input.from_TMD import persistent_homology_angles
-from neurots.morphio_utils import STR_TO_NEUROM_TYPES
 from neurots.utils import format_values
 
 L = logging.getLogger(__name__)
@@ -41,7 +41,7 @@ def _append_dicts(*args):
 
 def distributions(
     filepath,
-    neurite_types=("basal", "apical", "axon"),
+    neurite_types=("basal_dendrite", "apical_dendrite", "axon"),
     threshold_sec=2,
     diameter_input_morph=None,
     feature="path_distances",
@@ -71,7 +71,7 @@ def distributions(
     pop_tmd = tmd.io.load_population(filepath, use_morphio=True)
     pop_nm = load_morphologies(filepath)
 
-    input_distributions = {"soma": {}, "basal": {}, "apical": {}, "axon": {}}
+    input_distributions = {"soma": {}, "basal_dendrite": {}, "apical_dendrite": {}, "axon": {}}
     input_distributions["soma"] = soma_data(pop_nm)
 
     if diameter_input_morph is None:
@@ -96,7 +96,7 @@ def distributions(
             type_feature = feature
         else:
             type_feature = feature.get(neurite_type, "path_distances")
-        nm_type = STR_TO_NEUROM_TYPES[neurite_type]
+        nm_type = getattr(NeuriteType, neurite_type)
         input_distributions[neurite_type] = _append_dicts(
             trunk_neurite(pop_nm, nm_type),
             number_neurites(pop_nm, nm_type),
