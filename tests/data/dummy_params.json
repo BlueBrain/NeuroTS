@@ -1,4 +1,4 @@
-{ "apical": {
+{ "apical_dendrite": {
         "branching_method": "directional",
         "has_apical_tuft": true,
         "growth_method": "tmd_apical",
@@ -18,7 +18,7 @@
            "step_size": {"norm":{"mean":1.0, "std":0.2}}
     },
     "axon": {},
-    "basal": {
+    "basal_dendrite": {
         "branching_method": "bio_oriented",
         "growth_method": "tmd",
         "metric": "path_distances",
@@ -31,8 +31,8 @@
            "step_size": {"norm":{"mean":1.0, "std":0.2}}
     },
     "grow_types": [
-        "basal",
-        "apical"
+        "basal_dendrite",
+        "apical_dendrite"
     ],
     "origin": [
         0.0,

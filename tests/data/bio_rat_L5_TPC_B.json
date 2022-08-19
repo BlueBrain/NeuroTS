@@ -1,5 +1,5 @@
 {
-    "apical": {
+    "apical_dendrite": {
         "filtration_metric": "path_distances",
         "num_trees": {
             "data": {
@@ -3051,7 +3051,7 @@
         }
     },
     "axon": {},
-    "basal": {
+    "basal_dendrite": {
         "filtration_metric": "path_distances",
         "num_trees": {
             "data": {

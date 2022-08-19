@@ -43,7 +43,7 @@ def run(output_dir, data_dir):
 
     # Generate default parameters for topological synthesis of basal dendrites
     params = extract_input.parameters(
-        neurite_types=["basal"], feature="path_distances", method="tmd"
+        neurite_types=["basal_dendrite"], feature="path_distances", method="tmd"
     )
 
     # Save parameters in a json file

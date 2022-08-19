@@ -1,7 +1,7 @@
 {
-    "apical": {},
+    "apical_dendrite": {},
     "axon": {},
-    "basal": {
+    "basal_dendrite": {
         "branching_method": "bio_oriented",
         "growth_method": "tmd",
         "metric": "path_distances",
@@ -20,8 +20,8 @@
     },
     "diameter_params": {
         "asymmetry_threshold": {
-            "apical": 0.2,
-            "basal": 1.0
+            "apical_dendrite": 0.2,
+            "basal_dendrite": 1.0
         },
         "method": "external",
         "models": [
@@ -29,13 +29,13 @@
         ],
         "n_samples": 2,
         "neurite_types": [
-            "basal",
-            "apical"
+            "basal_dendrite",
+            "apical_dendrite"
         ],
         "trunk_max_tries": 100
     },
     "grow_types": [
-        "basal"
+        "basal_dendrite"
     ],
     "origin": [
         0.0,

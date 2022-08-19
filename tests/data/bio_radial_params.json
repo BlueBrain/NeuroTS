@@ -1,4 +1,4 @@
-{"basal": {"metric":"radial_distances",
+{"basal_dendrite": {"metric":"radial_distances",
            "randomness": 0.0,
            "targeting": 0.2,
            "radius": 0.3,
@@ -8,7 +8,7 @@
            "modify": null,
            "tree_type": 3,
            "step_size": {"norm":{"mean":1.0, "std":0.2}}},
- "apical": {"metric":"radial_distances",
+ "apical_dendrite": {"metric":"radial_distances",
             "has_apical_tuft": true,
             "randomness": 0.0,
             "targeting": 0.2,
@@ -26,6 +26,6 @@
  "origin": [0.0,
             0.0,
             0.0],
- "grow_types": ["basal", "apical"],
+ "grow_types": ["basal_dendrite", "apical_dendrite"],
  "diameter_params": {"method": "default"}
 }

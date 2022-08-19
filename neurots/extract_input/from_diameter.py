@@ -87,7 +87,7 @@ def model(input_object):
         trunk_diams[neurite.type].append(2.0 * np.max(get("segment_radii", neurite)))
 
     for neurite_type in tapers:
-        key = neurite_type.type.name
+        key = neurite_type.name
 
         taper_c = np.array(list(chain(*tapers[neurite_type])))
         trunk_taper = np.array(trunk_tapers[neurite_type])

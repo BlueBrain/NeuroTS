@@ -50,7 +50,7 @@ def interneuron_distribs():
 
 def test_validate_params(dummy_params):
     tested.validate_neuron_params(dummy_params)
-    dummy_params["apical"]["orientation"] = None
+    dummy_params["apical_dendrite"]["orientation"] = None
     tested.validate_neuron_params(dummy_params)
 
 
@@ -61,7 +61,7 @@ class TestValidateParams:
         tested.validate_neuron_params(dummy_params)
 
     def test_none_orientation(self, dummy_params):
-        dummy_params["apical"]["orientation"] = None
+        dummy_params["apical_dendrite"]["orientation"] = None
         tested.validate_neuron_params(dummy_params)
 
     def test_different_external_method(self, dummy_params):
@@ -96,7 +96,7 @@ class TestValidateParams:
 
     def test_orientation(self, dummy_params):
         # It must be a list of vectors, not a single one
-        dummy_params["apical"]["orientation"] = [0, 0, 0]
+        dummy_params["apical_dendrite"]["orientation"] = [0, 0, 0]
         with pytest.raises(tested.ValidationError):
             tested.validate_neuron_params(dummy_params)
 
@@ -108,9 +108,9 @@ class TestValidateParams:
 
 def test_empty_params():
     data = {
-        "apical": {},
+        "apical_dendrite": {},
         "axon": {},
-        "basal": {},
+        "basal_dendrite": {},
         "diameter_params": {"method": "M5"},
         "grow_types": [],
         "origin": [0.0, 0.0, 0.0],

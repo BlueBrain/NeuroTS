@@ -1,6 +1,6 @@
 {
-    "apical": {},
-    "basal": {
+    "apical_dendrite": {},
+    "basal_dendrite": {
         "num_trees": {
             "data": {
                 "bins": [
