@@ -31,7 +31,7 @@ default_model = {"Rall_ratio": 3.0 / 2.0, "siblings_ratio": 1.0}
 
 
 def _check(data):
-    """Checks if data in dictionary are empty."""
+    """Check if data in dictionary are empty."""
     for key, val in data.items():
         if len(val) == 0:
             raise NeuroTSError(f"Empty distribution for diameter key: {key}")
