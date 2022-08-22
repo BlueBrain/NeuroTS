@@ -28,7 +28,7 @@ reqs = [
     "neurom>=3.0,<4.0",
     "numpy>=1.15.0",
     "scipy>=1.6",
-    "tmd>=2.0.8",
+    "tmd>=2.2.0",
 ]
 
 doc_reqs = [
