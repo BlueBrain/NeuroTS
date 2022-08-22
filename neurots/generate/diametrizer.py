@@ -22,14 +22,14 @@ from morphio import SectionType
 
 
 def section_filter(neuron, tree_type=None):
-    """Filters all sections according to type."""
+    """Filter all sections according to type."""
     if tree_type is None:
         return list(neuron.iter())
     return [i for i in neuron.iter() if i.type == tree_type]
 
 
 def root_section_filter(neuron, tree_type=None):
-    """Filters root sections according to type."""
+    """Filter root sections according to type."""
     if tree_type is None:
         return list(neuron.root_sections)
     return [i for i in neuron.root_sections if i.type == tree_type]
