@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import warnings
 from copy import deepcopy
 
 import numpy as np
@@ -43,15 +44,24 @@ def format_values(obj, decimals=None):
     return obj
 
 
+def _warn(key):
+    warnings.warn(
+        f"The '{key}' property is deprecated, please use '{key}_dendrite' instead",
+        DeprecationWarning,
+    )
+
+
 def convert_from_legacy_neurite_type(data):
     """Convert legacy neurite type names, basal-> basal_dendrite and apical -> apical_dendrite."""
     old_data = deepcopy(data)
     for key, _data in old_data.items():
 
         if key == "apical":
+            _warn(key)
             data["apical_dendrite"] = data.pop("apical")
             key = "apical_dendrite"
         if key == "basal":
+            _warn(key)
             data["basal_dendrite"] = data.pop("basal")
             key = "basal_dendrite"
 
@@ -61,14 +71,18 @@ def convert_from_legacy_neurite_type(data):
         if isinstance(_data, list):
             for i, d in enumerate(_data):
                 if d == "apical":
+                    _warn(d)
                     data[key][i] = "apical_dendrite"
                 if d == "basal":
+                    _warn(d)
                     data[key][i] = "basal_dendrite"
 
         if isinstance(_data, str):
             if _data == "apical":
+                _warn(_data)
                 data[key] = "apical_dendrite"
             if _data == "basal":
+                _warn(_data)
                 data[key] = "basal_dendrite"
 
     return data
