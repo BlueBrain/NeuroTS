@@ -77,12 +77,4 @@ def convert_from_legacy_neurite_type(data):
                     _warn(d)
                     data[key][i] = "basal_dendrite"
 
-        if isinstance(_data, str):
-            if _data == "apical":
-                _warn(_data)
-                data[key] = "apical_dendrite"
-            if _data == "basal":
-                _warn(_data)
-                data[key] = "basal_dendrite"
-
     return data
