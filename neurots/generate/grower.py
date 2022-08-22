@@ -18,7 +18,6 @@
 import copy
 import json
 import logging
-from copy import deepcopy
 
 import numpy as np
 from morphio.mut import Morphology  # pylint: disable=import-error
@@ -35,39 +34,13 @@ from neurots.generate.soma import SomaGrower
 from neurots.generate.tree import TreeGrower
 from neurots.morphmath import sample
 from neurots.morphmath.utils import normalize_vectors
+from neurots.utils import convert_from_legacy_neurite_type
 from neurots.validator import validate_neuron_distribs
 from neurots.validator import validate_neuron_params
 
 L = logging.getLogger(__name__)
 
 bifurcation_methods = ["symmetric", "bio_oriented", "directional", "bio_smoothed"]
-
-
-def _convert_neurite_type(data):
-    """Convert old neurite type names, basal-> basal_dendrite and apical -> apical_dendrite."""
-    old_data = deepcopy(data)
-    for key, _data in old_data.items():
-        if key == "apical":
-            data["apical_dendrite"] = data.pop("apical")
-            key = "apical_dendrite"
-        if key == "basal":
-            data["basal_dendrite"] = data.pop("basal")
-            key = "basal_dendrite"
-
-        if isinstance(_data, dict):
-            data[key] = _convert_neurite_type(data[key])
-        if isinstance(_data, list):
-            for i, d in enumerate(_data):
-                if d == "apical":
-                    data[key][i] = "apical_dendrite"
-                if d == "basal":
-                    data[key][i] = "basal_dendrite"
-        if isinstance(_data, str):
-            if _data == "apical":
-                data[key] = "apical_dendrite"
-            if _data == "basal":
-                data[key] = "basal_dendrite"
-    return data
 
 
 def _load_json(path_or_json):
@@ -77,8 +50,7 @@ def _load_json(path_or_json):
     else:
         with open(path_or_json, encoding="utf-8") as f:
             data = json.load(f)
-    data = _convert_neurite_type(data)
-    return data
+    return convert_from_legacy_neurite_type(data)
 
 
 class NeuronGrower:
