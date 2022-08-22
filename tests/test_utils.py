@@ -16,13 +16,17 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # pylint: disable=missing-function-docstring
+import json
 from copy import deepcopy
+from pathlib import Path
 
 import dictdiffer  # pylint: disable=import-error
 import numpy as np
 import pytest
 
 from neurots import utils
+
+DATA = Path(__file__).parent / "data"
 
 
 def test_format_values():
@@ -59,3 +63,31 @@ def test_format_values():
     with pytest.raises(AssertionError):
         assert not list(dictdiffer.diff(utils.format_values(data), expected))
     assert not list(dictdiffer.diff(utils.format_values(data, decimals=6), expected))
+
+
+def test_convert_from_legacy_neurite_type():
+    """Test convert legacy json files (with added _dendrite to basal/apical)."""
+
+    with open(DATA / "dummy_distribution.json", encoding="utf-8") as f:
+        data = json.load(f)
+
+    data_converted = utils.convert_from_legacy_neurite_type(data)
+    assert data_converted == data
+
+    with open(DATA / "dummy_distribution_legacy.json", encoding="utf-8") as f:
+        data_legacy = json.load(f)
+
+    data_converted = utils.convert_from_legacy_neurite_type(data_legacy)
+    assert data_converted == data
+
+    with open(DATA / "dummy_params.json", encoding="utf-8") as f:
+        data = json.load(f)
+
+    data_converted = utils.convert_from_legacy_neurite_type(data)
+    assert data_converted == data
+
+    with open(DATA / "dummy_params_legacy.json", encoding="utf-8") as f:
+        data_legacy = json.load(f)
+
+    data_converted = utils.convert_from_legacy_neurite_type(data_legacy)
+    assert data_converted == data

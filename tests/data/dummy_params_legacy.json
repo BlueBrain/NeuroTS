@@ -1,0 +1,43 @@
+{ "apical": {
+        "branching_method": "directional",
+        "has_apical_tuft": true,
+        "growth_method": "tmd_apical",
+        "metric": "path_distances",
+        "modify": null,
+        "orientation": [
+            [
+                0.0,
+                1.0,
+                0.0
+            ]
+        ],
+        "radius": 0.3,
+        "randomness": 0.15,
+        "targeting": 0.12,
+        "tree_type": 4,
+           "step_size": {"norm":{"mean":1.0, "std":0.2}}
+    },
+    "axon": {},
+    "basal": {
+        "branching_method": "bio_oriented",
+        "growth_method": "tmd",
+        "metric": "path_distances",
+        "modify": null,
+        "orientation": null,
+        "radius": 0.3,
+        "randomness": 0.15,
+        "targeting": 0.12,
+        "tree_type": 3,
+           "step_size": {"norm":{"mean":1.0, "std":0.2}}
+    },
+    "grow_types": [
+        "basal",
+        "apical"
+    ],
+    "origin": [
+        0.0,
+        0.0,
+        0.0
+    ],
+"diameter_params": {"method": "default"}
+}

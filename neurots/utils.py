@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from copy import deepcopy
+
 import numpy as np
 
 
@@ -41,8 +43,32 @@ def format_values(obj, decimals=None):
     return obj
 
 
-def _check(data):
-    """Checks if data in dictionary are empty."""
-    for key, val in data.items():
-        if len(val) == 0:
-            raise NeuroTSError(f"Empty distribution for diameter key: {key}")
+def convert_from_legacy_neurite_type(data):
+    """Convert legacy neurite type names, basal-> basal_dendrite and apical -> apical_dendrite."""
+    old_data = deepcopy(data)
+    for key, _data in old_data.items():
+
+        if key == "apical":
+            data["apical_dendrite"] = data.pop("apical")
+            key = "apical_dendrite"
+        if key == "basal":
+            data["basal_dendrite"] = data.pop("basal")
+            key = "basal_dendrite"
+
+        if isinstance(_data, dict):
+            data[key] = convert_from_legacy_neurite_type(data[key])
+
+        if isinstance(_data, list):
+            for i, d in enumerate(_data):
+                if d == "apical":
+                    data[key][i] = "apical_dendrite"
+                if d == "basal":
+                    data[key][i] = "basal_dendrite"
+
+        if isinstance(_data, str):
+            if _data == "apical":
+                data[key] = "apical_dendrite"
+            if _data == "basal":
+                data[key] = "basal_dendrite"
+
+    return data
