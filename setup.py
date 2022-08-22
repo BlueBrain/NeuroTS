@@ -40,7 +40,7 @@ doc_reqs = [
 ]
 
 test_reqs = [
-    "diameter-synthesis>=0.4",
+    "diameter-synthesis>=0.5.0",
     "dictdiffer",
     "mock",
     "morph-tool>=0.1.12",
