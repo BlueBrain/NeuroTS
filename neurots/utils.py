@@ -44,7 +44,7 @@ def format_values(obj, decimals=None):
     return obj
 
 
-def _warn(key):
+def neurite_type_warning(key):
     warnings.warn(
         f"The '{key}' property is deprecated, please use '{key}_dendrite' instead",
         DeprecationWarning,
@@ -57,11 +57,11 @@ def convert_from_legacy_neurite_type(data):
     for key, _data in old_data.items():
 
         if key == "apical":
-            _warn(key)
+            neurite_type_warning(key)
             data["apical_dendrite"] = data.pop("apical")
             key = "apical_dendrite"
         if key == "basal":
-            _warn(key)
+            neurite_type_warning(key)
             data["basal_dendrite"] = data.pop("basal")
             key = "basal_dendrite"
 
@@ -71,10 +71,10 @@ def convert_from_legacy_neurite_type(data):
         if isinstance(_data, list):
             for i, d in enumerate(_data):
                 if d == "apical":
-                    _warn(d)
+                    neurite_type_warning(key)
                     data[key][i] = "apical_dendrite"
                 if d == "basal":
-                    _warn(d)
+                    neurite_type_warning(key)
                     data[key][i] = "basal_dendrite"
 
     return data
