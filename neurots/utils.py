@@ -45,6 +45,7 @@ def format_values(obj, decimals=None):
 
 
 def neurite_type_warning(key):
+    """Print a deprecation warning for old neurite_type key."""
     warnings.warn(
         f"The '{key}' property is deprecated, please use '{key}_dendrite' instead",
         DeprecationWarning,
