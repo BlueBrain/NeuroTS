@@ -102,6 +102,13 @@ class NeuronGrower:
 
         self.input_parameters = _load_json(input_parameters)
         L.debug("Input Parameters: %s", self.input_parameters)
+        # Consistency check between parameters - persistence diagram
+        for neurite_type in input_parameters["grow_types"]:
+            barSZ = input_distributions[neurite_type]["min_bar_length"]
+            stepSZ = input_parameters[neurite_type]["step_size"]["norm"]["mean"]
+            if stepSZ >= barSZ:
+                L.warning("Selected %s step size %f is too big for bars of size %f",
+                          neurite_type, stepSZ, barSZ)
 
         self.input_distributions = _load_json(input_distributions)
 

@@ -16,7 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
-import logging
 
 import numpy as np
 from tmd.Topology.analysis import get_lengths
@@ -28,8 +27,6 @@ from neurots.generate.algorithms.common import bif_methods
 from neurots.generate.algorithms.common import section_data
 from neurots.morphmath import sample
 from neurots.morphmath.utils import norm
-
-L = logging.getLogger(__name__)
 
 
 class TMDAlgo(AbstractAlgo):
@@ -52,11 +49,6 @@ class TMDAlgo(AbstractAlgo):
         self.bif_method = bif_methods[params["branching_method"]]
         self.params = copy.deepcopy(params)
         self.ph_angles = self.select_persistence(input_data, random_generator)
-        # Consistency check between parameters - persistence diagram
-        barSZ = np.min(get_lengths(self.ph_angles))
-        stepSZ = self.params["step_size"]["norm"]["mean"]
-        if stepSZ >= barSZ:
-            L.warning("Selected step size %f is too big for bars of size %f", stepSZ, barSZ)
         self.barcode = Barcode(list(self.ph_angles))
         self.start_point = start_point
         self.apical_section = None
