@@ -16,9 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
+import logging
 
 import numpy as np
-from tmd.Topology.analysis import get_lengths
 
 from neurots.generate.algorithms.abstractgrower import AbstractAlgo
 from neurots.generate.algorithms.barcode import Barcode
@@ -27,6 +27,8 @@ from neurots.generate.algorithms.common import bif_methods
 from neurots.generate.algorithms.common import section_data
 from neurots.morphmath import sample
 from neurots.morphmath.utils import norm
+
+L = logging.getLogger(__name__)
 
 
 class TMDAlgo(AbstractAlgo):
@@ -42,7 +44,14 @@ class TMDAlgo(AbstractAlgo):
     """
 
     def __init__(
-        self, input_data, params, start_point, context=None, random_generator=np.random, **_
+        self,
+        input_data,
+        params,
+        start_point,
+        skip_validation,
+        context=None,
+        random_generator=np.random,
+        **_,
     ):
         """TMD basic grower."""
         super().__init__(input_data, params, start_point, context)
@@ -54,6 +63,17 @@ class TMDAlgo(AbstractAlgo):
         self.apical_section = None
         self.apical_point_distance_from_soma = 0.0
         self.persistence_length = self.barcode.get_persistence_length()
+        # Validate parameters and distributions
+        if not skip_validation:
+            # Consistency check between parameters - persistence diagram
+            barSZ = input_data["min_bar_length"]
+            stepSZ = params["step_size"]["norm"]["mean"]
+            if stepSZ >= barSZ:
+                L.warning(
+                    "Selected step size %f is too big for bars of size %f",
+                    stepSZ,
+                    barSZ,
+                )
 
     def select_persistence(self, input_data, random_generator=np.random):
         """Select the persistence.
