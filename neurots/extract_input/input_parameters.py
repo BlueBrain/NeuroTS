@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from neurots.utils import neurite_type_warning
+
 tmd_algos = ("tmd", "tmd_gradient", "tmd_apical")
 
 
@@ -37,6 +39,11 @@ def parameters(
     Returns:
         dict: The parameters.
     """
+    for i, neurite_type in enumerate(neurite_types):
+        if not neurite_type.endswith("dendrite"):
+            neurite_type_warning(neurite_type)
+            neurite_types[i] = neurite_type + "_dendrite"
+
     input_parameters = {
         "basal_dendrite": {},
         "apical_dendrite": {},
