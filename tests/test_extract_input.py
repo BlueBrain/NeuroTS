@@ -239,6 +239,13 @@ class TestDistributions:
         assert_equal(
             set(distr.keys()), {"soma", "basal_dendrite", "apical_dendrite", "axon", "diameter"}
         )
+        distr_legacy = extract_input.distributions(
+            filename, feature="radial_distances", neurite_types=["basal", "apical", "axon"]
+        )
+        assert_equal(
+            set(distr_legacy.keys()),
+            {"soma", "basal_dendrite", "apical_dendrite", "axon", "diameter"},
+        )
         assert_equal(
             distr["basal_dendrite"]["num_trees"],
             {"data": {"bins": [4, 5, 6, 7, 8, 9], "weights": [1, 0, 0, 0, 0, 1]}},

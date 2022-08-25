@@ -27,6 +27,7 @@ from neurots.extract_input.from_neurom import soma_data
 from neurots.extract_input.from_neurom import trunk_neurite
 from neurots.extract_input.from_TMD import persistent_homology_angles
 from neurots.utils import format_values
+from neurots.utils import neurite_type_warning
 
 L = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ def _append_dicts(*args):
 
 def distributions(
     filepath,
-    neurite_types=("basal_dendrite", "apical_dendrite", "axon"),
+    neurite_types=["basal_dendrite", "apical_dendrite", "axon"],
     threshold_sec=2,
     diameter_input_morph=None,
     feature="path_distances",
@@ -68,6 +69,11 @@ def distributions(
     Returns:
         dict: The input distributions.
     """
+    for i, neurite_type in enumerate(neurite_types):
+        if neurite_type in ("basal", "apical"):
+            neurite_type_warning(neurite_type)
+            neurite_types[i] = neurite_type + "_dendrite"
+
     pop_tmd = tmd.io.load_population(filepath, use_morphio=True)
     pop_nm = load_morphologies(filepath)
 
