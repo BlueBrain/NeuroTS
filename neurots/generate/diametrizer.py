@@ -18,11 +18,21 @@
 import inspect
 
 import numpy as np
+from morphio import SectionType
 
-from neurots.morphio_utils import STR_TO_TYPES
-from neurots.morphio_utils import TYPE_TO_STR
-from neurots.morphio_utils import root_section_filter
-from neurots.morphio_utils import section_filter
+
+def section_filter(neuron, tree_type=None):
+    """Filter all sections according to type."""
+    if tree_type is None:
+        return list(neuron.iter())
+    return [i for i in neuron.iter() if i.type == tree_type]
+
+
+def root_section_filter(neuron, tree_type=None):
+    """Filter root sections according to type."""
+    if tree_type is None:
+        return list(neuron.root_sections)
+    return [i for i in neuron.root_sections if i.type == tree_type]
 
 
 def sample(data, random_generator=np.random):
@@ -214,7 +224,7 @@ def diametrize_from_root(
     """
     for r in root_section_filter(neuron, tree_type=neurite_type):
 
-        model = model_params[TYPE_TO_STR[r.type]]  # Selected by the root type.
+        model = model_params[r.type.name]  # Selected by the root type.
         trunk_diam = sample(model["trunk"], random_generator)
         min_diam = np.min(model["term"])
         status = {s.id: False for s in r.iter()}
@@ -274,7 +284,7 @@ def diametrize_from_tips(neuron, neurite_type=None, *, model_params, random_gene
         random_generator (numpy.random.Generator): The random number generator to use.
     """
     for r in root_section_filter(neuron, tree_type=neurite_type):
-        model = model_params[TYPE_TO_STR[r.type]]  # Selected by the root type.
+        model = model_params[r.type.name]  # Selected by the root type.
         trunk_diam = sample(model["trunk"], random_generator)
         min_diam = np.min(model["term"])
         tips = [s for s in r.iter() if not s.children]
@@ -397,7 +407,7 @@ def build(
     and should only update the neuron object.
     """
     if neurite_types is None:
-        neurite_types = [STR_TO_TYPES.get(tree_type) for tree_type in ["apical", "basal"]]
+        neurite_types = [SectionType.apical_dendrite, SectionType.basal_dendrite]
 
     if isinstance(diam_method, str):
         try:
@@ -413,7 +423,7 @@ def build(
 
     for tree_type in neurite_types:
         if isinstance(tree_type, str):
-            tree_type = STR_TO_TYPES.get(tree_type)
+            tree_type = getattr(SectionType, tree_type)
         param_signature = list(inspect.signature(diam_method).parameters.keys())
         optional_kw = {}
         if "model_params" in param_signature:

@@ -25,10 +25,16 @@ from neurom.core.morphology import iter_neurites
 from neurom.morphmath import segment_length
 from neurom.morphmath import segment_radius
 
-from neurots.morphio_utils import NEUROM_TYPE_TO_STR
-from neurots.utils import _check
+from neurots.utils import NeuroTSError
 
 default_model = {"Rall_ratio": 3.0 / 2.0, "siblings_ratio": 1.0}
+
+
+def _check(data):
+    """Check if data in dictionary are empty."""
+    for key, val in data.items():
+        if len(val) == 0:
+            raise NeuroTSError(f"Empty distribution for diameter key: {key}")
 
 
 def section_mean_taper(s):
@@ -88,7 +94,7 @@ def model(input_object):
         trunk_diams[neurite.type].append(2.0 * np.max(get("segment_radii", neurite)))
 
     for neurite_type in tapers:
-        key = NEUROM_TYPE_TO_STR[neurite_type]
+        key = neurite_type.name
 
         taper_c = np.array(list(chain(*tapers[neurite_type])))
         trunk_taper = np.array(trunk_tapers[neurite_type])

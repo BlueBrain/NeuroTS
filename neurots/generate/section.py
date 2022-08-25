@@ -171,23 +171,23 @@ class SectionGrower:
 class SectionGrowerExponentialProba(SectionGrower):
     """Abstract class for exponentially decreasing bifurcation and termination probabilities.
 
-    The parameter lamda defines the slope of the exponential.
+    The parameter lambda defines the slope of the exponential.
     The parameter that follows the exponential must be defined in the derived class.
     """
 
     def _check(self, value, which):
         crit = getattr(self.stop_criteria["TMD"], which)
-        lamda = self.params.scale_prob
-        assert lamda > 0
+        scale_prob = self.params.scale_prob
+        assert scale_prob > 0
         x = crit - value
         if x < 0:
             # no need to exponentiate, the comparison below automatically resolves to `True`
             return True
-        # Check if close enough to exp( distance * lamda)
-        return self._rng.random() < np.exp(-x * lamda)
+        # Check if close enough to exp( distance * scale_prob)
+        return self._rng.random() < np.exp(-x * scale_prob)
 
     def check_stop(self):
-        """Probabilities of bifurcating and stopping are proportional `exp(-distance * lamda)`."""
+        """Probabilities of bifurcating and stopping are proportional `exp(-distance * lambda)`."""
         if len(self.points) < 2:
             return True
 

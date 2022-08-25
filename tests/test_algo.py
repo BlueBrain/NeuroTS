@@ -38,10 +38,10 @@ _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 def _setup_test(Algo, Grower, custom_parameters=None):
     with open(os.path.join(_PATH, "dummy_distribution.json"), encoding="utf-8") as f:
-        distributions = json.load(f)["basal"]
+        distributions = json.load(f)["basal_dendrite"]
 
     with open(os.path.join(_PATH, "dummy_params.json"), encoding="utf-8") as f:
-        parameters = json.load(f)["basal"]
+        parameters = json.load(f)["basal_dendrite"]
     parameters["bias_length"] = 0.5
     parameters["bias"] = 0.5
     parameters["has_apical_tuft"] = True

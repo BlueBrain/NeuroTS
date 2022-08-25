@@ -131,7 +131,7 @@ def test_trunk_distr(POPUL):
 
 def test_diameter_extract(POPUL, NEU):
     res = extract_input.from_diameter.model(NEU)
-    assert_equal(set(res.keys()), {"basal"})
+    assert_equal(set(res.keys()), {"basal_dendrite"})
     expected = {
         "Rall_ratio": 1.5,
         "siblings_ratio": 1.0,
@@ -141,18 +141,18 @@ def test_diameter_extract(POPUL, NEU):
         "trunk_taper": [0.30],
     }
 
-    assert_equal(set(res["basal"]), set(expected))
+    assert_equal(set(res["basal_dendrite"]), set(expected))
     for key, value in expected.items():
-        assert_array_almost_equal(res["basal"][key], value)
+        assert_array_almost_equal(res["basal_dendrite"][key], value)
 
     with pytest.raises(NeuroTSError):
         extract_input.from_diameter.model(load_morphologies(os.path.join(_PATH, "simple.swc")))
 
     # Test on Population
     res = extract_input.from_diameter.model(POPUL)
-    assert_equal(set(res.keys()), {"axon", "basal", "apical"})
+    assert_equal(set(res.keys()), {"axon", "basal_dendrite", "apical_dendrite"})
     expected = {
-        "basal": {
+        "basal_dendrite": {
             "Rall_ratio": 1.5,
             "siblings_ratio": 1.0,
             "taper": [
@@ -178,7 +178,7 @@ def test_diameter_extract(POPUL, NEU):
                 2.121002e-01,
             ],
         },
-        "apical": {
+        "apical_dendrite": {
             "Rall_ratio": 1.5,
             "siblings_ratio": 1.0,
             "taper": [
@@ -214,7 +214,7 @@ def test_diameter_extract(POPUL, NEU):
         },
     }
 
-    for neurite_type in ["basal", "apical", "axon"]:
+    for neurite_type in ["basal_dendrite", "apical_dendrite", "axon"]:
         for key in expected[neurite_type]:
             try:
                 assert_equal(res[neurite_type].keys(), expected[neurite_type].keys())
@@ -236,25 +236,34 @@ class TestDistributions:
 
     def test_radial_distances(self, filename):
         distr = extract_input.distributions(filename, feature="radial_distances")
-        assert_equal(set(distr.keys()), {"soma", "basal", "apical", "axon", "diameter"})
         assert_equal(
-            distr["basal"]["num_trees"],
+            set(distr.keys()), {"soma", "basal_dendrite", "apical_dendrite", "axon", "diameter"}
+        )
+        distr_legacy = extract_input.distributions(
+            filename, feature="radial_distances", neurite_types=["basal", "apical", "axon"]
+        )
+        assert_equal(
+            set(distr_legacy.keys()),
+            {"soma", "basal_dendrite", "apical_dendrite", "axon", "diameter"},
+        )
+        assert_equal(
+            distr["basal_dendrite"]["num_trees"],
             {"data": {"bins": [4, 5, 6, 7, 8, 9], "weights": [1, 0, 0, 0, 0, 1]}},
         )
-        assert_equal(distr["basal"]["filtration_metric"], "radial_distances")
+        assert_equal(distr["basal_dendrite"]["filtration_metric"], "radial_distances")
 
         # Check that the returned distributions are valid according to the JSON schema
         validator.validate_neuron_distribs(distr)
 
     def test_path_distances(self, filename):
         distr = extract_input.distributions(filename, feature="path_distances")
-        assert_equal(distr["basal"]["filtration_metric"], "path_distances")
+        assert_equal(distr["basal_dendrite"]["filtration_metric"], "path_distances")
         validator.validate_neuron_distribs(distr)
 
     def test_trunk_length(self, filename):
         distr = extract_input.distributions(filename, feature="trunk_length")
-        assert "persistence_diagram" not in distr["basal"]
-        assert "filtration_metric" not in distr["basal"]
+        assert "persistence_diagram" not in distr["basal_dendrite"]
+        assert "filtration_metric" not in distr["basal_dendrite"]
         validator.validate_neuron_distribs(distr)
 
     def test_different_features(self, filename):
@@ -262,16 +271,16 @@ class TestDistributions:
         distr = extract_input.distributions(
             filename,
             feature={
-                "apical": "radial_distances",
-                "basal": "trunk_length",
+                "apical_dendrite": "radial_distances",
+                "basal_dendrite": "trunk_length",
                 "axon": "path_distances",
             },
         )
-        assert "filtration_metric" not in distr["basal"]
-        assert distr["apical"]["filtration_metric"] == "radial_distances"
+        assert "filtration_metric" not in distr["basal_dendrite"]
+        assert distr["apical_dendrite"]["filtration_metric"] == "radial_distances"
         assert distr["axon"]["filtration_metric"] == "path_distances"
-        assert "persistence_diagram" not in distr["basal"]
-        assert "persistence_diagram" in distr["apical"]
+        assert "persistence_diagram" not in distr["basal_dendrite"]
+        assert "persistence_diagram" in distr["apical_dendrite"]
         assert "persistence_diagram" in distr["axon"]
         validator.validate_neuron_distribs(distr)
 
@@ -281,14 +290,18 @@ class TestDistributions:
             feature="radial_distances",
             diameter_model=None,
         )
-        assert_equal(set(distr.keys()), {"soma", "basal", "apical", "axon", "diameter"})
+        assert_equal(
+            set(distr.keys()), {"soma", "basal_dendrite", "apical_dendrite", "axon", "diameter"}
+        )
         validator.validate_neuron_distribs(distr)
 
     def test_diameter_model_M5(self, filename):
         distr_M5 = extract_input.distributions(
             filename, feature="radial_distances", diameter_model="M5"
         )
-        assert_equal(set(distr_M5.keys()), {"soma", "basal", "apical", "axon", "diameter"})
+        assert_equal(
+            set(distr_M5.keys()), {"soma", "basal_dendrite", "apical_dendrite", "axon", "diameter"}
+        )
         validator.validate_neuron_distribs(distr_M5)
 
     def test_external_diameter_model(self, filename):
@@ -298,7 +311,10 @@ class TestDistributions:
         distr_external = extract_input.distributions(
             filename, feature="radial_distances", diameter_model=diam_method
         )
-        assert_equal(set(distr_external.keys()), {"soma", "basal", "apical", "axon", "diameter"})
+        assert_equal(
+            set(distr_external.keys()),
+            {"soma", "basal_dendrite", "apical_dendrite", "axon", "diameter"},
+        )
         validator.validate_neuron_distribs(distr_external)
 
         distr_external_input = extract_input.distributions(
@@ -359,50 +375,75 @@ def test_number_neurites_cut_pop(POPUL):
 
 def test_parameters():
     params = extract_input.parameters(
-        neurite_types=["basal", "apical"], method="tmd", feature="radial_distances"
+        neurite_types=["basal_dendrite", "apical_dendrite"],
+        method="tmd",
+        feature="radial_distances",
     )
-
-    assert_equal(
-        params,
-        {
-            "basal": {
-                "randomness": 0.24,
-                "targeting": 0.14,
-                "radius": 0.3,
-                "orientation": None,
-                "growth_method": "tmd",
-                "branching_method": "bio_oriented",
-                "modify": None,
-                "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
-                "tree_type": 3,
-                "metric": "radial_distances",
-            },
-            "apical": {
-                "randomness": 0.24,
-                "targeting": 0.14,
-                "radius": 0.3,
-                "orientation": [[0.0, 1.0, 0.0]],
-                "growth_method": "tmd_apical",
-                "branching_method": "directional",
-                "modify": None,
-                "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
-                "tree_type": 4,
-                "metric": "radial_distances",
-            },
-            "axon": {},
-            "origin": [0.0, 0.0, 0.0],
-            "grow_types": ["basal", "apical"],
-            "diameter_params": {"method": "default"},
+    expected_params = {
+        "basal_dendrite": {
+            "randomness": 0.24,
+            "targeting": 0.14,
+            "radius": 0.3,
+            "orientation": None,
+            "growth_method": "tmd",
+            "branching_method": "bio_oriented",
+            "modify": None,
+            "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
+            "tree_type": 3,
+            "metric": "radial_distances",
         },
+        "apical_dendrite": {
+            "randomness": 0.24,
+            "targeting": 0.14,
+            "radius": 0.3,
+            "orientation": [[0.0, 1.0, 0.0]],
+            "growth_method": "tmd_apical",
+            "branching_method": "directional",
+            "modify": None,
+            "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
+            "tree_type": 4,
+            "metric": "radial_distances",
+        },
+        "axon": {},
+        "origin": [0.0, 0.0, 0.0],
+        "grow_types": ["basal_dendrite", "apical_dendrite"],
+        "diameter_params": {"method": "default"},
+    }
+    assert_equal(params, expected_params)
+
+    legacy_params = extract_input.parameters(
+        neurite_types=["basal", "apical"],
+        method="tmd",
+        feature="radial_distances",
     )
+    assert_equal(legacy_params, expected_params)
+
+    default_params = extract_input.parameters(method="tmd", feature="radial_distances")
+    expected_params["axon"] = {
+        "randomness": 0.24,
+        "targeting": 0.14,
+        "radius": 0.3,
+        "orientation": [[0.0, -1.0, 0.0]],
+        "growth_method": "tmd",
+        "branching_method": "bio_oriented",
+        "modify": None,
+        "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
+        "metric": "radial_distances",
+        "tree_type": 2,
+    }
+    expected_params["grow_types"].append("axon")
+    assert_equal(default_params, expected_params)
+
     validator.validate_neuron_params(params)
 
-    params_path = extract_input.parameters(neurite_types=["basal", "apical"], method="tmd")
+    params_path = extract_input.parameters(
+        neurite_types=["basal_dendrite", "apical_dendrite"], method="tmd"
+    )
 
     assert_equal(
         params_path,
         {
-            "basal": {
+            "basal_dendrite": {
                 "randomness": 0.24,
                 "targeting": 0.14,
                 "radius": 0.3,
@@ -414,7 +455,7 @@ def test_parameters():
                 "tree_type": 3,
                 "metric": "path_distances",
             },
-            "apical": {
+            "apical_dendrite": {
                 "randomness": 0.24,
                 "targeting": 0.14,
                 "radius": 0.3,
@@ -428,7 +469,7 @@ def test_parameters():
             },
             "axon": {},
             "origin": [0.0, 0.0, 0.0],
-            "grow_types": ["basal", "apical"],
+            "grow_types": ["basal_dendrite", "apical_dendrite"],
             "diameter_params": {"method": "default"},
         },
     )
@@ -439,8 +480,8 @@ def test_parameters():
     assert_equal(
         params_axon,
         {
-            "basal": {},
-            "apical": {},
+            "basal_dendrite": {},
+            "apical_dendrite": {},
             "axon": {
                 "randomness": 0.24,
                 "targeting": 0.14,
@@ -465,8 +506,8 @@ def test_parameters():
     assert_equal(
         params_axon,
         {
-            "basal": {},
-            "apical": {},
+            "basal_dendrite": {},
+            "apical_dendrite": {},
             "axon": {
                 "randomness": 0.24,
                 "targeting": 0.14,
@@ -493,8 +534,8 @@ def test_parameters():
     assert_equal(
         params_diameter,
         {
-            "basal": {},
-            "apical": {},
+            "basal_dendrite": {},
+            "apical_dendrite": {},
             "axon": {
                 "randomness": 0.24,
                 "targeting": 0.14,
@@ -523,8 +564,8 @@ def test_parameters():
     assert_equal(
         params_diameter_dict,
         {
-            "basal": {},
-            "apical": {},
+            "basal_dendrite": {},
+            "apical_dendrite": {},
             "axon": {
                 "randomness": 0.24,
                 "targeting": 0.14,
@@ -560,7 +601,7 @@ def test_parameters():
 def test_from_TMD():
     files = sorted([os.path.join(POP_PATH, neuron_dir) for neuron_dir in os.listdir(POP_PATH)])
     pop = tmd.io.load_population(files)
-    angles = extract_input.from_TMD.persistent_homology_angles(pop, neurite_type="basal")
+    angles = extract_input.from_TMD.persistent_homology_angles(pop, neurite_type="basal_dendrite")
     expected = [
         [
             [39.8034782, 22.0587348, 0.2204977, -0.0031118, -0.7250693, 0.4353605],
@@ -628,7 +669,7 @@ def test_from_TMD():
             assert_array_almost_equal(ai, bi)
 
     angles = extract_input.from_TMD.persistent_homology_angles(
-        pop, neurite_type="basal", threshold=9
+        pop, neurite_type="basal_dendrite", threshold=9
     )
     expected = [
         [

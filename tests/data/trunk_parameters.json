@@ -1,4 +1,4 @@
-{"basal": {"randomness": 0.0,
+{"basal_dendrite": {"randomness": 0.0,
            "metric": "trunk_length",
            "targeting": 0.2,
            "radius": 0.3,
@@ -12,5 +12,5 @@
 "origin": [0.0,
            0.0,
            0.0],
-"grow_types": ["basal"],
+"grow_types": ["basal_dendrite"],
 "diameter_params": {"method": "default"}}

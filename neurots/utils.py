@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import warnings
+from copy import deepcopy
+
 import numpy as np
 
 
@@ -41,8 +44,38 @@ def format_values(obj, decimals=None):
     return obj
 
 
-def _check(data):
-    """Checks if data in dictionary are empty."""
-    for key, val in data.items():
-        if len(val) == 0:
-            raise NeuroTSError(f"Empty distribution for diameter key: {key}")
+def neurite_type_warning(key):
+    """Print a deprecation warning for old neurite_type key."""
+    warnings.warn(
+        f"The '{key}' property is deprecated, please use '{key}_dendrite' instead",
+        DeprecationWarning,
+    )
+
+
+def convert_from_legacy_neurite_type(data):
+    """Convert legacy neurite type names, basal -> basal_dendrite and apical -> apical_dendrite."""
+    old_data = deepcopy(data)
+    for key, _data in old_data.items():
+
+        if key == "apical":
+            neurite_type_warning(key)
+            data["apical_dendrite"] = data.pop("apical")
+            key = "apical_dendrite"
+        if key == "basal":
+            neurite_type_warning(key)
+            data["basal_dendrite"] = data.pop("basal")
+            key = "basal_dendrite"
+
+        if isinstance(_data, dict):
+            data[key] = convert_from_legacy_neurite_type(data[key])
+
+        if isinstance(_data, list):
+            for i, d in enumerate(_data):
+                if d == "apical":
+                    neurite_type_warning(key)
+                    data[key][i] = "apical_dendrite"
+                if d == "basal":
+                    neurite_type_warning(key)
+                    data[key][i] = "basal_dendrite"
+
+    return data

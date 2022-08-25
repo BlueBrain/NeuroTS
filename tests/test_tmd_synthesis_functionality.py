@@ -36,7 +36,7 @@ def test_barcode():
     """Tests the barcode functionality"""
 
     with open(os.path.join(_PATH, "dummy_distribution.json"), encoding="utf-8") as f:
-        ph_angles = json.load(f)["apical"]["persistence_diagram"][0]
+        ph_angles = json.load(f)["apical_dendrite"]["persistence_diagram"][0]
 
     barcode_test = Barcode(ph_angles)
     assert_equal(barcode_test.get_term_between(999), (None, -np.inf))
@@ -70,7 +70,7 @@ def test_barcode_validate_persistence():
     """Tests the barcode functionality"""
 
     with open(os.path.join(_PATH, "dummy_distribution.json"), encoding="utf-8") as f:
-        ph_angles = json.load(f)["apical"]["persistence_diagram"][0]
+        ph_angles = json.load(f)["apical_dendrite"]["persistence_diagram"][0]
     assert Barcode.validate_persistence(ph_angles)
     ph_angles[0][0] = 0
     assert not Barcode.validate_persistence(ph_angles)
@@ -131,7 +131,7 @@ def test_TMDStop():
     assert_equal(tmd_stop.expected_termination_length(), 0)
 
     with open(os.path.join(_PATH, "dummy_distribution.json"), encoding="utf-8") as f:
-        ph_angles = json.load(f)["apical"]["persistence_diagram"][0]
+        ph_angles = json.load(f)["apical_dendrite"]["persistence_diagram"][0]
 
     barcode_test = Barcode(ph_angles)
 

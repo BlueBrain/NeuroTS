@@ -149,7 +149,7 @@
         }
     },
     "properties": {
-        "apical": {
+        "apical_dendrite": {
             "description": "Specific distributions for apicals",
             "oneOf": [
                 {
@@ -171,7 +171,7 @@
                 }
             ]
         },
-        "basal": {
+        "basal_dendrite": {
             "$ref": "#/definitions/neurite_distrib",
             "description": "Specific distributions for basals"
         },
@@ -201,10 +201,10 @@
                             },
                             "type": "string"
                         },
-                        "apical": {
+                        "apical_dendrite": {
                             "$ref": "#/definitions/neurite_diameter"
                         },
-                        "basal": {
+                        "basal_dendrite": {
                             "$ref": "#/definitions/neurite_diameter"
                         },
                         "axon": {

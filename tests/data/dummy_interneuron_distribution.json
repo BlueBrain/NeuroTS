@@ -1,7 +1,7 @@
 {
-    "apical": {},
+    "apical_dendrite": {},
     "axon": {},
-    "basal": {
+    "basal_dendrite": {
         "filtration_metric": "path_distances",
         "num_trees": {
             "data": {
@@ -503,7 +503,7 @@
                 0.03592279424905551
             ]
         },
-        "basal": {
+        "basal_dendrite": {
             "Rall_ratio": 1.5,
             "siblings_ratio": 1.0,
             "taper": [

@@ -520,7 +520,7 @@ def test_null_orientation():
     np.random.seed(1)
     with open(os.path.join(_path, "dummy_params.json"), encoding="utf-8") as f:
         params = json.load(f)
-    params["apical"]["orientation"] = [[0, 0, 0], [1, 0, 0]]
+    params["apical_dendrite"]["orientation"] = [[0, 0, 0], [1, 0, 0]]
     with open(os.path.join(_path, "dummy_distribution.json"), encoding="utf-8") as f:
         distributions = json.load(f)
     N = NeuronGrower(input_distributions=distributions, input_parameters=params)

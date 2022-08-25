@@ -36,7 +36,7 @@ NEU_PATH2 = os.path.join(_path, "../test_data/simple.swc")
 NEU_PATH3 = os.path.join(_path, "../test_data/diam_simple_axon.swc")
 
 MODEL = {
-    "basal": {
+    "basal_dendrite": {
         "Rall_ratio": 2.0 / 3.0,
         "siblings_ratio": 1.0,
         "taper": [0.1],
@@ -382,7 +382,7 @@ def test_build_diam_method(neu1):
 
 
 def test_build_M1_basal_axon(neu2):
-    diametrizer.build(neu2, diam_method="M1", neurite_types=["basal", "axon"])
+    diametrizer.build(neu2, diam_method="M1", neurite_types=["basal_dendrite", "axon"])
     diameters = [i.diameters for i in neu2.sections.values()]
     assert_array_almost_equal(diameters[0], [2.3333333, 2.3333333])
     assert_array_almost_equal(diameters[1], diameters[2])
@@ -405,7 +405,7 @@ def test_build_M1_axon(neu2):
 def test_build_M4_rng(neu1):
     # Test with custom random generator
     test_model = copy.deepcopy(MODEL)
-    test_model["basal"]["trunk_taper"] = np.arange(0, 10, 0.3)
+    test_model["basal_dendrite"]["trunk_taper"] = np.arange(0, 10, 0.3)
     diametrizer.build(
         neu1,
         input_model=test_model,

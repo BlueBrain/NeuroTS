@@ -18,7 +18,9 @@
 import tmd
 
 
-def persistent_homology_angles(pop, threshold=2, neurite_type="basal", feature="radial_distances"):
+def persistent_homology_angles(
+    pop, threshold=2, neurite_type="basal_dendrite", feature="radial_distances"
+):
     """Add the persistent homology extracted from a population of apicals to the distr dictionary.
 
     Each tree in the population is associated with a persistence barcode (diagram)
@@ -30,7 +32,9 @@ def persistent_homology_angles(pop, threshold=2, neurite_type="basal", feature="
         neurite_type (neurom.core.types.NeuriteType): Consider only the neurites of this type.
         feature (str): Use the specified TMD feature.
     """
-    ph_ang = [tmd.methods.get_ph_angles(tr, feature=feature) for tr in getattr(pop, neurite_type)]
+    ph_ang = [
+        tmd.methods.get_ph_angles(tree, feature=feature) for tree in getattr(pop, neurite_type)
+    ]
 
     # Keep only the trees whose number of terminations is above the threshold
     # Saves the list of persistence diagrams for the selected neurite_type

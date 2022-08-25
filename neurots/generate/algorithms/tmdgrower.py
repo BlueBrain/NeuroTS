@@ -235,7 +235,7 @@ class TMDApicalAlgo(TMDAlgo):
         from tmd.Topology.analysis import find_apical_point_distance_smoothed as ap_dist
 
         stop, num_sec = super().initialize()
-        if self.params["has_apical_tuft"]:
+        if self.params.get("has_apical_tuft", False):
             self.apical_point_distance_from_soma = ap_dist(self.ph_angles)
         else:
             # If cell does not have a tuft return the distance before last bifurcation

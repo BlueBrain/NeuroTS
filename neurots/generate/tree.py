@@ -35,7 +35,7 @@ from neurots.utils import NeuroTSError
 L = logging.getLogger("neurots")
 
 # LAMBDA: parameter that defines the slope of exponential probability
-LAMDA = 1.0
+LAMBDA = 1.0
 
 growth_algorithms = {
     "tmd": tmdgrower.TMDAlgo,
@@ -72,7 +72,7 @@ def _create_section_parameters(input_dict):
     history = np.clip(1.0 - randomness - targeting, 0.0, 1.0)
 
     parameters = SectionParameters(
-        randomness=randomness, targeting=targeting, scale_prob=LAMDA, history=history
+        randomness=randomness, targeting=targeting, scale_prob=LAMBDA, history=history
     )
 
     try:

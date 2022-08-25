@@ -34,6 +34,7 @@ from neurots.generate.soma import SomaGrower
 from neurots.generate.tree import TreeGrower
 from neurots.morphmath import sample
 from neurots.morphmath.utils import normalize_vectors
+from neurots.utils import convert_from_legacy_neurite_type
 from neurots.validator import validate_neuron_distribs
 from neurots.validator import validate_neuron_params
 
@@ -49,7 +50,7 @@ def _load_json(path_or_json):
     else:
         with open(path_or_json, encoding="utf-8") as f:
             data = json.load(f)
-    return data
+    return convert_from_legacy_neurite_type(data)
 
 
 class NeuronGrower:
@@ -170,8 +171,8 @@ class NeuronGrower:
                 # This will ensure that for each apical tree a relevant apical point,
                 # will be exposed to the user as a set of 3D coordinates (x,y,z).
                 if (
-                    "apical" in self.input_parameters["grow_types"]
-                    and grower.type == self.input_parameters["apical"]["tree_type"]
+                    "apical_dendrite" in self.input_parameters["grow_types"]
+                    and grower.type == self.input_parameters["apical_dendrite"]["tree_type"]
                 ):
                     self.apical_sections.append(grower.growth_algo.apical_section)
                 self.active_neurites.remove(grower)
@@ -332,7 +333,7 @@ class NeuronGrower:
 
                 n_trees = sample.n_neurites(distr["num_trees"], random_generator=self._rng)
 
-                if type_of_tree == "basal" and n_trees < 2:
+                if type_of_tree == "basal_dendrite" and n_trees < 2:
                     raise Exception(f"There should be at least 2 basal dendrites (got {n_trees})")
 
                 orientation = params["orientation"]
@@ -345,7 +346,7 @@ class NeuronGrower:
                 )
                 n_trees = len(orientations)
 
-                if type_of_tree == "basal" and n_trees < 2:
+                if type_of_tree == "basal_dendrite" and n_trees < 2:
                     raise Exception(f"There should be at least 2 basal dendrites (got {n_trees})")
 
                 points = self.soma_grower.add_points_from_orientations(orientations)

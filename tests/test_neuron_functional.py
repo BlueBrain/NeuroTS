@@ -112,7 +112,7 @@ def _test_full(
             n0 = tmd.io.load_neuron(out_neuron)
 
             actual_persistence_diagram = tmd.methods.get_persistence_diagram(
-                n0.apical[0], feature=feature
+                n0.apical_dendrite[0], feature=feature
             )
             if save:
                 print(actual_persistence_diagram)
@@ -164,12 +164,12 @@ def test_grow_trunk_1_basal():
         os.path.join(_path, "bio_path_distribution.json"),
         os.path.join(_path, "bio_path_params.json"),
     )
-    distributions["basal"]["num_trees"]["data"]["bins"] = [1]
+    distributions["basal_dendrite"]["num_trees"]["data"]["bins"] = [1]
     ng = NeuronGrower(parameters, distributions)
     with pytest.raises(Exception, match=r"There should be at least 2 basal dendrites \(got 1\)"):
         ng.grow()
 
-    parameters["basal"]["orientation"] = {
+    parameters["basal_dendrite"]["orientation"] = {
         "mode": "use_predefined",
         "values": {"orientations": [[0.0, 1.0, 0.0]]},
     }
@@ -236,30 +236,30 @@ def test_convert_orientation2points():
     parameters["diameter_params"]["method"] = "M1"
     ng = NeuronGrower(parameters, distributions)
 
-    pts = ng._convert_orientation2points([[0, 1, 0]], 1, distributions["apical"], {})
+    pts = ng._convert_orientation2points([[0, 1, 0]], 1, distributions["apical_dendrite"], {})
     assert_array_almost_equal(pts, [[0, 15.27995, 0]])
 
     # Test with no existing trunk
     ng = NeuronGrower(parameters, distributions)
-    pts = ng._convert_orientation2points(None, 2, distributions["apical"], {})
+    pts = ng._convert_orientation2points(None, 2, distributions["apical_dendrite"], {})
     assert_array_almost_equal(
         pts, [[-10.399604, -0.173343, 0.937449], [10.31932, 0.172005, -1.594578]]
     )
 
     with pytest.raises(ValueError):
-        ng._convert_orientation2points("from_space", 1, distributions["apical"], {})
+        ng._convert_orientation2points("from_space", 1, distributions["apical_dendrite"], {})
 
     # Test with existing trunks
     ng.grow()
-    pts = ng._convert_orientation2points(None, 2, distributions["apical"], {})
+    pts = ng._convert_orientation2points(None, 2, distributions["apical_dendrite"], {})
 
     assert_array_almost_equal(pts, [[2.770599, 4.868847, 8.813554], [-6.314678, 6.2103, 5.533321]])
 
     with pytest.raises(ValueError):
-        ng._convert_orientation2points(object(), 1, distributions["apical"], {})
+        ng._convert_orientation2points(object(), 1, distributions["apical_dendrite"], {})
 
     with pytest.raises(ValueError):
-        ng._convert_orientation2points([[0, 1, 0]], 99, distributions["apical"], {})
+        ng._convert_orientation2points([[0, 1, 0]], 99, distributions["apical_dendrite"], {})
 
     distributions, parameters = _load_inputs(
         os.path.join(_path, "axon_trunk_distribution.json"),
