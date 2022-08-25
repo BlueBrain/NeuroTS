@@ -372,40 +372,45 @@ def test_parameters():
         method="tmd",
         feature="radial_distances",
     )
-
-    assert_equal(
-        params,
-        {
-            "basal_dendrite": {
-                "randomness": 0.24,
-                "targeting": 0.14,
-                "radius": 0.3,
-                "orientation": None,
-                "growth_method": "tmd",
-                "branching_method": "bio_oriented",
-                "modify": None,
-                "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
-                "tree_type": 3,
-                "metric": "radial_distances",
-            },
-            "apical_dendrite": {
-                "randomness": 0.24,
-                "targeting": 0.14,
-                "radius": 0.3,
-                "orientation": [[0.0, 1.0, 0.0]],
-                "growth_method": "tmd_apical",
-                "branching_method": "directional",
-                "modify": None,
-                "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
-                "tree_type": 4,
-                "metric": "radial_distances",
-            },
-            "axon": {},
-            "origin": [0.0, 0.0, 0.0],
-            "grow_types": ["basal_dendrite", "apical_dendrite"],
-            "diameter_params": {"method": "default"},
+    expected_params = {
+        "basal_dendrite": {
+            "randomness": 0.24,
+            "targeting": 0.14,
+            "radius": 0.3,
+            "orientation": None,
+            "growth_method": "tmd",
+            "branching_method": "bio_oriented",
+            "modify": None,
+            "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
+            "tree_type": 3,
+            "metric": "radial_distances",
         },
+        "apical_dendrite": {
+            "randomness": 0.24,
+            "targeting": 0.14,
+            "radius": 0.3,
+            "orientation": [[0.0, 1.0, 0.0]],
+            "growth_method": "tmd_apical",
+            "branching_method": "directional",
+            "modify": None,
+            "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
+            "tree_type": 4,
+            "metric": "radial_distances",
+        },
+        "axon": {},
+        "origin": [0.0, 0.0, 0.0],
+        "grow_types": ["basal_dendrite", "apical_dendrite"],
+        "diameter_params": {"method": "default"},
+    }
+    assert_equal(params, expected_params)
+
+    legacy_params = extract_input.parameters(
+        neurite_types=["basal", "apical"],
+        method="tmd",
+        feature="radial_distances",
     )
+    assert_equal(legacy_params, expected_params)
+
     validator.validate_neuron_params(params)
 
     params_path = extract_input.parameters(
