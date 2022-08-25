@@ -418,6 +418,22 @@ def test_parameters():
     )
     assert_equal(legacy_params, expected_params)
 
+    default_params = extract_input.parameters(method="tmd", feature="radial_distances")
+    expected_params["axon"] = {
+        "randomness": 0.24,
+        "targeting": 0.14,
+        "radius": 0.3,
+        "orientation": [[0.0, -1.0, 0.0]],
+        "growth_method": "tmd",
+        "branching_method": "bio_oriented",
+        "modify": None,
+        "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
+        "metric": "radial_distances",
+        "tree_type": 2,
+    }
+    expected_params['grow_types'].append('axon')
+    assert_equal(default_params, expected_params)
+
     validator.validate_neuron_params(params)
 
     params_path = extract_input.parameters(
