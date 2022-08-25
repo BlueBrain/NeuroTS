@@ -40,7 +40,7 @@ def parameters(
         dict: The parameters.
     """
     for i, neurite_type in enumerate(neurite_types):
-        if not neurite_type.endswith("dendrite"):
+        if neurite_type in ("basal", "apical"):
             neurite_type_warning(neurite_type)
             neurite_types[i] = neurite_type + "_dendrite"
 
