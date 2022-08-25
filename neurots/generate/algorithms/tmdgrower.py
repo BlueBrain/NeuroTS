@@ -19,7 +19,6 @@ import copy
 import logging
 
 import numpy as np
-from tmd.Topology.analysis import get_lengths
 
 from neurots.generate.algorithms.abstractgrower import AbstractAlgo
 from neurots.generate.algorithms.barcode import Barcode
@@ -52,13 +51,6 @@ class TMDAlgo(AbstractAlgo):
         self.bif_method = bif_methods[params["branching_method"]]
         self.params = copy.deepcopy(params)
         self.ph_angles = self.select_persistence(input_data, random_generator)
-        # Consistency check between parameters - persistence diagram
-        barSZ = np.min(get_lengths(self.ph_angles))
-        stepSZ = self.params["step_size"]["norm"]["mean"]
-        if stepSZ >= barSZ:
-            if barSZ > 0.1:
-                self.params["step_size"]["norm"]["mean"] = barSZ
-            L.debug("Selected step size %f is too big for bars of size %f", stepSZ, barSZ)
         self.barcode = Barcode(list(self.ph_angles))
         self.start_point = start_point
         self.apical_section = None
