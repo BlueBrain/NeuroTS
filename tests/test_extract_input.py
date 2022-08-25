@@ -431,7 +431,7 @@ def test_parameters():
         "metric": "radial_distances",
         "tree_type": 2,
     }
-    expected_params['grow_types'].append('axon')
+    expected_params["grow_types"].append("axon")
     assert_equal(default_params, expected_params)
 
     validator.validate_neuron_params(params)
