@@ -70,7 +70,8 @@ def distributions(
         dict: The input distributions.
     """
     if neurite_types is None:
-        neurite_types = (["basal_dendrite", "apical_dendrite", "axon"],)
+        neurite_types = ["basal_dendrite", "apical_dendrite", "axon"]
+
     for i, neurite_type in enumerate(neurite_types):
         if neurite_type in ("basal", "apical"):
             neurite_type_warning(neurite_type)
