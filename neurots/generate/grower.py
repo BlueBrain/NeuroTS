@@ -108,17 +108,6 @@ class NeuronGrower:
         if not skip_validation:
             self.validate_params()
             self.validate_distribs()
-            # Consistency check between parameters - persistence diagram
-            for neurite_type in input_parameters["grow_types"]:
-                barSZ = input_distributions[neurite_type]["min_bar_length"]
-                stepSZ = input_parameters[neurite_type]["step_size"]["norm"]["mean"]
-                if stepSZ >= barSZ:
-                    L.warning(
-                        "Selected %s step size %f is too big for bars of size %f",
-                        neurite_type,
-                        stepSZ,
-                        barSZ,
-                    )
 
         # Consistency check between parameters and distributions
         for tree_type in self.input_parameters["grow_types"]:

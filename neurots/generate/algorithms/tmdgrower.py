@@ -48,7 +48,7 @@ class TMDAlgo(AbstractAlgo):
         input_data,
         params,
         start_point,
-        skip_validation,
+        skip_validation=False,
         context=None,
         random_generator=np.random,
         **_,
