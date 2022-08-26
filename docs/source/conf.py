@@ -11,8 +11,8 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 import re
+from importlib import metadata
 
-from pkg_resources import get_distribution
 from sphinx_gallery.sorting import ExampleTitleSortKey  # pylint: disable=import-error
 
 # -- Project information -----------------------------------------------------
@@ -20,7 +20,7 @@ from sphinx_gallery.sorting import ExampleTitleSortKey  # pylint: disable=import
 project = "NeuroTS"
 
 # The short X.Y version
-version = get_distribution(project).version
+version = metadata.version("NeuroTS")
 
 # The full version, including alpha/beta/rc tags
 release = version
@@ -36,10 +36,13 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
+    "sphinx.ext.todo",
     "sphinx_gallery.gen_gallery",
     "sphinx-jsonschema",
     "m2r2",
 ]
+
+todo_include_todos = True
 
 # Add any paths that contain templates here, relative to this directory.
 # templates_path = ['_templates']
@@ -63,10 +66,10 @@ html_theme = "sphinx-bluebrain-theme"
 # html_static_path = ['_static']
 
 html_theme_options = {
-    "metadata_distribution": project,
+    "metadata_distribution": "NeuroTS",
 }
 
-html_title = "NeuroTS"
+html_title = project
 
 # If true, links to the reST sources are added to the pages.
 html_show_sourcelink = False
