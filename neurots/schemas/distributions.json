@@ -68,44 +68,52 @@
                     "type": "array"
                 },
                 "trunk": {
-                    "additionalProperties": false,
-                    "description": "The distributions used to synthesize the trunk",
-                    "properties": {
-                        "absolute_elevation_deviation": {
-                            "$ref": "#/definitions/data_distr",
-                            "description": "The data distribution used for the absolute elevation deviation"
+                    "oneOf": [
+                        {
+                            "description": "No trunk distribution provided",
+                            "type": "null"
                         },
-                        "azimuth": {
+                        {
                             "additionalProperties": false,
-                            "description": "The uniform distribution used for the azimuth",
+                            "description": "The distributions used to synthesize the trunk using orientation deviation",
                             "properties": {
-                                "uniform": {
+                                "absolute_elevation_deviation": {
+                                    "$ref": "#/definitions/data_distr",
+                                    "description": "The data distribution used for the absolute elevation deviation"
+                                },
+                                "azimuth": {
                                     "additionalProperties": false,
-                                    "description": "The properties of the uniform distribution",
+                                    "description": "The uniform distribution used for the azimuth",
                                     "properties": {
-                                        "max": {
-                                            "type": "number"
-                                        },
-                                        "min": {
-                                            "type": "number"
+                                        "uniform": {
+                                            "additionalProperties": false,
+                                            "description": "The properties of the uniform distribution",
+                                            "properties": {
+                                                "max": {
+                                                    "type": "number"
+                                                },
+                                                "min": {
+                                                    "type": "number"
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
+                                },
+                                "orientation_deviation": {
+                                    "$ref": "#/definitions/data_distr",
+                                    "description": "The data distribution used for the orientation deviation"
                                 }
                             },
+                            "required": [
+                                "absolute_elevation_deviation",
+                                "azimuth",
+                                "orientation_deviation"
+                            ],
                             "type": "object"
-                        },
-                        "orientation_deviation": {
-                            "$ref": "#/definitions/data_distr",
-                            "description": "The data distribution used for the orientation deviation"
                         }
-                    },
-                    "required": [
-                        "absolute_elevation_deviation",
-                        "azimuth",
-                        "orientation_deviation"
-                    ],
-                    "type": "object"
+                    ]
                 }
             },
             "required": [
