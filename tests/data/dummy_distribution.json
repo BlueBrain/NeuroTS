@@ -1,6 +1,7 @@
 {
     "apical_dendrite": {
         "filtration_metric": "path_distances",
+        "min_bar_length": 1.0,
         "num_trees": {
             "data": {
                 "bins": [
@@ -411,6 +412,7 @@
     "axon": {},
     "basal_dendrite": {
         "filtration_metric": "path_distances",
+        "min_bar_length": 1.0,
         "num_trees": {
             "data": {
                 "bins": [

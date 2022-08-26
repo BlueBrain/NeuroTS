@@ -58,6 +58,7 @@ def test_json_schema():
                             },
                         },
                         "num_trees": {"type": "object"},
+                        "min_bar_length": {"type": "number"},
                         "persistence_diagram": {"type": "array"},
                         "filtration_metric": {"type": "string"},
                     },

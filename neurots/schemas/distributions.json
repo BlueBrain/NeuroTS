@@ -49,6 +49,11 @@
                     "$ref": "#/definitions/data_distr",
                     "description": "The data distribution used for the number of trees to synthesize"
                 },
+                "min_bar_length": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "The minimum bar length, used for checking input parameters consistency"
+                },
                 "persistence_diagram": {
                     "description": "The persistence diagram",
                     "items": {

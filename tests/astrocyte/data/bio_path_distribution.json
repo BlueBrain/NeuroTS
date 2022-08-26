@@ -1,6 +1,7 @@
 {
     "axon": {
         "filtration_metric": "path_distances",
+        "min_bar_length": 0.1,
         "num_trees": {
             "data": {
                 "bins": [
@@ -276,6 +277,7 @@
     },
     "apical": {
         "filtration_metric": "path_distances",
+        "min_bar_length": 0.1,
         "num_trees": {
             "data": {
                 "bins": [
@@ -343,6 +345,7 @@
     },
     "basal": {
         "filtration_metric": "path_distances",
+        "min_bar_length": 0.1,
         "num_trees": {
             "data": {
                 "bins": [

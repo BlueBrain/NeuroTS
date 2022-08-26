@@ -19,7 +19,6 @@ import copy
 import logging
 
 import numpy as np
-from tmd.Topology.analysis import get_lengths
 
 from neurots.generate.algorithms.abstractgrower import AbstractAlgo
 from neurots.generate.algorithms.barcode import Barcode
@@ -40,28 +39,43 @@ class TMDAlgo(AbstractAlgo):
         params (dict): The parameters required for growth. It should include the
             ``branching_method`` selected from: ``|bio_oriented, symmetric, directional]``.
         start_point (list[float]): The first point of the trunk.
+        skip_validation (bool): If set to ``False``, the parameters and distributions and
+            the "min_bar_length" parameter are validated.
         context (Any): An object containing contextual information.
         random_generator (numpy.random.Generator): The random number generator to use.
     """
 
     def __init__(
-        self, input_data, params, start_point, context=None, random_generator=np.random, **_
+        self,
+        input_data,
+        params,
+        start_point,
+        skip_validation=False,
+        context=None,
+        random_generator=np.random,
+        **_,
     ):
         """TMD basic grower."""
         super().__init__(input_data, params, start_point, context)
         self.bif_method = bif_methods[params["branching_method"]]
         self.params = copy.deepcopy(params)
         self.ph_angles = self.select_persistence(input_data, random_generator)
-        # Consistency check between parameters - persistence diagram
-        barSZ = np.min(get_lengths(self.ph_angles))
-        stepSZ = self.params["step_size"]["norm"]["mean"]
-        if stepSZ >= barSZ:
-            L.warning("Selected step size %f is too big for bars of size %f", stepSZ, barSZ)
         self.barcode = Barcode(list(self.ph_angles))
         self.start_point = start_point
         self.apical_section = None
         self.apical_point_distance_from_soma = 0.0
         self.persistence_length = self.barcode.get_persistence_length()
+        # Validate parameters and distributions
+        if not skip_validation:
+            # Consistency check between parameters - persistence diagram
+            barSZ = input_data["min_bar_length"]
+            stepSZ = params["step_size"]["norm"]["mean"]
+            if stepSZ >= barSZ:
+                L.warning(
+                    "Selected step size %f is too big for bars of size %f",
+                    stepSZ,
+                    barSZ,
+                )
 
     def select_persistence(self, input_data, random_generator=np.random):
         """Select the persistence.
