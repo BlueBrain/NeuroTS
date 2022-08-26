@@ -107,6 +107,7 @@ class TreeGrower:
         initial_point,
         parameters,
         distributions,
+        skip_validation=False,
         context=None,
         random_generator=np.random,
     ):
@@ -119,6 +120,7 @@ class TreeGrower:
         self.distr = distributions
         self.active_sections = []
         self.context = context
+        self.skip_validation = skip_validation
         self._rng = random_generator
 
         # Creates the distribution from which the segment lengths
@@ -135,6 +137,7 @@ class TreeGrower:
             input_data=self.distr,
             params=self.params,
             start_point=self.point,
+            skip_validation=self.skip_validation,
             context=self.context,
             random_generator=self._rng,
         )

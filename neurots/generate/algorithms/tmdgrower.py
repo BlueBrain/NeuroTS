@@ -39,6 +39,8 @@ class TMDAlgo(AbstractAlgo):
         params (dict): The parameters required for growth. It should include the
             ``branching_method`` selected from: ``|bio_oriented, symmetric, directional]``.
         start_point (list[float]): The first point of the trunk.
+        skip_validation (bool): If set to ``False``, the parameters and distributions and
+            the "min_bar_length" parameter are validated.
         context (Any): An object containing contextual information.
         random_generator (numpy.random.Generator): The random number generator to use.
     """

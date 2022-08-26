@@ -45,6 +45,7 @@ class TreeGrowerSpaceColonization(TreeGrower):
             params=self.params,
             start_point=self.point,
             context=self.context,
+            skip_validation=self.skip_validation,
             random_generator=self._rng,
         )
 

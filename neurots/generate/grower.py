@@ -88,6 +88,7 @@ class NeuronGrower:
         """Constructor of the NeuronGrower class."""
         self.neuron = Morphology()
         self.context = context
+        self.skip_validation = skip_validation
         if rng_or_seed is None or isinstance(
             rng_or_seed, (int, np.integer, SeedSequence, BitGenerator)
         ):
@@ -360,6 +361,7 @@ class NeuronGrower:
                         initial_point=p,
                         parameters=params,
                         distributions=distr,
+                        skip_validation=self.skip_validation,
                         context=self.context,
                         random_generator=self._rng,
                     )
