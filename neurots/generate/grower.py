@@ -198,6 +198,8 @@ class NeuronGrower:
 
     def _post_grow(self):
         """Actions after the morphology has been grown and before its diametrization."""
+        # ensures section.id are consistent with morphio loader
+        self.neuron = Morphology(self.neuron)
 
     def _init_diametrizer(self, external_diametrizer=None):
         """Set a diametrizer function."""
