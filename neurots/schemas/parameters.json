@@ -246,7 +246,7 @@
                     "properties": {
                         "method": {
                             "enum": [
-                                "external"
+                                "external", "default"
                             ],
                             "description": "The method used to synthesize the diameters",
                             "type": "string"
@@ -260,7 +260,7 @@
                             "description": "The method used to synthesize the diameters",
                             "not": {
                                 "enum": [
-                                    "external"
+                                    "external", "default"
                                 ]
                             },
                             "type": "string"

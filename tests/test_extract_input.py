@@ -407,7 +407,7 @@ def test_parameters():
         "axon": {},
         "origin": [0.0, 0.0, 0.0],
         "grow_types": ["basal_dendrite", "apical_dendrite"],
-        "diameter_params": {"method": "default"},
+        "diameter_params": {"method": "default", "models": ["simpler"]},
     }
     assert_equal(params, expected_params)
 
@@ -470,7 +470,7 @@ def test_parameters():
             "axon": {},
             "origin": [0.0, 0.0, 0.0],
             "grow_types": ["basal_dendrite", "apical_dendrite"],
-            "diameter_params": {"method": "default"},
+            "diameter_params": {"method": "default", "models": ["simpler"]},
         },
     )
     validator.validate_neuron_params(params_path)
@@ -496,7 +496,7 @@ def test_parameters():
             },
             "origin": [0.0, 0.0, 0.0],
             "grow_types": ["axon"],
-            "diameter_params": {"method": "default"},
+            "diameter_params": {"method": "default", "models": ["simpler"]},
         },
     )
     validator.validate_neuron_params(params_axon)
@@ -522,7 +522,7 @@ def test_parameters():
             },
             "origin": [0.0, 0.0, 0.0],
             "grow_types": ["axon"],
-            "diameter_params": {"method": "default"},
+            "diameter_params": {"method": "default", "models": ["simpler"]},
         },
     )
     validator.validate_neuron_params(params)

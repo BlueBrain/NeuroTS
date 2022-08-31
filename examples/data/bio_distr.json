@@ -303,6 +303,6 @@
         }
     },
     "diameter": {
-        "method": "default"
+        "method": "no_diameters"
     }
 }

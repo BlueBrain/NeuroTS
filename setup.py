@@ -28,6 +28,7 @@ reqs = [
     "numpy>=1.20.0",
     "scipy>=1.6",
     "tmd>=2.2.0",
+    "diameter-synthesis>=0.5.2"
 ]
 
 doc_reqs = [

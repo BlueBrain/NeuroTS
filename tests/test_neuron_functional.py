@@ -206,10 +206,6 @@ def test_external_diametrizer():
     ):
         NeuronGrower(parameters, distributions)
 
-    bad_ng = NeuronGrower(parameters, distributions, external_diametrizer=object())
-    with pytest.raises(Exception, match="Please provide an external diametrizer!"):
-        bad_ng._init_diametrizer()
-
     # Test with an external diametrizer and neurite_types in diameter_params
     distributions["diameter"]["method"] = "external"
     parameters["diameter_params"]["method"] = "external"
@@ -294,11 +290,11 @@ def test_breaker_of_tmd_algo():
     assert_array_equal(N.apical_sections, [33])
     assert_array_almost_equal(
         n.sections[169].points[-1],
-        np.array([-220.93813, -21.49141, -55.93323]),
+        np.array([4.5475516, 46.869442, 49.396336]),
         decimal=5,
     )
     assert_array_almost_equal(
-        n.sections[122].points[-1], np.array([-17.31787, 151.4876, -6.67741]), decimal=5
+        n.sections[122].points[-1], np.array([-30.22846, 53.705578, -6.5473685]), decimal=5
     )
 
     # Test with a specific random generator
@@ -310,11 +306,11 @@ def test_breaker_of_tmd_algo():
     assert_array_equal(N.apical_sections, [33])
     assert_array_almost_equal(
         n.sections[169].points[-1],
-        np.array([-220.93813, -21.49141, -55.93323]),
+        np.array([4.5475516, 46.869442, 49.396336]),
         decimal=5,
     )
     assert_array_almost_equal(
-        n.sections[122].points[-1], np.array([-17.31787, 151.4876, -6.67741]), decimal=5
+        n.sections[122].points[-1], np.array([-30.22846, 53.705578, -6.5473685]), decimal=5
     )
 
 
