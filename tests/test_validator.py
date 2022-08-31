@@ -69,14 +69,6 @@ class TestValidateParams:
         dummy_params["diameter_params"] = {"method": "default"}
         tested.validate_neuron_params(dummy_params)
 
-    def test_default_diameter_unknown_key(self, dummy_params):
-        dummy_params["diameter_params"] = {
-            "method": "default",
-            "other key": "any value",
-        }
-        with pytest.raises(tested.ValidationError):
-            tested.validate_neuron_params(dummy_params)
-
     def test_M1_diameter_unknown_key(self, dummy_params):
         dummy_params["diameter_params"] = {"method": "M1", "other key": "any value"}
         with pytest.raises(tested.ValidationError):
