@@ -295,6 +295,14 @@ class TestDistributions:
         )
         validator.validate_neuron_distribs(distr)
 
+    def test_diameter_model_invalid(self, filename):
+        with pytest.raises(NotImplementedError):
+            extract_input.distributions(
+                filename,
+                feature="radial_distances",
+                diameter_model="invalid",
+            )
+
     def test_diameter_model_M5(self, filename):
         distr_M5 = extract_input.distributions(
             filename, feature="radial_distances", diameter_model="M5"
