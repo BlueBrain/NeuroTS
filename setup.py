@@ -1,4 +1,4 @@
-"""Distribution configuration for the NeuroTS package."""
+"""Setup for the NeuroTS package."""
 
 # Copyright (C) 2021  Blue Brain Project, EPFL
 #
@@ -15,11 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from pathlib import Path
+
 from setuptools import find_packages
 from setuptools import setup
-
-with open("README.md", encoding="utf-8") as f:
-    README = f.read()
 
 reqs = [
     "jsonschema>=3.0.1",
@@ -55,28 +54,26 @@ test_reqs = [
 setup(
     name="NeuroTS",
     author="Blue Brain Project, EPFL",
-    description="Synthesis of artificial neurons using their topological profiles package",
-    long_description=README,
+    description="Synthesis of artificial neurons using their topological profiles package.",
+    long_description=Path("README.md").read_text(encoding="utf-8"),
     long_description_content_type="text/markdown",
-    license="GPLv3",
-    url="https://github.com/BlueBrain/NeuroTS",
+    url="https://NeuroTS.readthedocs.io",
     project_urls={
         "Tracker": "https://github.com/BlueBrain/NeuroTS/issues",
         "Source": "https://github.com/BlueBrain/NeuroTS",
     },
-    install_requires=reqs,
-    extras_require={
-        "docs": doc_reqs,
-        "test": test_reqs,
-    },
-    tests_require=test_reqs,
+    license="GNU General Public License v3.0",
+    packages=find_packages(include=["neurots*"]),
     python_requires=">=3.8",
     use_scm_version=True,
     setup_requires=[
         "setuptools_scm",
     ],
-    packages=find_packages(include=["neurots*"]),
-    include_package_data=True,
+    install_requires=reqs,
+    extras_require={
+        "docs": doc_reqs,
+        "test": test_reqs,
+    },
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",
@@ -85,5 +82,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
+    include_package_data=True,
 )

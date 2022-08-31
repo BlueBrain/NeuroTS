@@ -1,9 +1,10 @@
 # data
 .eggs
-*.png
+.idea
 *.pdf
-
+*.png
 *.pyc
+*.swp
 *py~
 *~
 *.egg-info
@@ -12,29 +13,31 @@
 .DS_Store
 
 # Packaging builds
-build/
-dist/
+build
+dist
 
 # tox
-.tox/
+.tox
 
 # coverage
+.coverage
 .coverage*
 coverage.xml
 
-# test venv
-test_venv/
+# venv
+venv
+test_venv
 
-# doc
-doc/build
-doc/source/generated
-doc/source/examples
+# docs
+docs/build
+docs/source/generated
+docs/source/examples
 
 # reports
 reports
 
 # examples
-examples/.ipynb_checkpoints/
+examples/.ipynb_checkpoints
 
 # Node
 node_modules

@@ -1,9 +1,9 @@
 {
-  "name": "neurots",
+  "name": "NeuroTS",
   "auto-changelog": {
     "replaceText": {
-      "([bB]reaking:)": "",
-      "([bB]reaking change:)": "",
+      "([bB]reaking: ?)": "",
+      "([bB]reaking change: ?)": "",
       "(^[bB]uild: ?)": "",
       "(^[bB]uild\\((.*)\\): ?)": "\\($2\\)",
       "(^[cC]hore: ?)": "",

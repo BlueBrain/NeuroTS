@@ -1,0 +1,27 @@
+# Changes here will be overwritten by Copier
+
+_commit: 0.1.9
+_src_path: git@bbpgitlab.epfl.ch:neuromath/python-template.git
+author_email: ''
+author_name: Blue Brain Project, EPFL
+copyright_license: GNU General Public License v3.0
+copyright_year: '2022'
+distribution_name: NeuroTS
+download_url: https://github.com/BlueBrain/NeuroTS
+init_git: false
+maintainer: Lida Kanari (@lidakanari)
+package_name: neurots
+project_description: Synthesis of artificial neurons using their topological profiles
+    package.
+project_name: NeuroTS
+project_url: https://NeuroTS.readthedocs.io
+repository_name: NeuroTS
+repository_namespace: BlueBrain
+repository_provider: github
+ssh_url: git@github.com:BlueBrain/NeuroTS.git
+support_py37: false
+team_name: neuromath
+tracker_url: https://github.com/BlueBrain/NeuroTS/issues
+version: 3.2.0
+
+# End of Copier answers

@@ -1,4 +1,7 @@
-"""NeuroTS package."""
+"""NeuroTS package.
+
+Synthesis of artificial neurons using their topological profiles package.
+"""
 
 # Copyright (C) 2021  Blue Brain Project, EPFL
 #
@@ -15,10 +18,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from pkg_resources import get_distribution
+import importlib.metadata
 
 from neurots.astrocyte.grower import AstrocyteGrower  # noqa
 from neurots.generate.grower import NeuronGrower  # noqa
 from neurots.utils import NeuroTSError  # noqa
 
-__version__ = get_distribution("NeuroTS").version
+__version__ = importlib.metadata.version("NeuroTS")

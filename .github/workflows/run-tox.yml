@@ -1,16 +1,19 @@
-name: Run all tox jobs using python3
+name: Run all tox jobs using Python3
 
 on:
   pull_request:
   push:
     branches:
       - main
+
 jobs:
   build:
+
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [3.8, 3.9]
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -24,6 +27,11 @@ jobs:
     - name: Run tox
       run: |
         tox
+    - name: JUnit Report Action
+      uses: mikepenz/action-junit-report@v3.2.0
+      if: always() # always run even if the previous step fails
+      with:
+        report_paths: 'reports/pytest-*.xml'
     - name: Upload to codecov
       if: ${{matrix.python-version == '3.9'}}
       uses: codecov/codecov-action@v1
@@ -31,4 +39,4 @@ jobs:
         fail_ci_if_error: false
         files: ./coverage.xml
         flags: pytest
-        name: "NeuroTS-py39"
+        name: "NeuroTS"
