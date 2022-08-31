@@ -20,6 +20,7 @@ import json
 import logging
 
 import numpy as np
+from diameter_synthesis import build_diameters
 from morphio.mut import Morphology
 from numpy.random import BitGenerator
 from numpy.random import Generator
@@ -37,8 +38,6 @@ from neurots.morphmath.utils import normalize_vectors
 from neurots.utils import convert_from_legacy_neurite_type
 from neurots.validator import validate_neuron_distribs
 from neurots.validator import validate_neuron_params
-
-from diameter_synthesis import build_diameters
 
 L = logging.getLogger(__name__)
 

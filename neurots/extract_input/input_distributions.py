@@ -18,6 +18,7 @@
 import logging
 
 import tmd
+from diameter_synthesis.build_models import build as build_diameter_models
 from neurom import NeuriteType
 from neurom import load_morphologies
 
@@ -28,8 +29,6 @@ from neurots.extract_input.from_neurom import trunk_neurite
 from neurots.extract_input.from_TMD import persistent_homology_angles
 from neurots.utils import format_values
 from neurots.utils import neurite_type_warning
-
-from diameter_synthesis.build_models import build as build_diameter_models
 
 L = logging.getLogger(__name__)
 
@@ -88,7 +87,7 @@ def distributions(
     if diameter_input_morph is None:
         diameter_input_morph = filepath
     morphology = load_morphologies(diameter_input_morph)
-    if isinstance(diameter_model, str) and diameter_model.startswith('M'):
+    if isinstance(diameter_model, str) and diameter_model.startswith("M"):
         input_distributions["diameter"] = from_diameter.model(morphology)
         input_distributions["diameter"]["method"] = diameter_model
 
