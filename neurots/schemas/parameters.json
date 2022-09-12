@@ -110,24 +110,20 @@
                                         {
                                             "type": "object",
                                             "properties": {
-                                                "primary_orientation": {
-                                                    "$ref": "#/definitions/point",
-                                                    "description": "The primary orientation vector"
+                                                "form": {
+                                                    "description": "Form of the 3d angle fit",
+                                                    "type": "string"
+                                                },
+                                                "params": {
+"items": {
+                                                        "$ref": "#/definitions/point",
+                                                        "description": "The fit parameters"
+                                                    },
+                                                    "type": "array"
                                                 }
                                             },
                                             "additionalProperties": false,
-                                            "required": ["primary_orientation"]
-                                        },
-                                        {
-                                            "type": "object",
-                                            "properties": {
-                                                "pia": {
-                                                    "$ref": "#/definitions/point",
-                                                    "description": "The pia direction"
-                                                }
-                                            },
-                                            "additionalProperties": false,
-                                            "required": ["pia"]
+                                            "required": ["mode", "params"]
                                         }
                                     ]
                                 }

@@ -327,6 +327,34 @@ class NeuronGrower:
                         initial_point=p,
                         parameters=params,
                         distributions=distr,
+                        skip_validation=self.skip_validation,
+                        context=self.context,
+                        random_generator=self._rng,
+                    )
+                )
+
+    def _3d_angles_grow_trunks(self):
+        """Grow trunk with 3d_angles method."""
+        trunk_orientations_manager = self._trunk_orientations_class(
+            soma=self.soma_grower.soma,
+            parameters=self.input_parameters,
+            distributions=self.input_distributions,
+            context=self.context,
+            rng=self._rng,
+        )
+        orientations = []
+        for neurite_type in self.input_parameters["grow_types"]:
+            orientations = trunk_orientations_manager.compute_tree_type_orientations(neurite_type)
+
+            for p in self.soma_grower.add_points_from_orientations(orientations):
+                self.active_neurites.append(
+                    TreeGrower(
+                        self.neuron,
+                        initial_direction=self.soma_grower.soma.orientation_from_point(p),
+                        initial_point=p,
+                        parameters=self.input_parameters[neurite_type],
+                        distributions=self.input_distributions[neurite_type],
+                        skip_validation=self.skip_validation,
                         context=self.context,
                         random_generator=self._rng,
                     )
@@ -341,39 +369,12 @@ class NeuronGrower:
         as ``parameters['type']['orientation']`` or it is randomly chosen according to the
         biological distribution of trunks on the soma surface if ``orientation`` is ``None``.
         """
-        tree_types = self.input_parameters["grow_types"]
-        if not isinstance(self.input_parameters[tree_types[0]]["orientation"], dict):
-            self._simple_grow_trunks()
+        from neurots.generate.orientations import fit_3d_angles
+
+        if fit_3d_angles(self.input_parameters, self.input_distributions):
+            self._3d_angles_grow_trunks()
         else:
-            trunk_orientations_manager = self._trunk_orientations_class(
-                soma=self.soma_grower.soma,
-                parameters=self.input_parameters,
-                distributions=self.input_distributions,
-                context=self.context,
-                rng=self._rng,
-            )
-            orientations = []
-            for type_of_tree in tree_types:
-                orientations = trunk_orientations_manager.compute_tree_type_orientations(
-                    type_of_tree
-                )
-                n_trees = len(orientations)
-
-                if type_of_tree == "basal_dendrite" and n_trees < 2:
-                    raise Exception(f"There should be at least 2 basal dendrites (got {n_trees})")
-
-                for p in self.soma_grower.add_points_from_orientations(orientations):
-                    self.active_neurites.append(
-                        TreeGrower(
-                            self.neuron,
-                            initial_direction=self.soma_grower.soma.orientation_from_point(p),
-                            initial_point=p,
-                            parameters=self.input_parameters[type_of_tree],
-                            distributions=self.input_distributions[type_of_tree],
-                            context=self.context,
-                            random_generator=self._rng,
-                        )
-                    )
+            self._simple_grow_trunks()
 
     def _grow_soma(self, soma_type="contour"):
         """Generates a soma based on the input_distributions.

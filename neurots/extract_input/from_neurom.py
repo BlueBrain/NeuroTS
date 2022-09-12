@@ -14,17 +14,69 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import warnings
 
 import neurom as nm
 import numpy as np
 from neurom import stats
-from neurom.check.morphology_checks import has_apical_dendrite
 from neurom.core.types import tree_type_checker as is_type
-from scipy.integrate import quad
-from scipy.optimize import curve_fit
 
-from neurots.generate.orientations import prob_function
+PIA_REF_VEC = [0.0, 1.0, 0.0]
+
+
+def transform_distr(opt_distr):
+    """Transform distributions.
+
+    Args:
+        opt_distr (neurom.stats.FitResults): The fitted distribution.
+
+    Returns:
+        dict: A dictionary whose structure depends on the type of distribution:
+
+        * if `type == "norm"`:
+
+        .. code-block:: bash
+
+            {
+                "norm": {
+                    "mean": <mean value>,
+                    "std": <std value>
+                }
+            }
+
+        * if `type == "uniform"`:
+
+        .. code-block:: bash
+
+            {
+                "uniform": {
+                    "min": <min value>,
+                    "max": <max value>
+                }
+            }
+
+        * if `type == "expon"`:
+
+        .. code-block:: bash
+
+            {
+                "expon": {
+                    "loc": <loc value>,
+                    "lambda": <lambda value>
+                }
+            }
+    """
+    if opt_distr.type == "norm":
+        return {"norm": {"mean": opt_distr.params[0], "std": opt_distr.params[1]}}
+    elif opt_distr.type == "uniform":
+        return {
+            "uniform": {
+                "min": opt_distr.params[0],
+                "max": opt_distr.params[1] + opt_distr.params[0],
+            }
+        }
+    elif opt_distr.type == "expon":
+        return {"expon": {"loc": opt_distr.params[0], "lambda": 1.0 / opt_distr.params[1]}}
+    return None
 
 
 def soma_data(pop):
@@ -45,100 +97,20 @@ def soma_data(pop):
     # Extract soma size as a normal distribution
     # Returns a dictionary with the soma information
     soma_size = nm.get("soma_radius", pop)
-    params = stats.fit(soma_size, distribution="norm").params
-    return {"size": {"norm": {"mean": params[0], "std": params[1]}}}
+    ss = stats.fit(soma_size, distribution="norm")
+
+    return {"size": transform_distr(ss)}
 
 
-def _step_fit_prob_function(angle, scale, rate):
-    """Probablity function to use for fitting angle distributions."""
-
-    def _prob(_angle):
-        return prob_function(_angle, [scale, rate], form="step") * np.sin(_angle)
-
-    return _prob(angle) / quad(_prob, 0, np.pi)[0]
-
-
-def _double_step_fit_prob_function(angle, scale_low, rate_low, scale_high, rate_high):
-    """Probablity function to use for fitting angle distributions."""
-
-    def _prob(_angle):
-        return prob_function(
-            _angle, [scale_low, rate_low, scale_high, rate_high], form="double_step"
-        ) * np.sin(_angle)
-
-    return _prob(angle) / quad(_prob, 0, np.pi)[0]
-
-
-def get_fit_prob_function(morph_class="PC", neurite_type=nm.BASAL_DENDRITE, params=None):
-    """Get probability function for trunk angles.
-
-    Args:
-        morph_class (str): morphological class (PC or IN)
-        neurite_type (nm.NeuriteType): type of neurite to consider
-        params (dict): if not None, can be used to overwrite the fit functions/bounds
-    """
-    # this is the form of the expected parameter dict.
-    # The bounds correspond to the function's parameter min/max bounds for the fit
-    default_params = {
-        "PC": {
-            "basal_dendrite": {"form": "step", "bounds": ([0.0, 0.01], [np.pi, 10])},
-            "apical_dendrite": {"form": "step", "bounds": ([0.0, -10], [3.0, -0.010])},
-            "axon": {"form": "step", "bounds": ([0.0, 0.01], [3.0, 10])},
-        },
-        "IN": {
-            "basal_dendrite": {
-                "form": "double_step",
-                "bounds": ([-np.pi, 0.01, -np.pi, 0.01], [np.pi, 10, np.pi, 10]),
-            },
-            "axon": {"form": "step", "bounds": ([0.0, 0.01], [3.0, 10])},
-        },
-    }
-    if params is not None:
-        default_params.update(params)
-
-    if morph_class not in default_params:
-        raise ValueError(f"{morph_class} is not in fit parameters {list(default_params.keys())}.")
-    if neurite_type.name not in default_params[morph_class]:
-        _keys = list(default_params[morph_class].keys())
-        raise ValueError(f"{neurite_type.name} is not in fit parameters {_keys}.")
-
-    bound = default_params[morph_class][neurite_type.name]["bounds"]
-    form = default_params[morph_class][neurite_type.name]["form"]
-    function = _step_fit_prob_function if form == "step" else _double_step_fit_prob_function
-    return function, bound, form
-
-
-def _get_hist(data, bins=50):
-    """Return density histogram with bin centers."""
-    densities, bins = np.histogram(data, bins=bins, density=True)
-    return 0.5 * (bins[1:] + bins[:-1]), densities
-
-
-def trunk_vectors(morph, neurite_type, from_center_of_mass=True):
-    """This is `neurom.get('trunk_vectors')` but wrt to `[0, 0, 0]` if `from_center_of_mass=False`.
-
-    If one uses some.center (which is center of mass of soma points), it
-    may not corresponds to [0, 0, 0], from which the trunk angles should be computed.
-    """
-    if from_center_of_mass:
-        return nm.get("trunk_vectors", morph, neurite_type=neurite_type)
+def trunk_vectors(morph, neurite_type):
+    """This is `neurom.get('trunk_vectors')` but wrt to `[0, 0, 0]`."""
     return [
         nm.morphmath.vector(n.root_node.points[0], [0.0, 0.0, 0.0])
         for n in nm.iter_neurites(morph, filt=is_type(neurite_type))
     ]
 
 
-def _have_apical_dendrites(pop):
-    """Check if all morphologies in a population have apicals to find the population class."""
-    apicals = list(has_apical_dendrite(morph).status for morph in pop.morphologies)
-    if all(apicals):
-        return "PC"
-    if all(not a for a in apicals):
-        return "IN"
-    raise Exception("Population of neurons has inconsistent classes")
-
-
-def _trunk_neurite(pop, neurite_type, bins, params=None):
+def _3d_angles_trunk_neurite(pop, neurite_type, bins, params=None):
     """Extract trunk angle data.
 
     Args:
@@ -162,33 +134,30 @@ def _trunk_neurite(pop, neurite_type, bins, params=None):
                 }
             }
     """
-    # not yet implemented  for other neurite types
-    if neurite_type not in [nm.BASAL_DENDRITE, nm.AXON]:
-        return {"trunk": None}
-
-    pop_morph_class = _have_apical_dendrites(pop)
-    fit_prob_function, bounds, form = get_fit_prob_function(
-        morph_class=pop_morph_class, neurite_type=neurite_type, params=params
-    )
-    angles = []
+    pia_3d_angles = []
+    apical_3d_angles = []
     for morph in pop.morphologies:
-        # for PC neurons, we use apical-basal and apical-axon 3d angles, thus apical as reference
-        if pop_morph_class == "PC":
-            # to deal with multiple apical mtypes here, as we take first one only for now
-            ref_vec = trunk_vectors(morph, neurite_type=nm.APICAL_DENDRITE)[0]
-
-        # for IN we use pia direction as reference
-        elif pop_morph_class == "IN":
-            ref_vec = [0, 1, 0]
-
         vecs = trunk_vectors(morph, neurite_type=neurite_type)
-        angles += [nm.morphmath.angle_between_vectors(ref_vec, vec) for vec in vecs]
-    try:
-        popt = curve_fit(fit_prob_function, *_get_hist(angles, bins=bins), bounds=bounds)[0]
-    except RuntimeError:
-        warnings.warn("Cannot fit some trunk angles")
-        popt = None
-    return {"trunk": {"3d_angle": {"form": form, "params": popt}}}
+        pia_3d_angles += [nm.morphmath.angle_between_vectors(PIA_REF_VEC, vec) for vec in vecs]
+        if neurite_type.name is not "apical_dendrite":
+            apical_ref_vec = trunk_vectors(morph, neurite_type=nm.APICAL_DENDRITE)
+            if len(apical_ref_vec) > 0:
+                apical_3d_angles += [
+                    nm.morphmath.angle_between_vectors(apical_ref_vec[0], vec) for vec in vecs
+                ]
+
+    def _get_hist(data):
+        """Return density histogram with bin centers."""
+        densities, _bins = np.histogram(data, bins=bins, density=True)
+        return densities, 0.5 * (_bins[1:] + _bins[:-1])
+
+    data = {}
+    weights, _bins = _get_hist(pia_3d_angles)
+    data["pia_3d_angles"] = {"data": {"bins": _bins.tolist(), "weights": weights.tolist()}}
+    if len(apical_3d_angles) > 0:
+        weights, _bins = _get_hist(apical_3d_angles)
+        data["apical_3d_angles"] = {"data": {"bins": _bins.tolist(), "weights": weights.tolist()}}
+    return data
 
 
 def _simple_trunk_neurite(pop, neurite_type, bins):
@@ -214,7 +183,7 @@ def _simple_trunk_neurite(pop, neurite_type, bins):
                         }
                     },
                     "azimuth": {
-                        "inuform": {
+                        "uniform": {
                             "min": <min value>,
                             "max": <max value>
                         }
@@ -273,9 +242,12 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30, params=None, met
     Returns:
         dict: A dictionary with the trunk data.
     """
-    if method == "simple":
-        return _simple_trunk_neurite(pop, neurite_type=neurite_type, bins=bins)
-    return _trunk_neurite(pop, neurite_type=neurite_type, bins=bins, params=params)
+    trunk_data = _simple_trunk_neurite(pop, neurite_type=neurite_type, bins=bins)
+    if method == "3d_angles":
+        trunk_data["trunk"].update(
+            _3d_angles_trunk_neurite(pop, neurite_type=neurite_type, bins=bins, params=params)
+        )
+    return trunk_data
 
 
 def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE):

@@ -16,7 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from neurots.utils import neurite_type_warning
-from copy import deepcopy
 
 tmd_algos = ("tmd", "tmd_gradient", "tmd_apical")
 
@@ -27,8 +26,8 @@ def _sort_neurite_types(neurite_types):
     For now, only apical should be first, so it is placed first, and other neurite_types can be
     placed with respect to it.
     """
-    if "apical" in neurite_types:
-        return ["apical"] + [t for t in neurite_types if t != "apical"]
+    if "apical_dendrite" in neurite_types:
+        return ["apical_dendrite"] + [t for t in neurite_types if t != "apical_dendrite"]
     return list(neurite_types)
 
 
@@ -40,7 +39,7 @@ def parameters(
     diameter_parameters=None,
     trunk_method="simple",
 ):
-    """Return a default set of input parameters to be used as input for synthesis.
+    """Returns a default set of input parameters to be used as input for synthesis.
 
     Args:
         origin (list[float]): The origin point.
@@ -62,56 +61,76 @@ def parameters(
             neurite_types[i] = neurite_type + "_dendrite"
 
     if method not in ("trunk", "tmd", "tmd_gradient", "tmd_apical"):
-        raise KeyError(f"Method {method} not recognized!.")
+        raise KeyError(f"Method {method} not understood.")
     if trunk_method not in ("simple", "3d_angles"):
-        raise KeyError(f"trunk_method {trunk_method} not understood")
+        raise KeyError(f"trunk_method {trunk_method} not understood.")
 
-    base_params = {
-        "randomness": 0.24,
-        "targeting": 0.14,
-        "radius": 0.3,
-        "orientation": None
-        if trunk_method == "simple"
-        else {"mode": "pia_constraint", "values": {"pia": [0, 1, 0]}},
-        "growth_method": method,
-        "branching_method": "random" if method == "trunk" else "bio_oriented",
-        "modify": None,
-        "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
-        "metric": feature,
-    }
+    if trunk_method == "3d_angles":
+        neurite_types = _sort_neurite_types(neurite_types)
 
     input_parameters = {
-        "axon": {**base_params, "tree_type": 2},
-        "basal_dendrtie": {**base_params, "tree_type": 3},
-        "apical_dendrite": {**base_params, "tree_type": 4},
+        "basal_dendrite": {},
+        "apical_dendrite": {},
+        "axon": {},
         "origin": list(origin),
-        "grow_types": neurite_types
-        if trunk_method == "simple"
-        else _sort_neurite_types(neurite_types),
+        "grow_types": neurite_types,
     }
-    if "axon" in neurite_types:
-        input_parameters["axon"] = deepcopy(base_params)
-        input_parameters["axon"]["tree_type"] = 2
-        if "apical" in neurite_types and trunk_method == "3d_angles":
-            input_parameters["axon"]["orientation"] = {"mode": "apical_constraint", "values": None}
 
-    if "basal" in neurite_types:
-        input_parameters["basal"] = deepcopy(base_params)
-        input_parameters["basal"]["tree_type"] = 3
-        if "apical" in neurite_types and trunk_method == "3d_angles":
-            input_parameters["basal"]["orientation"] = {"mode": "apical_constraint", "values": None}
-    if "apical" in neurite_types:
-        input_parameters["apical"] = deepcopy(base_params)
-        input_parameters["apical"]["tree_type"] = 4
-        input_parameters["apical"].update(
+    def merged_params(data):
+        """Use input method to set branching."""
+        ret = {}
+        if method == "trunk":
+            branching = "random"
+        elif method in tmd_algos:
+            branching = "bio_oriented"
+        else:
+            raise KeyError(f"Method not recognized! Please select from: {tmd_algos}.")
+
+        ret.update(
             {
-                "branching_method": "directional",
-                "growth_method": "tmd_apical" if method == "tmd" else None,
-                "orientation": [[0.0, 1.0, 0.0]]
-                if trunk_method == "simple"
-                else {"mode": "use_predefined", "values": {"orientations": [[0.0, 1.0, 0.0]]}},
+                "randomness": 0.24,
+                "targeting": 0.14,
+                "radius": 0.3,
+                "orientation": None,
+                "growth_method": method,
+                "branching_method": branching,
+                "modify": None,
+                "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
+                "metric": feature,
             }
         )
+        ret.update(data)
+        return ret
+
+    if "axon" in neurite_types:
+        input_parameters["axon"] = merged_params(
+            {
+                "tree_type": 2,
+                "orientation": [[0.0, -1.0, 0.0]],
+            }
+        )
+
+    if "basal_dendrite" in neurite_types:
+        input_parameters["basal_dendrite"] = merged_params({"tree_type": 3})
+
+    if "apical_dendrite" in neurite_types:
+        input_parameters["apical_dendrite"] = merged_params(
+            {
+                "tree_type": 4,
+                "branching_method": "directional",
+                "orientation": [[0.0, 1.0, 0.0]],
+            }
+        )
+        if method == "tmd":
+            input_parameters["apical_dendrite"]["growth_method"] = "tmd_apical"
+
+    if trunk_method == "3d_angles":
+        input_parameters["basal_dendrite"]["orientation"] = {"mode": "pia_constraint"}
+        if "apical_dendrite" in neurite_types:
+            input_parameters["apical_dendrite"]["orientation"] = {
+                "mode": "normal_pia_constraint",
+                "values": {"direction": [0.0, 0.0]},
+            }
 
     input_parameters["diameter_params"] = {}
     if diameter_parameters is None:
@@ -123,6 +142,6 @@ def parameters(
         input_parameters["diameter_params"] = diameter_parameters
         input_parameters["diameter_params"]["method"] = "external"
     else:
-        raise ValueError(f"Diameter params not understood, {diameter_parameters}")
+        raise KeyError(f"Diameter params {diameter_parameters} not understood.")
 
     return input_parameters

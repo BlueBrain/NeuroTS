@@ -117,7 +117,7 @@
                             "type": "null"
                         },
                         {
-                            "additionalProperties": false,
+                            "additionalProperties": true,
                             "description": "The distributions used to synthesize the trunk using orientation deviation",
                             "properties": {
                                 "absolute_elevation_deviation": {
@@ -153,36 +153,6 @@
                                 "absolute_elevation_deviation",
                                 "azimuth",
                                 "orientation_deviation"
-                            ],
-                            "type": "object"
-                        },
-                        {
-                            "additionalProperties": false,
-                            "description": "The distributions used to synthesize the trunk using 3d angles",
-                            "properties": {
-                                "3d_angle": {
-                                    "additionalProperties": false,
-                                    "description": "Distribution of 3d angles",
-                                    "properties": {
-                                        "form": {
-                                            "type": "string"
-                                        },
-                                        "params": {
-                                            "items": {
-                                                "type": "number"
-                                            },
-                                            "type": "array"
-                                        }
-                                    },
-                                    "required": [
-                                        "form",
-                                        "params"
-                                    ],
-                                    "type": "object"
-                                }
-                            },
-                            "required": [
-                                "3d_angle"
                             ],
                             "type": "object"
                         }
