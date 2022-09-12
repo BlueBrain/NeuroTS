@@ -82,7 +82,7 @@ def parameters(
 
     input_parameters = {
         "axon": {**base_params, "tree_type": 2},
-        "basal_dendruie": {**base_params, "tree_type": 3},
+        "basal_dendrtie": {**base_params, "tree_type": 3},
         "apical_dendrite": {**base_params, "tree_type": 4},
         "origin": list(origin),
         "grow_types": neurite_types
