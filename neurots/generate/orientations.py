@@ -481,7 +481,7 @@ def get_probability_function(form="step", with_density=True):
 # The bounds correspond to the function's parameter min/max bounds for the fit
 default_bounds = {
     "double_step": ([0, 0.1, -np.pi, 0.1], [np.pi, 10, 0, 10]),
-    "step": ([0.0, 0.1], [np.pi, 10]),
+    "step": ([-np.pi, 0.1], [np.pi, 10]),
 }
 default_params = {
     "with_apical": {"basal_dendrite": {"form": "step", "bounds": default_bounds["step"]}},
