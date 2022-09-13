@@ -17,7 +17,7 @@
 
 from pathlib import Path
 
-from setuptools import find_packages
+from setuptools import find_namespace_packages
 from setuptools import setup
 
 reqs = [
@@ -63,7 +63,7 @@ setup(
         "Source": "https://github.com/BlueBrain/NeuroTS",
     },
     license="GNU General Public License v3.0",
-    packages=find_packages(include=["neurots*"]),
+    packages=find_namespace_packages(include=["neurots*"]),
     python_requires=">=3.8",
     use_scm_version=True,
     setup_requires=[
