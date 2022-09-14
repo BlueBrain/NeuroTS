@@ -160,33 +160,6 @@ class OrientationManager(OrientationManagerBase):
         sample.n_neurites(tree_type_distrs["num_trees"], self._rng)
         return normalize_vectors(np.asarray(values_dict["orientations"], dtype=np.float64))
 
-    def _mode_normal_pia_constraint(self, values_dict, tree_type):
-        """Returns orientations using normal/exp distribution along a direction.
-
-        The `direction` value should be a 2-tuple, or a list of 2-tuples for multiple trunks.
-        The first value of the tuple is the angle wrt to pia ([0, 1, 0]) direction and the second
-        is the standard deviation of a normal distribution if angle>0 or scaling of exponential
-        distribution if angle=0. As the resulting angle must be in [0, 2 * pi], we clip the
-        obtained angle and uniformaly sample the second angle to obtain a 3d direction.
-        """
-        assert "direction" in values_dict, "'direction' key is missing"
-
-        if len(np.shape(values_dict["direction"])) == 1:
-            values_dict["direction"] = [values_dict["direction"]]
-
-        thetas = []
-        for direction in values_dict["direction"]:
-            if direction[0] == 0:
-                if direction[1] > 0:
-                    thetas.append(np.clip(np.random.exponential(direction[1]), 0, np.pi))
-                else:
-                    thetas.append(0)
-            else:
-                thetas.append(np.clip(np.random.normal(*direction), 0, np.pi))
-
-        phis = np.random.uniform(0, 2 * np.pi, len(values_dict["direction"]))
-        return spherical_angles_to_pia_orientations(phis, thetas)
-
     def _mode_sample_around_primary_orientation(self, values_dict, tree_type):
         """Sample orientations around a primary direction."""
         tree_type_distrs = self._distributions[tree_type]
@@ -237,6 +210,33 @@ class OrientationManager(OrientationManagerBase):
         return np.asarray(
             [sample_spherical_unit_vectors(rng=self._rng) for _ in range(n_orientations)]
         )
+
+    def _mode_normal_pia_constraint(self, values_dict, tree_type):
+        """Returns orientations using normal/exp distribution along a direction.
+
+        The `direction` value should be a 2-tuple, or a list of 2-tuples for multiple trunks.
+        The first value of the tuple is the angle wrt to pia ([0, 1, 0]) direction and the second
+        is the standard deviation of a normal distribution if angle>0 or scaling of exponential
+        distribution if angle=0. As the resulting angle must be in [0, 2 * pi], we clip the
+        obtained angle and uniformaly sample the second angle to obtain a 3d direction.
+        """
+        assert "direction" in values_dict, "'direction' key is missing"
+
+        if len(np.shape(values_dict["direction"])) == 1:
+            values_dict["direction"] = [values_dict["direction"]]
+
+        thetas = []
+        for direction in values_dict["direction"]:
+            if direction[0] == 0:
+                if direction[1] > 0:
+                    thetas.append(np.clip(np.random.exponential(direction[1]), 0, np.pi))
+                else:
+                    thetas.append(0)
+            else:
+                thetas.append(np.clip(np.random.normal(*direction), 0, np.pi))
+
+        phis = np.random.uniform(0, 2 * np.pi, len(values_dict["direction"]))
+        return spherical_angles_to_pia_orientations(phis, thetas)
 
     def _mode_pia_constraint(self, _, tree_type):
         """Create trunks from distribution of angles with pia ([0 , 1, 0]) direction.
@@ -317,31 +317,6 @@ def points_to_orientations(origin, points):
     return normalize_vectors(points - origin)
 
 
-def trunk_absolute_orientation_to_spherical_angles(orientation, trunk_absolute_angles, z_angles):
-    """Generate spherical angles from a unit vector and a list of angles.
-
-    Args:
-        orientation (list[float]): The orientation vector.
-        trunk_absolute_angles (list[float]): The polar angles (phi in spherical coordinates).
-        z_angles (list[float]): The azimuthal angles (theta in spherical coordinates).
-
-    Returns:
-        tuple[numpy.ndarray[float], numpy.ndarray[float]]: The phi and theta angles.
-    """
-    # Sort angles
-    sort_ids = np.argsort(trunk_absolute_angles)
-    sorted_phis = np.asarray(trunk_absolute_angles)[sort_ids]
-    sorted_thetas = np.asarray(z_angles)[sort_ids]
-
-    # Convert orientation vector to angles
-    phi, theta = rotation.spherical_from_vector(orientation)
-
-    phis = phi + sorted_phis - 0.5 * np.pi
-    thetas = theta + sorted_thetas - 0.5 * np.pi
-
-    return phis, thetas
-
-
 def orientations_to_sphere_points(oris, sphere_center, sphere_radius):
     """Compute points on a sphere from the given directions.
 
@@ -392,6 +367,31 @@ def trunk_to_spherical_angles(trunk_angles, z_angles, phi_interval=None):
 
     equiangle = (phi_interval[1] - phi_interval[0]) / (n_angles + nb_intervals_min)
     phis = np.arange(1, n_angles + 1) * equiangle + sorted_phi_devs + phi_interval[0]
+
+    return phis, thetas
+
+
+def trunk_absolute_orientation_to_spherical_angles(orientation, trunk_absolute_angles, z_angles):
+    """Generate spherical angles from a unit vector and a list of angles.
+
+    Args:
+        orientation (list[float]): The orientation vector.
+        trunk_absolute_angles (list[float]): The polar angles (phi in spherical coordinates).
+        z_angles (list[float]): The azimuthal angles (theta in spherical coordinates).
+
+    Returns:
+        tuple[numpy.ndarray[float], numpy.ndarray[float]]: The phi and theta angles.
+    """
+    # Sort angles
+    sort_ids = np.argsort(trunk_absolute_angles)
+    sorted_phis = np.asarray(trunk_absolute_angles)[sort_ids]
+    sorted_thetas = np.asarray(z_angles)[sort_ids]
+
+    # Convert orientation vector to angles
+    phi, theta = rotation.spherical_from_vector(orientation)
+
+    phis = phi + sorted_phis - 0.5 * np.pi
+    thetas = theta + sorted_thetas - 0.5 * np.pi
 
     return phis, thetas
 
