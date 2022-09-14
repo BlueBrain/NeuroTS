@@ -21,6 +21,9 @@ from copy import deepcopy
 import numpy as np
 
 
+PIA_DIRECTION = [0.0, 1.0, 0.0]
+
+
 class NeuroTSError(Exception):
     """Raises NeuroTS error."""
 

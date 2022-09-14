@@ -27,6 +27,7 @@ from neurots.morphmath import rotation
 from neurots.morphmath import sample
 from neurots.morphmath.utils import normalize_vectors
 from neurots.utils import NeuroTSError
+from neurots.utils import PIA_DIRECTION
 
 from scipy.optimize import curve_fit
 
@@ -62,7 +63,6 @@ class OrientationManagerBase:
 
         self._orientations = {}
         self._modes = self._collect_mode_methods()
-        self.pia_direction = np.array([0.0, 1.0, 0.0])
 
     def _collect_mode_methods(self):
         """Collects and stores in self._modes the methods, the name of which starts with '_mode_'.
@@ -135,7 +135,7 @@ class OrientationManager(OrientationManagerBase):
         .. code-block:: python
 
             {
-                "mode": "absolute",
+                "mode": "use_predefine",
                 "values": {"orientations": [or1, or2, ...]}
             }
             {
@@ -161,9 +161,19 @@ class OrientationManager(OrientationManagerBase):
         return normalize_vectors(np.asarray(values_dict["orientations"], dtype=np.float64))
 
     def _mode_normal_pia_constraint(self, values_dict, tree_type):
-        """Returns predefined orientations using normal/exp distribution."""
+        """Returns orientations using normal/exp distribution along a direction.
+
+        The `direction` value should be a 2-tuple, or a list of 2-tuples for multiple trunks.
+        The first value of the tuple is the angle wrt to pia ([0, 1, 0]) direction and the second
+        is the standard deviation of a normal distribution if angle>0 or scaling of exponential
+        distribution if angle=0. As the resulting angle must be in [0, 2 * pi], we clip the
+        obtained angle and uniformaly sample the second angle to obtain a 3d direction.
+        """
+        assert "direction" in values_dict, "'direction' key is missing"
+
         if len(np.shape(values_dict["direction"])) == 1:
             values_dict["direction"] = [values_dict["direction"]]
+
         thetas = []
         for direction in values_dict["direction"]:
             if direction[0] == 0:
@@ -175,7 +185,7 @@ class OrientationManager(OrientationManagerBase):
                 thetas.append(np.clip(np.random.normal(*direction), 0, np.pi))
 
         phis = np.random.uniform(0, 2 * np.pi, len(values_dict["direction"]))
-        return spherical_angles_to_orientations(phis, thetas, along_pia=True)
+        return spherical_angles_to_pia_orientations(phis, thetas)
 
     def _mode_sample_around_primary_orientation(self, values_dict, tree_type):
         """Sample orientations around a primary direction."""
@@ -222,24 +232,30 @@ class OrientationManager(OrientationManagerBase):
         return np.vstack(orientations_i)
 
     def _mode_uniform(self, _, tree_type):
-        """Uniformly distribute angles."""
+        """Uniformly sample angles on the sphere."""
         n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
         return np.asarray(
             [sample_spherical_unit_vectors(rng=self._rng) for _ in range(n_orientations)]
         )
 
     def _mode_pia_constraint(self, _, tree_type):
-        """Create trunks from constraint with pia direction."""
+        """Create trunks from distribution of angles with pia ([0 , 1, 0]) direction.
+
+        See :func: `_sample_trunk_from_3d_angle` for more details on the algorithm.
+        """
         n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
         return np.asarray(
             [
-                self._sample_trunk_from_3d_angle(tree_type, self.pia_direction)
+                self._sample_trunk_from_3d_angle(tree_type, PIA_DIRECTION)
                 for _ in range(n_orientations)
             ]
         )
 
     def _mode_apical_constraint(self, _, tree_type):
-        """Create trunks from constraint with apical direction."""
+        """Create trunks from distribution of angles with apical direction.
+
+        See :func: `_sample_trunk_from_3d_angle` for more details on the algorithm.
+        """
         n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
         ref_dir = self._orientations["apical_dendrite"][0]
         return np.asarray(
@@ -247,20 +263,29 @@ class OrientationManager(OrientationManagerBase):
         )
 
     def _sample_trunk_from_3d_angle(self, tree_type, ref_dir, max_tries=100):
-        """Method to sample trunk angles from 3d constraints to ref_dir."""
+        """Sample trunk directions from fit of distribution of 3d_angles wrt to ref_dir.
+
+        We use the accept-reject algorithm so we can sample from any distribution.
+        After a number of unsuccesfull tries (default=100), we  stop and return a random direction.
+        We also issue a warning so the user is aware that the provided distribution may have issues,
+        mostly related to large region of small probabilities.
+        """
         prob = get_probability_function(
             form=self._parameters[tree_type]["orientation"]["values"]["form"],
             with_density=False,
         )
         params = self._parameters[tree_type]["orientation"]["values"]["params"]
         n_try = 0
-        while n_try < max_tries + 1:
-            n_try += 1
+        while n_try < max_tries:
             propose = sample_spherical_unit_vectors(self._rng)
             angle = nm.morphmath.angle_between_vectors(ref_dir, propose)
             if self._rng.binomial(1, prob(angle, *params)):
                 return propose
-        warnings.warn("Could not find a point, we take last attempt")
+            n_try += 1
+        warnings.warn(
+            """We could not sample from distribution, so we take a random point.
+                      Consider checking the given probability distribution."""
+        )
         return sample_spherical_unit_vectors(self._rng)
 
 
@@ -289,7 +314,7 @@ def trunk_absolute_orientation_to_spherical_angles(orientation, trunk_absolute_a
     return phis, thetas
 
 
-def spherical_angles_to_orientations(phis, thetas, along_pia=False):
+def spherical_angles_to_orientations(phis, thetas):
     """Compute orientation from spherical angles.
 
     Args:
@@ -299,10 +324,6 @@ def spherical_angles_to_orientations(phis, thetas, along_pia=False):
     Returns:
         numpy.ndarray: The orientation vectors where each row correspnds to a phi-theta pair.
     """
-    if along_pia:
-        return np.column_stack(
-            (np.cos(phis) * np.sin(thetas), np.cos(thetas), np.sin(phis) * np.sin(thetas))
-        )
     return np.column_stack(
         (np.cos(phis) * np.sin(thetas), np.sin(phis) * np.sin(thetas), np.cos(thetas))
     )
@@ -375,20 +396,6 @@ def trunk_to_spherical_angles(trunk_angles, z_angles, phi_interval=None):
     return phis, thetas
 
 
-def sample_spherical_unit_vectors(rng, bias=None):
-    """Prior uniform distribution on the sphere.
-
-    Args:
-        rng: random number generator
-        bias: bias the sampling along a direction
-
-    If bias is tuple(direction, std), the sample will be along direction with normal std, improving
-    the efficiency of the Metropolos-Hastings for axon sampling, mostly oriented in [0, -1, 0].
-    """
-    x = rng.normal(0, 1, 3) if bias is None else rng.normal(bias[0], bias[1], 3)
-    return x / np.linalg.norm(x)
-
-
 def compute_interval_n_tree(soma, n_trees, rng=np.random):
     """Compute the number of trunks to add between each pair of consecutive existing trunks.
 
@@ -444,6 +451,31 @@ def compute_interval_n_tree(soma, n_trees, rng=np.random):
         interval_n_trees = np.array([n_trees])
 
     return phi_intervals, interval_n_trees
+
+
+def sample_spherical_unit_vectors(rng):
+    """Sample a point uniformly on the sphere.
+
+    Args:
+        rng: random number generator
+    """
+    x = rng.normal(0, 1, 3)
+    return x / np.linalg.norm(x)
+
+
+def spherical_angles_to_pia_orientations(phis, thetas):
+    """Compute orientation from spherical angles.
+
+    Args:
+        phis (numpy.ndarray): Polar angles.
+        thetas (numpy.ndarray): Azimuthal angles.
+
+    Returns:
+        numpy.ndarray: The orientation vectors where each row correspnds to a phi-theta pair.
+    """
+    return np.column_stack(
+        (np.cos(phis) * np.sin(thetas), np.cos(thetas), np.sin(phis) * np.sin(thetas))
+    )
 
 
 def get_probability_function(form="step", with_density=True):
