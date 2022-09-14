@@ -587,7 +587,7 @@ def _get_fit_params_from_input_parameters(parameters):
         bounds = parameters["orientation"]["values"].get("bounds")
         if form is not None:
             if bounds is None:
-                bounds = fit_3d_angles_params[form]
+                bounds = fit_3d_angles_bounds[form]
             if parameters["orientation"]["values"].get("params") is None:
                 return {"form": form, "bounds": bounds}
     return None
@@ -628,7 +628,7 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
                     data["data"],
                     neurite_type,
                     morph_class,
-                    params=_get_fit_params_from_input_parameters(tmd_parameters[neurite_type]),
+                    fit_params=_get_fit_params_from_input_parameters(tmd_parameters[neurite_type]),
                 )
 
         if tmd_parameters[neurite_type]["orientation"]["mode"] == "pia_constraint":
@@ -642,6 +642,6 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
                     data["data"],
                     neurite_type,
                     morph_class,
-                    params=_get_fit_params_from_input_parameters(tmd_parameters[neurite_type]),
+                    fit_params=_get_fit_params_from_input_parameters(tmd_parameters[neurite_type]),
                 )
     return with_3d
