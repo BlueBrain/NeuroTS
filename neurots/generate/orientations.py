@@ -135,7 +135,7 @@ class OrientationManager(OrientationManagerBase):
         .. code-block:: python
 
             {
-                "mode": "use_predefine",
+                "mode": "use_predefined",
                 "values": {"orientations": [or1, or2, ...]}
             }
             {
@@ -289,31 +289,6 @@ class OrientationManager(OrientationManagerBase):
         return sample_spherical_unit_vectors(self._rng)
 
 
-def trunk_absolute_orientation_to_spherical_angles(orientation, trunk_absolute_angles, z_angles):
-    """Generate spherical angles from a unit vector and a list of angles.
-
-    Args:
-        orientation (list[float]): The orientation vector.
-        trunk_absolute_angles (list[float]): The polar angles (phi in spherical coordinates).
-        z_angles (list[float]): The azimuthal angles (theta in spherical coordinates).
-
-    Returns:
-        tuple[numpy.ndarray[float], numpy.ndarray[float]]: The phi and theta angles.
-    """
-    # Sort angles
-    sort_ids = np.argsort(trunk_absolute_angles)
-    sorted_phis = np.asarray(trunk_absolute_angles)[sort_ids]
-    sorted_thetas = np.asarray(z_angles)[sort_ids]
-
-    # Convert orientation vector to angles
-    phi, theta = rotation.spherical_from_vector(orientation)
-
-    phis = phi + sorted_phis - 0.5 * np.pi
-    thetas = theta + sorted_thetas - 0.5 * np.pi
-
-    return phis, thetas
-
-
 def spherical_angles_to_orientations(phis, thetas):
     """Compute orientation from spherical angles.
 
@@ -340,6 +315,31 @@ def points_to_orientations(origin, points):
         numpy.ndarray: Normalized orientations from origin to points.
     """
     return normalize_vectors(points - origin)
+
+
+def trunk_absolute_orientation_to_spherical_angles(orientation, trunk_absolute_angles, z_angles):
+    """Generate spherical angles from a unit vector and a list of angles.
+
+    Args:
+        orientation (list[float]): The orientation vector.
+        trunk_absolute_angles (list[float]): The polar angles (phi in spherical coordinates).
+        z_angles (list[float]): The azimuthal angles (theta in spherical coordinates).
+
+    Returns:
+        tuple[numpy.ndarray[float], numpy.ndarray[float]]: The phi and theta angles.
+    """
+    # Sort angles
+    sort_ids = np.argsort(trunk_absolute_angles)
+    sorted_phis = np.asarray(trunk_absolute_angles)[sort_ids]
+    sorted_thetas = np.asarray(z_angles)[sort_ids]
+
+    # Convert orientation vector to angles
+    phi, theta = rotation.spherical_from_vector(orientation)
+
+    phis = phi + sorted_phis - 0.5 * np.pi
+    thetas = theta + sorted_thetas - 0.5 * np.pi
+
+    return phis, thetas
 
 
 def orientations_to_sphere_points(oris, sphere_center, sphere_radius):
