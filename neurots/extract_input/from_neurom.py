@@ -247,8 +247,8 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30, method="simple")
     If `method=='simple'`, only trunk angles for the `simple` method will be extracted,
     if `method=='3d_angles'` additional angles will be extracted for `3d_angles` method.
 
-    See docstring of :func: trunk_neurite_simple and :func: trunk_neurite_3d_angles for more details
-    on the extracted angles.
+    See docstring of :func:`trunk_neurite_simple` and :func:`trunk_neurite_3d_angles`
+    for more details on the extracted angles.
 
     Args:
         pop (neurom.core.population.Population): The given population.

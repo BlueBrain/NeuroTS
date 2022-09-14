@@ -249,7 +249,7 @@ class OrientationManager(OrientationManagerBase):
     def _mode_pia_constraint(self, _, tree_type):
         """Create trunks from distribution of angles with pia ([0 , 1, 0]) direction.
 
-        See :func: `_sample_trunk_from_3d_angle` for more details on the algorithm.
+        See :func:`_sample_trunk_from_3d_angle` for more details on the algorithm.
         """
         n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
         return np.asarray(
@@ -262,7 +262,7 @@ class OrientationManager(OrientationManagerBase):
     def _mode_apical_constraint(self, _, tree_type):
         """Create trunks from distribution of angles with apical direction.
 
-        See :func: `_sample_trunk_from_3d_angle` for more details on the algorithm.
+        See :func:`_sample_trunk_from_3d_angle` for more details on the algorithm.
         """
         n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
         ref_dir = self._orientations["apical_dendrite"][0]
@@ -495,9 +495,10 @@ def get_probability_function(form="step", with_density=True):
         with_density (bool): return the function with spherical density factor or not
 
     Three forms of functions are available:
-        - `flat`: uniform flat distribution
-        - `step`: distribution with a single sigmoid :func: `scipy.special.expit`
-        - `double_step`: distribution with two opposite sigmoids :func: `scipy.special.expit`
+    - `flat`: uniform flat distribution
+    - `step`: distribution with a single sigmoid :func:`scipy.special.expit`
+    - `double_step`: distribution with two opposite sigmoids :func:`scipy.special.expit`
+
     Each sigmoid is  parametrized by a scale and a rate.
 
     In practice, the `flat` function is used when no asymetry is present in the data, and the other

@@ -373,7 +373,7 @@ class NeuronGrower:
                 )
 
     def _3d_angles_grow_trunks(self):
-        """Grow trunk with 3d_angles method via OrientationManager class."""
+        """Grow trunk with 3d_angles method via :func:`.orientation.OrientationManager` class."""
         trunk_orientations_manager = self._trunk_orientations_class(
             soma=self.soma_grower.soma,
             parameters=self.input_parameters,
@@ -402,8 +402,8 @@ class NeuronGrower:
         """Grow the trunks.
 
         Two methods are available, depending on the data present in the input_parameters.
-        If no 3d_angles data is present, we grow trunks with :func: `_simple_grow_trunks` else
-        we fit the raw binned 3d angle data and apply :func: `_3d_angles_grow_trunks`.
+        If no 3d_angles data is present, we grow trunks with :func:`_simple_grow_trunks` else
+        we fit the raw binned 3d angle data and apply :func:`_3d_angles_grow_trunks`.
         """
 
         if fit_3d_angles(self.input_parameters, self.input_distributions):

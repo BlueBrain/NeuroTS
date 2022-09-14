@@ -79,11 +79,7 @@ autosummary_generate = True
 
 # autodoc settings
 autodoc_typehints = "signature"
-autodoc_default_options = {
-    "members": True,
-    "show-inheritance": True,
-}
-
+autodoc_default_options = {"members": True, "show-inheritance": True, "private-members": True}
 intersphinx_mapping = {
     "morphio": ("https://morphio.readthedocs.io/en/latest/", None),
     "neurom": ("https://neurom.readthedocs.io/en/stable/", None),
