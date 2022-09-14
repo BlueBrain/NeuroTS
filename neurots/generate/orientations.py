@@ -32,6 +32,14 @@ from neurots.utils import PIA_DIRECTION
 from scipy.optimize import curve_fit
 
 _TWOPI = 2.0 * np.pi
+fit_3d_angles_bounds = {
+    "double_step": ([0, 0.1, -np.pi, 0.1], [np.pi, 10, 0, 10]),
+    "step": ([-np.pi, 0.1], [np.pi, 10]),
+}
+fit_3d_angles_params = {
+    "with_apical": {"basal_dendrite": {"form": "step", "bounds": fit_3d_angles_bounds["step"]}},
+    "without_apical": {"basal_dendrite": {"form": "flat", "bounds": []}},
+}
 
 
 class OrientationManagerBase:
@@ -464,7 +472,7 @@ def sample_spherical_unit_vectors(rng):
 
 
 def spherical_angles_to_pia_orientations(phis, thetas):
-    """Compute orientation from spherical angles.
+    """Compute orientation from spherical angles where thetas are wirt to pia at [0, 1, 0].
 
     Args:
         phis (numpy.ndarray): Polar angles.
@@ -473,14 +481,32 @@ def spherical_angles_to_pia_orientations(phis, thetas):
     Returns:
         numpy.ndarray: The orientation vectors where each row correspnds to a phi-theta pair.
     """
+    assert PIA_DIRECTION == [0, 1, 0], "Global pia direction is not compatible"
     return np.column_stack(
         (np.cos(phis) * np.sin(thetas), np.cos(thetas), np.sin(phis) * np.sin(thetas))
     )
 
 
 def get_probability_function(form="step", with_density=True):
-    """Get probability function for 3d trunk angles."""
+    """Get probability functions to fit 3d trunk angles distributions.
 
+    Args:
+        form (str): form of the function, can be `flat`, `step` or `double_step`
+        with_density (bool): return the function with spherical density factor or not
+
+    Three forms of functions are available:
+        - `flat`: uniform flat distribution
+        - `step`: distribution with a single sigmoid :func: `scipy.special.expit`
+        - `double_step`: distribution with two opposite sigmoids :func: `scipy.special.expit`
+    Each sigmoid is  parametrized by a scale and a rate.
+
+    In practice, the `flat` function is used when no asymetry is present in the data, and the other
+    two are when an asymetry towards one direction, usually opposite to pia or apical,
+    or two directions, usually along and opposite to pia
+
+    Returns:
+        function with first arg as angle and next args to parametrize the function
+    """
     if form == "flat":
 
         def flat_prob(angle):
@@ -520,25 +546,21 @@ def get_probability_function(form="step", with_density=True):
         return double_prob
 
 
-# this is the form of the expected parameter dict.
-# The bounds correspond to the function's parameter min/max bounds for the fit
-default_bounds = {
-    "double_step": ([0, 0.1, -np.pi, 0.1], [np.pi, 10, 0, 10]),
-    "step": ([-np.pi, 0.1], [np.pi, 10]),
-}
-default_params = {
-    "with_apical": {"basal_dendrite": {"form": "step", "bounds": default_bounds["step"]}},
-    "without_apical": {"basal_dendrite": {"form": "flat", "bounds": []}},
-}
+def _fit_single_3d_angles(data, neurite_type, morph_class, fit_params=None):
+    """Fit function to distribution of 3d angles for a neurite_type.
 
+    Args:
+        data (dict): bins and weights data from input_distribution
+        neurite_type (str): neurite_type to consider
+        morph_class (str): morph_class of the neuron (with_apical or without_apical)
+        fit_params (dict): specific fit parameters such as form and bounds to overwrite the defaults
+    """
+    _fit_params = deepcopy(fit_3d_angles_params)
+    if fit_params is not None:
 
-def _fit_single_3d_angles(data, neurite_type, morph_class, params=None):
-    """Fit 3d angles on a single neurite_type."""
-    _params = deepcopy(default_params)
-    if params is not None:
-        _params[morph_class][neurite_type].update(params)
+        _fit_params[morph_class][neurite_type].update(fit_params)
 
-    form = _params[morph_class][neurite_type]["form"]
+    form = _fit_params[morph_class][neurite_type]["form"]
     if form != "flat":
         function = get_probability_function(form, with_density=True)
 
@@ -547,10 +569,10 @@ def _fit_single_3d_angles(data, neurite_type, morph_class, params=None):
                 function,
                 data["bins"],
                 data["weights"],
-                bounds=_params[morph_class][neurite_type]["bounds"],
+                bounds=_fit_params[morph_class][neurite_type]["bounds"],
             )[0]
         except RuntimeError:
-            warnings.warn("Cannot fit some trunk angles")
+            warnings.warn("Cannot fit some trunk angles, we fallback to flat distribution")
             form = "flat"
             popt = np.array([])
     else:
@@ -558,21 +580,35 @@ def _fit_single_3d_angles(data, neurite_type, morph_class, params=None):
     return {"form": form, "params": popt.tolist()}
 
 
-def _get_params(parameters):
+def _get_fit_params_from_input_parameters(parameters):
     """Get parameter dict for fits from tmd_parameters."""
     if "values" in parameters["orientation"] and parameters["orientation"]["values"] is not None:
         form = parameters["orientation"]["values"].get("form")
         bounds = parameters["orientation"]["values"].get("bounds")
         if form is not None:
             if bounds is None:
-                bounds = default_bounds[form]
+                bounds = fit_3d_angles_params[form]
             if parameters["orientation"]["values"].get("params") is None:
                 return {"form": form, "bounds": bounds}
     return None
 
 
 def fit_3d_angles(tmd_parameters, tmd_distributions):
-    """Fit 3d angles to update tmd_parameters if not present."""
+    """Fit functions to 3d_angles from tmd_distributions and save in tmd_parameters.
+    The update of tmd_parmeters is in plcae, and if fit parameters are already in tmd_parameters,
+    the fit is skipped.
+
+    We return True if there is any 3d_angle data what was present in tmd_distributions, with or
+    without fit data, so this function can be used to detect if 3d_angles modes can be used
+    in synthesis.
+
+    Args:
+        tmd_parameters (dict): input parameters
+        tmd_distributions (dict): inputdistributions
+
+    Returns:
+        bool: True if 3d_angles mode can be used, False otherwise
+    """
     with_3d = False
     morph_class = (
         "with_apical" if "apical_dendrite" in tmd_parameters["grow_types"] else "without_apical"
@@ -592,7 +628,7 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
                     data["data"],
                     neurite_type,
                     morph_class,
-                    params=_get_params(tmd_parameters[neurite_type]),
+                    params=_get_fit_params_from_input_parameters(tmd_parameters[neurite_type]),
                 )
 
         if tmd_parameters[neurite_type]["orientation"]["mode"] == "pia_constraint":
@@ -606,6 +642,6 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
                     data["data"],
                     neurite_type,
                     morph_class,
-                    params=_get_params(tmd_parameters[neurite_type]),
+                    params=_get_fit_params_from_input_parameters(tmd_parameters[neurite_type]),
                 )
     return with_3d
