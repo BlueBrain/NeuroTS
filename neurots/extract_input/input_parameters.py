@@ -65,9 +65,6 @@ def parameters(
             f"trunk_method {trunk_method} not understood, choose between {('simple', '3d_angles')}"
         )
 
-    if trunk_method == "3d_angles":
-        neurite_types = _sort_neurite_types(neurite_types)
-
     input_parameters = {
         "basal_dendrite": {},
         "apical_dendrite": {},
@@ -125,6 +122,7 @@ def parameters(
             input_parameters["apical_dendrite"]["growth_method"] = "tmd_apical"
 
     if trunk_method == "3d_angles":
+        input_parameters["grow_types"] = _sort_neurite_types(neurite_types)
         input_parameters["basal_dendrite"]["orientation"] = {"mode": "pia_constraint"}
         if "apical_dendrite" in neurite_types:
             input_parameters["apical_dendrite"]["orientation"] = {
@@ -142,6 +140,6 @@ def parameters(
         input_parameters["diameter_params"] = diameter_parameters
         input_parameters["diameter_params"]["method"] = "external"
     else:
-        raise KeyError(f"Diameter params {diameter_parameters} not understood.")
+        raise ValueError(f"Diameter params not understood, {diameter_parameters}")
 
     return input_parameters
