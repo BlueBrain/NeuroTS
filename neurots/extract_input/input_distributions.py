@@ -83,7 +83,9 @@ def distributions(
             neurite_types[i] = neurite_type + "_dendrite"
 
     if trunk_method not in ("simple", "3d_angles"):
-        raise KeyError(f"trunk_method {trunk_method} not understood")
+        raise KeyError(
+            f"trunk_method {trunk_method} not understood, choose between {('simple', '3d_angles')}"
+        )
 
     pop_tmd = tmd.io.load_population(filepath, use_morphio=True)
     pop_nm = load_morphologies(filepath)
