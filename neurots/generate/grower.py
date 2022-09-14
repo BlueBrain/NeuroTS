@@ -302,20 +302,58 @@ class NeuronGrower:
         else:
             raise ValueError("Input orientation format is not correct!")
 
-        return self.soma_grower.add_points_from_orientations(orientations)
+        pts = self.soma_grower.add_points_from_orientations(orientations)
+        return pts
 
     def _simple_grow_trunks(self):
-        """Simple _grow_trunks function."""
-        for type_of_tree in self.input_parameters["grow_types"]:
+        """Grow the trunks.
+
+        Generates the initial points of each tree, which depend on the selectedS
+        tree types and the soma surface. All the trees start growing from the surface
+        of the soma. The outgrowth direction is either specified in the input parameters,
+        as ``parameters['type']['orientation']`` or it is randomly chosen according to the
+        biological distribution of trunks on the soma surface if ``orientation`` is ``None``.
+        """
+        tree_types = self.input_parameters["grow_types"]
+
+        legacy_mode = not isinstance(self.input_parameters[tree_types[0]]["orientation"], dict)
+
+        if not legacy_mode:
+
+            trunk_orientations_manager = self._trunk_orientations_class(
+                soma=self.soma_grower.soma,
+                parameters=self.input_parameters,
+                distributions=self.input_distributions,
+                context=self.context,
+                rng=self._rng,
+            )
+
+        for type_of_tree in tree_types:
+
             params = self.input_parameters[type_of_tree]
             distr = self.input_distributions[type_of_tree]
 
-            n_trees = sample.n_neurites(distr["num_trees"], random_generator=self._rng)
+            if legacy_mode:
 
-            if type_of_tree == "basal" and n_trees < 2:
-                raise Exception(f"There should be at least 2 basal dendrites (got {n_trees})")
+                n_trees = sample.n_neurites(distr["num_trees"], random_generator=self._rng)
 
-            points = self._convert_orientation2points(params["orientation"], n_trees, distr, params)
+                if type_of_tree == "basal_dendrite" and n_trees < 2:
+                    raise Exception(f"There should be at least 2 basal dendrites (got {n_trees})")
+
+                orientation = params["orientation"]
+                points = self._convert_orientation2points(orientation, n_trees, distr, params)
+
+            else:
+
+                orientations = trunk_orientations_manager.compute_tree_type_orientations(
+                    type_of_tree
+                )
+                n_trees = len(orientations)
+
+                if type_of_tree == "basal" and n_trees < 2:
+                    raise Exception(f"There should be at least 2 basal dendrites (got {n_trees})")
+
+                points = self.soma_grower.add_points_from_orientations(orientations)
 
             # Iterate over all initial points on the soma and create new trees
             # with a direction and initial_point
@@ -361,14 +399,8 @@ class NeuronGrower:
                 )
 
     def _grow_trunks(self):
-        """Grow the trunks.
+        """Grwo trunk."""
 
-        Generates the initial points of each tree, which depend on the selectedS
-        tree types and the soma surface. All the trees start growing from the surface
-        of the soma. The outgrowth direction is either specified in the input parameters,
-        as ``parameters['type']['orientation']`` or it is randomly chosen according to the
-        biological distribution of trunks on the soma surface if ``orientation`` is ``None``.
-        """
         from neurots.generate.orientations import fit_3d_angles
 
         if fit_3d_angles(self.input_parameters, self.input_distributions):
@@ -384,6 +416,5 @@ class NeuronGrower:
         self._grow_trunks()
 
         points, diameters = self.soma_grower.build(soma_type)
-
         self.neuron.soma.points = points
         self.neuron.soma.diameters = diameters
