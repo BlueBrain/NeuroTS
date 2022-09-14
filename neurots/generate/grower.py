@@ -30,6 +30,7 @@ from numpy.random import SeedSequence
 from neurots.generate import diametrizer
 from neurots.generate import orientations as _oris
 from neurots.generate.orientations import OrientationManager
+from neurots.generate.orientations import fit_3d_angles
 from neurots.generate.soma import Soma
 from neurots.generate.soma import SomaGrower
 from neurots.generate.tree import TreeGrower
@@ -372,7 +373,7 @@ class NeuronGrower:
                 )
 
     def _3d_angles_grow_trunks(self):
-        """Grow trunk with 3d_angles method."""
+        """Grow trunk with 3d_angles method via OrientationManager class."""
         trunk_orientations_manager = self._trunk_orientations_class(
             soma=self.soma_grower.soma,
             parameters=self.input_parameters,
@@ -380,7 +381,6 @@ class NeuronGrower:
             context=self.context,
             rng=self._rng,
         )
-        orientations = []
         for neurite_type in self.input_parameters["grow_types"]:
             orientations = trunk_orientations_manager.compute_tree_type_orientations(neurite_type)
 
@@ -399,9 +399,12 @@ class NeuronGrower:
                 )
 
     def _grow_trunks(self):
-        """Grwo trunk."""
+        """Grow the trunks.
 
-        from neurots.generate.orientations import fit_3d_angles
+        Two methods are available, depending on the data present in the input_parameters.
+        If no 3d_angles data is present, we grow trunks with :func: `_simple_grow_trunks` else
+        we fit the raw binned 3d angle data and apply :func: `_3d_angles_grow_trunks`.
+        """
 
         if fit_3d_angles(self.input_parameters, self.input_distributions):
             self._3d_angles_grow_trunks()
