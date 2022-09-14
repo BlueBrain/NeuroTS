@@ -67,7 +67,7 @@ def distributions(
             ``{<neurite type 1>: <feature 1>, ...}``.
         diameter_model (str): model for diameters, internal models are `M1`, `M2`, `M3`, `M4` and
             `M5`. Can be set to `external` for external model.
-        trunk_method (str): 'simple' for simple trunk method, or '3d_angles'
+        trunk_method (str): `simple` for simple trunk method, or `3d_angles`.
 
     Returns:
         dict: The input distributions.

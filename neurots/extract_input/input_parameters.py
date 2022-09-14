@@ -23,7 +23,7 @@ tmd_algos = ("tmd", "tmd_gradient", "tmd_apical")
 def _sort_neurite_types(neurite_types):
     """Sort neurite types to comply with internal requirements.
 
-    For now, only apical should be first, so it is placed first, and other neurite_types can be
+    For now, only apical should be first, so it is placed first, and other `neurite_types` can be
     placed with respect to it.
     """
     if "apical_dendrite" in neurite_types:
@@ -47,7 +47,7 @@ def parameters(
         neurite_types (list[str]): The neurite types to consider.
         feature (str): Use the specified TMD feature.
         diameter_parameters (dict or str): The parameters used for the diameters.
-        trunk_method (str): 'simple' for simple trunk method, or '3d_angles'.
+        trunk_method (str): `simple` for simple trunk method, or `3d_angles`.
 
     Returns:
         dict: The parameters.

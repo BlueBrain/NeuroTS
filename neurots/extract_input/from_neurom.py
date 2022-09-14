@@ -122,7 +122,7 @@ def trunk_neurite_3d_angles(pop, neurite_type, bins):
     Args:
         pop (neurom.core.population.Population): The given population.
         neurite_type (neurom.core.types.NeuriteType): Consider only the neurites of this type.
-        bins (int or list[int] or str, optional): The bins to use (this pararmeter is passed to
+        bins (int or list[int] or str, optional): The bins to use (this parameter is passed to
             :func:`numpy.histogram`).
 
     Returns:
@@ -253,9 +253,9 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30, method="simple")
     Args:
         pop (neurom.core.population.Population): The given population.
         neurite_type (neurom.core.types.NeuriteType): Consider only the neurites of this type.
-        bins (int or list[int] or str, optional): The bins to use (this pararmeter is passed to
+        bins (int or list[int] or str, optional): The bins to use (this parameter is passed to
             :func:`numpy.histogram`).
-        method (str): Method to use, either simple or 3d_angles.
+        method (str): Method to use, either `simple` or `3d_angles`.
 
     Returns:
         dict: A dictionary with the trunk data.

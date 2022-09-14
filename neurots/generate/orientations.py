@@ -223,10 +223,10 @@ class OrientationManager(OrientationManagerBase):
         """Returns orientations using normal/exp distribution along a direction.
 
         The `direction` value should be a 2-tuple, or a list of 2-tuples for multiple trunks.
-        The first value of the tuple is the angle wrt to pia ([0, 1, 0]) direction and the second
-        is the standard deviation of a normal distribution if angle>0 or scaling of exponential
-        distribution if angle=0. As the resulting angle must be in [0, 2 * pi], we clip the
-        obtained angle and uniformaly sample the second angle to obtain a 3d direction.
+        The first value of the tuple is the angle wrt to pia (`[0, 1, 0]`) direction and the second
+        is the standard deviation of a normal distribution if `angle>0` or scaling of exponential
+        distribution if `angle=0`. As the resulting angle must be in `[0, 2 * pi]`, we clip the
+        obtained angle and uniformly sample the second angle to obtain a 3d direction.
         """
         assert "direction" in values_dict, "'direction' key is missing"
 
@@ -247,7 +247,7 @@ class OrientationManager(OrientationManagerBase):
         return spherical_angles_to_pia_orientations(phis, thetas)
 
     def _mode_pia_constraint(self, _, tree_type):
-        """Create trunks from distribution of angles with pia ([0 , 1, 0]) direction.
+        """Create trunks from distribution of angles with pia (`[0 , 1, 0]`) direction.
 
         See :func:`_sample_trunk_from_3d_angle` for more details on the algorithm.
         """
@@ -274,7 +274,7 @@ class OrientationManager(OrientationManagerBase):
         """Sample trunk directions from fit of distribution of 3d_angles wrt to ref_dir.
 
         We use the accept-reject algorithm so we can sample from any distribution.
-        After a number of unsuccesfull tries (default=100), we  stop and return a random direction.
+        After a number of unsuccesfull tries (default=100), we stop and return a random direction.
         We also issue a warning so the user is aware that the provided distribution may have issues,
         mostly related to large region of small probabilities.
         """
@@ -472,14 +472,14 @@ def sample_spherical_unit_vectors(rng):
 
 
 def spherical_angles_to_pia_orientations(phis, thetas):
-    """Compute orientation from spherical angles where thetas are wirt to pia at [0, 1, 0].
+    """Compute orientation from spherical angles where thetas are wrt to pia at `[0, 1, 0]`.
 
     Args:
         phis (numpy.ndarray): Polar angles.
         thetas (numpy.ndarray): Azimuthal angles.
 
     Returns:
-        numpy.ndarray: The orientation vectors where each row correspnds to a phi-theta pair.
+        numpy.ndarray: The orientation vectors where each row corresponds to a phi-theta pair.
     """
     assert PIA_DIRECTION == [0, 1, 0], "Global pia direction is not compatible"
     return np.column_stack(
@@ -491,19 +491,19 @@ def get_probability_function(form="step", with_density=True):
     """Get probability functions to fit 3d trunk angles distributions.
 
     Args:
-        form (str): form of the function, can be `flat`, `step` or `double_step`
-        with_density (bool): return the function with spherical density factor or not
+        form (str): Form of the function, can be `flat`, `step` or `double_step`.
+        with_density (bool): Return the function with spherical density factor or not.
 
     Three forms of functions are available:
     - `flat`: uniform flat distribution
     - `step`: distribution with a single sigmoid :func:`scipy.special.expit`
     - `double_step`: distribution with two opposite sigmoids :func:`scipy.special.expit`
 
-    Each sigmoid is  parametrized by a scale and a rate.
+    Each sigmoid is parametrized by a scale and a rate.
 
     In practice, the `flat` function is used when no asymetry is present in the data, and the other
-    two are when an asymetry towards one direction, usually opposite to pia or apical,
-    or two directions, usually along and opposite to pia
+    two are when an asymmetry towards one direction, usually opposite to pia or apical,
+    or two directions, usually along and opposite to pia.
 
     Returns:
         function with first arg as angle and next args to parametrize the function
@@ -546,6 +546,7 @@ def get_probability_function(form="step", with_density=True):
 
         return double_prob
 
+    raise ValueError(f"The '{form}' value is unknown, it should be one of ['flat', 'step', 'double_step']")
 
 def _fit_single_3d_angles(data, neurite_type, morph_class, fit_params=None):
     """Fit function to distribution of 3d angles for a neurite_type.
@@ -595,20 +596,20 @@ def _get_fit_params_from_input_parameters(parameters):
 
 
 def fit_3d_angles(tmd_parameters, tmd_distributions):
-    """Fit functions to 3d_angles from tmd_distributions and save in tmd_parameters.
-    The update of tmd_parmeters is in plcae, and if fit parameters are already in tmd_parameters,
+    """Fit functions to 3d_angles from `tmd_distributions` and save in `tmd_parameters`.
+    The update of `tmd_parmeters` is in place, and if fit parameters are already in `tmd_parameters`,
     the fit is skipped.
 
-    We return True if there is any 3d_angle data what was present in tmd_distributions, with or
-    without fit data, so this function can be used to detect if 3d_angles modes can be used
+    We return `True` if there is any `3d_angle` data what was present in `tmd_distributions`, with or
+    without fit data, so this function can be used to detect if `3d_angles` modes can be used
     in synthesis.
 
     Args:
-        tmd_parameters (dict): input parameters
-        tmd_distributions (dict): inputdistributions
+        tmd_parameters (dict): Input parameters.
+        tmd_distributions (dict): Input distributions.
 
     Returns:
-        bool: True if 3d_angles mode can be used, False otherwise
+        bool: `True` if `3d_angles` mode can be used, `False` otherwise
     """
     with_3d = False
     morph_class = (
