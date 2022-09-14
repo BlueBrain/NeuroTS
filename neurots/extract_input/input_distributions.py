@@ -49,7 +49,6 @@ def distributions(
     feature="path_distances",
     diameter_model=None,
     trunk_method="simple",
-    trunk_parameters=None,
 ):
     """Extracts the input distributions from an input population.
 
@@ -69,7 +68,6 @@ def distributions(
         diameter_model (str): model for diameters, internal models are `M1`, `M2`, `M3`, `M4` and
             `M5`. Can be set to `external` for external model.
         trunk_method (str): 'simple' for simple trunk method, or '3d_angles'
-        trunk_parameters (dict): additional parameter for trunk angles (for '3d_angles' method)
 
     Returns:
         dict: The input distributions.
@@ -123,8 +121,7 @@ def distributions(
         nm_type = getattr(NeuriteType, neurite_type)
 
         input_distributions[neurite_type] = _append_dicts(
-            trunk_neurite(pop_nm, nm_type, params=trunk_parameters, method=trunk_method),
-            number_neurites(pop_nm, nm_type),
+            trunk_neurite(pop_nm, nm_type, method=trunk_method), number_neurites(pop_nm, nm_type)
         )
         if type_feature in ["path_distances", "radial_distances"]:
             _append_dicts(

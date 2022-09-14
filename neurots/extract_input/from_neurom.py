@@ -110,15 +110,20 @@ def trunk_vectors(morph, neurite_type):
     ]
 
 
-def _3d_angles_trunk_neurite(pop, neurite_type, bins, params=None):
-    """Extract trunk angle data.
+def trunk_neurite_3d_angles(pop, neurite_type, bins):
+    """Extract 3d trunk angle data.
+
+    We extract non-projected, or 3d angles between the pia/apical and any neurite trunk.
+    The direction of a trunk is defined from the vector between [0, 0, 0] and the root point,
+    to avoid any bias from non-spherical somata, where the soma center would be away from [0, 0, 0].
+
+    If no apical dendrite is present, the entry `apical_3d_angles` will be absent.
 
     Args:
         pop (neurom.core.population.Population): The given population.
         neurite_type (neurom.core.types.NeuriteType): Consider only the neurites of this type.
         bins (int or list[int] or str, optional): The bins to use (this pararmeter is passed to
             :func:`numpy.histogram`).
-        params (dict): parameter to pass to fit functions to set the bounds
 
     Returns:
         dict: A dictionary with the following structure:
@@ -127,9 +132,17 @@ def _3d_angles_trunk_neurite(pop, neurite_type, bins, params=None):
 
             {
                 "trunk": {
-                    "3d_angle": {
-                        "form": <form of fit function>,
-                        "params": <fit params>,
+                    "pia_3d_angles": {
+                        "data": {
+                            "bins": <bin values>,
+                            "weights": <weights>
+                        }
+                    },
+                    "apical_3d_angles": {
+                        "data": {
+                            "bins": <bin values>,
+                            "weights": <weights>
+                        }
                     }
                 }
             }
@@ -139,7 +152,7 @@ def _3d_angles_trunk_neurite(pop, neurite_type, bins, params=None):
     for morph in pop.morphologies:
         vecs = trunk_vectors(morph, neurite_type=neurite_type)
         pia_3d_angles += [nm.morphmath.angle_between_vectors(PIA_REF_VEC, vec) for vec in vecs]
-        if neurite_type.name is not "apical_dendrite":
+        if neurite_type.name != "apical_dendrite":
             apical_ref_vec = trunk_vectors(morph, neurite_type=nm.APICAL_DENDRITE)
             if len(apical_ref_vec) > 0:
                 apical_3d_angles += [
@@ -151,16 +164,15 @@ def _3d_angles_trunk_neurite(pop, neurite_type, bins, params=None):
         densities, _bins = np.histogram(data, bins=bins, density=True)
         return densities, 0.5 * (_bins[1:] + _bins[:-1])
 
-    data = {}
     weights, _bins = _get_hist(pia_3d_angles)
-    data["pia_3d_angles"] = {"data": {"bins": _bins.tolist(), "weights": weights.tolist()}}
+    data = {"pia_3d_angles": {"data": {"bins": _bins.tolist(), "weights": weights.tolist()}}}
     if len(apical_3d_angles) > 0:
         weights, _bins = _get_hist(apical_3d_angles)
         data["apical_3d_angles"] = {"data": {"bins": _bins.tolist(), "weights": weights.tolist()}}
-    return data
+    return {"trunk": data}
 
 
-def _simple_trunk_neurite(pop, neurite_type, bins):
+def trunk_neurite_simple(pop, neurite_type, bins):
     """Extract the trunk data for a specific tree type.
 
     Args:
@@ -229,23 +241,29 @@ def _simple_trunk_neurite(pop, neurite_type, bins):
     }
 
 
-def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30, params=None, method="simple"):
+def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30, method="simple"):
     """Extract the trunk data for a specific tree type.
+
+    If `method=='simple'`, only trunk angles for the `simple` method will be extracted,
+    if `method=='3d_angles'` additional angles will be extracted for `3d_angles` method.
+
+    See docstring of :func: trunk_neurite_simple and :func: trunk_neurite_3d_angles for more details
+    on the extracted angles.
 
     Args:
         pop (neurom.core.population.Population): The given population.
         neurite_type (neurom.core.types.NeuriteType): Consider only the neurites of this type.
         bins (int or list[int] or str, optional): The bins to use (this pararmeter is passed to
             :func:`numpy.histogram`).
-        method (str): Method to use.
+        method (str): Method to use, either simple or 3d_angles.
 
     Returns:
         dict: A dictionary with the trunk data.
     """
-    trunk_data = _simple_trunk_neurite(pop, neurite_type=neurite_type, bins=bins)
+    trunk_data = trunk_neurite_simple(pop, neurite_type=neurite_type, bins=bins)
     if method == "3d_angles":
         trunk_data["trunk"].update(
-            _3d_angles_trunk_neurite(pop, neurite_type=neurite_type, bins=bins, params=params)
+            trunk_neurite_3d_angles(pop, neurite_type=neurite_type, bins=bins)["trunk"]
         )
     return trunk_data
 
