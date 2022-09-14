@@ -149,6 +149,17 @@ class OrientationManager(OrientationManagerBase):
 
     """
 
+    def _mode_use_predefined(self, values_dict, tree_type):
+        """Returns predefined orientations."""
+        assert "orientations" in values_dict, "'orientations' key is missing"
+        tree_type_distrs = self._distributions[tree_type]
+
+        # the reason of this sampling is to maintain the pseudorandom
+        # sequence of the legacy implementation. Otherwise the functional tests
+        # will break because the sequence will be slightly different.
+        sample.n_neurites(tree_type_distrs["num_trees"], self._rng)
+        return normalize_vectors(np.asarray(values_dict["orientations"], dtype=np.float64))
+
     def _mode_normal_pia_constraint(self, values_dict, tree_type):
         """Returns predefined orientations using normal/exp distribution."""
         if len(np.shape(values_dict["direction"])) == 1:
