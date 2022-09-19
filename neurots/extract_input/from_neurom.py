@@ -117,6 +117,8 @@ def trunk_neurite_3d_angles(pop, neurite_type, bins):
     The direction of a trunk is defined from the vector between [0, 0, 0] and the root point,
     to avoid any bias from non-spherical somata, where the soma center would be away from [0, 0, 0].
 
+    Warning: This is not compatible with the neurom `trunk_vectors` features.
+
     If no apical dendrite is present, the entry `apical_3d_angles` will be absent.
 
     Args:

@@ -60,7 +60,7 @@ def parameters(
             neurite_type_warning(neurite_type)
             neurite_types[i] = neurite_type + "_dendrite"
 
-    if trunk_method not in ("simple", "3d_angles"):
+    if trunk_method not in {"simple", "3d_angles"}:
         raise KeyError(
             f"trunk_method {trunk_method} not understood, choose between {('simple', '3d_angles')}"
         )

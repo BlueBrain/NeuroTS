@@ -406,7 +406,10 @@ class NeuronGrower:
         we fit the raw binned 3d angle data and apply :func:`_3d_angles_grow_trunks`.
         """
 
-        if fit_3d_angles(self.input_parameters, self.input_distributions):
+        with_3d, self.input_parameters = fit_3d_angles(
+            self.input_parameters, self.input_distributions
+        )
+        if with_3d:
             self._3d_angles_grow_trunks()
         else:
             self._simple_grow_trunks()
