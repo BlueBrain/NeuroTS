@@ -18,7 +18,7 @@
 import neurom as nm
 import numpy as np
 from neurom import stats
-from neurom.core.types import tree_type_checker as is_type
+from neurom.features.morphology import trunk_vectors
 
 from neurots.utils import PIA_DIRECTION
 
@@ -102,22 +102,10 @@ def soma_data(pop):
     return {"size": transform_distr(ss)}
 
 
-def trunk_vectors(morph, neurite_type):
-    """This is `neurom.get('trunk_vectors')` but wrt to `[0, 0, 0]`."""
-    return [
-        nm.morphmath.vector(n.root_node.points[0], [0.0, 0.0, 0.0])
-        for n in nm.iter_neurites(morph, filt=is_type(neurite_type))
-    ]
-
-
 def trunk_neurite_3d_angles(pop, neurite_type, bins):
     """Extract 3d trunk angle data.
 
     We extract non-projected, or 3d angles between the pia/apical and any neurite trunk.
-    The direction of a trunk is defined from the vector between [0, 0, 0] and the root point,
-    to avoid any bias from non-spherical somata, where the soma center would be away from [0, 0, 0].
-
-    Warning: This is not compatible with the neurom `trunk_vectors` features.
 
     If no apical dendrite is present, the entry `apical_3d_angles` will be absent.
 
