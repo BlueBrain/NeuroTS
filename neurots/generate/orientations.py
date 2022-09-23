@@ -251,9 +251,10 @@ class OrientationManager(OrientationManagerBase):
         See :func:`_sample_trunk_from_3d_angle` for more details on the algorithm.
         """
         n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
+        pia_direction = self._parameters.get("pia_direction", PIA_DIRECTION)
         return np.asarray(
             [
-                _sample_trunk_from_3d_angle(self._parameters, self._rng, tree_type, PIA_DIRECTION)
+                _sample_trunk_from_3d_angle(self._parameters, self._rng, tree_type, pia_direction)
                 for _ in range(n_orientations)
             ]
         )
