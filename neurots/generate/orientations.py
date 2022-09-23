@@ -254,9 +254,7 @@ class OrientationManager(OrientationManagerBase):
         n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
         return np.asarray(
             [
-                self._sample_trunk_from_3d_angle(
-                    self._parameters, self._rng, tree_type, PIA_DIRECTION
-                )
+                _sample_trunk_from_3d_angle(self._parameters, self._rng, tree_type, PIA_DIRECTION)
                 for _ in range(n_orientations)
             ]
         )
@@ -270,7 +268,7 @@ class OrientationManager(OrientationManagerBase):
         ref_dir = self._orientations["apical_dendrite"][0]
         return np.asarray(
             [
-                self._sample_trunk_from_3d_angle(self._parameters, self._rng, tree_type, ref_dir)
+                _sample_trunk_from_3d_angle(self._parameters, self._rng, tree_type, ref_dir)
                 for _ in range(n_orientations)
             ]
         )
