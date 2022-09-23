@@ -21,15 +21,14 @@ from copy import deepcopy
 
 import neurom as nm
 import numpy as np
+from scipy.optimize import curve_fit
 from scipy.special import expit
 
 from neurots.morphmath import rotation
 from neurots.morphmath import sample
 from neurots.morphmath.utils import normalize_vectors
-from neurots.utils import NeuroTSError
 from neurots.utils import PIA_DIRECTION
-
-from scipy.optimize import curve_fit
+from neurots.utils import NeuroTSError
 
 _TWOPI = 2.0 * np.pi
 fit_3d_angles_bounds = {
@@ -623,7 +622,7 @@ def _sample_trunk_from_3d_angle(parameters, rng, tree_type, ref_dir, max_tries=1
     """Sample trunk directions from fit of distribution of 3d_angles wrt to ref_dir.
 
     We use the accept-reject algorithm so we can sample from any distribution.
-    After a number of unsuccesfull tries (default=100), we stop and return a random direction.
+    After a number of unsuccessful tries (default=100), we stop and return a random direction.
     We also issue a warning so the user is aware that the provided distribution may have issues,
     mostly related to large region of small probabilities.
     """
