@@ -583,6 +583,10 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
     morph_class = (
         "with_apical" if "apical_dendrite" in tmd_parameters["grow_types"] else "without_apical"
     )
+    _3d_angles_mapping = {
+        "apical_constraint": "apical_3d_angles",
+        "pia_constraint": "pia_3d_angles",
+    }
     new_tmd_parameters = deepcopy(tmd_parameters)
     for neurite_type in tmd_parameters["grow_types"]:
 
@@ -592,33 +596,20 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
         ):
             continue
 
-        if tmd_parameters[neurite_type]["orientation"]["mode"] == "apical_constraint":
+        mode = tmd_parameters[neurite_type]["orientation"]["mode"]
+        if mode in _3d_angles_mapping:
             with_3d = True
             if (
                 tmd_parameters[neurite_type]["orientation"].get("values") is None
                 or "params" not in tmd_parameters[neurite_type]["orientation"]["values"]
             ):
-                data = tmd_distributions[neurite_type]["trunk"]["apical_3d_angles"]
                 new_tmd_parameters[neurite_type]["orientation"]["values"] = _fit_single_3d_angles(
-                    data["data"],
+                    tmd_distributions[neurite_type]["trunk"][_3d_angles_mapping[mode]]["data"],
                     neurite_type,
                     morph_class,
                     fit_params=_get_fit_params_from_input_parameters(tmd_parameters[neurite_type]),
                 )
 
-        if tmd_parameters[neurite_type]["orientation"]["mode"] == "pia_constraint":
-            with_3d = True
-            if (
-                tmd_parameters[neurite_type]["orientation"].get("values") is None
-                or "params" not in tmd_parameters[neurite_type]["orientation"]["values"]
-            ):
-                data = tmd_distributions[neurite_type]["trunk"]["pia_3d_angles"]
-                new_tmd_parameters[neurite_type]["orientation"]["values"] = _fit_single_3d_angles(
-                    data["data"],
-                    neurite_type,
-                    morph_class,
-                    fit_params=_get_fit_params_from_input_parameters(tmd_parameters[neurite_type]),
-                )
     return new_tmd_parameters if with_3d else None
 
 
