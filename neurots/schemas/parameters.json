@@ -70,7 +70,7 @@
                     "type": "integer"
                 },
                 "orientation": {
-                    "oneOf": [
+                    "anyOf": [
                         {
                             "$ref": "#/definitions/null_object"
                         },
@@ -107,6 +107,17 @@
                                             "additionalProperties": false,
                                             "required": ["orientations"]
                                         },
+                                         {
+                                            "type": "object",
+                                            "properties": {
+                                                "primary_orientation": {
+                                                    "$ref": "#/definitions/point",
+                                                    "description": "The primary orientation vector"
+                                                }
+                                            },
+                                            "additionalProperties": false,
+                                            "required": ["primary_orientation"]
+                                         },
                                         {
                                             "type": "object",
                                             "properties": {

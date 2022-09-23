@@ -349,7 +349,7 @@ def test_orientation_manager__pia_constraint():
         "basal": {
             "orientation": {
                 "mode": "pia_constraint",
-                "values": {"pia": [0, 1, 0]},
+                "values": {"form": "step", "params": [1.5, 0.25]},
             }
         },
     }
@@ -360,7 +360,6 @@ def test_orientation_manager__pia_constraint():
             "num_trees": {
                 "data": {"bins": [2], "weights": [1]},
             },
-            "trunk": {"3d_angle": {"form": "step", "params": [1.5, 0.25]}},
         }
     }
 
@@ -384,8 +383,8 @@ def test_orientation_manager__pia_constraint():
 def test_orientation_manager__apical_constraint():
 
     parameters = {
-        "grow_types": ["apical", "basal"],
-        "apical": {
+        "grow_types": ["apical_dendrite", "basal"],
+        "apical_dendrite": {
             "orientation": {
                 "mode": "use_predefined",
                 "values": {"orientations": [[0.0, 1.0, 0.0]]},
@@ -394,14 +393,14 @@ def test_orientation_manager__apical_constraint():
         "basal": {
             "orientation": {
                 "mode": "apical_constraint",
-                "values": {},
+                "values": {"form": "step", "params": [1.5, 0.25]},
             }
         },
     }
 
     # params obtained from fit to an L5_TPC:A population
     distributions = {
-        "apical": {
+        "apical_dendrite": {
             "num_trees": {
                 "data": {"bins": [1], "weights": [1]},
             }
@@ -410,7 +409,6 @@ def test_orientation_manager__apical_constraint():
             "num_trees": {
                 "data": {"bins": [2], "weights": [1]},
             },
-            "trunk": {"3d_angle": {"form": "step", "params": [1.5, 0.25]}},
         },
     }
 
@@ -424,12 +422,30 @@ def test_orientation_manager__apical_constraint():
 
     for tree_type in parameters["grow_types"]:
         om.compute_tree_type_orientations(tree_type)
-    om._sample_trunk_from_3d_angle("basal", [0, 0, 1], max_tries=-1)
+    tested._sample_trunk_from_3d_angle(parameters, om._rng, "basal", [0, 0, 1], max_tries=-1)
 
     actual = om.get_tree_type_orientations("basal")
     expected = np.array([[0.761068, 0.124662, -0.636581], [0.741505, 0.538547, -0.400171]])
 
     npt.assert_allclose(actual, expected, rtol=2e-5)
 
-    with pytest.raises(NotImplementedError):
-        tested.prob_function(0, {}, "UNKNOWN")
+
+def test_probability_function():
+
+    func = tested.get_probability_function(form="flat")
+    npt.assert_equal(func(1.0), 0.8414709848078965)
+
+    func = tested.get_probability_function(form="step")
+    npt.assert_equal(func(2.1, 0.5, 5), 0.7949219421515932)
+
+    func = tested.get_probability_function(form="double_step")
+    npt.assert_equal(func(2.1, 0.5, 5, -0.5, 1), 0.5877841415613994)
+
+    func = tested.get_probability_function(form="flat", with_density=False)
+    npt.assert_equal(func(1.0), 1.0)
+
+    func = tested.get_probability_function(form="step", with_density=False)
+    npt.assert_equal(func(2.1, 0.5, 5), 0.9208912378205718)
+
+    func = tested.get_probability_function(form="double_step", with_density=False)
+    npt.assert_equal(func(2.1, 0.5, 5, -0.5, 1), 0.6809288270854589)

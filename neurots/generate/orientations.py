@@ -585,7 +585,11 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
     )
     new_tmd_parameters = deepcopy(tmd_parameters)
     for neurite_type in tmd_parameters["grow_types"]:
-        if "mode" not in tmd_parameters[neurite_type]["orientation"]:
+
+        if (
+            tmd_parameters[neurite_type] is not None
+            or "mode" not in tmd_parameters[neurite_type]["orientation"]
+        ):
             continue
 
         if tmd_parameters[neurite_type]["orientation"]["mode"] == "apical_constraint":
