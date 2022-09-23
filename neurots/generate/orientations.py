@@ -567,21 +567,20 @@ def _get_fit_params_from_input_parameters(parameters):
 
 
 def fit_3d_angles(tmd_parameters, tmd_distributions):
-    """Fit functions to 3d_angles from `tmd_distributions` and save in `tmd_parameters`.
+    """Fit functions to 3d_angles from `tmd_distributions` and save in copy of `tmd_parameters`.
 
     If if fit parameters are already in `tmd_parameters`, the fit is skipped.
 
-    We return `True` if there is any `3d_angle` data what was present in `tmd_distributions`,
-    with or without fit data, so this function can be used to detect if `3d_angles` modes can
-    be used in synthesis.
+    We return `None` instead of copy of `tmd_parameters` if there is any `3d_angle` data that
+    was present in `tmd_distributions`, with or without fit data, so this function can be used
+    to detect if `3d_angles` modes can be used in synthesis.
 
     Args:
         tmd_parameters (dict): Input parameters.
         tmd_distributions (dict): Input distributions.
 
     Returns:
-        bool: `True` if `3d_angles` mode can be used, `False` otherwise
-        tmd_parmeters with fit data
+        tmd_parmeters with fit data if 3d_angles mode is found, else None
     """
     with_3d = False
     morph_class = (
@@ -619,7 +618,7 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
                     morph_class,
                     fit_params=_get_fit_params_from_input_parameters(tmd_parameters[neurite_type]),
                 )
-    return with_3d, new_tmd_parameters
+    return new_tmd_parameters if with_3d else None
 
 
 def _sample_trunk_from_3d_angle(parameters, rng, tree_type, ref_dir, max_tries=100):
