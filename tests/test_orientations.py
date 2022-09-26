@@ -524,7 +524,7 @@ def test_probability_function():
     npt.assert_equal(func(2.1, 0.5, 5, -0.5, 1), 0.6809288270854589)
 
     with pytest.raises(ValueError):
-        tested.get_probability_function(form="UNKOWN")
+        tested.get_probability_function(form="UNKNOWN")
 
 
 def test_fit_3d_angles():
@@ -573,6 +573,6 @@ def test_fit_3d_angles():
         new_parameters["basal_dendrite"]["orientation"]["values"]["params"], expected_params
     )
 
-    del distributions['basal_dendrite']['trunk']['apical_3d_angles']
+    del distributions["basal_dendrite"]["trunk"]["apical_3d_angles"]
     with pytest.raises(ValueError):
         tested.fit_3d_angles(parameters, distributions)

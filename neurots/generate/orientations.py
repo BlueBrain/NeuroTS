@@ -589,7 +589,7 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
     for neurite_type in tmd_parameters["grow_types"]:
 
         if (
-            tmd_parameters[neurite_type]['orientation'] is None
+            tmd_parameters[neurite_type]["orientation"] is None
             or "mode" not in tmd_parameters[neurite_type]["orientation"]
         ):
             continue
