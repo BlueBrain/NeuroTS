@@ -100,6 +100,38 @@ def test_trunk_distr(POPUL):
             "azimuth": {"uniform": {"max": 0.0, "min": np.pi}},
             "orientation_deviation": {"data": {"weights": [4, 3, 1, 2, 0, 1, 0, 0, 0, 2]}},
             "absolute_elevation_deviation": absolute_elevation_deviation_BAS,
+            "pia_3d_angles": {
+                "data": {
+                    "weights": [
+                        1.2274214110745432,
+                        0.6137107055372726,
+                        0.6137107055372716,
+                        0.6137107055372716,
+                        1.2274214110745432,
+                        0.6137107055372716,
+                        1.841132116611821,
+                        0.0,
+                        0.0,
+                        1.2274214110745432,
+                    ]
+                }
+            },
+            "apical_3d_angles": {
+                "data": {
+                    "weights": [
+                        1.0248077967009541,
+                        0.0,
+                        1.0248077967009541,
+                        2.0496155934019082,
+                        0.5124038983504771,
+                        1.0248077967009541,
+                        0.0,
+                        0.0,
+                        0.5124038983504771,
+                        0.5124038983504771,
+                    ]
+                }
+            },
         }
     }
     target_trunkAPIC = {
@@ -107,6 +139,9 @@ def test_trunk_distr(POPUL):
             "azimuth": {"uniform": {"max": 0.0, "min": np.pi}},
             "orientation_deviation": {"data": {"bins": [0.0], "weights": [2]}},
             "absolute_elevation_deviation": {"data": {"weights": [2]}},
+            "pia_3d_angles": {
+                "data": {"bins": [0.533409061432279], "weights": [8.904401504877203]}
+            },
         }
     }
 
@@ -126,6 +161,8 @@ def test_trunk_distr(POPUL):
     )
     del trunkBAS["trunk"]["orientation_deviation"]["data"]["bins"]
     del trunkBAS["trunk"]["absolute_elevation_deviation"]["data"]["bins"]
+    del trunkBAS["trunk"]["pia_3d_angles"]["data"]["bins"]
+    del trunkBAS["trunk"]["apical_3d_angles"]["data"]["bins"]
     del trunkAP["trunk"]["absolute_elevation_deviation"]["data"]["bins"]
 
     assert_equal(trunkBAS, target_trunkBAS)
@@ -335,10 +372,6 @@ class TestDistributions:
             diameter_input_morph=filename,
         )
         assert distr_external == distr_external_input
-
-    def test_trunk_method(self, filename):
-        with pytest.raises(KeyError):
-            extract_input.distributions(filename, trunk_method="UNKNOWN")
 
 
 def test_number_neurites(POPUL):
@@ -737,9 +770,7 @@ def test_from_TMD():
 
 
 def test_trunk_neurite_3d_angles(POPUL, NEU):
-    all_angles = extract_input.from_neurom.trunk_neurite(
-        POPUL, neurom.APICAL_DENDRITE, bins=10, method="3d_angles"
-    )
+    all_angles = extract_input.from_neurom.trunk_neurite(POPUL, neurom.APICAL_DENDRITE, bins=10)
     angles = extract_input.from_neurom.trunk_neurite_3d_angles(
         POPUL, neurom.APICAL_DENDRITE, bins=10
     )
@@ -774,9 +805,7 @@ def test_trunk_neurite_3d_angles(POPUL, NEU):
         }
     }
 
-    all_angles = extract_input.from_neurom.trunk_neurite(
-        POPUL, neurom.BASAL_DENDRITE, bins=10, method="3d_angles"
-    )
+    all_angles = extract_input.from_neurom.trunk_neurite(POPUL, neurom.BASAL_DENDRITE, bins=10)
 
     angles = extract_input.from_neurom.trunk_neurite_3d_angles(
         POPUL, neurom.BASAL_DENDRITE, bins=10
