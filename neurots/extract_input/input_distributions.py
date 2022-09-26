@@ -48,7 +48,6 @@ def distributions(
     diameter_input_morph=None,
     feature="path_distances",
     diameter_model=None,
-    trunk_method="simple",
 ):
     """Extracts the input distributions from an input population.
 
@@ -67,7 +66,6 @@ def distributions(
             ``{<neurite type 1>: <feature 1>, ...}``.
         diameter_model (str): model for diameters, internal models are `M1`, `M2`, `M3`, `M4` and
             `M5`. Can be set to `external` for external model.
-        trunk_method (str): `simple` for simple trunk method, or `3d_angles`.
 
     Returns:
         dict: The input distributions.
@@ -79,11 +77,6 @@ def distributions(
         if neurite_type in ("basal", "apical"):
             neurite_type_warning(neurite_type)
             neurite_types[i] = neurite_type + "_dendrite"
-
-    if trunk_method not in {"simple", "3d_angles"}:
-        raise KeyError(
-            f"trunk_method {trunk_method} not understood, choose between {('simple', '3d_angles')}"
-        )
 
     pop_tmd = tmd.io.load_population(filepath, use_morphio=True)
     pop_nm = load_morphologies(filepath)
@@ -121,7 +114,7 @@ def distributions(
         nm_type = getattr(NeuriteType, neurite_type)
 
         input_distributions[neurite_type] = _append_dicts(
-            trunk_neurite(pop_nm, nm_type, method=trunk_method), number_neurites(pop_nm, nm_type)
+            trunk_neurite(pop_nm, nm_type), number_neurites(pop_nm, nm_type)
         )
         if type_feature in ["path_distances", "radial_distances"]:
             _append_dicts(

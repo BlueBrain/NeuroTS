@@ -231,11 +231,8 @@ def trunk_neurite_simple(pop, neurite_type, bins):
     }
 
 
-def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30, method="simple"):
+def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30):
     """Extract the trunk data for a specific tree type.
-
-    If `method=='simple'`, only trunk angles for the `simple` method will be extracted,
-    if `method=='3d_angles'` additional angles will be extracted for `3d_angles` method.
 
     See docstring of :func:`trunk_neurite_simple` and :func:`trunk_neurite_3d_angles`
     for more details on the extracted angles.
@@ -251,10 +248,10 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30, method="simple")
         dict: A dictionary with the trunk data.
     """
     trunk_data = trunk_neurite_simple(pop, neurite_type=neurite_type, bins=bins)
-    if method == "3d_angles":
-        trunk_data["trunk"].update(
-            trunk_neurite_3d_angles(pop, neurite_type=neurite_type, bins=bins)["trunk"]
-        )
+    # adds 3d_angle related distributions
+    trunk_data["trunk"].update(
+        trunk_neurite_3d_angles(pop, neurite_type=neurite_type, bins=bins)["trunk"]
+    )
     return trunk_data
 
 
