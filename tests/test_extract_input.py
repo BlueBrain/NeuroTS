@@ -62,7 +62,7 @@ def test_num_trees(POPUL):
     assert_equal(numAX, target_numAX)
 
 
-def test_trunk_distr(POPUL):
+def test_trunk_distr(POPUL, NEU):
     bins_BAS = [
         0.19391773616376634,
         0.4880704446023673,
@@ -149,6 +149,8 @@ def test_trunk_distr(POPUL):
         POPUL, neurite_type=neurom.APICAL_DENDRITE, bins=1
     )
     trunkBAS = extract_input.from_neurom.trunk_neurite(POPUL, bins=10)
+    trunkNEU = extract_input.from_neurom.trunk_neurite(NEU, bins=10)
+    assert 'apical_3d_angles' not in trunkNEU
 
     assert_array_almost_equal(trunkBAS["trunk"]["orientation_deviation"]["data"]["bins"], bins_BAS)
     assert_array_almost_equal(
