@@ -527,6 +527,7 @@ def test_probability_function():
         tested.get_probability_function(form="UNKNOWN")
 
 
+# pylint:disable=unsubscriptable-object
 def test_fit_3d_angles():
 
     parameters = {
@@ -563,6 +564,7 @@ def test_fit_3d_angles():
     }
     expected_params = [3.1415926535803003, 2.9065466158869935]
     new_parameters = tested.fit_3d_angles(parameters, distributions)
+
     assert new_parameters["basal_dendrite"]["orientation"]["values"]["form"] == "step"
     npt.assert_equal(
         new_parameters["basal_dendrite"]["orientation"]["values"]["params"], expected_params

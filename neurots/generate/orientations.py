@@ -218,7 +218,7 @@ class OrientationManager(OrientationManagerBase):
             [sample.sample_spherical_unit_vectors(rng=self._rng) for _ in range(n_orientations)]
         )
 
-    def _mode_normal_pia_constraint(self, values_dict, tree_type):
+    def _mode_normal_pia_constraint(self, values_dict, _):
         """Returns orientations using normal/exp distribution along a direction.
 
         The `direction` value should be a 2-tuple, or a list of 2-tuples for multiple trunks.

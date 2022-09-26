@@ -813,7 +813,7 @@ def test_from_TMD():
             assert_array_almost_equal(ai, bi, decimal=6 if not _OLD_NUMPY else 5)
 
 
-def test_trunk_neurite_3d_angles(POPUL, NEU):
+def test_trunk_neurite_3d_angles(POPUL):
     all_angles = extract_input.from_neurom.trunk_neurite(POPUL, neurom.APICAL_DENDRITE, bins=10)
     angles = extract_input.from_neurom.trunk_neurite_3d_angles(
         POPUL, neurom.APICAL_DENDRITE, bins=10

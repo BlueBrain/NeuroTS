@@ -38,7 +38,7 @@ def parameters(
     feature="path_distances",
     diameter_parameters=None,
     trunk_method="simple",
-):
+):  # pylint: disable=too-many-branches
     """Returns a default set of input parameters to be used as input for synthesis.
 
     Args:
