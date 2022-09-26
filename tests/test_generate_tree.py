@@ -89,3 +89,26 @@ def test_TreeGrower():
             i,
             sections[len(sections) - num - 1],
         )
+
+
+def test_TreeGrower_3d_angles():
+    np.random.seed(0)
+    with open(os.path.join(_path, "bio_distribution_3d_angles.json"), encoding="utf-8") as f:
+        distributions = json.load(f)
+
+    with open(os.path.join(_path, "bio_parameters_3d_angles.json"), encoding="utf-8") as f:
+        params = json.load(f)
+
+    grower = NeuronGrower(input_distributions=distributions, input_parameters=params)
+    grower._grow_soma()
+
+    # Test order_per_process()
+    sections = [i.active_sections[0] for i in grower.active_neurites]
+    for num, i in enumerate(sections):
+        i.process = str(len(sections) - num - 1)
+    res = TreeGrower.order_per_process(sections)
+    for num, i in enumerate(res):
+        assert i == sections[len(sections) - num - 1], (
+            i,
+            sections[len(sections) - num - 1],
+        )

@@ -627,6 +627,48 @@ def test_parameters():
             diameter_parameters=object(),
         )
 
+    params = extract_input.parameters(
+        neurite_types=["basal_dendrite", "apical_dendrite"], trunk_method="3d_angles"
+    )
+    print(params)
+    assert_equal(
+        params,
+        {
+            "basal_dendrite": {
+                "randomness": 0.24,
+                "targeting": 0.14,
+                "radius": 0.3,
+                "orientation": {"mode": "pia_constraint"},
+                "growth_method": "tmd",
+                "branching_method": "bio_oriented",
+                "modify": None,
+                "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
+                "tree_type": 3,
+                "metric": "path_distances",
+            },
+            "apical_dendrite": {
+                "randomness": 0.24,
+                "targeting": 0.14,
+                "radius": 0.3,
+                "orientation": {
+                    "mode": "normal_pia_constraint",
+                    "values": {"direction": [0.0, 0.0]},
+                },
+                "growth_method": "tmd_apical",
+                "branching_method": "directional",
+                "modify": None,
+                "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
+                "tree_type": 4,
+                "metric": "path_distances",
+            },
+            "axon": {},
+            "origin": [0.0, 0.0, 0.0],
+            "grow_types": ["apical_dendrite", "basal_dendrite"],
+            "diameter_params": {"method": "default"},
+        },
+    )
+    validator.validate_neuron_params(params_path)
+
     with pytest.raises(KeyError):
         extract_input.parameters(neurite_types=["axon"], trunk_method="UNKNOWN METHOD")
 

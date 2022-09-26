@@ -227,8 +227,6 @@ class OrientationManager(OrientationManagerBase):
         distribution if `angle=0`. As the resulting angle must be in `[0, 2 * pi]`, we clip the
         obtained angle and uniformly sample the second angle to obtain a 3d direction.
         """
-        assert "direction" in values_dict, "'direction' key is missing"
-
         if len(np.shape(values_dict["direction"])) == 1:
             values_dict["direction"] = [values_dict["direction"]]
 
@@ -236,13 +234,13 @@ class OrientationManager(OrientationManagerBase):
         for direction in values_dict["direction"]:
             if direction[0] == 0:
                 if direction[1] > 0:
-                    thetas.append(np.clip(np.random.exponential(direction[1]), 0, np.pi))
+                    thetas.append(np.clip(self._rng.exponential(direction[1]), 0, np.pi))
                 else:
                     thetas.append(0)
             else:
-                thetas.append(np.clip(np.random.normal(*direction), 0, np.pi))
+                thetas.append(np.clip(self._rng.normal(*direction), 0, np.pi))
 
-        phis = np.random.uniform(0, 2 * np.pi, len(values_dict["direction"]))
+        phis = self._rng.uniform(0, 2 * np.pi, len(values_dict["direction"]))
         return spherical_angles_to_pia_orientations(phis, thetas)
 
     def _mode_pia_constraint(self, _, tree_type):
@@ -527,7 +525,6 @@ def _fit_single_3d_angles(data, neurite_type, morph_class, fit_params=None):
         fit_params (dict): specific fit parameters such as form and bounds to overwrite the defaults
     """
     _fit_params = deepcopy(fit_3d_angles_params)
-
     if fit_params is not None:
         _fit_params[morph_class][neurite_type].update(fit_params)
 
@@ -592,7 +589,7 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
     for neurite_type in tmd_parameters["grow_types"]:
 
         if (
-            tmd_parameters[neurite_type] is not None
+            tmd_parameters[neurite_type]['orientation'] is None
             or "mode" not in tmd_parameters[neurite_type]["orientation"]
         ):
             continue
@@ -604,6 +601,9 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
                 tmd_parameters[neurite_type]["orientation"].get("values") is None
                 or "params" not in tmd_parameters[neurite_type]["orientation"]["values"]
             ):
+                if _3d_angles_mapping[mode] not in tmd_distributions[neurite_type]["trunk"]:
+                    raise ValueError("No 3d angles found in distributions.")
+
                 new_tmd_parameters[neurite_type]["orientation"]["values"] = _fit_single_3d_angles(
                     tmd_distributions[neurite_type]["trunk"][_3d_angles_mapping[mode]]["data"],
                     neurite_type,

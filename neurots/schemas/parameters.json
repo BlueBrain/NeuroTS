@@ -118,6 +118,21 @@
                                             "additionalProperties": false,
                                             "required": ["primary_orientation"]
                                          },
+                                          {
+                                            "type": "object",
+                                            "properties": {
+                                                "direction": {
+                                                    "items": {
+                                                        "maxItems": 2,
+                                                        "minItems": 2,
+                                                        "description": "The orientation 3d angle (mean, sd)"
+                                                    },
+                                                "type": "array"
+                                                }
+                                            },
+                                            "additionalProperties": false,
+                                            "required": ["direction"]
+                                         },
                                         {
                                             "type": "object",
                                             "properties": {
@@ -126,7 +141,7 @@
                                                     "type": "string"
                                                 },
                                                 "params": {
-"items": {
+                                                    "items": {
                                                         "$ref": "#/definitions/point",
                                                         "description": "The fit parameters"
                                                     },
@@ -134,7 +149,7 @@
                                                 }
                                             },
                                             "additionalProperties": false,
-                                            "required": ["mode", "params"]
+                                            "required": ["form", "params"]
                                         }
                                     ]
                                 }
