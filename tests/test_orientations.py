@@ -566,12 +566,12 @@ def test_fit_3d_angles():
     new_parameters = tested.fit_3d_angles(parameters, distributions)
 
     assert new_parameters["basal_dendrite"]["orientation"]["values"]["form"] == "step"
-    npt.assert_equal(
+    npt.assert_almost_equal(
         new_parameters["basal_dendrite"]["orientation"]["values"]["params"], expected_params
     )
     parameters["basal_dendrite"]["orientation"]["values"]["form"] = "step"
     new_parameters = tested.fit_3d_angles(parameters, distributions)
-    npt.assert_equal(
+    npt.assert_almost_equal(
         new_parameters["basal_dendrite"]["orientation"]["values"]["params"], expected_params
     )
 

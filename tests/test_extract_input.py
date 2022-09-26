@@ -139,9 +139,7 @@ def test_trunk_distr(POPUL, NEU):
             "azimuth": {"uniform": {"max": 0.0, "min": np.pi}},
             "orientation_deviation": {"data": {"bins": [0.0], "weights": [2]}},
             "absolute_elevation_deviation": {"data": {"weights": [2]}},
-            "pia_3d_angles": {
-                "data": {"bins": [0.533409061432279], "weights": [8.904401504877203]}
-            },
+            "pia_3d_angles": {"data": {"weights": [8.904401504877203]}},
         }
     }
 
@@ -166,6 +164,7 @@ def test_trunk_distr(POPUL, NEU):
     del trunkBAS["trunk"]["pia_3d_angles"]["data"]["bins"]
     del trunkBAS["trunk"]["apical_3d_angles"]["data"]["bins"]
     del trunkAP["trunk"]["absolute_elevation_deviation"]["data"]["bins"]
+    del trunkAP["trunk"]["pia_3d_angles"]["data"]["bins"]
 
     assert_equal(trunkBAS, target_trunkBAS)
     assert_equal(trunkAP, target_trunkAPIC)
@@ -820,34 +819,25 @@ def test_trunk_neurite_3d_angles(POPUL):
     )
 
     assert all_angles["trunk"]["pia_3d_angles"] == angles["trunk"]["pia_3d_angles"]
-    assert angles["trunk"]["pia_3d_angles"] == {
-        "data": {
-            "bins": [
-                0.4828722567123299,
-                0.49410265776120743,
-                0.5053330588100851,
-                0.5165634598589626,
-                0.5277938609078402,
-                0.5390242619567178,
-                0.5502546630055953,
-                0.5614850640544728,
-                0.5727154651033505,
-                0.5839458661522281,
-            ],
-            "weights": [
-                44.52200752438604,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                44.52200752438582,
-            ],
-        }
-    }
+    assert_array_almost_equal(
+        angles["trunk"]["pia_3d_angles"]["data"]["bins"],
+        [
+            0.4828722567123299,
+            0.49410265776120743,
+            0.5053330588100851,
+            0.5165634598589626,
+            0.5277938609078402,
+            0.5390242619567178,
+            0.5502546630055953,
+            0.5614850640544728,
+            0.5727154651033505,
+            0.5839458661522281,
+        ],
+    )
+    assert_array_almost_equal(
+        angles["trunk"]["pia_3d_angles"]["data"]["weights"],
+        [44.52200752438604, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 44.52200752438582],
+    )
 
     all_angles = extract_input.from_neurom.trunk_neurite(POPUL, neurom.BASAL_DENDRITE, bins=10)
 
