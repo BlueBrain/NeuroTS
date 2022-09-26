@@ -150,7 +150,7 @@ def test_trunk_distr(POPUL, NEU):
     )
     trunkBAS = extract_input.from_neurom.trunk_neurite(POPUL, bins=10)
     trunkNEU = extract_input.from_neurom.trunk_neurite(NEU, bins=10)
-    assert 'apical_3d_angles' not in trunkNEU
+    assert "apical_3d_angles" not in trunkNEU
 
     assert_array_almost_equal(trunkBAS["trunk"]["orientation_deviation"]["data"]["bins"], bins_BAS)
     assert_array_almost_equal(
