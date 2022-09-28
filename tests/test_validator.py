@@ -105,6 +105,14 @@ class TestValidateParams:
         dummy_params["unknown_param"] = 0
         tested.validate_neuron_params(dummy_params)
 
+    def test_error_in_list(self, dummy_params):
+        # Wrong element in lists should be reported correctly
+        dummy_params["grow_types"] = ["UNKNOWN TYPE"]
+        with pytest.raises(
+            tested.ValidationError, match=r"In \[grow_types->0\]: 'UNKNOWN TYPE' is not one of"
+        ):
+            tested.validate_neuron_params(dummy_params)
+
 
 def test_empty_params():
     data = {

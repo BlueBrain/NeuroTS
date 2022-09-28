@@ -38,7 +38,7 @@ class ValidationError(Exception):
 
 
 def _format_error(error):
-    return f"""In [{"->".join(error.absolute_path)}]: {error.message}"""
+    return f"""In [{"->".join([str(i) for i in error.absolute_path])}]: {error.message}"""
 
 
 def validate(instance, schema):
