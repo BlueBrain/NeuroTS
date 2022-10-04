@@ -21,9 +21,12 @@ import logging
 import numpy as np
 
 from neurots.generate.algorithms.abstractgrower import AbstractAlgo
+from neurots.generate.algorithms.abstractgrower import SkipValidationLevel
 from neurots.generate.algorithms.barcode import Barcode
 from neurots.generate.algorithms.common import TMDStop
 from neurots.generate.algorithms.common import bif_methods
+from neurots.generate.algorithms.common import get_grower_name
+from neurots.generate.algorithms.common import growth_algorithms
 from neurots.generate.algorithms.common import section_data
 from neurots.morphmath import sample
 from neurots.morphmath.utils import norm
@@ -56,7 +59,9 @@ class TMDAlgo(AbstractAlgo):
         **_,
     ):
         """TMD basic grower."""
-        super().__init__(input_data, params, start_point, context)
+        super().__init__(
+            input_data, params, start_point, context=context, skip_validation=skip_validation
+        )
         self.bif_method = bif_methods[params["branching_method"]]
         self.params = copy.deepcopy(params)
         self.ph_angles = self.select_persistence(input_data, random_generator)
@@ -65,17 +70,33 @@ class TMDAlgo(AbstractAlgo):
         self.apical_section = None
         self.apical_point_distance_from_soma = 0.0
         self.persistence_length = self.barcode.get_persistence_length()
-        # Validate parameters and distributions
-        if not skip_validation:
-            # Consistency check between parameters - persistence diagram
-            barSZ = input_data["min_bar_length"]
-            stepSZ = params["step_size"]["norm"]["mean"]
-            if stepSZ >= barSZ:
-                L.warning(
-                    "Selected step size %f is too big for bars of size %f",
-                    stepSZ,
-                    barSZ,
-                )
+
+    @classmethod
+    def preprocess_inputs(cls, params, distrs, skip_validation_level=False):
+        """Preprocess all inputs for the given class."""
+        # Check consistency between parameters and persistence diagram.
+        try:
+            barSZ = distrs["min_bar_length"]
+        except KeyError as exc:
+            if skip_validation_level == SkipValidationLevel.SKIP_OPTIONAL_ONLY:
+                # Here we just raise a warning
+                barSZ = -1
+            elif skip_validation_level == SkipValidationLevel.SKIP_ALL:
+                # Here we do nothing
+                barSZ = float("inf")
+            else:
+                grower_name = get_grower_name(cls)
+                raise KeyError(
+                    "The distributions must contain a 'min_bar_length' entry when the "
+                    f"'growth_method' entry in parameters is '{grower_name}'."
+                ) from exc
+        stepSZ = params["step_size"]["norm"]["mean"]
+        if stepSZ >= barSZ:
+            L.warning(
+                "Selected step size %f is too big for bars of size %f",
+                stepSZ,
+                barSZ,
+            )
 
     def select_persistence(self, input_data, random_generator=np.random):
         """Select the persistence.
@@ -342,3 +363,12 @@ class TMDGradientAlgo(TMDApicalAlgo):
                 current_section, s2["stop"]["TMD"], s2["process"], s2["direction"]
             )
         return s1, s2
+
+
+growth_algorithms.update(
+    {
+        "tmd": TMDAlgo,
+        "tmd_apical": TMDApicalAlgo,
+        "tmd_gradient": TMDGradientAlgo,
+    }
+)

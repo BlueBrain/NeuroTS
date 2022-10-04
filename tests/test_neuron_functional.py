@@ -479,6 +479,30 @@ class TestPathGrower:
             rng_or_seed=build_random_generator(0),
         )
 
+    def test_min_bar_length_missing(self, tmpdir):
+        """Check that the proper exception is raised when the min_bar_length entry is missing."""
+        with open(join(_path, "bio_distribution.json"), encoding="utf-8") as f:
+            distributions = json.load(f)
+        del distributions["apical_dendrite"]["min_bar_length"]
+        broken_distribution = tmpdir / "bio_distribution.json"
+        with open(broken_distribution, mode="w", encoding="utf-8") as f:
+            json.dump(distributions, f)
+
+        with pytest.raises(
+            KeyError,
+            match=(
+                "The distributions must contain a 'min_bar_length' entry when the "
+                "'growth_method' entry in parameters is 'tmd_apical'."
+            ),
+        ):
+            _test_full(
+                "path_distances",
+                broken_distribution,
+                "bio_path_params.json",
+                "path_grower.h5",
+                "bio_path_persistence_diagram.json",
+            )
+
 
 class TestGradientPathGrower:
     """test tmd_path"""

@@ -21,6 +21,7 @@ import numpy as np
 
 from neurots.generate.algorithms.abstractgrower import AbstractAlgo
 from neurots.generate.algorithms.common import bif_methods
+from neurots.generate.algorithms.common import growth_algorithms
 from neurots.generate.algorithms.common import section_data
 
 logger = logging.getLogger(__name__)
@@ -36,10 +37,21 @@ class TrunkAlgo(AbstractAlgo):
         context (Any): An object containing contextual information.
     """
 
-    def __init__(self, input_data, params, start_point, context=None, **_):
+    def __init__(self, input_data, params, start_point, context=None, skip_validation=False, **_):
         """Constructor of the TrunkAlgo class."""
-        super().__init__(input_data, params, start_point, context)
+        super().__init__(
+            input_data, params, start_point, context=context, skip_validation=skip_validation
+        )
         self.bif_method = bif_methods[params["branching_method"]]
+
+    @classmethod
+    def preprocess_inputs(cls, params, distrs, skip_validation_level=False):
+        """Preprocess all inputs for the given class."""
+        if "num_seg" not in params:
+            raise KeyError(
+                "The parameters must contain a 'num_seg' entry when the "
+                "'growth_method' entry in parameters is 'trunk'."
+            )
 
     def initialize(self):
         """Generates the data to be used for the initialization of the first section to be grown.
@@ -100,3 +112,11 @@ class AxonAlgo(TrunkAlgo):
         params["num_seg"] = 1
 
         super().__init__(*args, **kwargs)
+
+
+growth_algorithms.update(
+    {
+        "axon_trunk": AxonAlgo,
+        "trunk": TrunkAlgo,
+    }
+)

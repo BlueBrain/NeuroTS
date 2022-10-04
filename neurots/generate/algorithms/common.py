@@ -19,12 +19,21 @@ import numpy as np
 
 from neurots.morphmath import bifurcation as _bif
 
+growth_algorithms = {}
+
 bif_methods = {
     "bio_oriented": _bif.bio_oriented,
     "symmetric": _bif.symmetric,
     "directional": _bif.directional,
     "random": _bif.random,
 }
+
+
+def get_grower_name(grower):
+    grower_name = [k for k, v in growth_algorithms.items() if v == grower]
+    if not grower_name:
+        raise ValueError(f"No name can be found for the grower {grower}.")
+    return grower_name[0]
 
 
 def checks_bif_term(ref, bif, term, target_length):

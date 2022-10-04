@@ -25,10 +25,13 @@ from morphio import PointLevel
 from morphio import SectionType
 
 from neurots.generate.algorithms import basicgrower
-from neurots.generate.algorithms import tmdgrower
-from neurots.generate.section import SectionGrower
-from neurots.generate.section import SectionGrowerPath
-from neurots.generate.section import SectionGrowerTMD
+from neurots.generate.algorithms.common import growth_algorithms
+from neurots.generate.section import section_growers
+
+# from neurots.generate.algorithms import tmdgrower
+# from neurots.generate.section import SectionGrower
+# from neurots.generate.section import SectionGrowerPath
+# from neurots.generate.section import SectionGrowerTMD
 from neurots.morphmath import sample
 from neurots.utils import NeuroTSError
 
@@ -36,20 +39,6 @@ L = logging.getLogger("neurots")
 
 # LAMBDA: parameter that defines the slope of exponential probability
 LAMBDA = 1.0
-
-growth_algorithms = {
-    "tmd": tmdgrower.TMDAlgo,
-    "tmd_apical": tmdgrower.TMDApicalAlgo,
-    "tmd_gradient": tmdgrower.TMDGradientAlgo,
-    "axon_trunk": basicgrower.AxonAlgo,
-    "trunk": basicgrower.TrunkAlgo,
-}
-
-section_growers = {
-    "radial_distances": SectionGrowerTMD,
-    "path_distances": SectionGrowerPath,
-    "trunk_length": SectionGrower,
-}
 
 
 # Section grower parameters
@@ -129,9 +118,13 @@ class TreeGrower:
         self._section_parameters = _create_section_parameters(parameters)
         self.growth_algo = self._initialize_algorithm()
 
+    @staticmethod
+    def select_grow_method(params):
+        return growth_algorithms[params["growth_method"]]
+
     def _initialize_algorithm(self):
         """Initialization steps for TreeGrower."""
-        grow_meth = growth_algorithms[self.params["growth_method"]]
+        grow_meth = self.select_grow_method(self.params)
 
         growth_algo = grow_meth(
             input_data=self.distr,
