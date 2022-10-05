@@ -152,9 +152,11 @@
                                     "type": "number"
                                 }
                             },
+                            "additionalProperties": false,
                             "type": "object"
                         }
                     },
+                    "additionalProperties": false,
                     "type": "object"
                 },
                 "targeting": {
@@ -227,7 +229,7 @@
                 }
             ]
         },
-        "basal": {
+        "basal_dendrite": {
             "description": "Specific parameters for basals",
             "oneOf": [
                 {

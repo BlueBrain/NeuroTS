@@ -17,13 +17,6 @@
 
 import abc
 import copy
-from enum import Enum
-
-
-class SkipValidationLevel(Enum):
-    SKIP_NONE = 0
-    SKIP_OPTIONAL_ONLY = 10
-    SKIP_ALL = 100
 
 
 class AbstractAlgo:
@@ -39,23 +32,12 @@ class AbstractAlgo:
     # meta class is used to define other classes
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, input_data, params, start_point, context=None, skip_validation=False):
+    def __init__(self, input_data, params, start_point, context):
         """The TreeGrower Algorithm initialization."""
         self.context = context
         self.input_data = copy.deepcopy(input_data)
         self.params = copy.deepcopy(params)
         self.start_point = start_point
-
-        if not skip_validation:
-            if skip_validation is True:
-                skip_validation = SkipValidationLevel.SKIP_ALL
-            elif skip_validation is False:
-                skip_validation = SkipValidationLevel.SKIP_NONE
-            self.preprocess_inputs(params, input_data, skip_validation)
-
-    @abc.abstractclassmethod
-    def preprocess_inputs(cls, params, distrs, skip_validation_level=False):
-        """Preprocess all inputs for the given class."""
 
     @abc.abstractmethod
     def initialize(self):

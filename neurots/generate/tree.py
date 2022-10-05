@@ -25,13 +25,10 @@ from morphio import PointLevel
 from morphio import SectionType
 
 from neurots.generate.algorithms import basicgrower
-from neurots.generate.algorithms.common import growth_algorithms
-from neurots.generate.section import section_growers
-
-# from neurots.generate.algorithms import tmdgrower
-# from neurots.generate.section import SectionGrower
-# from neurots.generate.section import SectionGrowerPath
-# from neurots.generate.section import SectionGrowerTMD
+from neurots.generate.algorithms import tmdgrower
+from neurots.generate.section import SectionGrower
+from neurots.generate.section import SectionGrowerPath
+from neurots.generate.section import SectionGrowerTMD
 from neurots.morphmath import sample
 from neurots.utils import NeuroTSError
 
@@ -39,6 +36,20 @@ L = logging.getLogger("neurots")
 
 # LAMBDA: parameter that defines the slope of exponential probability
 LAMBDA = 1.0
+
+growth_algorithms = {
+    "tmd": tmdgrower.TMDAlgo,
+    "tmd_apical": tmdgrower.TMDApicalAlgo,
+    "tmd_gradient": tmdgrower.TMDGradientAlgo,
+    "axon_trunk": basicgrower.AxonAlgo,
+    "trunk": basicgrower.TrunkAlgo,
+}
+
+section_growers = {
+    "radial_distances": SectionGrowerTMD,
+    "path_distances": SectionGrowerPath,
+    "trunk_length": SectionGrower,
+}
 
 
 # Section grower parameters

@@ -24,8 +24,6 @@ from pathlib import Path
 import jsonschema
 import pkg_resources
 
-from neurots.generate.tree import TreeGrower
-
 SCHEMA_PATH = pkg_resources.resource_filename("neurots", "schemas")
 
 with Path(SCHEMA_PATH, "parameters.json").open(encoding="utf-8") as f:
@@ -67,12 +65,3 @@ def validate_neuron_params(data):
 def validate_neuron_distribs(data):
     """Validate distribution dictionary."""
     validate(data, DISTRIBS_SCHEMA)
-
-
-def preprocess_inputs(params, distrs, skip_validation_level=False):
-    """Validate and preprocess all inputs."""
-    validate_neuron_params(params)
-    validate_neuron_distribs(distrs)
-
-    grow_method = TreeGrower.select_grow_method(params)
-    grow_method.preprocess_inputs(params, distrs, skip_validation_level=skip_validation_level)

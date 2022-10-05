@@ -222,10 +222,3 @@ class SectionGrowerPath(SectionGrowerExponentialProba):
     def get_val(self):
         """Returns path distance."""
         return self.pathlength
-
-
-section_growers = {
-    "radial_distances": SectionGrowerTMD,
-    "path_distances": SectionGrowerPath,
-    "trunk_length": SectionGrower,
-}

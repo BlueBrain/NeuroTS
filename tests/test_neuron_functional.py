@@ -490,10 +490,7 @@ class TestPathGrower:
 
         with pytest.raises(
             KeyError,
-            match=(
-                "The distributions must contain a 'min_bar_length' entry when the "
-                "'growth_method' entry in parameters is 'tmd_apical'."
-            ),
+            match="'min_bar_length'",
         ):
             _test_full(
                 "path_distances",
