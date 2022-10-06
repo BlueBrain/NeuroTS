@@ -58,10 +58,8 @@ class TMDAlgo(AbstractAlgo):
         """TMD basic grower."""
         super().__init__(input_data, params, start_point, context)
         self.bif_method = bif_methods[params["branching_method"]]
-        self.params = copy.deepcopy(params)
         self.ph_angles = self.select_persistence(input_data, random_generator)
         self.barcode = Barcode(list(self.ph_angles))
-        self.start_point = start_point
         self.apical_section = None
         self.apical_point_distance_from_soma = 0.0
         self.persistence_length = self.barcode.get_persistence_length()

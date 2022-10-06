@@ -129,13 +129,9 @@ class TreeGrower:
         self._section_parameters = _create_section_parameters(parameters)
         self.growth_algo = self._initialize_algorithm()
 
-    @staticmethod
-    def select_grow_method(params):
-        return growth_algorithms[params["growth_method"]]
-
     def _initialize_algorithm(self):
         """Initialization steps for TreeGrower."""
-        grow_meth = self.select_grow_method(self.params)
+        grow_meth = growth_algorithms[self.params["growth_method"]]
 
         growth_algo = grow_meth(
             input_data=self.distr,
