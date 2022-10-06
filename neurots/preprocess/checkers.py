@@ -6,6 +6,7 @@ from neurots.preprocess.utils import register_preprocess
 @register_preprocess("trunk")
 def check_num_seg(params, distrs):
     """Check that params contains a 'num_seg' entry."""
+    # pylint: disable=unused-argument
     if "num_seg" not in params:
         raise KeyError(
             "The parameters must contain a 'num_seg' entry when the "
