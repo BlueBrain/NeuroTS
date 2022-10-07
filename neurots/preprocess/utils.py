@@ -1,11 +1,31 @@
 """Some utils for preprocessing."""
+
+# Copyright (C) 2022  Blue Brain Project, EPFL
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 from collections import defaultdict
 from copy import deepcopy
+from itertools import chain
 
 from neurots.validator import validate_neuron_distribs
 from neurots.validator import validate_neuron_params
 
-_PREPROCESS_FUNCTIONS = defaultdict(set)
+_PREPROCESS_FUNCTIONS = {
+    "preprocess": defaultdict(set),
+    "validator": defaultdict(set),
+}
 
 
 def register_preprocess(*growth_methods):
@@ -13,7 +33,18 @@ def register_preprocess(*growth_methods):
 
     def inner(func):
         for i in growth_methods:
-            _PREPROCESS_FUNCTIONS[i].add(func)
+            _PREPROCESS_FUNCTIONS["preprocess"][i].add(func)
+        return func
+
+    return inner
+
+
+def register_validator(*growth_methods):
+    """Register a validation function."""
+
+    def inner(func):
+        for i in growth_methods:
+            _PREPROCESS_FUNCTIONS["validator"][i].add(func)
         return func
 
     return inner
@@ -28,7 +59,10 @@ def preprocess_inputs(params, distrs):
 
     for grow_type in params["grow_types"]:
         growth_method = params[grow_type]["growth_method"]
-        for preprocess_func in _PREPROCESS_FUNCTIONS[growth_method]:
+        for preprocess_func in chain(
+            _PREPROCESS_FUNCTIONS["validator"][growth_method],
+            _PREPROCESS_FUNCTIONS["preprocess"][growth_method],
+        ):
             preprocess_func(params[grow_type], distrs[grow_type])
 
     return params, distrs

@@ -1,4 +1,12 @@
-"""Functions used for preprocessing."""
+"""Functions to modify the given parameters and distributions before running the algorithm.
+
+The functions used as preprocesses should have a name like 'preprocess_*' and have the following
+signature: `check_something(params, distrs)`. These functions should be very generic and should
+not depend on any context in which the related grower is used.
+
+The preprocesses should be registered to be executed in the preprocess step using the
+`@register_preprocess` decorator.
+"""
 
 # Copyright (C) 2022  Blue Brain Project, EPFL
 #
@@ -15,8 +23,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from neurots.preprocess import relevancy_checkers  # noqa
-from neurots.preprocess import validity_checkers  # noqa
-from neurots.preprocess.utils import preprocess_inputs  # noqa
+# TODO: remove the next line and the 'noqa' when a preprocess is added
+# pylint: disable=unused-import
 from neurots.preprocess.utils import register_preprocess  # noqa
-from neurots.preprocess.utils import register_validator  # noqa

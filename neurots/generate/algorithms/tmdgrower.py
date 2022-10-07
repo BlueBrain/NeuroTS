@@ -27,6 +27,7 @@ from neurots.generate.algorithms.common import bif_methods
 from neurots.generate.algorithms.common import section_data
 from neurots.morphmath import sample
 from neurots.morphmath.utils import norm
+from neurots.preprocess.relevancy_checkers import check_min_bar_length
 
 L = logging.getLogger(__name__)
 
@@ -65,19 +66,7 @@ class TMDAlgo(AbstractAlgo):
         self.persistence_length = self.barcode.get_persistence_length()
         # Validate parameters and distributions
         if not skip_validation:
-            self.check_min_bar_length(params, input_data)
-
-    @staticmethod
-    def check_min_bar_length(params, distrs):
-        """Consistency check between parameters - persistence diagram."""
-        barSZ = distrs["min_bar_length"]
-        stepSZ = params["step_size"]["norm"]["mean"]
-        if stepSZ >= barSZ:
-            L.warning(
-                "Selected step size %f is too big for bars of size %f",
-                stepSZ,
-                barSZ,
-            )
+            check_min_bar_length(params, input_data, start_point, context)
 
     def select_persistence(self, input_data, random_generator=np.random):
         """Select the persistence.
