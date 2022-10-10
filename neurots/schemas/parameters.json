@@ -145,10 +145,12 @@
                             "properties": {
                                 "mean": {
                                     "description": "The mean of the distribution",
+                                    "minimum": 0,
                                     "type": "number"
                                 },
                                 "std": {
                                     "description": "The std of the distribution",
+                                    "minimum": 0,
                                     "type": "number"
                                 }
                             },

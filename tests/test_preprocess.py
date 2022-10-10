@@ -1,5 +1,6 @@
 """Test the neurots.preprocess functions."""
 import json
+import logging
 from pathlib import Path
 
 import pytest
@@ -77,3 +78,82 @@ def test_params_and_distrs(params_file, distrs_file):
         distrs = convert_from_legacy_neurite_type(json.load(f))
 
     preprocess.preprocess_inputs(params, distrs)
+
+
+def test_check_num_seg():
+    """Check that the parametesr have a 'num_seg' entry.
+
+    Note: The type is already checked in the validation step with the JSON schema.
+    """
+    params = {}
+
+    with pytest.raises(
+        KeyError,
+        match=(
+            "The parameters must contain a 'num_seg' entry when the "
+            "'growth_method' entry in parameters is 'trunk'."
+        ),
+    ):
+        preprocess.validity_checkers.check_num_seg(params, {})
+
+    params["num_seg"] = 1
+    preprocess.validity_checkers.check_num_seg(params, {})
+
+
+def test_check_min_bar_length(caplog):
+    """Check that the parametesr have a 'num_seg' entry.
+
+    Note: The type is already checked in the validation step with the JSON schema.
+    """
+
+    with pytest.raises(
+        KeyError,
+        match=(
+            r"The distributions must contain a 'min_bar_length' entry when the "
+            r"'growth_method' entry in parameters is in \['tmd', 'tmd_apical', 'tmd_gradient'\]\."
+        ),
+    ):
+        preprocess.validity_checkers.check_bar_length({}, {})
+
+    distrs = {
+        "min_bar_length": 1,
+    }
+
+    with pytest.raises(
+        KeyError,
+        match=(
+            r"The parameters must contain a 'step_size' entry when the "
+            r"'growth_method' entry in parameters is in \['tmd', 'tmd_apical', 'tmd_gradient'\]\."
+        ),
+    ):
+        preprocess.validity_checkers.check_bar_length({}, distrs)
+
+    params = {
+        "step_size": {
+            "norm": {
+                "mean": 999,
+            }
+        }
+    }
+    caplog.clear()
+    with caplog.at_level(logging.DEBUG):
+        preprocess.validity_checkers.check_bar_length(params, distrs)
+    assert caplog.record_tuples == [
+        (
+            "neurots.preprocess.relevancy_checkers",
+            30,
+            "Selected step size 999.000000 is too big for bars of size 1.000000",
+        )
+    ]
+
+    params = {
+        "step_size": {
+            "norm": {
+                "mean": 0.1,
+            }
+        }
+    }
+    caplog.clear()
+    with caplog.at_level(logging.DEBUG):
+        preprocess.validity_checkers.check_bar_length(params, distrs)
+    assert caplog.record_tuples == []
