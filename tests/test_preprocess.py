@@ -1,11 +1,17 @@
 """Test the neurots.preprocess functions."""
+# pylint: disable=redefined-outer-name
+# pylint: disable=unused-argument
 import json
 import logging
+from collections import defaultdict
 from pathlib import Path
 
 import pytest
 
 from neurots import preprocess
+from neurots.preprocess.exceptions import NeuroTSValidationError
+from neurots.preprocess.utils import register_preprocessor
+from neurots.preprocess.utils import register_validator
 from neurots.utils import convert_from_legacy_neurite_type
 
 DATA_PATH = Path(__file__).parent / "data"
@@ -88,7 +94,7 @@ def test_check_num_seg():
     params = {}
 
     with pytest.raises(
-        KeyError,
+        NeuroTSValidationError,
         match=(
             "The parameters must contain a 'num_seg' entry when the "
             "'growth_method' entry in parameters is 'trunk'."
@@ -107,7 +113,7 @@ def test_check_min_bar_length(caplog):
     """
 
     with pytest.raises(
-        KeyError,
+        NeuroTSValidationError,
         match=(
             r"The distributions must contain a 'min_bar_length' entry when the "
             r"'growth_method' entry in parameters is in \['tmd', 'tmd_apical', 'tmd_gradient'\]\."
@@ -120,7 +126,7 @@ def test_check_min_bar_length(caplog):
     }
 
     with pytest.raises(
-        KeyError,
+        NeuroTSValidationError,
         match=(
             r"The parameters must contain a 'step_size' entry when the "
             r"'growth_method' entry in parameters is in \['tmd', 'tmd_apical', 'tmd_gradient'\]\."
@@ -140,7 +146,7 @@ def test_check_min_bar_length(caplog):
         preprocess.validity_checkers.check_bar_length(params, distrs)
     assert caplog.record_tuples == [
         (
-            "neurots.preprocess.relevancy_checkers",
+            "neurots.preprocess.relevance_checkers",
             30,
             "Selected step size 999.000000 is too big for bars of size 1.000000",
         )
@@ -157,3 +163,58 @@ def test_check_min_bar_length(caplog):
     with caplog.at_level(logging.DEBUG):
         preprocess.validity_checkers.check_bar_length(params, distrs)
     assert caplog.record_tuples == []
+
+
+@pytest.fixture
+def dummy_register(monkeypatch):
+    """Monkeypatch the registered functions and reset it at the end of the test."""
+    monkeypatch.setattr(
+        preprocess.utils,
+        "_REGISTERED_FUNCTIONS",
+        {
+            "preprocessors": defaultdict(set),
+            "validators": defaultdict(set),
+        },
+    )
+
+
+def test_register_validator(dummy_register):
+    """Test validator registering."""
+    with (DATA_PATH / "axon_trunk_parameters.json").open(encoding="utf-8") as f:
+        params = convert_from_legacy_neurite_type(json.load(f))
+    with (DATA_PATH / "axon_trunk_distribution.json").open(encoding="utf-8") as f:
+        distrs = convert_from_legacy_neurite_type(json.load(f))
+
+    @register_validator("axon_trunk")
+    def dummy_validator(params, distrs):
+        assert params["randomness"] == 0
+        assert distrs["num_trees"]["data"]["bins"] == [1]
+
+    assert params["axon"]["randomness"] == 0
+    assert distrs["axon"]["num_trees"]["data"]["bins"] == [1]
+
+    preprocessed_params, preprocessed_distrs = preprocess.preprocess_inputs(params, distrs)
+
+    assert preprocessed_params == params
+    assert preprocessed_distrs == distrs
+
+
+def test_register_preprocessor(dummy_register):
+    """Test preprocessor registering."""
+    with (DATA_PATH / "axon_trunk_parameters.json").open(encoding="utf-8") as f:
+        params = convert_from_legacy_neurite_type(json.load(f))
+    with (DATA_PATH / "axon_trunk_distribution.json").open(encoding="utf-8") as f:
+        distrs = convert_from_legacy_neurite_type(json.load(f))
+
+    @register_preprocessor("axon_trunk")
+    def dummy_preprocessor(params, distrs):
+        params["randomness"] = 999
+        distrs["num_trees"]["data"]["bins"] = [999]
+
+    assert params["axon"]["randomness"] == 0
+    assert distrs["axon"]["num_trees"]["data"]["bins"] == [1]
+
+    preprocessed_params, preprocessed_distrs = preprocess.preprocess_inputs(params, distrs)
+
+    assert preprocessed_params["axon"]["randomness"] == 999
+    assert preprocessed_distrs["axon"]["num_trees"]["data"]["bins"] == [999]

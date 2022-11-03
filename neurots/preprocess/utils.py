@@ -22,18 +22,18 @@ from itertools import chain
 from neurots.validator import validate_neuron_distribs
 from neurots.validator import validate_neuron_params
 
-_PREPROCESS_FUNCTIONS = {
-    "preprocess": defaultdict(set),
-    "validator": defaultdict(set),
+_REGISTERED_FUNCTIONS = {
+    "preprocessors": defaultdict(set),
+    "validators": defaultdict(set),
 }
 
 
-def register_preprocess(*growth_methods):
+def register_preprocessor(*growth_methods):
     """Register a preprocess function."""
 
     def inner(func):
         for i in growth_methods:
-            _PREPROCESS_FUNCTIONS["preprocess"][i].add(func)
+            _REGISTERED_FUNCTIONS["preprocessors"][i].add(func)
         return func
 
     return inner
@@ -44,7 +44,7 @@ def register_validator(*growth_methods):
 
     def inner(func):
         for i in growth_methods:
-            _PREPROCESS_FUNCTIONS["validator"][i].add(func)
+            _REGISTERED_FUNCTIONS["validators"][i].add(func)
         return func
 
     return inner
@@ -60,8 +60,8 @@ def preprocess_inputs(params, distrs):
     for grow_type in params["grow_types"]:
         growth_method = params[grow_type]["growth_method"]
         for preprocess_func in chain(
-            _PREPROCESS_FUNCTIONS["validator"][growth_method],
-            _PREPROCESS_FUNCTIONS["preprocess"][growth_method],
+            _REGISTERED_FUNCTIONS["validators"][growth_method],
+            _REGISTERED_FUNCTIONS["preprocessors"][growth_method],
         ):
             preprocess_func(params[grow_type], distrs[grow_type])
 

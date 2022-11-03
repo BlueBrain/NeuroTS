@@ -1,9 +1,11 @@
-"""Functions to check that the given parameters and distributions will given relevant results.
+"""Functions to check that the given parameters and distributions will give relevant results.
 
-The functions used as relevancy checkers should have a name like 'check_*' and have the following
+The functions used as relevance checkers should have a name like 'check_*' and have the following
 signature: `check_something(params, distrs, start_point=None, context=None)`. The `start_point` and
 `context` parameters should always be optional, as they will not be known during the preprocessing
 step.
+
+These functions can be called either in validity checkers or inside the grower codes.
 """
 
 # Copyright (C) 2022  Blue Brain Project, EPFL

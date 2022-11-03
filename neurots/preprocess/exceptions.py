@@ -1,4 +1,4 @@
-"""Functions used for preprocessing."""
+"""Exceptions raised during validation process."""
 
 # Copyright (C) 2022  Blue Brain Project, EPFL
 #
@@ -15,8 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from neurots.preprocess import relevance_checkers  # noqa
-from neurots.preprocess import validity_checkers  # noqa
-from neurots.preprocess.utils import preprocess_inputs  # noqa
-from neurots.preprocess.utils import register_preprocessor  # noqa
-from neurots.preprocess.utils import register_validator  # noqa
+
+class NeuroTSValidationError(Exception):
+    """Exception raised when a configuration set is not valid."""

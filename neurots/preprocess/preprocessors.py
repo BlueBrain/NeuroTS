@@ -23,6 +23,5 @@ The preprocesses should be registered to be executed in the preprocess step usin
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# TODO: remove the next line and the 'noqa' when a preprocess is added
-# pylint: disable=unused-import
-from neurots.preprocess.utils import register_preprocess  # noqa
+# TODO: uncomment the next line when a preprocess is added
+# from neurots.preprocess.utils import register_preprocessor

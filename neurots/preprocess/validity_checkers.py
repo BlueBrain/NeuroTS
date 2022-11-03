@@ -23,7 +23,8 @@ The checkers should be registered to be executed in the preprocess step using th
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from neurots.preprocess.relevancy_checkers import check_min_bar_length
+from neurots.preprocess.exceptions import NeuroTSValidationError
+from neurots.preprocess.relevance_checkers import check_min_bar_length
 from neurots.preprocess.utils import register_validator
 
 
@@ -32,7 +33,7 @@ def check_num_seg(params, distrs):
     """Check that params contains a 'num_seg' entry."""
     # pylint: disable=unused-argument
     if "num_seg" not in params:
-        raise KeyError(
+        raise NeuroTSValidationError(
             "The parameters must contain a 'num_seg' entry when the "
             "'growth_method' entry in parameters is 'trunk'."
         )
@@ -42,12 +43,12 @@ def check_num_seg(params, distrs):
 def check_bar_length(params, distrs):
     """Check consistency between parameters and persistence diagram."""
     if "min_bar_length" not in distrs:
-        raise KeyError(
+        raise NeuroTSValidationError(
             "The distributions must contain a 'min_bar_length' entry when the "
             "'growth_method' entry in parameters is in ['tmd', 'tmd_apical', 'tmd_gradient']."
         )
     if "mean" not in params.get("step_size", {}).get("norm", {}):
-        raise KeyError(
+        raise NeuroTSValidationError(
             "The parameters must contain a 'step_size' entry when the "
             "'growth_method' entry in parameters is in ['tmd', 'tmd_apical', 'tmd_gradient']."
         )

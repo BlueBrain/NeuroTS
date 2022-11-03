@@ -27,7 +27,7 @@ from neurots.generate.algorithms.common import bif_methods
 from neurots.generate.algorithms.common import section_data
 from neurots.morphmath import sample
 from neurots.morphmath.utils import norm
-from neurots.preprocess.relevancy_checkers import check_min_bar_length
+from neurots.preprocess.relevance_checkers import check_min_bar_length
 
 L = logging.getLogger(__name__)
 
