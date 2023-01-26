@@ -22,10 +22,10 @@ from setuptools import setup
 
 reqs = [
     "jsonschema>=3.0.1",
-    "matplotlib>=1.3.1",
-    "morphio>=3.0,<4.0",
+    "matplotlib>=3.2.1",
+    "morphio>=3.3.3,<4.0",
     "neurom>=3.0,<4.0",
-    "numpy>=1.15.0",
+    "numpy>=1.20.0",
     "scipy>=1.6",
     "tmd>=2.2.0",
 ]
@@ -40,15 +40,14 @@ doc_reqs = [
 
 test_reqs = [
     "diameter-synthesis>=0.5.0",
-    "dictdiffer",
-    "mock",
-    "morph-tool>=0.1.12",
-    "numpy>=1.22",
-    "pytest",
-    "pytest-cov",
-    "pytest-html",
-    "pytest-xdist",
-    "tqdm",
+    "dictdiffer>=0.5",
+    "mock>=3",
+    "morph-tool>=2.9",
+    "pytest>=6",
+    "pytest-cov>=3",
+    "pytest-html>=2",
+    "pytest-xdist>=2",
+    "tqdm>=4.8.4",
 ]
 
 setup(
@@ -82,6 +81,8 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
     include_package_data=True,
