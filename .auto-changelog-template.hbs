@@ -9,6 +9,7 @@ Introduction
 • The types feat:, fix:, chore:, docs:, refactor:, test:, style:, perf: must be at the beginning of the commit subject with an : on end.
    • They can optionally have a scope set to outline the module or component that is affected eg feat(bldAssess):
 • There is a short hash on the end of every commit that is currently commented out so that change log did not grow too long (due to some system's file size limitations).  You can uncomment if you wish [`{{shorthash}}`]({{href}})
+
 Example Definitions
 • feat: A new feature
 • fix: A bug fix
@@ -30,6 +31,8 @@ Example Definitions
     "replaceText": {
       "([bB]reaking:)": "",
       "([bB]reaking change:)": "",
+      "(^[bB]uild:)": "",
+      "(^[bB]uild\\()": "\\(",
       "(^[fF]eat:)": "",
       "(^[fF]eat\\()": "\\(",
       "(^[fF]ix:)": "",
@@ -59,7 +62,7 @@ Example Definitions
  \s = whitespace
  . = any character except newline
  | = or
- [aA] = charcter a or character A
+ [aA] = character a or character A
  --}}
 
 
@@ -87,7 +90,11 @@ Example Definitions
   {{/commit-list}}
 
   {{! List commits organised under a heading, but not those already listed in the breaking section }}
-      {{#commit-list merges heading='### New Features' message='^[fF]eat:|[fF]eat\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
+      {{#commit-list merges heading='### Build' message='^[bB]uild:|^[bB]uild\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
+        - {{message}} ({{author}}{{#if href}} - [#{{id}}]({{href}}){{/if}})
+      {{/commit-list}}
+
+      {{#commit-list merges heading='### New Features' message='^[fF]eat:|^[fF]eat\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
         - {{message}} ({{author}}{{#if href}} - [#{{id}}]({{href}}){{/if}})
       {{/commit-list}}
 
@@ -123,7 +130,7 @@ Example Definitions
         - {{message}} ({{author}}{{#if href}} - [#{{id}}]({{href}}){{/if}})
       {{/commit-list}}
 
-      {{#commit-list merges heading='### Uncategorized Changes' exclude='[bB]reaking [cC]hange:|[bB]reaking:|^[fF]eat:|^[fF]eat\(|^[fF]ix:|^[fF]ix\(|^[cC]hore:|^[cC]hore\(|^[cC][iI]:|^[cC][iI]\(|^[dD]ocs:|^[dD]ocs\(|^[rR]efactor:|^[rR]efactor\(|^[tT]est:|^[tT]est\(|^[sS]tyle:|^[sS]tyle\(|^[pP]erf:|^[pP]erf\(|\[skip-changelog\]'}}
+      {{#commit-list merges heading='### General Changes' exclude='[bB]reaking [cC]hange:|[bB]reaking:|^[bB]uild:|^[bB]uild\(|^[fF]eat:|^[fF]eat\(|^[fF]ix:|^[fF]ix\(|^[cC]hore:|^[cC]hore\(|^[cC][iI]:|^[cC][iI]\(|^[dD]ocs:|^[dD]ocs\(|^[rR]efactor:|^[rR]efactor\(|^[tT]est:|^[tT]est\(|^[sS]tyle:|^[sS]tyle\(|^[pP]erf:|^[pP]erf\(|\[skip-changelog\]'}}
         - {{message}} ({{author}}{{#if href}} - [#{{id}}]({{href}}){{/if}})
       {{/commit-list}}
 
@@ -133,7 +140,11 @@ Example Definitions
   {{/commit-list}}
 
   {{! List commits organised under a heading, but not those already listed in the breaking section }}
-      {{#commit-list commits heading='### New Features' message='^[fF]eat:|[fF]eat\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
+      {{#commit-list commits heading='### Build' message='^[bB]uild:|^[bB]uild\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
+        - {{subject}} ({{author}}{{#if href}} - [{{shorthash}}]({{href}}){{/if}})
+      {{/commit-list}}
+
+      {{#commit-list commits heading='### New Features' message='^[fF]eat:|^[fF]eat\(' exclude='[bB]reaking [cC]hange:|[bB]reaking:|\[skip-changelog\]'}}
         - {{subject}} ({{author}}{{#if href}} - [{{shorthash}}]({{href}}){{/if}})
       {{/commit-list}}
 
@@ -169,7 +180,7 @@ Example Definitions
         - {{subject}} ({{author}}{{#if href}} - [{{shorthash}}]({{href}}){{/if}})
       {{/commit-list}}
 
-      {{#commit-list commits heading='### Uncategorized Changes' exclude='[bB]reaking [cC]hange:|[bB]reaking:|^[fF]eat:|^[fF]eat\(|^[fF]ix:|^[fF]ix\(|^[cC]hore:|^[cC]hore\(|^[cC][iI]:|^[cC][iI]\(|^[dD]ocs:|^[dD]ocs\(|^[rR]efactor:|^[rR]efactor\(|^[tT]est:|^[tT]est\(|^[sS]tyle:|^[sS]tyle\(|^[pP]erf:|^[pP]erf\(|\[skip-changelog\]'}}
+      {{#commit-list commits heading='### General Changes' exclude='[bB]reaking [cC]hange:|[bB]reaking:|^[bB]uild:|^[bB]uild\(|^[fF]eat:|^[fF]eat\(|^[fF]ix:|^[fF]ix\(|^[cC]hore:|^[cC]hore\(|^[cC][iI]:|^[cC][iI]\(|^[dD]ocs:|^[dD]ocs\(|^[rR]efactor:|^[rR]efactor\(|^[tT]est:|^[tT]est\(|^[sS]tyle:|^[sS]tyle\(|^[pP]erf:|^[pP]erf\(|\[skip-changelog\]'}}
         - {{subject}} ({{author}}{{#if href}} - [{{shorthash}}]({{href}}){{/if}})
       {{/commit-list}}
 

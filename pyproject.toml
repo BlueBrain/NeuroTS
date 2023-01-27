@@ -14,7 +14,6 @@ target-version = [
     "py38",
     "py39",
 ]
-include = 'neurots\/.*\.py$|tests\/.*\.py$|doc\/source\/conf\.py$|setup\.py$|examples\/*.py$'
 
 # PYDOCSTYLE
 [tool.pydocstyle]
@@ -24,7 +23,7 @@ add-ignore = [
     "D107",
 ]
 convention = "google"
-match = "[neurots, tests, docs/source/conf.py, setup.py, examples]"
+match = 'neurots\/.*\.py$|docs\/source\/conf\.py$|setup\.py$|examples\/.*.py$'
 
 # ISORT
 [tool.isort]

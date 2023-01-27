@@ -1,1 +1,3 @@
 *.asc linguist-detectable=false
+.auto-changelog-template.hbs linguist-detectable=false
+commitlint.config.js linguist-detectable=false
