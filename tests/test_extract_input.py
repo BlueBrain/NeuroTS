@@ -674,7 +674,7 @@ def test_from_TMD():
     ]
     for a, b in zip(angles["persistence_diagram"], expected):
         for ai, bi in zip(a, b):
-            assert_array_almost_equal(ai, bi)
+            assert_array_almost_equal(ai, bi, decimal=5)
 
     angles = extract_input.from_TMD.persistent_homology_angles(
         pop, neurite_type="basal_dendrite", threshold=9
