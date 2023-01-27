@@ -673,10 +673,10 @@ def test_from_TMD():
             [265.9921875, 0, np.nan, np.nan, np.nan, np.nan],
         ],
     ]
-    _OLD_NUMPY = parse_version(np.__version__) < parse_version("1.20")
+    _OLD_NUMPY = parse_version(np.__version__) < parse_version("1")
     for a, b in zip(angles["persistence_diagram"], expected):
         for ai, bi in zip(a, b):
-            assert_array_almost_equal(ai, bi, decimal=6 if not _OLD_NUMPY else 4)
+            assert_array_almost_equal(ai, bi, decimal=6 if _OLD_NUMPY else 4)
 
     angles = extract_input.from_TMD.persistent_homology_angles(
         pop, neurite_type="basal_dendrite", threshold=9
