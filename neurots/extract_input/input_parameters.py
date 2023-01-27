@@ -106,6 +106,7 @@ def parameters(
     input_parameters["diameter_params"] = {}
     if diameter_parameters is None:
         input_parameters["diameter_params"]["method"] = "default"
+        input_parameters["diameter_params"]["models"] = ["simpler"]
     elif isinstance(diameter_parameters, str):
         input_parameters["diameter_params"]["method"] = diameter_parameters
     elif isinstance(diameter_parameters, dict):

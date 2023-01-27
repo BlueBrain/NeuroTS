@@ -18,6 +18,7 @@
 import logging
 
 import tmd
+from diameter_synthesis.build_models import build as build_diameter_models
 from neurom import NeuriteType
 from neurom import load_morphologies
 
@@ -85,20 +86,25 @@ def distributions(
 
     if diameter_input_morph is None:
         diameter_input_morph = filepath
-
-    if isinstance(diameter_model, str):
-        input_distributions["diameter"] = from_diameter.model(
-            load_morphologies(diameter_input_morph)
-        )
+    morphology = load_morphologies(diameter_input_morph)
+    if isinstance(diameter_model, str) and diameter_model.startswith("M"):
+        input_distributions["diameter"] = from_diameter.model(morphology)
         input_distributions["diameter"]["method"] = diameter_model
 
     elif hasattr(diameter_model, "__call__"):
-        input_distributions["diameter"] = diameter_model(load_morphologies(diameter_input_morph))
+        input_distributions["diameter"] = diameter_model(morphology)
         input_distributions["diameter"]["method"] = "external"
-    else:
+    elif (
+        isinstance(diameter_model, str) and diameter_model == "default"
+    ) or diameter_model is None:
+
         input_distributions["diameter"] = {}
         input_distributions["diameter"]["method"] = "default"
-        L.warning("No valid diameter model provided, so we will not generate a distribution.")
+        input_distributions["diameter"]["diameter"] = build_diameter_models(
+            morphology, config={"models": ["simpler"], "neurite_types": neurite_types}
+        )
+    else:
+        raise NotImplementedError(f"Diameter model {diameter_model} not understood")
 
     for neurite_type in neurite_types:
         if isinstance(feature, str):

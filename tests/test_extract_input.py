@@ -27,10 +27,13 @@ from neurom import load_morphologies
 from neurom import stats
 from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_equal
+from pkg_resources import parse_version
 
 from neurots import NeuroTSError
 from neurots import extract_input
 from neurots import validator
+
+_OLD_NUMPY = parse_version(np.__version__) < parse_version("1.21")
 
 _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "test_data")
 POP_PATH = os.path.join(_PATH, "bio/")
@@ -295,6 +298,14 @@ class TestDistributions:
         )
         validator.validate_neuron_distribs(distr)
 
+    def test_diameter_model_invalid(self, filename):
+        with pytest.raises(NotImplementedError):
+            extract_input.distributions(
+                filename,
+                feature="radial_distances",
+                diameter_model="invalid",
+            )
+
     def test_diameter_model_M5(self, filename):
         distr_M5 = extract_input.distributions(
             filename, feature="radial_distances", diameter_model="M5"
@@ -407,7 +418,7 @@ def test_parameters():
         "axon": {},
         "origin": [0.0, 0.0, 0.0],
         "grow_types": ["basal_dendrite", "apical_dendrite"],
-        "diameter_params": {"method": "default"},
+        "diameter_params": {"method": "default", "models": ["simpler"]},
     }
     assert_equal(params, expected_params)
 
@@ -470,7 +481,7 @@ def test_parameters():
             "axon": {},
             "origin": [0.0, 0.0, 0.0],
             "grow_types": ["basal_dendrite", "apical_dendrite"],
-            "diameter_params": {"method": "default"},
+            "diameter_params": {"method": "default", "models": ["simpler"]},
         },
     )
     validator.validate_neuron_params(params_path)
@@ -496,7 +507,7 @@ def test_parameters():
             },
             "origin": [0.0, 0.0, 0.0],
             "grow_types": ["axon"],
-            "diameter_params": {"method": "default"},
+            "diameter_params": {"method": "default", "models": ["simpler"]},
         },
     )
     validator.validate_neuron_params(params_axon)
@@ -522,7 +533,7 @@ def test_parameters():
             },
             "origin": [0.0, 0.0, 0.0],
             "grow_types": ["axon"],
-            "diameter_params": {"method": "default"},
+            "diameter_params": {"method": "default", "models": ["simpler"]},
         },
     )
     validator.validate_neuron_params(params)
@@ -666,7 +677,7 @@ def test_from_TMD():
     ]
     for a, b in zip(angles["persistence_diagram"], expected):
         for ai, bi in zip(a, b):
-            assert_array_almost_equal(ai, bi)
+            assert_array_almost_equal(ai, bi, decimal=6 if not _OLD_NUMPY else 4)
 
     angles = extract_input.from_TMD.persistent_homology_angles(
         pop, neurite_type="basal_dendrite", threshold=9
@@ -699,4 +710,4 @@ def test_from_TMD():
     ]
     for a, b in zip(angles["persistence_diagram"], expected):
         for ai, bi in zip(a, b):
-            assert_array_almost_equal(ai, bi)
+            assert_array_almost_equal(ai, bi, decimal=6 if not _OLD_NUMPY else 5)

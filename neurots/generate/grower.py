@@ -20,7 +20,8 @@ import json
 import logging
 
 import numpy as np
-from morphio.mut import Morphology  # pylint: disable=import-error
+from diameter_synthesis import build_diameters
+from morphio.mut import Morphology
 from numpy.random import BitGenerator
 from numpy.random import Generator
 from numpy.random import RandomState
@@ -198,17 +199,20 @@ class NeuronGrower:
 
     def _post_grow(self):
         """Actions after the morphology has been grown and before its diametrization."""
+        # ensures section.id are consistent with morphio loader
+        self.neuron = Morphology(self.neuron)
 
     def _init_diametrizer(self, external_diametrizer=None):
         """Set a diametrizer function."""
-        if self.input_distributions["diameter"]["method"] == "default":
+        if self.input_distributions["diameter"]["method"] == "no_diameters":
             self._diametrize = lambda: None
             L.warning("No diametrizer provided, so neurons will have default diameters.")
         else:
             if self.input_distributions["diameter"]["method"] == "external":
-                if external_diametrizer is None:
-                    raise Exception("Please provide an external diametrizer!")
                 diam_method = external_diametrizer
+            elif self.input_distributions["diameter"]["method"] == "default":
+                self.input_parameters["diameter_params"]["models"] = ["simpler"]
+                diam_method = build_diameters.build
             else:
                 diam_method = self.input_distributions["diameter"]["method"]
 
