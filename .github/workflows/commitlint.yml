@@ -9,11 +9,11 @@ jobs:
     name: Check PR title
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '16'
       - run: npm install -g --force commitlint @commitlint/cli commitlint-plugin-cleanfeet
       - run: npm install conventional-changelog-conventionalcommits
       - run: touch .git/COMMIT_EDITMSG
-      - run: echo ${{ github.event.pull_request.title }} | commitlint
+      - run: echo "${{ github.event.pull_request.title }}" | commitlint

@@ -85,6 +85,7 @@ class TMDStop:
         # self.verify()
 
     def __str__(self):
+        """Return the string representation of the TMDStop."""
         return (
             f"(Ref: {self.ref}, BifID: {self.bif_id}, Bif: {self.bif}, TermID: {self.term_id}, "
             f"Term: {self.term})"
@@ -167,6 +168,7 @@ class TMDStop:
         return abs(self.ref - max(self.bif, self.term))
 
     def __eq__(self, other):
+        """Check for equality with another object."""
         if isinstance(other, TMDStop):
             return (
                 self.bif_id == other.bif_id

@@ -74,6 +74,7 @@ setup(
         "docs": doc_reqs,
         "test": test_reqs,
     },
+    include_package_data=True,
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",
@@ -86,5 +87,4 @@ setup(
         "Programming Language :: Python :: 3.11",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
-    include_package_data=True,
 )

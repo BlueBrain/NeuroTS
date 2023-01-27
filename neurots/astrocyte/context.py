@@ -53,6 +53,7 @@ class EndfeetTargets:
         self.active = np.ones(len(coordinates), dtype=bool)
 
     def __len__(self):
+        """Return the number of active points."""
         return len(self.active)
 
     @property
