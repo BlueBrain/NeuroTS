@@ -27,10 +27,13 @@ from neurom import load_morphologies
 from neurom import stats
 from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_equal
+from pkg_resources import parse_version
 
 from neurots import NeuroTSError
 from neurots import extract_input
 from neurots import validator
+
+_OLD_NUMPY = parse_version(np.__version__) < parse_version("1.21")
 
 _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "test_data")
 POP_PATH = os.path.join(_PATH, "bio/")
@@ -674,7 +677,7 @@ def test_from_TMD():
     ]
     for a, b in zip(angles["persistence_diagram"], expected):
         for ai, bi in zip(a, b):
-            assert_array_almost_equal(ai, bi)
+            assert_array_almost_equal(ai, bi, decimal=6 if not _OLD_NUMPY else 4)
 
     angles = extract_input.from_TMD.persistent_homology_angles(
         pop, neurite_type="basal_dendrite", threshold=9
@@ -707,4 +710,4 @@ def test_from_TMD():
     ]
     for a, b in zip(angles["persistence_diagram"], expected):
         for ai, bi in zip(a, b):
-            assert_array_almost_equal(ai, bi)
+            assert_array_almost_equal(ai, bi, decimal=6 if not _OLD_NUMPY else 5)
