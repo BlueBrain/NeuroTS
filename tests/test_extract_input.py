@@ -33,6 +33,8 @@ from neurots import NeuroTSError
 from neurots import extract_input
 from neurots import validator
 
+_OLD_NUMPY = parse_version(np.__version__) < parse_version("1.21")
+
 _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "test_data")
 POP_PATH = os.path.join(_PATH, "bio/")
 NEU_PATH = os.path.join(_PATH, "diam_simple.swc")
@@ -673,7 +675,6 @@ def test_from_TMD():
             [265.9921875, 0, np.nan, np.nan, np.nan, np.nan],
         ],
     ]
-    _OLD_NUMPY = parse_version(np.__version__) < parse_version("1.21")
     for a, b in zip(angles["persistence_diagram"], expected):
         for ai, bi in zip(a, b):
             assert_array_almost_equal(ai, bi, decimal=6 if not _OLD_NUMPY else 4)
@@ -709,4 +710,4 @@ def test_from_TMD():
     ]
     for a, b in zip(angles["persistence_diagram"], expected):
         for ai, bi in zip(a, b):
-            assert_array_almost_equal(ai, bi)
+            assert_array_almost_equal(ai, bi, decimal=6 if not _OLD_NUMPY else 5)
