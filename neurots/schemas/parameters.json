@@ -145,16 +145,20 @@
                             "properties": {
                                 "mean": {
                                     "description": "The mean of the distribution",
+                                    "minimum": 0,
                                     "type": "number"
                                 },
                                 "std": {
                                     "description": "The std of the distribution",
+                                    "minimum": 0,
                                     "type": "number"
                                 }
                             },
+                            "additionalProperties": false,
                             "type": "object"
                         }
                     },
+                    "additionalProperties": false,
                     "type": "object"
                 },
                 "targeting": {
@@ -227,7 +231,7 @@
                 }
             ]
         },
-        "basal": {
+        "basal_dendrite": {
             "description": "Specific parameters for basals",
             "oneOf": [
                 {

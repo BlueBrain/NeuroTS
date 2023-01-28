@@ -27,6 +27,7 @@ from neurots.generate.algorithms.common import bif_methods
 from neurots.generate.algorithms.common import section_data
 from neurots.morphmath import sample
 from neurots.morphmath.utils import norm
+from neurots.preprocess.relevance_checkers import check_min_bar_length
 
 L = logging.getLogger(__name__)
 
@@ -58,24 +59,14 @@ class TMDAlgo(AbstractAlgo):
         """TMD basic grower."""
         super().__init__(input_data, params, start_point, context)
         self.bif_method = bif_methods[params["branching_method"]]
-        self.params = copy.deepcopy(params)
         self.ph_angles = self.select_persistence(input_data, random_generator)
         self.barcode = Barcode(list(self.ph_angles))
-        self.start_point = start_point
         self.apical_section = None
         self.apical_point_distance_from_soma = 0.0
         self.persistence_length = self.barcode.get_persistence_length()
         # Validate parameters and distributions
         if not skip_validation:
-            # Consistency check between parameters - persistence diagram
-            barSZ = input_data["min_bar_length"]
-            stepSZ = params["step_size"]["norm"]["mean"]
-            if stepSZ >= barSZ:
-                L.warning(
-                    "Selected step size %f is too big for bars of size %f",
-                    stepSZ,
-                    barSZ,
-                )
+            check_min_bar_length(params, input_data, start_point, context)
 
     def select_persistence(self, input_data, random_generator=np.random):
         """Select the persistence.
