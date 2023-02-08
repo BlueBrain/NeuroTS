@@ -1,11 +1,12 @@
 """Functions to modify the given parameters and distributions before running the algorithm.
 
-The functions used as preprocesses should have a name like 'preprocess_*' and have the following
-signature: `check_something(params, distrs)`. These functions should be very generic and should
-not depend on any context in which the related grower is used.
+The functions used as preprocesses should have the signature: `check_something(params, distrs)`.
+These functions should be very generic and should not depend on any context in which the related
+grower is used.
 
 The preprocesses should be registered to be executed in the preprocess step using the
-`@register_preprocess` decorator.
+`@register_preprocessor` decorator if they are applied per grow_type and growth_method, or with
+`@register_global_processor` if they need the entire data.
 """
 
 # Copyright (C) 2022  Blue Brain Project, EPFL
@@ -23,5 +24,10 @@ The preprocesses should be registered to be executed in the preprocess step usin
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# TODO: uncomment the next line when a preprocess is added
-# from neurots.preprocess.utils import register_preprocessor
+from neurots.preprocess.utils import register_global_preprocessor
+from neurots.generate.orientations import fit_3d_angles
+
+
+@register_global_preprocessor()
+def preprocess_3d_angles(params, distrs):
+    fit_3d_angles(params, distrs )

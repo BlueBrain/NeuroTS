@@ -30,15 +30,14 @@ from numpy.random import SeedSequence
 from neurots.generate import diametrizer
 from neurots.generate import orientations as _oris
 from neurots.generate.orientations import OrientationManager
-from neurots.generate.orientations import fit_3d_angles
+from neurots.generate.orientations import check_3d_angles
 from neurots.generate.soma import Soma
 from neurots.generate.soma import SomaGrower
 from neurots.generate.tree import TreeGrower
 from neurots.morphmath import sample
 from neurots.morphmath.utils import normalize_vectors
+from neurots.preprocess import preprocess_inputs
 from neurots.utils import convert_from_legacy_neurite_type
-from neurots.validator import validate_neuron_distribs
-from neurots.validator import validate_neuron_params
 
 L = logging.getLogger(__name__)
 
@@ -67,8 +66,8 @@ class NeuronGrower:
         input_distributions (dict): Distributions extracted from biological data.
         context (Any): An object containing contextual information.
         external_diametrizer (Callable): Diametrizer function for external diametrizer module
-        skip_validation (bool): If set to ``False``, the parameters and distributions are
-            validated.
+        skip_proprocessing(bool): If set to ``False``, the parameters and distributions are
+            preprocessed with registered validator and preprocessors.
         rng_or_seed (int or numpy.random.Generator): A random number generator to use. If an
             int is given, it is passed to :func:`numpy.random.default_rng()` to create a new
             random number generator.
@@ -83,14 +82,14 @@ class NeuronGrower:
         input_distributions,
         context=None,
         external_diametrizer=None,
-        skip_validation=False,
+        skip_preprocessing=False,
         rng_or_seed=np.random,
         trunk_orientations_class=OrientationManager,
     ):
         """Constructor of the NeuronGrower class."""
         self.neuron = Morphology()
         self.context = context
-        self.skip_validation = skip_validation
+        self.skip_validation = skip_preprocessing
         if rng_or_seed is None or isinstance(
             rng_or_seed, (int, np.integer, SeedSequence, BitGenerator)
         ):
@@ -108,9 +107,10 @@ class NeuronGrower:
         self.input_distributions = _load_json(input_distributions)
 
         # Validate parameters and distributions
-        if not skip_validation:
-            self.validate_params()
-            self.validate_distribs()
+        if not skip_preprocessing:
+            self.input_parameters, self.input_distributions = preprocess_inputs(
+                self.input_parameters, self.input_distributions
+            )
 
         # Consistency check between parameters and distributions
         for tree_type in self.input_parameters["grow_types"]:
@@ -156,14 +156,6 @@ class NeuronGrower:
         self._init_diametrizer(external_diametrizer=external_diametrizer)
 
         self._trunk_orientations_class = trunk_orientations_class
-
-    def validate_params(self):
-        """Validate the parameter dictionary."""
-        validate_neuron_params(self.input_parameters)
-
-    def validate_distribs(self):
-        """Validate the distribution dictionary."""
-        validate_neuron_distribs(self.input_distributions)
 
     def next(self):
         """Call the "next" method of each neurite grower."""
@@ -372,7 +364,7 @@ class NeuronGrower:
                     )
                 )
 
-    def _3d_angles_grow_trunks(self, input_parameters_with_3d_angles):
+    def _3d_angles_grow_trunks(self):
         """Grow trunk with 3d_angles method via :func:`.orientation.OrientationManager` class.
 
         Args:
@@ -380,7 +372,7 @@ class NeuronGrower:
         """
         trunk_orientations_manager = self._trunk_orientations_class(
             soma=self.soma_grower.soma,
-            parameters=input_parameters_with_3d_angles,
+            parameters=self.input_parameters,
             distributions=self.input_distributions,
             context=self.context,
             rng=self._rng,
@@ -409,11 +401,8 @@ class NeuronGrower:
         If no `3d_angles` entry is present, we grow trunks with :func:`_simple_grow_trunks` else
         we fit the raw binned 3d angle data and apply :func:`_3d_angles_grow_trunks`.
         """
-        input_parameters_with_3d_angles = fit_3d_angles(
-            self.input_parameters, self.input_distributions
-        )
-        if input_parameters_with_3d_angles is not None:
-            self._3d_angles_grow_trunks(input_parameters_with_3d_angles)
+        if check_3d_angles(self.input_parameters):
+            self._3d_angles_grow_trunks()
         else:
             self._simple_grow_trunks()
 

@@ -39,6 +39,10 @@ fit_3d_angles_params = {
     "with_apical": {"basal_dendrite": {"form": "step", "bounds": fit_3d_angles_bounds["step"]}},
     "without_apical": {"basal_dendrite": {"form": "flat", "bounds": []}},
 }
+_3d_angles_mapping = {
+    "apical_constraint": "apical_3d_angles",
+    "pia_constraint": "pia_3d_angles",
+}
 
 
 class OrientationManagerBase:
@@ -561,10 +565,25 @@ def _get_fit_params_from_input_parameters(parameters):
     return None
 
 
+def check_3d_angles(tmd_parameters):
+    with_3d = False
+    for neurite_type in tmd_parameters["grow_types"]:
+
+        if (
+            tmd_parameters[neurite_type]["orientation"] is None
+            or "mode" not in tmd_parameters[neurite_type]["orientation"]
+        ):
+            if with_3d:
+                raise Exception("Only partial 3d_angle parameters are present")
+        elif tmd_parameters[neurite_type]["orientation"]["mode"] in _3d_angles_mapping:
+            with_3d = True
+    return with_3d
+
+
 def fit_3d_angles(tmd_parameters, tmd_distributions):
     """Fit functions to 3d_angles from `tmd_distributions` and save in copy of `tmd_parameters`.
 
-    If if fit parameters are already in `tmd_parameters`, the fit is skipped.
+    If the fit parameters are already in `tmd_parameters`, the fit is skipped.
 
     We return `None` instead of copy of `tmd_parameters` if there is any `3d_angle` data that
     was present in `tmd_distributions`, with or without fit data, so this function can be used
@@ -577,15 +596,10 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
     Returns:
         tmd_parmeters with fit data if 3d_angles mode is found, else None
     """
-    with_3d = False
     morph_class = (
         "with_apical" if "apical_dendrite" in tmd_parameters["grow_types"] else "without_apical"
     )
-    _3d_angles_mapping = {
-        "apical_constraint": "apical_3d_angles",
-        "pia_constraint": "pia_3d_angles",
-    }
-    new_tmd_parameters = deepcopy(tmd_parameters)
+
     for neurite_type in tmd_parameters["grow_types"]:
 
         if (
@@ -596,22 +610,20 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
 
         mode = tmd_parameters[neurite_type]["orientation"]["mode"]
         if mode in _3d_angles_mapping:
-            with_3d = True
             if (
                 tmd_parameters[neurite_type]["orientation"].get("values") is None
                 or "params" not in tmd_parameters[neurite_type]["orientation"]["values"]
             ):
                 if _3d_angles_mapping[mode] not in tmd_distributions[neurite_type]["trunk"]:
                     raise ValueError("No 3d angles found in distributions.")
-
-                new_tmd_parameters[neurite_type]["orientation"]["values"] = _fit_single_3d_angles(
+                tmd_parameters[neurite_type]["orientation"]["values"] = _fit_single_3d_angles(
                     tmd_distributions[neurite_type]["trunk"][_3d_angles_mapping[mode]]["data"],
                     neurite_type,
                     morph_class,
                     fit_params=_get_fit_params_from_input_parameters(tmd_parameters[neurite_type]),
                 )
 
-    return new_tmd_parameters if with_3d else None
+    return tmd_parameters
 
 
 def _sample_trunk_from_3d_angle(parameters, rng, tree_type, ref_dir, max_tries=100):

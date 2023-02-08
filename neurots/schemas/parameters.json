@@ -142,7 +142,6 @@
                                                 },
                                                 "params": {
                                                     "items": {
-                                                        "$ref": "#/definitions/point",
                                                         "description": "The fit parameters"
                                                     },
                                                     "type": "array"

@@ -1,11 +1,12 @@
 """Functions to check that the given parameters and distributions will not break the algorithm.
 
-The functions used as validity checkers should have a name like 'check_*' and have the following
-signature: `check_something(params, distrs)`. These functions should be very generic and should
-not depend on any context in which the related grower is used.
+The functions for validity checkers should have the signature: `check_something(params, distrs)`.
+These functions should be very generic and should not depend on any context in which the related
+grower is used.
 
 The checkers should be registered to be executed in the preprocess step using the
-`@register_validator` decorator.
+`@register_validator` decorator if they are applied per grow_type and growth_method, or with
+`@register_global_validator`  if they need the entire data.
 """
 
 # Copyright (C) 2022  Blue Brain Project, EPFL
@@ -26,6 +27,9 @@ The checkers should be registered to be executed in the preprocess step using th
 from neurots.preprocess.exceptions import NeuroTSValidationError
 from neurots.preprocess.relevance_checkers import check_min_bar_length
 from neurots.preprocess.utils import register_validator
+from neurots.preprocess.utils import register_global_validator
+from neurots.validator import validate_neuron_distribs
+from neurots.validator import validate_neuron_params
 
 
 @register_validator("trunk")
@@ -37,6 +41,12 @@ def check_num_seg(params, distrs):
             "The parameters must contain a 'num_seg' entry when the "
             "'growth_method' entry in parameters is 'trunk'."
         )
+
+
+@register_global_validator()
+def validate(params, distrs):
+    validate_neuron_params(params)
+    validate_neuron_distribs(distrs)
 
 
 @register_validator("tmd", "tmd_apical", "tmd_gradient")

@@ -25,7 +25,19 @@ from neurots.validator import validate_neuron_params
 _REGISTERED_FUNCTIONS = {
     "preprocessors": defaultdict(set),
     "validators": defaultdict(set),
+    "global_preprocessors": set(),
+    "global_validators": set(),
 }
+
+
+def register_global_preprocessor():
+    """Register a global preprocess function."""
+
+    def inner(func):
+        _REGISTERED_FUNCTIONS["global_preprocessors"].add(func)
+        return func
+
+    return inner
 
 
 def register_preprocessor(*growth_methods):
@@ -34,6 +46,16 @@ def register_preprocessor(*growth_methods):
     def inner(func):
         for i in growth_methods:
             _REGISTERED_FUNCTIONS["preprocessors"][i].add(func)
+        return func
+
+    return inner
+
+
+def register_global_validator():
+    """Register a global validation function."""
+
+    def inner(func):
+        _REGISTERED_FUNCTIONS["global_validators"].add(func)
         return func
 
     return inner
@@ -54,8 +76,11 @@ def preprocess_inputs(params, distrs):
     """Validate and preprocess all inputs."""
     params = deepcopy(params)
     distrs = deepcopy(distrs)
-    validate_neuron_params(params)
-    validate_neuron_distribs(distrs)
+    for preprocess_func in chain(
+        _REGISTERED_FUNCTIONS["global_validators"],
+        _REGISTERED_FUNCTIONS["global_preprocessors"],
+    ):
+        preprocess_func(params, distrs)
 
     for grow_type in params["grow_types"]:
         growth_method = params[grow_type]["growth_method"]
