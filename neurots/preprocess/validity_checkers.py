@@ -6,7 +6,7 @@ grower is used.
 
 The checkers should be registered to be executed in the preprocess step using the
 `@register_validator` decorator if they are applied per grow_type and growth_method, or with
-`@register_global_validator`  if they need the entire data.
+`@register_global_validator` if they need the entire data.
 """
 
 # Copyright (C) 2022  Blue Brain Project, EPFL
@@ -63,3 +63,24 @@ def check_bar_length(params, distrs):
             "'growth_method' entry in parameters is in ['tmd', 'tmd_apical', 'tmd_gradient']."
         )
     check_min_bar_length(params, distrs)
+
+
+@register_global_validator()
+def check_consistency(params, distrs):
+    """Check consistency check between some parameters and distributions values."""
+    for tree_type in params["grow_types"]:
+        metric1 = params[tree_type].get("metric")
+        metric2 = distrs[tree_type].get("filtration_metric")
+        if metric1 not in ["trunk_length", metric2]:
+            raise ValueError(
+                "Metric of parameters and distributions is inconsistent:"
+                + f" {metric1} != {metric2}"
+            )
+
+    method1 = params["diameter_params"]["method"]
+    method2 = distrs["diameter"]["method"]
+    if method1 != method2:
+        raise ValueError(
+            "Diameters methods of parameters and distributions is inconsistent:"
+            + f" {method1} != {method2}"
+        )

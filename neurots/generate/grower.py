@@ -66,7 +66,7 @@ class NeuronGrower:
         input_distributions (dict): Distributions extracted from biological data.
         context (Any): An object containing contextual information.
         external_diametrizer (Callable): Diametrizer function for external diametrizer module
-        skip_proprocessing(bool): If set to ``False``, the parameters and distributions are
+        skip_proprocessing (bool): If set to ``False``, the parameters and distributions are
             preprocessed with registered validator and preprocessors.
         rng_or_seed (int or numpy.random.Generator): A random number generator to use. If an
             int is given, it is passed to :func:`numpy.random.default_rng()` to create a new
@@ -89,7 +89,6 @@ class NeuronGrower:
         """Constructor of the NeuronGrower class."""
         self.neuron = Morphology()
         self.context = context
-        self.skip_validation = skip_preprocessing
         if rng_or_seed is None or isinstance(
             rng_or_seed, (int, np.integer, SeedSequence, BitGenerator)
         ):
@@ -106,35 +105,11 @@ class NeuronGrower:
         L.debug("Input Parameters: %s", self.input_parameters)
         self.input_distributions = _load_json(input_distributions)
 
-        # Validate parameters and distributions
+        # Validate and preprocess parameters and distributions
         if not skip_preprocessing:
             self.input_parameters, self.input_distributions = preprocess_inputs(
                 self.input_parameters, self.input_distributions
             )
-
-        # Consistency check between parameters and distributions
-        for tree_type in self.input_parameters["grow_types"]:
-            metric1 = self.input_parameters[tree_type].get("metric")
-            metric2 = self.input_distributions[tree_type].get("filtration_metric")
-            if metric1 not in ["trunk_length", metric2]:
-                raise ValueError(
-                    "Metric of parameters and distributions is inconsistent:"
-                    + f" {metric1} != {metric2}"
-                )
-
-        method1 = self.input_parameters["diameter_params"]["method"]
-        method2 = self.input_distributions["diameter"]["method"]
-        if method1 != method2:
-            raise ValueError(
-                "Diameters methods of parameters and distributions is inconsistent:"
-                + f" {method1} != {method2}"
-            )
-
-        if (
-            self.input_distributions["diameter"]["method"] == "external"
-            and external_diametrizer is None
-        ):
-            raise ValueError("External diametrizer is missing the diametrizer function.")
 
         # A list of trees with the corresponding orientations
         # and initial points on the soma surface will be initialized.
@@ -197,6 +172,12 @@ class NeuronGrower:
 
     def _init_diametrizer(self, external_diametrizer=None):
         """Set a diametrizer function."""
+        if (
+            self.input_distributions["diameter"]["method"] == "external"
+            and external_diametrizer is None
+        ):
+            raise ValueError("External diametrizer is missing the diametrizer function.")
+
         if self.input_distributions["diameter"]["method"] == "no_diameters":
             self._diametrize = lambda: None
             L.warning("No diametrizer provided, so neurons will have default diameters.")
@@ -358,7 +339,6 @@ class NeuronGrower:
                         initial_point=p,
                         parameters=params,
                         distributions=distr,
-                        skip_validation=self.skip_validation,
                         context=self.context,
                         random_generator=self._rng,
                     )
@@ -388,7 +368,6 @@ class NeuronGrower:
                         initial_point=p,
                         parameters=self.input_parameters[neurite_type],
                         distributions=self.input_distributions[neurite_type],
-                        skip_validation=self.skip_validation,
                         context=self.context,
                         random_generator=self._rng,
                     )

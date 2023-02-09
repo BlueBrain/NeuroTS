@@ -27,7 +27,6 @@ from neurots.generate.algorithms.common import bif_methods
 from neurots.generate.algorithms.common import section_data
 from neurots.morphmath import sample
 from neurots.morphmath.utils import norm
-from neurots.preprocess.relevance_checkers import check_min_bar_length
 
 L = logging.getLogger(__name__)
 
@@ -40,7 +39,6 @@ class TMDAlgo(AbstractAlgo):
         params (dict): The parameters required for growth. It should include the
             ``branching_method`` selected from: ``|bio_oriented, symmetric, directional]``.
         start_point (list[float]): The first point of the trunk.
-        skip_validation (bool): If set to ``False``, the parameters and distributions and
             the "min_bar_length" parameter are validated.
         context (Any): An object containing contextual information.
         random_generator (numpy.random.Generator): The random number generator to use.
@@ -51,7 +49,6 @@ class TMDAlgo(AbstractAlgo):
         input_data,
         params,
         start_point,
-        skip_validation=False,
         context=None,
         random_generator=np.random,
         **_,
@@ -64,9 +61,6 @@ class TMDAlgo(AbstractAlgo):
         self.apical_section = None
         self.apical_point_distance_from_soma = 0.0
         self.persistence_length = self.barcode.get_persistence_length()
-        # Validate parameters and distributions
-        if not skip_validation:
-            check_min_bar_length(params, input_data, start_point, context)
 
     def select_persistence(self, input_data, random_generator=np.random):
         """Select the persistence.
