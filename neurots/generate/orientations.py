@@ -553,7 +553,7 @@ def _fit_single_3d_angles(data, neurite_type, morph_class, fit_params=None):
 
 
 def _get_fit_params_from_input_parameters(parameters):
-    """Get parameter dict for fits from tmd_parameters."""
+    """Get parameter dict for fits from `tmd_parameters`."""
     if "values" in parameters["orientation"] and parameters["orientation"]["values"] is not None:
         form = parameters["orientation"]["values"].get("form")
         bounds = parameters["orientation"]["values"].get("bounds")
