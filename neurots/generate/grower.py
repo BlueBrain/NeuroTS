@@ -282,7 +282,7 @@ class NeuronGrower:
     def _simple_grow_trunks(self):
         """Grow the trunks.
 
-        Generates the initial points of each tree, which depend on the selectedS
+        Generates the initial points of each tree, which depend on the selected
         tree types and the soma surface. All the trees start growing from the surface
         of the soma. The outgrowth direction is either specified in the input parameters,
         as ``parameters['type']['orientation']`` or it is randomly chosen according to the

@@ -37,7 +37,6 @@ def parameters(
     neurite_types=None,
     feature="path_distances",
     diameter_parameters=None,
-    trunk_method="simple",
 ):  # pylint: disable=too-many-branches
     """Returns a default set of input parameters to be used as input for synthesis.
 
@@ -47,7 +46,6 @@ def parameters(
         neurite_types (list[str]): The neurite types to consider.
         feature (str): Use the specified TMD feature.
         diameter_parameters (dict or str): The parameters used for the diameters.
-        trunk_method (str): `simple` for simple trunk method, or `3d_angles`.
 
     Returns:
         dict: The parameters.
@@ -59,11 +57,6 @@ def parameters(
         if neurite_type in ("basal", "apical"):
             neurite_type_warning(neurite_type)
             neurite_types[i] = neurite_type + "_dendrite"
-
-    if trunk_method not in {"simple", "3d_angles"}:
-        raise KeyError(
-            f"trunk_method {trunk_method} not understood, choose between {('simple', '3d_angles')}"
-        )
 
     input_parameters = {
         "basal_dendrite": {},
@@ -120,15 +113,6 @@ def parameters(
         )
         if method == "tmd":
             input_parameters["apical_dendrite"]["growth_method"] = "tmd_apical"
-
-    if trunk_method == "3d_angles":
-        input_parameters["grow_types"] = _sort_neurite_types(neurite_types)
-        input_parameters["basal_dendrite"]["orientation"] = {"mode": "pia_constraint"}
-        if "apical_dendrite" in neurite_types:
-            input_parameters["apical_dendrite"]["orientation"] = {
-                "mode": "normal_pia_constraint",
-                "values": {"direction": [0.0, 0.0]},
-            }
 
     input_parameters["diameter_params"] = {}
     if diameter_parameters is None:
