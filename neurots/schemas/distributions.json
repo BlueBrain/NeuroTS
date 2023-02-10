@@ -117,7 +117,7 @@
                             "type": "null"
                         },
                         {
-                            "additionalProperties": true,
+                            "additionalProperties": false,
                             "description": "The distributions used to synthesize the trunk using orientation deviation",
                             "properties": {
                                 "absolute_elevation_deviation": {
@@ -147,6 +147,14 @@
                                 "orientation_deviation": {
                                     "$ref": "#/definitions/data_distr",
                                     "description": "The data distribution used for the orientation deviation"
+                                },
+                                "pia_3d_angles": {
+                                    "$ref": "#/definitions/data_distr",
+                                    "description": "The data distribution used for the 3d angles wrt pia direction"
+                                },
+                                "apical_3d_angles": {
+                                    "$ref": "#/definitions/data_distr",
+                                    "description": "The data distribution used for the 3d angles wrt apical direction"
                                 }
                             },
                             "required": [

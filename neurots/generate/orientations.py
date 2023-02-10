@@ -31,15 +31,15 @@ from neurots.utils import PIA_DIRECTION
 from neurots.utils import NeuroTSError
 
 _TWOPI = 2.0 * np.pi
-fit_3d_angles_bounds = {
+FIT_3D_ANGLES_BOUNDS = {
     "double_step": ([0, 0.1, -np.pi, 0.1], [np.pi, 10, 0, 10]),
     "step": ([-np.pi, 0.1], [np.pi, 10]),
 }
-fit_3d_angles_params = {
-    "with_apical": {"basal_dendrite": {"form": "step", "bounds": fit_3d_angles_bounds["step"]}},
+FIT_3D_ANGLES_PARAMS = {
+    "with_apical": {"basal_dendrite": {"form": "step", "bounds": FIT_3D_ANGLES_BOUNDS["step"]}},
     "without_apical": {"basal_dendrite": {"form": "flat", "bounds": []}},
 }
-_3d_angles_mapping = {
+_3D_ANGLES_MAPPING = {
     "apical_constraint": "apical_3d_angles",
     "pia_constraint": "pia_3d_angles",
 }
@@ -528,7 +528,7 @@ def _fit_single_3d_angles(data, neurite_type, morph_class, fit_params=None):
         morph_class (str): morph_class of the neuron (with_apical or without_apical)
         fit_params (dict): specific fit parameters such as form and bounds to overwrite the defaults
     """
-    _fit_params = deepcopy(fit_3d_angles_params)
+    _fit_params = deepcopy(FIT_3D_ANGLES_PARAMS)
     if fit_params is not None:
         _fit_params[morph_class][neurite_type].update(fit_params)
 
@@ -558,12 +558,13 @@ def _get_fit_params_from_input_parameters(parameters):
     if values is not None:
         form = values.get("form")
         if form is not None and values.get("params") is None:
-            bounds = values.get("bounds", fit_3d_angles_bounds[form])
+            bounds = values.get("bounds", FIT_3D_ANGLES_BOUNDS[form])
             return {"form": form, "bounds": deepcopy(bounds)}
     return None
 
 
 def check_3d_angles(tmd_parameters):
+    """Check whther the parameters correspond to 3d_angle modes, and return a bool."""
     with_3d = False
     for neurite_type in tmd_parameters["grow_types"]:
 
@@ -573,7 +574,7 @@ def check_3d_angles(tmd_parameters):
         ):
             if with_3d:
                 raise Exception("Only partial 3d_angle parameters are present")
-        elif tmd_parameters[neurite_type]["orientation"]["mode"] in _3d_angles_mapping:
+        elif tmd_parameters[neurite_type]["orientation"]["mode"] in _3D_ANGLES_MAPPING:
             with_3d = True
     return with_3d
 
@@ -599,27 +600,25 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
     )
 
     for neurite_type in tmd_parameters["grow_types"]:
+        orientation = tmd_parameters[neurite_type]["orientation"]
 
-        if (
-            tmd_parameters[neurite_type]["orientation"] is None
-            or "mode" not in tmd_parameters[neurite_type]["orientation"]
-        ):
+        if orientation is None or "mode" not in orientation:
             continue
 
-        mode = tmd_parameters[neurite_type]["orientation"]["mode"]
+        mode = orientation["mode"]
         make_fit = False
-        if mode in _3d_angles_mapping:
-            if tmd_parameters[neurite_type]["orientation"].get("values") is None:
+        if mode in _3D_ANGLES_MAPPING:
+            if orientation.get("values") is None:
                 make_fit = True
             else:
-                val = tmd_parameters[neurite_type]["orientation"]["values"]
+                val = orientation["values"]
                 if "params" not in val and "direction" not in val:
-                    if _3d_angles_mapping[mode] not in tmd_distributions[neurite_type]["trunk"]:
+                    if _3D_ANGLES_MAPPING[mode] not in tmd_distributions[neurite_type]["trunk"]:
                         raise ValueError("No 3d angles found in distributions.")
                     make_fit = True
         if make_fit:
             tmd_parameters[neurite_type]["orientation"]["values"] = _fit_single_3d_angles(
-                tmd_distributions[neurite_type]["trunk"][_3d_angles_mapping[mode]]["data"],
+                tmd_distributions[neurite_type]["trunk"][_3D_ANGLES_MAPPING[mode]]["data"],
                 neurite_type,
                 morph_class,
                 fit_params=_get_fit_params_from_input_parameters(tmd_parameters[neurite_type]),
