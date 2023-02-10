@@ -67,7 +67,7 @@ def check_bar_length(params, distrs):
 
 @register_global_validator()
 def check_consistency(params, distrs):
-    """Check consistency check between some parameters and distributions values."""
+    """Check consistency between some parameters and distributions values."""
     for tree_type in params["grow_types"]:
         metric1 = params[tree_type].get("metric")
         metric2 = distrs[tree_type].get("filtration_metric")
