@@ -542,26 +542,24 @@ def _fit_single_3d_angles(data, neurite_type, morph_class, fit_params=None):
                 data["bins"],
                 data["weights"],
                 bounds=_fit_params[morph_class][neurite_type]["bounds"],
-            )[0]
+            )[0].tolist()
         except RuntimeError:
             warnings.warn("Cannot fit some trunk angles, we fallback to flat distribution")
             form = "flat"
-            popt = np.array([])
+            popt = []
     else:
-        popt = np.array([])
-    return {"form": form, "params": popt.tolist()}
+        popt = []
+    return {"form": form, "params": popt}
 
 
 def _get_fit_params_from_input_parameters(parameters):
     """Get parameter dict for fits from `tmd_parameters`."""
-    if "values" in parameters["orientation"] and parameters["orientation"]["values"] is not None:
-        form = parameters["orientation"]["values"].get("form")
-        bounds = parameters["orientation"]["values"].get("bounds")
-        if form is not None:
-            if bounds is None:
-                bounds = fit_3d_angles_bounds[form]
-            if parameters["orientation"]["values"].get("params") is None:
-                return {"form": form, "bounds": bounds}
+    values = parameters["orientation"].get("values")
+    if values is not None:
+        form = values.get("form")
+        if form is not None and values.get("params") is None:
+            bounds = values.get("bounds", fit_3d_angles_bounds[form])
+            return {"form": form, "bounds": deepcopy(bounds)}
     return None
 
 
@@ -594,7 +592,7 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
         tmd_distributions (dict): Input distributions.
 
     Returns:
-        tmd_parmeters with fit data if 3d_angles mode is found, else None
+        `tmd_parmeters` with fit data if `3d_angles` mode is found, else None
     """
     morph_class = (
         "with_apical" if "apical_dendrite" in tmd_parameters["grow_types"] else "without_apical"
@@ -631,7 +629,7 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
 
 
 def _sample_trunk_from_3d_angle(parameters, rng, tree_type, ref_dir, max_tries=100):
-    """Sample trunk directions from fit of distribution of 3d_angles wrt to ref_dir.
+    """Sample trunk directions from fit of distribution of `3d_angles` wrt to `ref_dir`.
 
     We use the accept-reject algorithm so we can sample from any distribution.
     After a number of unsuccessful tries (default=100), we stop and return a random direction.
