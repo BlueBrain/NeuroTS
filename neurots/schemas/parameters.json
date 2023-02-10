@@ -107,7 +107,7 @@
                                             "additionalProperties": false,
                                             "required": ["orientations"]
                                         },
-                                         {
+                                        {
                                             "type": "object",
                                             "properties": {
                                                 "primary_orientation": {
