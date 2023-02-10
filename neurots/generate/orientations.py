@@ -520,7 +520,7 @@ def get_probability_function(form="step", with_density=True):
 
 
 def _fit_single_3d_angles(data, neurite_type, morph_class, fit_params=None):
-    """Fit function to distribution of 3d angles for a neurite_type.
+    """Fit function to distribution of 3d angles for a `neurite_type`.
 
     Args:
         data (dict): bins and weights data from input_distribution
