@@ -573,7 +573,7 @@ def check_3d_angles(tmd_parameters):
         ):
             if with_3d:
                 raise Exception("Only partial 3d_angle parameters are present")
-        if tmd_parameters[neurite_type]["orientation"]["mode"] in _3D_ANGLES_MAPPING:
+        elif tmd_parameters[neurite_type]["orientation"]["mode"] in _3D_ANGLES_MAPPING:
             with_3d = True
     return with_3d
 
