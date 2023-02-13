@@ -174,6 +174,8 @@ def dummy_register(monkeypatch):
         {
             "preprocessors": defaultdict(set),
             "validators": defaultdict(set),
+            "global_preprocessors": set(),
+            "global_validators": set(),
         },
     )
 

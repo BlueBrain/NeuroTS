@@ -19,9 +19,6 @@ from collections import defaultdict
 from copy import deepcopy
 from itertools import chain
 
-from neurots.validator import validate_neuron_distribs
-from neurots.validator import validate_neuron_params
-
 _REGISTERED_FUNCTIONS = {
     "preprocessors": defaultdict(set),
     "validators": defaultdict(set),

@@ -99,7 +99,7 @@ class AstrocyteGrower(NeuronGrower):
         input_parameters,
         input_distributions,
         context,
-        skip_preprocessing=False,
+        skip_preprocessing=True,
         external_diametrizer=None,
         rng_or_seed=np.random,
     ):

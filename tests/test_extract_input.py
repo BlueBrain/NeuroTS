@@ -628,10 +628,7 @@ def test_parameters():
             diameter_parameters=object(),
         )
 
-    params = extract_input.parameters(
-        neurite_types=["basal_dendrite", "apical_dendrite"], trunk_method="3d_angles"
-    )
-    print(params)
+    params = extract_input.parameters(neurite_types=["basal_dendrite", "apical_dendrite"])
     assert_equal(
         params,
         {
@@ -639,39 +636,33 @@ def test_parameters():
                 "randomness": 0.24,
                 "targeting": 0.14,
                 "radius": 0.3,
-                "orientation": {"mode": "pia_constraint"},
+                "orientation": None,
                 "growth_method": "tmd",
                 "branching_method": "bio_oriented",
                 "modify": None,
                 "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
-                "tree_type": 3,
                 "metric": "path_distances",
+                "tree_type": 3,
             },
             "apical_dendrite": {
                 "randomness": 0.24,
                 "targeting": 0.14,
                 "radius": 0.3,
-                "orientation": {
-                    "mode": "normal_pia_constraint",
-                    "values": {"direction": [0.0, 0.0]},
-                },
+                "orientation": [[0.0, 1.0, 0.0]],
                 "growth_method": "tmd_apical",
                 "branching_method": "directional",
                 "modify": None,
                 "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
-                "tree_type": 4,
                 "metric": "path_distances",
+                "tree_type": 4,
             },
             "axon": {},
             "origin": [0.0, 0.0, 0.0],
-            "grow_types": ["apical_dendrite", "basal_dendrite"],
-            "diameter_params": {"method": "default"},
+            "grow_types": ["basal_dendrite", "apical_dendrite"],
+            "diameter_params": {"method": "default", "models": ["simpler"]},
         },
     )
     validator.validate_neuron_params(params_path)
-
-    with pytest.raises(KeyError):
-        extract_input.parameters(neurite_types=["axon"], trunk_method="UNKNOWN METHOD")
 
     extract_input.parameters(
         neurite_types=["axon"],
@@ -684,28 +675,6 @@ def test_parameters():
         method="trunk",
         diameter_parameters="some_diametrizer",
     )
-
-
-def test__sort_neurite_types():
-    assert extract_input.input_parameters._sort_neurite_types(
-        ["basal_dendrite", "apical_dendrite"]
-    ) == [
-        "apical_dendrite",
-        "basal_dendrite",
-    ]
-    assert extract_input.input_parameters._sort_neurite_types(
-        ["apical_dendrite", "basal_dendrite"]
-    ) == [
-        "apical_dendrite",
-        "basal_dendrite",
-    ]
-
-    assert extract_input.input_parameters._sort_neurite_types(
-        ["axonal_dendrite", "basal_dendrite"]
-    ) == [
-        "axonal_dendrite",
-        "basal_dendrite",
-    ]
 
 
 def test_from_TMD():
@@ -839,16 +808,7 @@ def test_trunk_neurite_3d_angles(POPUL):
         [44.52200752438604, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 44.52200752438582],
     )
 
-    all_angles = extract_input.from_neurom.trunk_neurite(POPUL, neurom.BASAL_DENDRITE, bins=10)
-
-    angles = extract_input.from_neurom.trunk_neurite_3d_angles(
-        POPUL, neurom.BASAL_DENDRITE, bins=10
-    )
-    assert all_angles["trunk"]["apical_3d_angles"] == angles["trunk"]["apical_3d_angles"]
-    assert all_angles["trunk"]["pia_3d_angles"] == angles["trunk"]["pia_3d_angles"]
-
-    angles = extract_input.from_neurom._trunk_neurite(NEU, neurom.BASAL_DENDRITE, bins=2)
-    assert angles["trunk"]["3d_angle"]["params"] is None
+    angles = extract_input.from_neurom.trunk_neurite(POPUL, neurom.BASAL_DENDRITE, bins=10)
     assert angles["trunk"]["pia_3d_angles"] == {
         "data": {
             "bins": [

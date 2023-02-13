@@ -24,10 +24,11 @@ The preprocesses should be registered to be executed in the preprocess step usin
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from neurots.preprocess.utils import register_global_preprocessor
 from neurots.generate.orientations import fit_3d_angles
+from neurots.preprocess.utils import register_global_preprocessor
 
 
 @register_global_preprocessor()
 def preprocess_3d_angles(params, distrs):
-    fit_3d_angles(params, distrs )
+    """Fit 3d angle data if enabled."""
+    fit_3d_angles(params, distrs)

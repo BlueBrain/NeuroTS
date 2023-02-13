@@ -3,7 +3,8 @@ disable=
 	fixme,
 	invalid-name,
 	len-as-condition,
-	no-else-return
+	no-else-return,
+    broad-exception-raised
 
 [FORMAT]
 # Regexp for a line that is allowed to be longer than the limit.

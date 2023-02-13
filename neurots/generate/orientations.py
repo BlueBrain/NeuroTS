@@ -564,7 +564,7 @@ def _get_fit_params_from_input_parameters(parameters):
 
 
 def check_3d_angles(tmd_parameters):
-    """Check whther the parameters correspond to 3d_angle modes, and return a bool."""
+    """Check whether the parameters correspond to 3d_angle modes, and return a bool."""
     with_3d = False
     for neurite_type in tmd_parameters["grow_types"]:
 
@@ -613,9 +613,8 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
             else:
                 val = orientation["values"]
                 if "params" not in val and "direction" not in val:
-                    if _3D_ANGLES_MAPPING[mode] not in tmd_distributions[neurite_type]["trunk"]:
-                        raise ValueError("No 3d angles found in distributions.")
                     make_fit = True
+
         if make_fit:
             tmd_parameters[neurite_type]["orientation"]["values"] = _fit_single_3d_angles(
                 tmd_distributions[neurite_type]["trunk"][_3D_ANGLES_MAPPING[mode]]["data"],

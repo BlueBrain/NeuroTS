@@ -26,8 +26,8 @@ The checkers should be registered to be executed in the preprocess step using th
 
 from neurots.preprocess.exceptions import NeuroTSValidationError
 from neurots.preprocess.relevance_checkers import check_min_bar_length
-from neurots.preprocess.utils import register_validator
 from neurots.preprocess.utils import register_global_validator
+from neurots.preprocess.utils import register_validator
 from neurots.validator import validate_neuron_distribs
 from neurots.validator import validate_neuron_params
 
@@ -44,8 +44,14 @@ def check_num_seg(params, distrs):
 
 
 @register_global_validator()
-def validate(params, distrs):
+def validate_parameters(params, _):
+    """Validate parameters."""
     validate_neuron_params(params)
+
+
+@register_global_validator()
+def validate_distributions(_, distrs):
+    """Validate distributions."""
     validate_neuron_distribs(distrs)
 
 

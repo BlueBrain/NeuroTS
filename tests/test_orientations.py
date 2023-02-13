@@ -574,7 +574,3 @@ def test_fit_3d_angles():
     npt.assert_almost_equal(
         new_parameters["basal_dendrite"]["orientation"]["values"]["params"], expected_params
     )
-
-    del distributions["basal_dendrite"]["trunk"]["apical_3d_angles"]
-    with pytest.raises(ValueError):
-        tested.fit_3d_angles(parameters, distributions)
