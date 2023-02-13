@@ -563,6 +563,7 @@ def test_fit_3d_angles():
         },
     }
     expected_params = [3.1415926535803003, 2.9065466158869935]
+
     new_parameters = tested.fit_3d_angles(parameters, distributions)
 
     assert new_parameters["basal_dendrite"]["orientation"]["values"]["form"] == "step"
@@ -574,3 +575,23 @@ def test_fit_3d_angles():
     npt.assert_almost_equal(
         new_parameters["basal_dendrite"]["orientation"]["values"]["params"], expected_params
     )
+
+    parameters = {
+        "grow_types": ["apical_dendrite", "basal_dendrite"],
+        "apical_dendrite": {
+            "orientation": {
+                "mode": "use_predefined",
+                "values": {"orientations": [[0.0, 1.0, 0.0]]},
+            }
+        },
+        "basal_dendrite": {
+            "orientation": {
+                "mode": "apical_constraint",
+                "values": {"form": "flat"},
+            },
+        },
+    }
+
+    new_parameters = tested.fit_3d_angles(parameters, distributions)
+    assert new_parameters["basal_dendrite"]["orientation"]["values"]["form"] == "flat"
+    assert new_parameters["basal_dendrite"]["orientation"]["values"]["params"] == []

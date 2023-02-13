@@ -531,7 +531,6 @@ def _fit_single_3d_angles(data, neurite_type, morph_class, fit_params=None):
     _fit_params = deepcopy(FIT_3D_ANGLES_PARAMS)
     if fit_params is not None:
         _fit_params[morph_class][neurite_type].update(fit_params)
-
     form = _fit_params[morph_class][neurite_type]["form"]
     if form != "flat":
         function = get_probability_function(form, with_density=True)
@@ -543,7 +542,7 @@ def _fit_single_3d_angles(data, neurite_type, morph_class, fit_params=None):
                 data["weights"],
                 bounds=_fit_params[morph_class][neurite_type]["bounds"],
             )[0].tolist()
-        except RuntimeError:
+        except RuntimeError:  # pragma: no cover
             warnings.warn("Cannot fit some trunk angles, we fallback to flat distribution")
             form = "flat"
             popt = []
@@ -558,7 +557,7 @@ def _get_fit_params_from_input_parameters(parameters):
     if values is not None:
         form = values.get("form")
         if form is not None and values.get("params") is None:
-            bounds = values.get("bounds", FIT_3D_ANGLES_BOUNDS[form])
+            bounds = values.get("bounds", FIT_3D_ANGLES_BOUNDS.get(form, None))
             return {"form": form, "bounds": deepcopy(bounds)}
     return None
 
@@ -574,7 +573,7 @@ def check_3d_angles(tmd_parameters):
         ):
             if with_3d:
                 raise Exception("Only partial 3d_angle parameters are present")
-        elif tmd_parameters[neurite_type]["orientation"]["mode"] in _3D_ANGLES_MAPPING:
+        if tmd_parameters[neurite_type]["orientation"]["mode"] in _3D_ANGLES_MAPPING:
             with_3d = True
     return with_3d
 
