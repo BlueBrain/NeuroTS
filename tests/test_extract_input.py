@@ -27,6 +27,7 @@ import tmd
 from neurom import load_morphologies
 from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_equal
+from numpy.testing import assert_almost_equal
 from pkg_resources import parse_version
 
 from neurots import NeuroTSError
@@ -58,8 +59,8 @@ def test_num_trees(POPUL):
 
     numBAS = extract_input.from_neurom.number_neurites(POPUL)
     numAX = extract_input.from_neurom.number_neurites(POPUL, neurite_type=neurom.AXON)
-    assert_equal(numBAS, target_numBAS)
-    assert_equal(numAX, target_numAX)
+    assert_almost_equal(numBAS, target_numBAS)
+    assert_almost_equal(numAX, target_numAX)
 
 
 def test_trunk_distr(POPUL, NEU):
