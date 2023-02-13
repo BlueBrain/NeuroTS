@@ -139,7 +139,7 @@ def test_trunk_distr(POPUL, NEU):
             "azimuth": {"uniform": {"max": 0.0, "min": np.pi}},
             "orientation_deviation": {"data": {"bins": [0.0], "weights": [2]}},
             "absolute_elevation_deviation": {"data": {"weights": [2]}},
-            "pia_3d_angles": {"data": {"weights": [8.904401504877203]}},
+            "pia_3d_angles": {"data": {"weights": [8.9044]}},
         }
     }
 
@@ -167,6 +167,10 @@ def test_trunk_distr(POPUL, NEU):
     del trunkAP["trunk"]["pia_3d_angles"]["data"]["bins"]
 
     assert_equal(trunkBAS, target_trunkBAS)
+    # this value is slightly unstable with python versions
+    trunkAP["trunk"]["pia_3d_angles"]["data"]["weights"][0] = np.around(
+        trunkAP["trunk"]["pia_3d_angles"]["data"]["weights"][0], 4
+    )
     assert_equal(trunkAP, target_trunkAPIC)
 
 
