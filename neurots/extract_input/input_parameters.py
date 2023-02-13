@@ -20,17 +20,6 @@ from neurots.utils import neurite_type_warning
 tmd_algos = ("tmd", "tmd_gradient", "tmd_apical")
 
 
-def _sort_neurite_types(neurite_types):
-    """Sort neurite types to comply with internal requirements.
-
-    For now, only apical should be first, so it is placed first, and other `neurite_types` can be
-    placed with respect to it.
-    """
-    if "apical_dendrite" in neurite_types:
-        return ["apical_dendrite"] + [t for t in neurite_types if t != "apical_dendrite"]
-    return list(neurite_types)
-
-
 def parameters(
     origin=(0.0, 0.0, 0.0),
     method="tmd",
