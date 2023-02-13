@@ -30,7 +30,6 @@ class DynamicPointArray:
     """
 
     def __init__(self, initial_capacity=100000, resize_factor=2.0):
-
         self._size = 0
         self._capacity = initial_capacity
         self._resize_factor = resize_factor

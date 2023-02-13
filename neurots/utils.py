@@ -58,7 +58,6 @@ def convert_from_legacy_neurite_type(data):
     """Convert legacy neurite type names, basal -> basal_dendrite and apical -> apical_dendrite."""
     old_data = deepcopy(data)
     for key, _data in old_data.items():
-
         if key == "apical":
             neurite_type_warning(key)
             data["apical_dendrite"] = data.pop("apical")

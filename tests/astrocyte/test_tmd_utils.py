@@ -37,7 +37,6 @@ def _barcode_list():
 
 
 def test_scale_barcode():
-
     barcode = _barcode()
 
     target_distance = 2.0 * 1072.5500821184357
@@ -54,7 +53,6 @@ def test_scale_barcode():
 
 
 def test_barcodes_greater_than_distance():
-
     barcode_list = _barcode_list()
 
     result = _tu.barcodes_greater_than_distance(barcode_list, 3000.0)

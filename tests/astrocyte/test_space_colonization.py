@@ -39,7 +39,6 @@ PCLOUD_POINTS = np.array(
 
 
 def _point_cloud():
-
     point_cloud = Mock(points=PCLOUD_POINTS, remove_hemisphere=Mock())
 
     values = [
@@ -58,7 +57,6 @@ def _point_cloud():
 
 
 def test_majorize():
-
     process = "secondary"
 
     stop = Mock()
@@ -81,7 +79,6 @@ def test_majorize():
 
 
 def test_repulsion():
-
     point = np.zeros(3)
 
     points = np.array([[0.0, 0.0, 1.0], [0.0, 0.0, 2.0], [0.0, 0.0, 3.0]])
@@ -114,7 +111,6 @@ def test_repulsion():
 
 
 def test_fallback_strategy():
-
     repulsion = np.array([0.0, 1.0, 2.0])
 
     mock_dir1 = np.array([1.0, 0.0, 0.0])
@@ -124,7 +120,6 @@ def test_fallback_strategy():
         "neurots.astrocyte.space_colonization.directional",
         return_value=(mock_dir1.copy(), mock_dir2.copy()),
     ):
-
         section_direction = np.array([0.0, 0.0, 1.0])
 
         dir1, dir2 = tested._fallback_strategy(section_direction, None, repulsion)
@@ -140,7 +135,6 @@ def test_fallback_strategy():
 
 
 def test_colonization_strategy_secondary():
-
     vectors = np.array(
         [
             [0.14525965, 0.18989378, 0.73957937],
@@ -169,7 +163,6 @@ def test_colonization_strategy_secondary():
 
 
 def test_colonization_strategy_primary():
-
     vectors = np.array(
         [
             [0.14525965, 0.18989378, 0.73957937],
@@ -200,7 +193,6 @@ def test_colonization_strategy_primary():
 
 
 def _section(process_type):
-
     mock = Mock()
     mock.direction = np.array([1.0, 0.0, 0.0])
     mock.last_point = np.array([0.5, 0.5, 0.5])
@@ -217,7 +209,6 @@ def _section(process_type):
 
 
 def test_colonization_split():
-
     section = _section("major")
     parameters = {"step_size": {"norm": {"mean": 1.0}}}
 
@@ -236,7 +227,6 @@ def test_colonization_split():
     ) as primary_strategy, patch(
         module + "_colonization_strategy_secondary"
     ) as secondary_strategy:
-
         repulsion.return_value = np.array([3.0, 2.0, 1.0])
         half_ball_query.return_value = []
 
@@ -320,7 +310,6 @@ def test_colonization_split():
 
 
 def test_add_attraction_bias():
-
     target_point = np.array([0.0, 0.0, 100.0])
     current_point = np.array([0.0, 0.0, 0.0])
 
@@ -348,7 +337,6 @@ def test_add_attraction_bias():
 
 
 def test_colonization_split_with_target_influence():
-
     parameters = {
         "bias": 1.0,
         "distance_soma_target": 1.0,
@@ -374,7 +362,6 @@ def test_colonization_split_with_target_influence():
     ) as mock_add_attraction_bias, patch(
         module + "_majorize_process"
     ) as mock_majorize_process:
-
         mock_colonization_split.return_value = (
             np.array([0.0, 0.0, 1.0]),
             None,

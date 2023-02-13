@@ -29,7 +29,6 @@ from .test_grower import _parameters
 
 
 def test_tree_grower_space_colonization_constructor():
-
     neuron = Mock()
     initial_direction = np.array([0.12427115, 0.93206836, 0.3403017])
     initial_point = np.array([1.5411615, 0.29389329, 0.15904417])

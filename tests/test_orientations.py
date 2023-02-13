@@ -29,7 +29,6 @@ from neurots.utils import NeuroTSError
 
 
 def test_orientation_manager__constructor():
-
     soma = "soma"
     parameters = "parameters"
     distributions = "distributions"
@@ -77,7 +76,6 @@ def test_orientation_manager__constructor():
 
 
 def test_orientation_manager__mode_use_predefined():
-
     parameters = {
         "grow_types": ["john"],
         "john": {
@@ -114,7 +112,6 @@ def test_orientation_manager__mode_use_predefined():
 
 
 def test_orientation_manager__tree_type_method_values():
-
     parameters = {
         "grow_types": ["john"],
         "john": {
@@ -156,7 +153,6 @@ def test_orientation_manager__tree_type_method_values():
 
 
 def test_orientation_manager__mode_sample_around_primary_orientation():
-
     parameters = {
         "grow_types": ["john"],
         "john": {
@@ -197,7 +193,6 @@ def test_orientation_manager__mode_sample_around_primary_orientation():
 
 
 def test_orientation_manager__mode_sample_pairwise_angles():
-
     parameters = {
         "grow_types": ["john"],
         "john": {"orientation": {"mode": "sample_pairwise_angles", "values": {}}},
@@ -267,7 +262,6 @@ def test_orientation_manager__mode_sample_pairwise_angles():
 
 
 def test_spherical_angles_to_orientations():
-
     phis = [0.5 * np.pi, np.pi, np.pi]
 
     thetas = [0.5 * np.pi, np.pi, 0.5 * np.pi]
@@ -282,7 +276,6 @@ def test_spherical_angles_to_orientations():
 
 
 def test_points_to_orientations():
-
     origin = np.array([0.0, 0.0, 0.0])
     points = np.array([[2.0, 0.0, 0.0], [0.0, 0.0, 3.0]])
 
@@ -291,7 +284,6 @@ def test_points_to_orientations():
 
 
 def test_orientations_to_sphere_points():
-
     sphere_center = np.array([0.0, 0.0, 1.0])
     sphere_radius = 0.2
 
@@ -306,7 +298,6 @@ def test_orientations_to_sphere_points():
 
 
 def test_orientation_manager__mode_uniform():
-
     parameters = {
         "grow_types": ["basal_dendrite"],
         "basal_dendrite": {
@@ -414,7 +405,6 @@ def test_orientation_manager__mode_normal_pia_constraint():
 
 
 def test_orientation_manager__pia_constraint():
-
     parameters = {
         "grow_types": ["basal_dendrite"],
         "basal_dendrite": {
@@ -452,7 +442,6 @@ def test_orientation_manager__pia_constraint():
 
 
 def test_orientation_manager__apical_constraint():
-
     parameters = {
         "grow_types": ["apical_dendrite", "basal_dendrite"],
         "apical_dendrite": {
@@ -504,7 +493,6 @@ def test_orientation_manager__apical_constraint():
 
 
 def test_probability_function():
-
     func = tested.get_probability_function(form="flat")
     npt.assert_equal(func(1.0), 0.8414709848078965)
 
@@ -529,7 +517,6 @@ def test_probability_function():
 
 # pylint:disable=unsubscriptable-object
 def test_fit_3d_angles():
-
     parameters = {
         "grow_types": ["apical_dendrite", "basal_dendrite"],
         "apical_dendrite": {

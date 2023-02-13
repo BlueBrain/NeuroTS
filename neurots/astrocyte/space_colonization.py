@@ -237,7 +237,6 @@ def _colonization_split(section, angles, parameters, context):
     repulsion = _repulsion(morphology_points[ids], current_point, kill_distance)
 
     if section.process == "major":
-
         seed_ids = point_cloud.partial_ball_query(
             current_point,
             influence_distance,
@@ -254,7 +253,6 @@ def _colonization_split(section, angles, parameters, context):
                 section_direction, vectors_to_seeds, repulsion
             )
     else:
-
         seed_ids = point_cloud.upper_half_ball_query(
             current_point, influence_distance, section_direction
         )
@@ -266,7 +264,6 @@ def _colonization_split(section, angles, parameters, context):
             dir1, dir2 = _colonization_strategy_secondary(vectors_to_seeds, repulsion)
 
     if np.allclose(dir1, dir2):
-
         L.warning(
             "Splitting directions are identical. Use of fallback strategy to recalculate them."
         )
@@ -348,7 +345,6 @@ def _colonization_split_with_target_influence(section, angles, parameters, conte
     target_point = context.endfeet_targets.points[target_id]
 
     if in_squared_proximity(current_point, target_point, ENDFOOT_SQUARED_DISTANCE):
-
         # this section will become the endfoot section that will connect to the target
         process2 = "endfoot"
 
@@ -356,7 +352,6 @@ def _colonization_split_with_target_influence(section, angles, parameters, conte
         context.endfeet_targets.active[target_id] = False
         dir2 = from_to_direction(current_point, target_point)
     else:
-
         max_target_distance = parameters["distance_soma_target"]
         if process1 == "major":
             dir1 = _add_attraction_bias(
@@ -367,7 +362,6 @@ def _colonization_split_with_target_influence(section, angles, parameters, conte
                 section.context.field,
             )
         else:
-
             process1 = _majorize_process(
                 process1,
                 section.stop_criteria["TMD"],

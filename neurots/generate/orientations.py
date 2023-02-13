@@ -65,7 +65,6 @@ class OrientationManagerBase:
     """
 
     def __init__(self, soma, parameters, distributions, context, rng):
-
         self._soma = soma
         self._parameters = parameters
         self._distributions = distributions
@@ -566,7 +565,6 @@ def check_3d_angles(tmd_parameters):
     """Check whether the parameters correspond to 3d_angle modes, and return a bool."""
     with_3d = False
     for neurite_type in tmd_parameters["grow_types"]:
-
         if (
             tmd_parameters[neurite_type]["orientation"] is None
             or "mode" not in tmd_parameters[neurite_type]["orientation"]

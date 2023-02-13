@@ -223,7 +223,6 @@ def diametrize_from_root(
         random_generator (numpy.random.Generator): The random number generator to use.
     """
     for r in root_section_filter(neuron, tree_type=neurite_type):
-
         model = model_params[r.type.name]  # Selected by the root type.
         trunk_diam = sample(model["trunk"], random_generator)
         min_diam = np.min(model["term"])
@@ -233,7 +232,6 @@ def diametrize_from_root(
 
         while active:
             for section in list(active):
-
                 if section.is_root:
                     taper = sample(model["trunk_taper"], random_generator)
                     init_diam = trunk_diam

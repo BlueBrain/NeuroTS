@@ -80,7 +80,6 @@ def _parameters():
 
 
 def _distributions():
-
     path = _path / "bio_path_distribution.json"
     with open(path, "r", encoding="utf-8") as f:
         distributions = json.load(f)
@@ -216,7 +215,6 @@ def _legacy_rng():
 
 
 def _check_neurots_soma(soma):
-
     expected_points = np.array(
         [
             [-5.760930017396721, 14.022942101967232, -1.909993715025774],

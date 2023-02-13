@@ -33,7 +33,6 @@ _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
 def test_create_section_parameters__normal_input():
-
     input_dict = {"randomness": 0.3, "targeting": 0.6}
 
     parameters = _create_section_parameters(input_dict)
@@ -44,7 +43,6 @@ def test_create_section_parameters__normal_input():
 
 
 def test_create_section_parameters__exceed_bounds():
-
     input_dict = {"randomness": 1.1, "targeting": -0.1}
     parameters = _create_section_parameters(input_dict)
 
@@ -61,7 +59,6 @@ def test_create_section_parameters__exceed_bounds():
 
 
 def test_create_section_parameters__sum_to_one_error():
-
     input_dict = {"randomness": 2.0, "targeting": 2.0}
 
     with pytest.raises(NeuroTSError):
