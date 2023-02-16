@@ -341,7 +341,7 @@ def test_orientation_manager__mode_normal_pia_constraint():
         "apical_dendrite": {
             "orientation": {
                 "mode": "normal_pia_constraint",
-                "values": {"direction": [0, 0.1]},
+                "values": {"direction": [[0, 0.1]]},
             }
         },
     }
