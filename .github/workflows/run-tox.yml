@@ -8,12 +8,18 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  tests:
 
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
+        min_versions: ["min_versions", "latest_versions"]
+        exclude:
+          - min_versions: "min_versions"
+        include:
+          - python-version: "3.8"
+            min_versions: "min_versions"
 
     steps:
     - uses: actions/checkout@v3
@@ -28,16 +34,21 @@ jobs:
           .tox
           ~/.cache/pre-commit
         key: ${{ runner.os }}-${{ matrix.python-version }}-${{ steps.date.outputs.date }}-${{ hashFiles('setup.py') }}-${{ hashFiles('.pre-commit-config.yaml') }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip setuptools
-        pip install tox-gh-actions
     - name: Clear results in tox environments
       run: |
         rm -rf .tox/*/tmp
-    - name: Run tox
+    - name: Run tox with latest versions
+      if: ${{ matrix.min_versions == 'latest_versions' }}
       run: |
+        python -m pip install --upgrade pip setuptools
+        pip install tox-gh-actions
         tox
+    - name: Run tox with min versions
+      if: ${{ matrix.min_versions == 'min_versions' }}
+      run: |
+        python -m pip install --upgrade pip setuptools
+        pip install tox
+        tox run -e min_versions
     - name: JUnit Report Action
       uses: mikepenz/action-junit-report@v3
       if: always() # always run even if the previous step fails
