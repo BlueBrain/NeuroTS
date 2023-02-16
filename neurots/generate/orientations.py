@@ -563,17 +563,16 @@ def _get_fit_params_from_input_parameters(parameters):
 
 def check_3d_angles(tmd_parameters):
     """Check whether the parameters correspond to 3d_angle modes, and return a bool."""
-    with_3d = False
+    with_3d = []
     for neurite_type in tmd_parameters["grow_types"]:
-        if (
-            tmd_parameters[neurite_type]["orientation"] is None
-            or "mode" not in tmd_parameters[neurite_type]["orientation"]
-        ):
-            if with_3d:
-                raise Exception("Only partial 3d_angle parameters are present")
-        elif tmd_parameters[neurite_type]["orientation"]["mode"] in _3D_ANGLES_MAPPING:
-            with_3d = True
-    return with_3d
+        orient = tmd_parameters[neurite_type]["orientation"]
+        if orient is not None and "mode" in orient and orient["mode"] in _3D_ANGLES_MAPPING:
+            with_3d.append(True)
+        else:
+            with_3d.append(False)
+    if len(set(with_3d)) > 1:
+        raise NeuroTSError("Only partial 3d_angle parameters are present")
+    return with_3d[0]
 
 
 def fit_3d_angles(tmd_parameters, tmd_distributions):

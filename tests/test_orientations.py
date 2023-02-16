@@ -441,6 +441,33 @@ def test_orientation_manager__pia_constraint():
     npt.assert_allclose(actual, expected, rtol=2e-5)
 
 
+def test_check_3d_angles():
+    parameters = {
+        "grow_types": ["apical_dendrite", "basal_dendrite"],
+        "apical_dendrite": {
+            "orientation": {
+                "mode": "pia_constraint",
+                "values": {"orientations": [[0.0, 1.0, 0.0]]},
+            }
+        },
+        "basal_dendrite": {
+            "orientation": {
+                "mode": "apical_constraint",
+                "values": {"form": "step", "params": [1.5, 0.25]},
+            }
+        },
+    }
+    assert tested.check_3d_angles(parameters)
+    parameters["apical_dendrite"]["orientation"] = None
+    with pytest.raises(NeuroTSError):
+        tested.check_3d_angles(parameters)
+
+    parameters["apical_dendrite"]["orientation"] = parameters["basal_dendrite"]["orientation"]
+    parameters["basal_dendrite"]["orientation"] = None
+    with pytest.raises(NeuroTSError):
+        tested.check_3d_angles(parameters)
+
+
 def test_orientation_manager__apical_constraint():
     parameters = {
         "grow_types": ["apical_dendrite", "basal_dendrite"],
