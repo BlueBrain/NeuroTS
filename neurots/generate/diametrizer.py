@@ -20,6 +20,8 @@ import inspect
 import numpy as np
 from morphio import SectionType
 
+from neurots.utils import NeuroTSError
+
 
 def section_filter(neuron, tree_type=None):
     """Filter all sections according to type."""
@@ -71,7 +73,7 @@ def redefine_diameter_section(section, diam_ind, diam_new):
         + section.diameters.tolist()[(diam_ind + 1) :]
     )
     if len(section.points) != len(section.diameters):
-        raise Exception("Mismatch in dimensions of diameters.")
+        raise NeuroTSError("Mismatch in dimensions of diameters.")
 
 
 def bifurcator(initial_diam, num_children, rall_ratio, siblings_ratio):

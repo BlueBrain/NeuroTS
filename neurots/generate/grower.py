@@ -37,6 +37,7 @@ from neurots.generate.tree import TreeGrower
 from neurots.morphmath import sample
 from neurots.morphmath.utils import normalize_vectors
 from neurots.preprocess import preprocess_inputs
+from neurots.utils import NeuroTSError
 from neurots.utils import convert_from_legacy_neurite_type
 
 L = logging.getLogger(__name__)
@@ -307,7 +308,9 @@ class NeuronGrower:
                 n_trees = sample.n_neurites(distr["num_trees"], random_generator=self._rng)
 
                 if type_of_tree == "basal_dendrite" and n_trees < 2:
-                    raise Exception(f"There should be at least 2 basal dendrites (got {n_trees})")
+                    raise NeuroTSError(
+                        f"There should be at least 2 basal dendrites (got {n_trees})"
+                    )
 
                 orientation = params["orientation"]
                 points = self._convert_orientation2points(orientation, n_trees, distr, params)
@@ -319,7 +322,9 @@ class NeuronGrower:
                 n_trees = len(orientations)
 
                 if type_of_tree == "basal_dendrite" and n_trees < 2:
-                    raise Exception(f"There should be at least 2 basal dendrites (got {n_trees})")
+                    raise NeuroTSError(
+                        f"There should be at least 2 basal dendrites (got {n_trees})"
+                    )
 
                 points = self.soma_grower.add_points_from_orientations(orientations)
 

@@ -29,6 +29,7 @@ from neurots.generate.grower import NeuronGrower
 from neurots.morphmath import sample
 from neurots.morphmath.utils import norm as vectorial_norm
 from neurots.morphmath.utils import normalize_vectors
+from neurots.utils import NeuroTSError
 
 L = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ def _number_of_trees(tree_type, oris, distributions, random_generator=np.random)
         n_trees = len(oris)
 
     if tree_type == "basal" and n_trees < 2:
-        raise Exception(f"There should be at least 2 basal dendrites (got {n_trees})")
+        raise NeuroTSError(f"There should be at least 2 basal dendrites (got {n_trees})")
 
     return n_trees
 
