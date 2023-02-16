@@ -39,7 +39,6 @@ def get_features_medians(object1, object2, flist=feat_list, neurite_type=nm.BASA
     collect_all = []
 
     for feat in flist:
-
         feature_pop = [np.median(nm.get(feat, obj, neurite_type=neurite_type)) for obj in object1]
         feature_neu = [np.median(nm.get(feat, obj, neurite_type=neurite_type)) for obj in object2]
 

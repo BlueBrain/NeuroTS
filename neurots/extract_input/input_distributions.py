@@ -97,7 +97,6 @@ def distributions(
     elif (
         isinstance(diameter_model, str) and diameter_model == "default"
     ) or diameter_model is None:
-
         input_distributions["diameter"] = {}
         input_distributions["diameter"]["method"] = "default"
         input_distributions["diameter"]["diameter"] = build_diameter_models(

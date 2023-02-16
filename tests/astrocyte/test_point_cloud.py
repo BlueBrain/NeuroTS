@@ -60,7 +60,6 @@ def _assert_unordered_equal(arr1, arr2):
 
 
 def test_ball_query():
-
     point_cloud = create_point_cloud()
 
     ids = point_cloud.ball_query(np.array([1.0, 1.0, 1.0]), 0.001)
@@ -72,7 +71,6 @@ def test_ball_query():
 
 
 def test_upper_half_ball_query():
-
     point_cloud = create_point_cloud()
 
     ref_point = np.array([0.2, 0.2, 0.2])
@@ -86,7 +84,6 @@ def test_upper_half_ball_query():
 
 
 def test_partial_ball_query():
-
     point_cloud = create_point_cloud()
 
     ref_point = -np.ones(3)
@@ -110,7 +107,6 @@ def test_partial_ball_query():
 
 
 def test_remove_ids():
-
     to_remove = np.array([4, 3, 9, 1])
 
     point_cloud = create_point_cloud()
@@ -120,7 +116,6 @@ def test_remove_ids():
 
 
 def test_nearest_neighbor_direction():
-
     point_cloud = create_point_cloud()
 
     point = np.ones(3) + 0.2

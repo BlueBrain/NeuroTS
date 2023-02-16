@@ -163,7 +163,6 @@ class SomaGrower:
         new_points = []
 
         for vect in vectors:
-
             phi, theta = rotation.spherical_from_vector(vect)
             point = self.soma.point_from_trunk_direction(phi, theta)
             new_points.append(point)

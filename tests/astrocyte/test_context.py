@@ -37,7 +37,6 @@ def _input_params():
 
 
 def test_constructor():
-
     c = tested.SpaceColonizationContext(_input_params())
 
     npt.assert_equal(len(c.endfeet_targets.points), 2)
@@ -52,7 +51,6 @@ def test_constructor():
 
 
 def test_methods():
-
     c = tested.SpaceColonizationContext(_input_params())
 
     npt.assert_allclose(c.kill_distance(0.1), 15.0 * 0.1)

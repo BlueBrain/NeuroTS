@@ -42,7 +42,6 @@ SECTION_PARAMETERS = SectionParameters(randomness=0.5, targeting=0.5, scale_prob
 
 
 def _point_cloud():
-
     point_cloud = Mock(points=POINT_CLOUD_POINTS, remove_hemisphere=Mock())
 
     values = [
@@ -77,7 +76,6 @@ def _spatial_context():
 
 
 def _create_section_spatial_grower(process_type):
-
     start_point = np.array([0.0, 1.0, 2.0])
     direction = np.array([0.0, 1.0, 0.0])
 
@@ -103,7 +101,6 @@ def _create_section_spatial_grower(process_type):
 
 
 def test_section_spatial_grower__construction():
-
     grower = _create_section_spatial_grower("major")
 
     assert grower.process == "major"
@@ -119,7 +116,6 @@ def test_section_spatial_grower__construction():
 
 
 def test_section_spatial_grower__first_point():
-
     grower = _create_section_spatial_grower("major")
     grower.first_point()
 
@@ -136,7 +132,6 @@ def test_section_spatial_grower__first_point():
 
 
 def test_section_spatial_grower__next_direction():
-
     grower = _create_section_spatial_grower("major")
 
     grower.first_point()
@@ -150,7 +145,6 @@ def test_section_spatial_grower__next_direction():
 
 
 def test_section_spatial_grower__next_point():
-
     grower = _create_section_spatial_grower("major")
     grower.first_point()
     grower.next()

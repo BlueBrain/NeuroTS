@@ -38,7 +38,6 @@ def get_features(object1, object2, flist=feat_list, neurite_type=nm.BASAL_DENDRI
     collect_all = []
 
     for feat in flist:
-
         feature_pop = nm.get(feat, object1, neurite_type=neurite_type)
         feature_neu = nm.get(feat, object2, neurite_type=neurite_type)
 
@@ -52,7 +51,6 @@ def get_features_median(object1, object2, flist=feat_list, neurite_type=nm.BASAL
     collect_all = []
 
     for feat in flist:
-
         feature_pop = [np.median(nm.get(feat, obj, neurite_type=neurite_type)) for obj in object1]
         feature_neu = nm.get(feat, object2, neurite_type=neurite_type)
 

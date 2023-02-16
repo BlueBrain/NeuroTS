@@ -55,7 +55,6 @@ def grow_to_target(start_point, start_direction, target_point, segment_length, p
 
     points = []
     while not in_squared_proximity(point, target_point, target_proximity):
-
         target_direction = from_to_direction(point, target_point)
         direction = (1.0 - p) * direction + p * target_direction
 
