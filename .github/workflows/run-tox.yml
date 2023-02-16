@@ -48,10 +48,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip setuptools
         pip install tox
-        TOXENV=${{ matrix.python-version }}
-        TOXENV="py${TOXENV//./}-min_versions"
-        echo "$TOXENV"
-        tox run -e $TOXENV
+        tox run -e min_versions
     - name: JUnit Report Action
       uses: mikepenz/action-junit-report@v3
       if: always() # always run even if the previous step fails
