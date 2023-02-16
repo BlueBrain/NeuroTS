@@ -8,12 +8,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  tests:
 
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
+        include:
+          - python-version: "3.8"
+            min_versions: "true"
+          - python-version: "3.8"
+            min_versions: "false"
 
     steps:
     - uses: actions/checkout@v3
@@ -35,9 +40,14 @@ jobs:
     - name: Clear results in tox environments
       run: |
         rm -rf .tox/*/tmp
-    - name: Run tox
+    - name: Run tox with latest versions
+      if: ${{ !matrix.min_versions }} || ${{ matrix.min_versions == 'false' }}
       run: |
         tox
+    - name: Run tox with min versions
+      if: ${{ matrix.min_versions }}
+      run: |
+        tox run -e ${{ matrix.python-version }}-min_versions
     - name: JUnit Report Action
       uses: mikepenz/action-junit-report@v3
       if: always() # always run even if the previous step fails
