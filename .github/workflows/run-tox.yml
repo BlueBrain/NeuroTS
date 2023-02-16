@@ -14,11 +14,12 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
+        min_versions: ["true", "false"]
+        exclude:
+          - min_versions: "true"
         include:
           - python-version: "3.8"
             min_versions: "true"
-          - python-version: "3.8"
-            min_versions: "false"
 
     steps:
     - uses: actions/checkout@v3
@@ -41,13 +42,16 @@ jobs:
       run: |
         rm -rf .tox/*/tmp
     - name: Run tox with latest versions
-      if: ${{ !matrix.min_versions }} || ${{ matrix.min_versions == 'false' }}
+      if: ${{ matrix.min_versions == 'false' }}
       run: |
         tox
     - name: Run tox with min versions
-      if: ${{ matrix.min_versions }}
+      if: ${{ matrix.min_versions == 'true' }}
       run: |
-        tox run -e ${{ matrix.python-version }}-min_versions
+        TOXENV=${{ matrix.python-version }}
+        TOXENV="py${TOXENV//./}"
+        echo "$TOXENV"
+        tox run
     - name: JUnit Report Action
       uses: mikepenz/action-junit-report@v3
       if: always() # always run even if the previous step fails
