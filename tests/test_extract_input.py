@@ -841,3 +841,20 @@ def test_trunk_neurite_3d_angles(POPUL):
             ],
         }
     }
+
+
+def test_transform_distr():
+    np.random.seed(42)
+    data = np.random.uniform(0, 1, 100)
+
+    ss = neurom.stats.fit(data, distribution="norm")
+    res = extract_input.from_neurom.transform_distr(ss)
+    assert_equal(res, {"norm": {"mean": 0.47018074337820936, "std": 0.29599822663249037}})
+
+    ss = neurom.stats.fit(data, distribution="uniform")
+    res = extract_input.from_neurom.transform_distr(ss)
+    assert_equal(res, {"uniform": {"min": 0.005522117123602399, "max": 0.9868869366005173}})
+
+    ss = neurom.stats.fit(data, distribution="expon")
+    res = extract_input.from_neurom.transform_distr(ss)
+    assert_equal(res, {"expon": {"loc": 0.005522117123602399, "lambda": 2.1521175837421254}})
