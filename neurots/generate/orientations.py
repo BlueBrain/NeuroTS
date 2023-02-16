@@ -43,6 +43,7 @@ _3D_ANGLES_MAPPING = {
     "apical_constraint": "apical_3d_angles",
     "pia_constraint": "pia_3d_angles",
 }
+_3D_ANGLES_MODES = {"apical_constraint", "pia_constraint", "normal_pia_constraint"}
 
 
 class OrientationManagerBase:
@@ -566,7 +567,7 @@ def check_3d_angles(tmd_parameters):
     with_3d = []
     for neurite_type in tmd_parameters["grow_types"]:
         orient = tmd_parameters[neurite_type]["orientation"]
-        if orient is not None and "mode" in orient and orient["mode"] in _3D_ANGLES_MAPPING:
+        if orient is not None and "mode" in orient and orient["mode"] in _3D_ANGLES_MODES:
             with_3d.append(True)
         else:
             with_3d.append(False)
