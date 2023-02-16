@@ -38,7 +38,6 @@ _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
 def test_constructors():
-
     inputs = [
         [np.array([1.0, 2.0, 3.0]), 2.0],
         [np.array([1, 2, 3]), 2],
@@ -49,7 +48,6 @@ def test_constructors():
     ]
 
     for center, radius in inputs:
-
         soma = tested.Soma(center, radius)
 
         assert_equal(len(soma.points), 0)
@@ -77,7 +75,6 @@ def test_constructors():
 
 
 def test_soma_point_from_trunk_direction():
-
     soma = tested.Soma((1.0, 2.0, 3.0), 2.0)
 
     phi = 4.5
@@ -91,7 +88,6 @@ def test_soma_point_from_trunk_direction():
 
 
 def test_soma_orientation_from_point():
-
     soma = tested.Soma((1.0, 2.0, 3.0), 2.0)
 
     point = np.array([0.32764176, 0.53033757, 0.74690682])
@@ -105,7 +101,6 @@ def test_soma_orientation_from_point():
 
 
 def test_soma_orientation_from_point_exception():
-
     soma = tested.Soma((1.0, 2.0, 3.0), 2.0)
 
     point = np.array([1.0, 2.0, 3.0])
@@ -115,7 +110,6 @@ def test_soma_orientation_from_point_exception():
 
 
 def test_soma_contour_point():
-
     soma = tested.Soma((1.0, 2.0, 3.0), 2.0)
 
     point = [4.0, 5.0, 6.0]
@@ -128,7 +122,6 @@ def test_soma_contour_point():
 
 
 def test_soma_grower_one_point_soma():
-
     soma = tested.Soma((1.0, 2.0, 3.0), 2.0)
     soma_grower = tested.SomaGrower(soma)
 
@@ -139,7 +132,6 @@ def test_soma_grower_one_point_soma():
 
 
 def test_soma_grower_contour_soma():
-
     soma = tested.Soma((1.0, 2.0, 3.0), 2.0)
     soma_grower = tested.SomaGrower(soma)
 
@@ -161,7 +153,6 @@ def test_soma_grower_contour_soma():
 
 
 def test_soma_grower_original_soma():
-
     soma = tested.Soma((1.0, 2.0, 3.0), 2.0)
     soma_grower = tested.SomaGrower(soma)
 
@@ -172,7 +163,6 @@ def test_soma_grower_original_soma():
 
 
 def test_soma_grower_interpolate():
-
     soma = tested.Soma((0.0, 0.0, 0.0), 6.0)
     soma_grower = tested.SomaGrower(soma)
 
@@ -270,7 +260,6 @@ def test_soma_interpolate_from_neuron_2():
 
 
 def test_soma_interpolate_exception():
-
     soma = tested.Soma((0.0, 0.0, 0.0), 6.0)
     soma_grower = tested.SomaGrower(soma)
 
@@ -283,7 +272,6 @@ def test_soma_interpolate_exception():
 
 
 def test_add_points_from_trunk_angles():
-
     soma = tested.Soma((1.0, 2.0, 3.0), 2.0)
     soma_grower = tested.SomaGrower(soma)
 
@@ -318,7 +306,6 @@ def test_add_points_from_trunk_angles():
 
 
 def test_add_points_from_trunk_absolute_orientation():
-
     soma = tested.Soma((1.0, 2.0, 3.0), 2.0)
 
     # Test with trivial orientation
@@ -370,7 +357,6 @@ def test_add_points_from_trunk_absolute_orientation():
 
 
 def test_add_points_from_orientations():
-
     soma = tested.Soma((1.0, 2.0, 3.0), 2.0)
     soma_grower = tested.SomaGrower(soma)
 
@@ -394,7 +380,6 @@ def test_add_points_from_orientations():
 
 
 def test_build():
-
     soma_grower = tested.SomaGrower(tested.Soma((1.0, 2.0, 3.0), 2.0))
 
     soma_grower._contour_soma = lambda: "contour_function"

@@ -29,6 +29,7 @@ from neurots.generate.grower import NeuronGrower
 from neurots.morphmath import sample
 from neurots.morphmath.utils import norm as vectorial_norm
 from neurots.morphmath.utils import normalize_vectors
+from neurots.utils import NeuroTSError
 
 L = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ def _number_of_trees(tree_type, oris, distributions, random_generator=np.random)
         n_trees = len(oris)
 
     if tree_type == "basal" and n_trees < 2:
-        raise Exception(f"There should be at least 2 basal dendrites (got {n_trees})")
+        raise NeuroTSError(f"There should be at least 2 basal dendrites (got {n_trees})")
 
     return n_trees
 
@@ -63,9 +64,7 @@ def _ensure_endfeet_are_reached(cell, targets):
     distances, section_indices = KDTree(termination_points, copy_data=False).query(target_points)
 
     for distance, section_index, target_point in zip(distances, section_indices, target_points):
-
         if not np.isclose(distance, 0.0):
-
             L.warning(
                 "Target %s was not reached. Extending closest section to reach it.",
                 target_point,
@@ -175,7 +174,6 @@ class AstrocyteGrower(NeuronGrower):
         tree_type = "perivascular" if tree_type == "axon" else "perisynaptic"
 
         if tree_type == "perivascular":
-
             target_ids = np.array(parameters["target_ids"], dtype=np.int32)
             target_points = self.context.endfeet_targets.points[target_ids]
 
@@ -193,7 +191,6 @@ class AstrocyteGrower(NeuronGrower):
             ), "Number of targets is not equal to number of orientations"
 
             for target_id, trunk_point in zip(target_ids, trunk_points):
-
                 neurite_params = deepcopy(parameters)
                 neurite_params["target_id"] = target_id
                 neurite_params["distance_soma_target"] = vectorial_norm(
@@ -201,7 +198,6 @@ class AstrocyteGrower(NeuronGrower):
                 )
                 self._add_active_neurite(trunk_point, neurite_params, distributions)
         else:
-
             oris = parameters["orientation"]
 
             if oris is not None:
@@ -214,7 +210,6 @@ class AstrocyteGrower(NeuronGrower):
             )
 
             for i, trunk_point in enumerate(trunk_points):
-
                 neurite_params = deepcopy(parameters)
                 if "domain_distances" in neurite_params:
                     neurite_params["distance_to_domain"] = parameters["domain_distances"][i]

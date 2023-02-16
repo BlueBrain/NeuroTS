@@ -20,6 +20,8 @@ import inspect
 import numpy as np
 from morphio import SectionType
 
+from neurots.utils import NeuroTSError
+
 
 def section_filter(neuron, tree_type=None):
     """Filter all sections according to type."""
@@ -71,7 +73,7 @@ def redefine_diameter_section(section, diam_ind, diam_new):
         + section.diameters.tolist()[(diam_ind + 1) :]
     )
     if len(section.points) != len(section.diameters):
-        raise Exception("Mismatch in dimensions of diameters.")
+        raise NeuroTSError("Mismatch in dimensions of diameters.")
 
 
 def bifurcator(initial_diam, num_children, rall_ratio, siblings_ratio):
@@ -223,7 +225,6 @@ def diametrize_from_root(
         random_generator (numpy.random.Generator): The random number generator to use.
     """
     for r in root_section_filter(neuron, tree_type=neurite_type):
-
         model = model_params[r.type.name]  # Selected by the root type.
         trunk_diam = sample(model["trunk"], random_generator)
         min_diam = np.min(model["term"])
@@ -233,7 +234,6 @@ def diametrize_from_root(
 
         while active:
             for section in list(active):
-
                 if section.is_root:
                     taper = sample(model["trunk_taper"], random_generator)
                     init_diam = trunk_diam

@@ -92,7 +92,6 @@ class SpaceColonizationContext:
     """
 
     def __init__(self, params):
-
         self.morphology_points = DynamicPointArray()
 
         if "endfeet_targets" in params:

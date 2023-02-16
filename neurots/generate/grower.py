@@ -35,6 +35,7 @@ from neurots.generate.soma import SomaGrower
 from neurots.generate.tree import TreeGrower
 from neurots.morphmath import sample
 from neurots.morphmath.utils import normalize_vectors
+from neurots.utils import NeuroTSError
 from neurots.utils import convert_from_legacy_neurite_type
 from neurots.validator import validate_neuron_distribs
 from neurots.validator import validate_neuron_params
@@ -253,7 +254,6 @@ class NeuronGrower:
             ), "Orientations should have non-zero lengths"
             if params.get("trunk_absolute_orientation", False):
                 if len(orientation) == 1:
-
                     orientation = np.asarray(orientation[0], dtype=np.float64)
                     orientation /= np.linalg.norm(orientation)
 
@@ -271,7 +271,6 @@ class NeuronGrower:
                     raise ValueError("The orientation should contain exactly one point!")
             else:
                 if len(orientation) >= n_trees:
-
                     # TODO: pick orientations randomly?
                     orientations = normalize_vectors(np.asarray(orientation, dtype=np.float64))[
                         :n_trees
@@ -319,7 +318,6 @@ class NeuronGrower:
         legacy_mode = not isinstance(self.input_parameters[tree_types[0]]["orientation"], dict)
 
         if not legacy_mode:
-
             trunk_orientations_manager = self._trunk_orientations_class(
                 soma=self.soma_grower.soma,
                 parameters=self.input_parameters,
@@ -329,29 +327,30 @@ class NeuronGrower:
             )
 
         for type_of_tree in tree_types:
-
             params = self.input_parameters[type_of_tree]
             distr = self.input_distributions[type_of_tree]
 
             if legacy_mode:
-
                 n_trees = sample.n_neurites(distr["num_trees"], random_generator=self._rng)
 
                 if type_of_tree == "basal_dendrite" and n_trees < 2:
-                    raise Exception(f"There should be at least 2 basal dendrites (got {n_trees})")
+                    raise NeuroTSError(
+                        f"There should be at least 2 basal dendrites (got {n_trees})"
+                    )
 
                 orientation = params["orientation"]
                 points = self._convert_orientation2points(orientation, n_trees, distr, params)
 
             else:
-
                 orientations = trunk_orientations_manager.compute_tree_type_orientations(
                     type_of_tree
                 )
                 n_trees = len(orientations)
 
                 if type_of_tree == "basal_dendrite" and n_trees < 2:
-                    raise Exception(f"There should be at least 2 basal dendrites (got {n_trees})")
+                    raise NeuroTSError(
+                        f"There should be at least 2 basal dendrites (got {n_trees})"
+                    )
 
                 points = self.soma_grower.add_points_from_orientations(orientations)
 

@@ -47,7 +47,6 @@ class OrientationManagerBase:
     """
 
     def __init__(self, soma, parameters, distributions, context, rng):
-
         self._soma = soma
         self._parameters = parameters
         self._distributions = distributions

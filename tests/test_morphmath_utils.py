@@ -31,7 +31,6 @@ def test_norm():
 
 
 def test_from_to_direction():
-
     point = np.array([0.51374375, 0.39753749, 0.27568173])
     target = np.array([0.5932438, 0.96379423, 0.49277981])
 
@@ -47,7 +46,6 @@ def test_from_to_direction():
 
 
 def test_in_same_halfspace():
-
     points = np.array([[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], [2.0, 2.0, 2.0]])
 
     ref_point = np.array([0.5, 0.5, 0.5])
@@ -76,7 +74,6 @@ def test_in_squared_proximity():
 
 
 def test_ball_query():
-
     points = np.array(
         [
             [0.0, 0.0, -2.0],
@@ -92,7 +89,6 @@ def test_ball_query():
 
 
 def test_upper_half_ball_query():
-
     points = np.array([[10.0, 10.0, 10.0], [11.0, 11.0, 11.0]])
     ids = tested.upper_half_ball_query(points, np.zeros(3), 0.1, np.array([1.0, 0.0, 0.0]))
     assert ids.size == 0

@@ -27,7 +27,6 @@ from neurots.morphmath import point_array as _pa
 
 @pytest.fixture
 def dynamic_array():
-
     initial_capacity = 3
     resize_factor = 2
 
