@@ -122,12 +122,32 @@
                                             "type": "object",
                                             "properties": {
                                                 "direction": {
-                                                    "maxItems": 2,
-                                                    "minItems": 2,
-                                                    "items": {
-                                                        "description": "The orientation 3d angle (mean, std)"
-                                                    },
-                                                    "type": "array"
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "mean": {
+                                                            "oneOf": [
+                                                                {
+                                                                    "type": "number",
+                                                                    "minimum": 0,
+                                                                    "maximum": 3.1416
+                                                                },
+                                                                {
+                                                                    "type": "array"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "std":{
+                                                            "oneOf": [
+                                                                {
+                                                                    "type": "number",
+                                                                    "minimum": 0
+                                                                },
+                                                                {
+                                                                    "type": "array"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
                                                 }
                                             },
                                             "additionalProperties": false,
