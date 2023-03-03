@@ -125,7 +125,7 @@
                                                     "items": {
                                                         "maxItems": 2,
                                                         "minItems": 2,
-                                                        "description": "The orientation 3d angle (mean, sd)"
+                                                        "description": "The orientation 3d angle (mean, std)"
                                                     },
                                                 "type": "array"
                                                 }
