@@ -117,8 +117,8 @@
                                             },
                                             "additionalProperties": false,
                                             "required": ["primary_orientation"]
-                                         },
-                                          {
+                                        },
+                                        {
                                             "type": "object",
                                             "properties": {
                                                 "direction": {
@@ -152,7 +152,7 @@
                                             },
                                             "additionalProperties": false,
                                             "required": ["direction"]
-                                         },
+                                        },
                                         {
                                             "type": "object",
                                             "properties": {
