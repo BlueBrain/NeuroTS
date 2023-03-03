@@ -117,22 +117,23 @@
                                             },
                                             "additionalProperties": false,
                                             "required": ["primary_orientation"]
-                                         },
-                                          {
+                                        },
+                                        {
                                             "type": "object",
                                             "properties": {
                                                 "direction": {
+                                                    "description": "The orientation 3d angle (mean, std)",
                                                     "maxItems": 2,
                                                     "minItems": 2,
                                                     "items": {
-                                                        "description": "The orientation 3d angle (mean, std)"
+                                                        "type": "number"
                                                     },
                                                     "type": "array"
                                                 }
                                             },
                                             "additionalProperties": false,
                                             "required": ["direction"]
-                                         },
+                                        },
                                         {
                                             "type": "object",
                                             "properties": {
