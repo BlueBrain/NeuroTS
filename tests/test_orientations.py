@@ -341,7 +341,7 @@ def test_orientation_manager__mode_normal_pia_constraint():
         "apical_dendrite": {
             "orientation": {
                 "mode": "normal_pia_constraint",
-                "values": {"direction": [[0, 0.1]]},
+                "values": {"direction": {"mean": 0, "std": 0.1}},
             }
         },
     }
@@ -370,7 +370,7 @@ def test_orientation_manager__mode_normal_pia_constraint():
     npt.assert_allclose(actual, expected, rtol=1e-5)
 
     # make one along pia
-    parameters["apical_dendrite"]["orientation"]["values"]["direction"] = [0.0, 0.0]
+    parameters["apical_dendrite"]["orientation"]["values"]["direction"] = {"mean": 0.0, "std": 0.0}
     om = tested.OrientationManager(
         soma=None,
         parameters=parameters,
@@ -387,7 +387,7 @@ def test_orientation_manager__mode_normal_pia_constraint():
     npt.assert_allclose(actual, expected, rtol=1e-5)
 
     # make one away from pia
-    parameters["apical_dendrite"]["orientation"]["values"]["direction"] = [1.0, 0.1]
+    parameters["apical_dendrite"]["orientation"]["values"]["direction"] = {"mean": 1.0, "std": 0.1}
     om = tested.OrientationManager(
         soma=None,
         parameters=parameters,

@@ -233,14 +233,15 @@ class OrientationManager(OrientationManagerBase):
         should be lists with lenght equal to number of trees, otherwise it can be a float.
         """
         means = values_dict["direction"]["mean"]
-        means = [means] if isinstance(means, float) else means
+        means = means if isinstance(means, list) else [means]
         stds = values_dict["direction"]["std"]
-        stds = [stds] if isinstance(means, float) else stds
+        stds = stds if isinstance(stds, list) else [stds]
+
         thetas = []
         for mean, std in zip(means, stds):
             if mean == 0:
                 if std > 0:
-                    thetas.append(np.clip(self._rng.exponential(mean), 0, np.pi))
+                    thetas.append(np.clip(self._rng.exponential(std), 0, np.pi))
                 else:
                     thetas.append(0)
             else:
