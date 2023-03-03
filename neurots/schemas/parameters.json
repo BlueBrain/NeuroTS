@@ -132,7 +132,12 @@
                                                                     "maximum": 3.1416
                                                                 },
                                                                 {
-                                                                    "type": "array"
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "number",
+                                                                        "minimum": 0,
+                                                                        "maximum": 3.1416
+                                                                    }
                                                                 }
                                                             ]
                                                         },
@@ -143,7 +148,11 @@
                                                                     "minimum": 0
                                                                 },
                                                                 {
-                                                                    "type": "array"
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "number",
+                                                                        "minimum": 0
+                                                                    }
                                                                 }
                                                             ]
                                                         }
