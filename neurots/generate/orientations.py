@@ -230,7 +230,7 @@ class OrientationManager(OrientationManagerBase):
         normal distribution if `mean>0` or scaling of exponential distribution if `mean=0`. As the
         resulting angle must be in `[0, 2 * pi]`, we clip the obtained angle and uniformly sample
         the second angle to obtain a 3d direction. For multiple apical trees, `mean` and `std`
-        should be lists with lenght equal to number of trees, otherwise it can be a float.
+        should be two lists with lengths equal to number of trees, otherwise it can be a float.
         """
         means = values_dict["direction"]["mean"]
         means = means if isinstance(means, list) else [means]
