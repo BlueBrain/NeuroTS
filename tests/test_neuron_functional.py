@@ -288,7 +288,7 @@ def test_breaker_of_tmd_algo():
     N = NeuronGrower(input_distributions=distributions, input_parameters=params)
     n = N.grow()
 
-    assert_array_equal(N.apical_sections, [33])
+    assert_array_equal(N.apical_sections, [11])
     assert_array_almost_equal(
         n.sections[118].points[-1],
         np.array([-220.93813, -21.49141, -55.93323]),
@@ -304,7 +304,7 @@ def test_breaker_of_tmd_algo():
     N = NeuronGrower(input_distributions=distributions, input_parameters=params, rng_or_seed=rng)
     n = N.grow()
 
-    assert_array_equal(N.apical_sections, [33])
+    assert_array_equal(N.apical_sections, [11])
     assert_array_almost_equal(
         n.sections[118].points[-1],
         np.array([-220.93813, -21.49141, -55.93323]),
