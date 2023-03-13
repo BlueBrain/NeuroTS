@@ -482,7 +482,7 @@ def test_apical_points():
     grower.grow()
 
     apicals = grower.apical_sections
-    expected = [60]
+    expected = [47]
     assert_array_equal(apicals, expected)
 
     # Apical point not found so keep the last bifurcation
@@ -497,7 +497,7 @@ def test_apical_points():
     grower.grow()
 
     apicals = grower.apical_sections
-    expected = [11]
+    expected = [23]
     assert_array_equal(apicals, expected)
 
 
