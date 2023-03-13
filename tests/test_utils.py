@@ -23,6 +23,7 @@ from pathlib import Path
 import dictdiffer  # pylint: disable=import-error
 import numpy as np
 import pytest
+from morphio import Morphology
 
 from neurots import utils
 
@@ -91,3 +92,24 @@ def test_convert_from_legacy_neurite_type():
 
     data_converted = utils.convert_from_legacy_neurite_type(data_legacy)
     assert data_converted == data
+
+
+def test_point_to_section_segment():
+    neuron = Morphology(DATA / "dummy_neuron.asc")
+
+    section, segment = utils.point_to_section_segment(neuron, [0.0, 15.279950, 0.0])
+    assert section == 63
+    assert segment == 0
+
+    with pytest.raises(ValueError):
+        utils.point_to_section_segment(neuron, [24, 0, 0])
+
+    section, segment = utils.point_to_section_segment(
+        neuron, [0.0, 15.2, 0.0], rtol=1e-1, atol=1e-1
+    )
+    assert section == 63
+    assert segment == 0
+
+    section, segment = utils.point_to_section_segment(neuron, [0.0, 15.28, 0.0])
+    assert section == 63
+    assert segment == 0

@@ -39,6 +39,7 @@ from neurots.morphmath.utils import normalize_vectors
 from neurots.preprocess import preprocess_inputs
 from neurots.utils import NeuroTSError
 from neurots.utils import convert_from_legacy_neurite_type
+from neurots.utils import point_to_section_segment
 
 L = logging.getLogger(__name__)
 
@@ -169,7 +170,19 @@ class NeuronGrower:
     def _post_grow(self):
         """Actions after the morphology has been grown and before its diametrization."""
         # ensures section.id are consistent with morphio loader
+        apical_points = [
+            self.neuron.sections[apical_section].points[-1] if apical_section is not None else None
+            for apical_section in self.apical_sections
+        ]
+
         self.neuron = Morphology(self.neuron)
+
+        self.apical_sections = [
+            point_to_section_segment(self.neuron, apical_point)[0]
+            if apical_point is not None
+            else None
+            for apical_point in apical_points
+        ]
 
     def _init_diametrizer(self, external_diametrizer=None):
         """Set a diametrizer function."""
