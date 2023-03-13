@@ -24,11 +24,16 @@
                             "type": "array"
                         }
                     },
-                    "required": ["bins", "weights"],
+                    "required": [
+                        "bins",
+                        "weights"
+                    ],
                     "type": "object"
                 }
             },
-            "required": ["data"],
+            "required": [
+                "data"
+            ],
             "title": "Data distribution",
             "type": "object"
         },
@@ -36,6 +41,44 @@
             "additionalProperties": false,
             "description": "An object without any property",
             "title": "Empty distribution",
+            "type": "object"
+        },
+        "neurite_diameter": {
+            "additionalProperties": false,
+            "description": "The diameter distributions of a type of neurite",
+            "properties": {
+                "Rall_ratio": {
+                    "type": "number"
+                },
+                "siblings_ratio": {
+                    "type": "number"
+                },
+                "taper": {
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": "array"
+                },
+                "term": {
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": "array"
+                },
+                "trunk": {
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": "array"
+                },
+                "trunk_taper": {
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": "array"
+                }
+            },
+            "title": "Neurite diameter distribution",
             "type": "object"
         },
         "neurite_distrib": {
@@ -104,6 +147,14 @@
                                 "orientation_deviation": {
                                     "$ref": "#/definitions/data_distr",
                                     "description": "The data distribution used for the orientation deviation"
+                                },
+                                "pia_3d_angles": {
+                                    "$ref": "#/definitions/data_distr",
+                                    "description": "The data distribution used for the 3d angles wrt pia direction"
+                                },
+                                "apical_3d_angles": {
+                                    "$ref": "#/definitions/data_distr",
+                                    "description": "The data distribution used for the 3d angles wrt apical direction"
                                 }
                             },
                             "required": [
@@ -120,44 +171,6 @@
                 "trunk"
             ],
             "title": "Neurite distribution",
-            "type": "object"
-        },
-        "neurite_diameter": {
-            "additionalProperties": false,
-            "description": "The diameter distributions of a type of neurite",
-            "properties": {
-                "Rall_ratio": {
-                    "type": "number"
-                },
-                "siblings_ratio": {
-                    "type": "number"
-                },
-                "taper": {
-                    "items": {
-                        "type": "number"
-                    },
-                    "type": "array"
-                },
-                "term": {
-                    "items": {
-                        "type": "number"
-                    },
-                    "type": "array"
-                },
-                "trunk": {
-                    "items": {
-                        "type": "number"
-                    },
-                    "type": "array"
-                },
-                "trunk_taper": {
-                    "items": {
-                        "type": "number"
-                    },
-                    "type": "array"
-                }
-            },
-            "title": "Neurite diameter distribution",
             "type": "object"
         }
     },
@@ -206,6 +219,15 @@
                 {
                     "additionalProperties": false,
                     "properties": {
+                        "apical": {
+                            "$ref": "#/definitions/neurite_diameter"
+                        },
+                        "axon": {
+                            "$ref": "#/definitions/neurite_diameter"
+                        },
+                        "basal": {
+                            "$ref": "#/definitions/neurite_diameter"
+                        },
                         "method": {
                             "not": {
                                 "enum": [

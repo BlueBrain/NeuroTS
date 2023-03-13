@@ -295,3 +295,317 @@ def test_orientations_to_sphere_points():
         tested.orientations_to_sphere_points(oris, sphere_center, sphere_radius),
         expected_points,
     )
+
+
+def test_orientation_manager__mode_uniform():
+    parameters = {
+        "grow_types": ["basal_dendrite"],
+        "basal_dendrite": {
+            "orientation": {
+                "mode": "uniform",
+                "values": {},
+            }
+        },
+    }
+
+    distributions = {
+        "basal_dendrite": {
+            "num_trees": {
+                "data": {"bins": [2], "weights": [1]},
+            }
+        }
+    }
+
+    om = tested.OrientationManager(
+        soma=None,
+        parameters=parameters,
+        distributions=distributions,
+        context=None,
+        rng=np.random.default_rng(seed=0),
+    )
+
+    for tree_type in parameters["grow_types"]:
+        om.compute_tree_type_orientations(tree_type)
+
+    actual = om.get_tree_type_orientations("basal_dendrite")
+    expected = np.array([[-0.199474, 0.967017, 0.158396], [-0.368063, 0.248455, 0.895991]])
+
+    npt.assert_allclose(actual, expected, rtol=1e-5)
+
+
+def test_orientation_manager__mode_normal_pia_constraint():
+    """Test mode normal_pia_constraint."""
+    # make one near pia
+    parameters = {
+        "grow_types": ["apical_dendrite"],
+        "apical_dendrite": {
+            "orientation": {
+                "mode": "normal_pia_constraint",
+                "values": {"direction": {"mean": 0, "std": 0.1}},
+            }
+        },
+    }
+
+    distributions = {
+        "apical_dendrite": {
+            "num_trees": {
+                "data": {"bins": [1], "weights": [1]},
+            }
+        }
+    }
+
+    om = tested.OrientationManager(
+        soma=None,
+        parameters=parameters,
+        distributions=distributions,
+        context=None,
+        rng=np.random.default_rng(seed=0),
+    )
+
+    for tree_type in parameters["grow_types"]:
+        om.compute_tree_type_orientations(tree_type)
+
+    actual = om.get_tree_type_orientations("apical_dendrite")
+    expected = np.array([[-0.0084249, 0.99768935, 0.06741643]])
+    npt.assert_allclose(actual, expected, rtol=1e-5)
+
+    # make one along pia
+    parameters["apical_dendrite"]["orientation"]["values"]["direction"] = {"mean": 0.0, "std": 0.0}
+    om = tested.OrientationManager(
+        soma=None,
+        parameters=parameters,
+        distributions=distributions,
+        context=None,
+        rng=np.random.default_rng(seed=0),
+    )
+
+    for tree_type in parameters["grow_types"]:
+        om.compute_tree_type_orientations(tree_type)
+
+    actual = om.get_tree_type_orientations("apical_dendrite")
+    expected = np.array([[0, 1.0, 0.0]])
+    npt.assert_allclose(actual, expected, rtol=1e-5)
+
+    # make one away from pia
+    parameters["apical_dendrite"]["orientation"]["values"]["direction"] = {"mean": 1.0, "std": 0.1}
+    om = tested.OrientationManager(
+        soma=None,
+        parameters=parameters,
+        distributions=distributions,
+        context=None,
+        rng=np.random.default_rng(seed=0),
+    )
+
+    for tree_type in parameters["grow_types"]:
+        om.compute_tree_type_orientations(tree_type)
+
+    actual = om.get_tree_type_orientations("apical_dendrite")
+    expected = np.array([[-0.10517952, 0.52968005, 0.84165095]])
+    npt.assert_allclose(actual, expected, rtol=1e-5)
+
+
+def test_orientation_manager__pia_constraint():
+    parameters = {
+        "grow_types": ["basal_dendrite"],
+        "basal_dendrite": {
+            "orientation": {
+                "mode": "pia_constraint",
+                "values": {"form": "step", "params": [1.5, 0.25]},
+            }
+        },
+    }
+
+    # params obtained from fit to an L5_TPC:A population
+    distributions = {
+        "basal_dendrite": {
+            "num_trees": {
+                "data": {"bins": [2], "weights": [1]},
+            },
+        }
+    }
+
+    om = tested.OrientationManager(
+        soma=None,
+        parameters=parameters,
+        distributions=distributions,
+        context=None,
+        rng=np.random.default_rng(seed=0),
+    )
+
+    for tree_type in parameters["grow_types"]:
+        om.compute_tree_type_orientations(tree_type)
+
+    actual = om.get_tree_type_orientations("basal_dendrite")
+    expected = np.array([[-0.896702, -0.441664, 0.029284], [-0.14969, -0.852409, -0.500992]])
+
+    npt.assert_allclose(actual, expected, rtol=2e-5)
+
+
+def test_check_3d_angles():
+    parameters = {
+        "grow_types": ["apical_dendrite", "basal_dendrite"],
+        "apical_dendrite": {
+            "orientation": {
+                "mode": "pia_constraint",
+                "values": {"orientations": [[0.0, 1.0, 0.0]]},
+            }
+        },
+        "basal_dendrite": {
+            "orientation": {
+                "mode": "apical_constraint",
+                "values": {"form": "step", "params": [1.5, 0.25]},
+            }
+        },
+    }
+    assert tested.check_3d_angles(parameters)
+    parameters["apical_dendrite"]["orientation"] = None
+    with pytest.raises(NeuroTSError):
+        tested.check_3d_angles(parameters)
+
+    parameters["apical_dendrite"]["orientation"] = parameters["basal_dendrite"]["orientation"]
+    parameters["basal_dendrite"]["orientation"] = None
+    with pytest.raises(NeuroTSError):
+        tested.check_3d_angles(parameters)
+
+
+def test_orientation_manager__apical_constraint():
+    parameters = {
+        "grow_types": ["apical_dendrite", "basal_dendrite"],
+        "apical_dendrite": {
+            "orientation": {
+                "mode": "use_predefined",
+                "values": {"orientations": [[0.0, 1.0, 0.0]]},
+            }
+        },
+        "basal_dendrite": {
+            "orientation": {
+                "mode": "apical_constraint",
+                "values": {"form": "step", "params": [1.5, 0.25]},
+            }
+        },
+    }
+
+    # params obtained from fit to an L5_TPC:A population
+    distributions = {
+        "apical_dendrite": {
+            "num_trees": {
+                "data": {"bins": [1], "weights": [1]},
+            }
+        },
+        "basal_dendrite": {
+            "num_trees": {
+                "data": {"bins": [2], "weights": [1]},
+            },
+        },
+    }
+
+    om = tested.OrientationManager(
+        soma=None,
+        parameters=parameters,
+        distributions=distributions,
+        context=None,
+        rng=np.random.default_rng(seed=0),
+    )
+
+    for tree_type in parameters["grow_types"]:
+        om.compute_tree_type_orientations(tree_type)
+    tested._sample_trunk_from_3d_angle(
+        parameters, om._rng, "basal_dendrite", [0, 0, 1], max_tries=-1
+    )
+
+    actual = om.get_tree_type_orientations("basal_dendrite")
+    expected = np.array([[0.761068, 0.124662, -0.636581], [0.741505, 0.538547, -0.400171]])
+
+    npt.assert_allclose(actual, expected, rtol=2e-5)
+
+
+def test_probability_function():
+    func = tested.get_probability_function(form="flat")
+    npt.assert_equal(func(1.0), 0.8414709848078965)
+
+    func = tested.get_probability_function(form="step")
+    npt.assert_equal(func(2.1, 0.5, 5), 0.7949219421515932)
+
+    func = tested.get_probability_function(form="double_step")
+    npt.assert_equal(func(2.1, 0.5, 5, -0.5, 1), 0.5877841415613994)
+
+    func = tested.get_probability_function(form="flat", with_density=False)
+    npt.assert_equal(func(1.0), 1.0)
+
+    func = tested.get_probability_function(form="step", with_density=False)
+    npt.assert_equal(func(2.1, 0.5, 5), 0.9208912378205718)
+
+    func = tested.get_probability_function(form="double_step", with_density=False)
+    npt.assert_equal(func(2.1, 0.5, 5, -0.5, 1), 0.6809288270854589)
+
+    with pytest.raises(ValueError):
+        tested.get_probability_function(form="UNKNOWN")
+
+
+# pylint:disable=unsubscriptable-object
+def test_fit_3d_angles():
+    parameters = {
+        "grow_types": ["apical_dendrite", "basal_dendrite"],
+        "apical_dendrite": {
+            "orientation": {
+                "mode": "use_predefined",
+                "values": {"orientations": [[0.0, 1.0, 0.0]]},
+            }
+        },
+        "basal_dendrite": {
+            "orientation": {
+                "mode": "apical_constraint",
+                "values": {},
+            }
+        },
+    }
+
+    # params obtained from fit to an L5_TPC:A population
+    distributions = {
+        "apical_dendrite": {
+            "num_trees": {
+                "data": {"bins": [1], "weights": [1]},
+            }
+        },
+        "basal_dendrite": {
+            "num_trees": {
+                "data": {"bins": [2], "weights": [1]},
+            },
+            "trunk": {
+                "apical_3d_angles": {"data": {"bins": [0, 0.5, 1], "weights": [0.2, 0.8, 0.2]}}
+            },
+        },
+    }
+    expected_params = [3.1415926535803003, 2.9065466158869935]
+
+    new_parameters = tested.fit_3d_angles(parameters, distributions)
+
+    assert new_parameters["basal_dendrite"]["orientation"]["values"]["form"] == "step"
+    npt.assert_almost_equal(
+        new_parameters["basal_dendrite"]["orientation"]["values"]["params"], expected_params
+    )
+    parameters["basal_dendrite"]["orientation"]["values"]["form"] = "step"
+    new_parameters = tested.fit_3d_angles(parameters, distributions)
+    npt.assert_almost_equal(
+        new_parameters["basal_dendrite"]["orientation"]["values"]["params"], expected_params
+    )
+
+    parameters = {
+        "grow_types": ["apical_dendrite", "basal_dendrite"],
+        "apical_dendrite": {
+            "orientation": {
+                "mode": "use_predefined",
+                "values": {"orientations": [[0.0, 1.0, 0.0]]},
+            }
+        },
+        "basal_dendrite": {
+            "orientation": {
+                "mode": "apical_constraint",
+                "values": {"form": "flat"},
+            },
+        },
+    }
+
+    new_parameters = tested.fit_3d_angles(parameters, distributions)
+    assert new_parameters["basal_dendrite"]["orientation"]["values"]["form"] == "flat"
+    assert new_parameters["basal_dendrite"]["orientation"]["values"]["params"] == []

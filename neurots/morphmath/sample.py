@@ -145,3 +145,13 @@ def ph(phs, random_generator=np.random):
     """Samples randomly a persistence diagram from the input distribution."""
     index = random_generator.choice(len(phs))
     return phs[index]
+
+
+def sample_spherical_unit_vectors(rng):
+    """Sample a point uniformly on the sphere.
+
+    Args:
+        rng: random number generator
+    """
+    x = rng.normal(0, 1, 3)
+    return x / np.linalg.norm(x)

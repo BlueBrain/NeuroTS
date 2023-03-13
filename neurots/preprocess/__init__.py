@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from neurots.preprocess import preprocessors  # noqa
 from neurots.preprocess import relevance_checkers  # noqa
 from neurots.preprocess import validity_checkers  # noqa
 from neurots.preprocess.utils import preprocess_inputs  # noqa

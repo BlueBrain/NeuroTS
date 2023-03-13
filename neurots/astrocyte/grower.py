@@ -98,8 +98,8 @@ class AstrocyteGrower(NeuronGrower):
         input_parameters,
         input_distributions,
         context,
+        skip_preprocessing=True,
         external_diametrizer=None,
-        skip_validation=False,
         rng_or_seed=np.random,
     ):
         super().__init__(
@@ -107,7 +107,7 @@ class AstrocyteGrower(NeuronGrower):
             input_distributions,
             context=SpaceColonizationContext(context),
             external_diametrizer=external_diametrizer,
-            skip_validation=skip_validation,
+            skip_preprocessing=skip_preprocessing,
             rng_or_seed=rng_or_seed,
         )
 

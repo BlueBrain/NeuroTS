@@ -18,6 +18,9 @@
 import neurom as nm
 import numpy as np
 from neurom import stats
+from neurom.features.morphology import trunk_vectors
+
+from neurots.utils import PIA_DIRECTION
 
 
 def transform_distr(opt_distr):
@@ -99,7 +102,67 @@ def soma_data(pop):
     return {"size": transform_distr(ss)}
 
 
-def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30):
+def trunk_neurite_3d_angles(pop, neurite_type, bins):
+    """Extract 3d trunk angle data.
+
+    We extract non-projected, or 3d angles between the pia/apical and any neurite trunk.
+
+    If no apical dendrite is present, the entry `apical_3d_angles` will be absent.
+
+    Args:
+        pop (neurom.core.population.Population): The given population.
+        neurite_type (neurom.core.types.NeuriteType): Consider only the neurites of this type.
+        bins (int or list[int] or str, optional): The bins to use (this parameter is passed to
+            :func:`numpy.histogram`).
+
+    Returns:
+        dict: A dictionary with the following structure:
+
+        .. code-block:: bash
+
+            {
+                "trunk": {
+                    "pia_3d_angles": {
+                        "data": {
+                            "bins": <bin values>,
+                            "weights": <weights>
+                        }
+                    },
+                    "apical_3d_angles": {
+                        "data": {
+                            "bins": <bin values>,
+                            "weights": <weights>
+                        }
+                    }
+                }
+            }
+    """
+    pia_3d_angles = []
+    apical_3d_angles = []
+    for morph in pop.morphologies:
+        vecs = trunk_vectors(morph, neurite_type=neurite_type)
+        pia_3d_angles += [nm.morphmath.angle_between_vectors(PIA_DIRECTION, vec) for vec in vecs]
+        if neurite_type.name != "apical_dendrite":
+            apical_ref_vec = trunk_vectors(morph, neurite_type=nm.APICAL_DENDRITE)
+            if len(apical_ref_vec) > 0:
+                apical_3d_angles += [
+                    nm.morphmath.angle_between_vectors(apical_ref_vec[0], vec) for vec in vecs
+                ]
+
+    def _get_hist(data):
+        """Return density histogram with bin centers."""
+        densities, _bins = np.histogram(data, bins=bins, density=True)
+        return densities, 0.5 * (_bins[1:] + _bins[:-1])
+
+    weights, _bins = _get_hist(pia_3d_angles)
+    data = {"pia_3d_angles": {"data": {"bins": _bins.tolist(), "weights": weights.tolist()}}}
+    if len(apical_3d_angles) > 0:
+        weights, _bins = _get_hist(apical_3d_angles)
+        data["apical_3d_angles"] = {"data": {"bins": _bins.tolist(), "weights": weights.tolist()}}
+    return {"trunk": data}
+
+
+def trunk_neurite_simple(pop, neurite_type, bins):
     """Extract the trunk data for a specific tree type.
 
     Args:
@@ -122,7 +185,7 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30):
                         }
                     },
                     "azimuth": {
-                        "inuform": {
+                        "uniform": {
                             "min": <min value>,
                             "max": <max value>
                         }
@@ -166,6 +229,30 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30):
             },
         }
     }
+
+
+def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30):
+    """Extract the trunk data for a specific tree type.
+
+    See docstring of :func:`trunk_neurite_simple` and :func:`trunk_neurite_3d_angles`
+    for more details on the extracted angles.
+
+    Args:
+        pop (neurom.core.population.Population): The given population.
+        neurite_type (neurom.core.types.NeuriteType): Consider only the neurites of this type.
+        bins (int or list[int] or str, optional): The bins to use (this parameter is passed to
+            :func:`numpy.histogram`).
+        method (str): Method to use, either `simple` or `3d_angles`.
+
+    Returns:
+        dict: A dictionary with the trunk data.
+    """
+    trunk_data = trunk_neurite_simple(pop, neurite_type=neurite_type, bins=bins)
+    # adds 3d_angle related distributions
+    trunk_data["trunk"].update(
+        trunk_neurite_3d_angles(pop, neurite_type=neurite_type, bins=bins)["trunk"]
+    )
+    return trunk_data
 
 
 def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE):

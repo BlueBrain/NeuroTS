@@ -16,15 +16,34 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import inspect
+import warnings
+from copy import deepcopy
 
+import neurom as nm
 import numpy as np
+from scipy.optimize import curve_fit
+from scipy.special import expit
 
 from neurots.morphmath import rotation
 from neurots.morphmath import sample
 from neurots.morphmath.utils import normalize_vectors
+from neurots.utils import PIA_DIRECTION
 from neurots.utils import NeuroTSError
 
 _TWOPI = 2.0 * np.pi
+FIT_3D_ANGLES_BOUNDS = {
+    "double_step": ([0, 0.1, -np.pi, 0.1], [np.pi, 10, 0, 10]),
+    "step": ([-np.pi, 0.1], [np.pi, 10]),
+}
+FIT_3D_ANGLES_PARAMS = {
+    "with_apical": {"basal_dendrite": {"form": "step", "bounds": FIT_3D_ANGLES_BOUNDS["step"]}},
+    "without_apical": {"basal_dendrite": {"form": "flat", "bounds": []}},
+}
+_3D_ANGLES_MAPPING = {
+    "apical_constraint": "apical_3d_angles",
+    "pia_constraint": "pia_3d_angles",
+}
+_3D_ANGLES_MODES = {"apical_constraint", "pia_constraint", "normal_pia_constraint"}
 
 
 class OrientationManagerBase:
@@ -196,6 +215,69 @@ class OrientationManager(OrientationManagerBase):
             orientations_i.append(spherical_angles_to_orientations(phis, thetas))
         return np.vstack(orientations_i)
 
+    def _mode_uniform(self, _, tree_type):
+        """Uniformly sample angles on the sphere."""
+        n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
+        return np.asarray(
+            [sample.sample_spherical_unit_vectors(rng=self._rng) for _ in range(n_orientations)]
+        )
+
+    def _mode_normal_pia_constraint(self, values_dict, _):
+        """Returns orientations using normal/exp distribution along a direction.
+
+        The `direction` value should be a dict with two entries: `mean` and `std`. The mean is the
+        angle wrt to pia (`[0, 1, 0]`) direction and the second is the standard deviation of a
+        normal distribution if `mean>0` or scaling of exponential distribution if `mean=0`. As the
+        resulting angle must be in `[0, 2 * pi]`, we clip the obtained angle and uniformly sample
+        the second angle to obtain a 3d direction. For multiple apical trees, `mean` and `std`
+        should be two lists with lengths equal to number of trees, otherwise it can be a float.
+        """
+        means = values_dict["direction"]["mean"]
+        means = means if isinstance(means, list) else [means]
+        stds = values_dict["direction"]["std"]
+        stds = stds if isinstance(stds, list) else [stds]
+
+        thetas = []
+        for mean, std in zip(means, stds):
+            if mean == 0:
+                if std > 0:
+                    thetas.append(np.clip(self._rng.exponential(std), 0, np.pi))
+                else:
+                    thetas.append(0)
+            else:
+                thetas.append(np.clip(self._rng.normal(mean, std), 0, np.pi))
+
+        phis = self._rng.uniform(0, 2 * np.pi, len(means))
+        return spherical_angles_to_pia_orientations(phis, thetas)
+
+    def _mode_pia_constraint(self, _, tree_type):
+        """Create trunks from distribution of angles with pia (`[0 , 1, 0]`) direction.
+
+        See :func:`_sample_trunk_from_3d_angle` for more details on the algorithm.
+        """
+        n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
+        pia_direction = self._parameters.get("pia_direction", PIA_DIRECTION)
+        return np.asarray(
+            [
+                _sample_trunk_from_3d_angle(self._parameters, self._rng, tree_type, pia_direction)
+                for _ in range(n_orientations)
+            ]
+        )
+
+    def _mode_apical_constraint(self, _, tree_type):
+        """Create trunks from distribution of angles with apical direction.
+
+        See :func:`_sample_trunk_from_3d_angle` for more details on the algorithm.
+        """
+        n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
+        ref_dir = self._orientations["apical_dendrite"][0]
+        return np.asarray(
+            [
+                _sample_trunk_from_3d_angle(self._parameters, self._rng, tree_type, ref_dir)
+                for _ in range(n_orientations)
+            ]
+        )
+
 
 def spherical_angles_to_orientations(phis, thetas):
     """Compute orientation from spherical angles.
@@ -359,3 +441,209 @@ def compute_interval_n_tree(soma, n_trees, rng=np.random):
         interval_n_trees = np.array([n_trees])
 
     return phi_intervals, interval_n_trees
+
+
+def spherical_angles_to_pia_orientations(phis, thetas):
+    """Compute orientation from spherical angles where thetas are wrt to pia at `[0, 1, 0]`.
+
+    Args:
+        phis (numpy.ndarray): Polar angles.
+        thetas (numpy.ndarray): Azimuthal angles.
+
+    Returns:
+        numpy.ndarray: The orientation vectors where each row corresponds to a phi-theta pair.
+    """
+    return np.column_stack(
+        (np.cos(phis) * np.sin(thetas), np.cos(thetas), np.sin(phis) * np.sin(thetas))
+    )
+
+
+def get_probability_function(form="step", with_density=True):
+    """Get probability functions to fit 3d trunk angles distributions.
+
+    Args:
+        form (str): Form of the function, can be `flat`, `step` or `double_step`.
+        with_density (bool): Return the function with spherical density factor or not.
+
+    Three forms of functions are available:
+    - `flat`: uniform flat distribution
+    - `step`: distribution with a single sigmoid :func:`scipy.special.expit`
+    - `double_step`: distribution with two opposite sigmoids :func:`scipy.special.expit`
+
+    Each sigmoid is parametrized by a scale and a rate.
+
+    In practice, the `flat` function is used when no asymetry is present in the data, and the other
+    two are when an asymmetry towards one direction, usually opposite to pia or apical,
+    or two directions, usually along and opposite to pia.
+
+    Returns:
+        function with first arg as angle and next args to parametrize the function
+    """
+    if form == "flat":
+
+        def flat_prob(angle):
+            p = 1.0 + 0 * angle
+            if with_density:
+                p *= np.sin(angle)
+            return p
+
+        return flat_prob
+
+    if form == "step":
+
+        def single_prob(angle, scale, rate):
+            def _prob(angle):
+                return expit((angle - scale) / rate)
+
+            p = _prob(angle) / max(_prob(np.linspace(0, np.pi, 100)))
+            if with_density:
+                p *= np.sin(angle)
+            return np.clip(p, 0.0, 1.0)
+
+        return single_prob
+
+    if form == "double_step":
+
+        def double_prob(angle, scale_low, rate_low, scale_high, rate_high):
+            def _prob(angle):
+                return 0.5 * (
+                    expit((angle - scale_low) / rate_low) + expit((-angle - scale_high) / rate_high)
+                )
+
+            p = _prob(angle) / max(_prob(np.linspace(0, np.pi, 100)))
+            if with_density:
+                p *= np.sin(angle)
+            return np.clip(p, 0.0, 1.0)
+
+        return double_prob
+
+    raise ValueError(
+        f"The '{form}' value is unknown, it should be one of ['flat', 'step', 'double_step']"
+    )
+
+
+def _fit_single_3d_angles(data, neurite_type, morph_class, fit_params=None):
+    """Fit function to distribution of 3d angles for a `neurite_type`.
+
+    Args:
+        data (dict): bins and weights data from input_distribution
+        neurite_type (str): neurite_type to consider
+        morph_class (str): morph_class of the neuron (with_apical or without_apical)
+        fit_params (dict): specific fit parameters such as form and bounds to overwrite the defaults
+    """
+    _fit_params = deepcopy(FIT_3D_ANGLES_PARAMS)
+    if fit_params is not None:
+        _fit_params[morph_class][neurite_type].update(fit_params)
+    form = _fit_params[morph_class][neurite_type]["form"]
+    if form != "flat":
+        function = get_probability_function(form, with_density=True)
+
+        try:
+            popt = curve_fit(
+                function,
+                data["bins"],
+                data["weights"],
+                bounds=_fit_params[morph_class][neurite_type]["bounds"],
+            )[0].tolist()
+        except RuntimeError:  # pragma: no cover
+            warnings.warn("Cannot fit some trunk angles, we fallback to flat distribution")
+            form = "flat"
+            popt = []
+    else:
+        popt = []
+    return {"form": form, "params": popt}
+
+
+def _get_fit_params_from_input_parameters(parameters):
+    """Get parameter dict for fits from `tmd_parameters`."""
+    values = parameters["orientation"].get("values")
+    if values is not None:
+        form = values.get("form")
+        if form is not None and values.get("params") is None:
+            bounds = values.get("bounds", FIT_3D_ANGLES_BOUNDS.get(form, None))
+            return {"form": form, "bounds": deepcopy(bounds)}
+    return None
+
+
+def check_3d_angles(tmd_parameters):
+    """Check whether the parameters correspond to 3d_angle modes, and return a bool."""
+    with_3d = []
+    for neurite_type in tmd_parameters["grow_types"]:
+        orient = tmd_parameters[neurite_type]["orientation"]
+        if orient is not None and "mode" in orient and orient["mode"] in _3D_ANGLES_MODES:
+            with_3d.append(True)
+        else:
+            with_3d.append(False)
+    if len(set(with_3d)) > 1:
+        raise NeuroTSError("Only partial 3d_angle parameters are present")
+    return with_3d[0]
+
+
+def fit_3d_angles(tmd_parameters, tmd_distributions):
+    """Fit functions to 3d_angles from `tmd_distributions` and save in copy of `tmd_parameters`.
+
+    If the fit parameters are already in `tmd_parameters`, the fit is skipped.
+
+    Args:
+        tmd_parameters (dict): Input parameters.
+        tmd_distributions (dict): Input distributions.
+
+    Returns:
+        `tmd_parmeters` with fit data if `3d_angles` mode is found, else None
+    """
+    morph_class = (
+        "with_apical" if "apical_dendrite" in tmd_parameters["grow_types"] else "without_apical"
+    )
+
+    for neurite_type in tmd_parameters["grow_types"]:
+        orientation = tmd_parameters[neurite_type]["orientation"]
+
+        if orientation is None or "mode" not in orientation:
+            continue
+
+        mode = orientation["mode"]
+        make_fit = False
+        if mode in _3D_ANGLES_MAPPING:
+            if orientation.get("values") is None:
+                make_fit = True
+            else:
+                val = orientation["values"]
+                if "params" not in val and "direction" not in val:
+                    make_fit = True
+
+        if make_fit:
+            tmd_parameters[neurite_type]["orientation"]["values"] = _fit_single_3d_angles(
+                tmd_distributions[neurite_type]["trunk"][_3D_ANGLES_MAPPING[mode]]["data"],
+                neurite_type,
+                morph_class,
+                fit_params=_get_fit_params_from_input_parameters(tmd_parameters[neurite_type]),
+            )
+
+    return tmd_parameters
+
+
+def _sample_trunk_from_3d_angle(parameters, rng, tree_type, ref_dir, max_tries=100):
+    """Sample trunk directions from fit of distribution of `3d_angles` wrt to `ref_dir`.
+
+    We use the accept-reject algorithm so we can sample from any distribution.
+    After a number of unsuccessful tries (default=100), we stop and return a random direction.
+    We also issue a warning so the user is aware that the provided distribution may have issues,
+    mostly related to large region of small probabilities.
+    """
+    prob = get_probability_function(
+        form=parameters[tree_type]["orientation"]["values"]["form"],
+        with_density=False,
+    )
+    params = parameters[tree_type]["orientation"]["values"]["params"]
+    n_try = 0
+    while n_try < max_tries:
+        propose = sample.sample_spherical_unit_vectors(rng)
+        angle = nm.morphmath.angle_between_vectors(ref_dir, propose)
+        if rng.binomial(1, prob(angle, *params)):
+            return propose
+        n_try += 1
+    warnings.warn(
+        """We could not sample from distribution, so we take a random point.
+                    Consider checking the given probability distribution."""
+    )
+    return sample.sample_spherical_unit_vectors(rng)

@@ -26,7 +26,7 @@ def parameters(
     neurite_types=None,
     feature="path_distances",
     diameter_parameters=None,
-):
+):  # pylint: disable=too-many-branches
     """Returns a default set of input parameters to be used as input for synthesis.
 
     Args:

@@ -111,9 +111,9 @@ def distributions(
         else:
             type_feature = feature.get(neurite_type, "path_distances")
         nm_type = getattr(NeuriteType, neurite_type)
+
         input_distributions[neurite_type] = _append_dicts(
-            trunk_neurite(pop_nm, nm_type),
-            number_neurites(pop_nm, nm_type),
+            trunk_neurite(pop_nm, nm_type), number_neurites(pop_nm, nm_type)
         )
         if type_feature in ["path_distances", "radial_distances"]:
             _append_dicts(

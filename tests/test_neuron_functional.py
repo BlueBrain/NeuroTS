@@ -42,6 +42,7 @@ from scipy.spatial.distance import cdist
 
 from neurots.generate.diametrizer import diametrize_constant_per_neurite
 from neurots.generate.grower import NeuronGrower
+from neurots.preprocess.exceptions import NeuroTSValidationError
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -81,7 +82,7 @@ def _test_full(
     ref_persistence_diagram,
     save=False,
     rng_or_seed=None,
-    skip_validation=False,
+    skip_preprocessing=False,
 ):
     distributions, params = _load_inputs(join(_path, distributions), join(_path, parameters))
     if rng_or_seed is None:
@@ -89,14 +90,14 @@ def _test_full(
         n = NeuronGrower(
             input_distributions=distributions,
             input_parameters=params,
-            skip_validation=skip_validation,
+            skip_preprocessing=skip_preprocessing,
         ).grow()
     else:
         n = NeuronGrower(
             input_distributions=distributions,
             input_parameters=params,
             rng_or_seed=rng_or_seed,
-            skip_validation=skip_validation,
+            skip_preprocessing=skip_preprocessing,
         ).grow()
 
     with TemporaryDirectory("test_grower") as folder:
@@ -341,7 +342,7 @@ def test_axon_grower():
         "axon_trunk_parameters_orientation_manager.json",
         "test_axon_grower.h5",
         None,
-        skip_validation=True,
+        skip_preprocessing=True,
     )
     _test_full(
         "radial_distances",
@@ -350,7 +351,7 @@ def test_axon_grower():
         "test_axon_grower.h5",
         None,
         rng_or_seed=build_random_generator(0),
-        skip_validation=True,
+        skip_preprocessing=True,
     )
 
     _test_full(
@@ -374,7 +375,7 @@ def test_axon_grower():
         "axon_trunk_parameters_absolute_orientation_manager.json",
         "test_axon_grower_absolute.h5",
         None,
-        skip_validation=True,
+        skip_preprocessing=True,
     )
     _test_full(
         "radial_distances",
@@ -383,7 +384,7 @@ def test_axon_grower():
         "test_axon_grower_absolute.h5",
         None,
         rng_or_seed=build_random_generator(0),
-        skip_validation=True,
+        skip_preprocessing=True,
     )
 
 
@@ -458,24 +459,24 @@ class TestPathGrower:
             rng_or_seed=build_random_generator(0),
         )
 
-    def test_skip_validation(self):
+    def test_skip_preprocessing(self):
         _test_full(
             "path_distances",
             "bio_distribution.json",
             "bio_path_params_orientation_manager.json",
             "path_grower.h5",
             "bio_path_persistence_diagram.json",
-            skip_validation=True,
+            skip_preprocessing=True,
         )
 
-    def test_skip_rng_and_validation(self):
+    def test_skip_rng_and_preprocessing(self):
         _test_full(
             "path_distances",
             "bio_distribution.json",
             "bio_path_params_orientation_manager.json",
             "path_grower.h5",
             "bio_path_persistence_diagram.json",
-            skip_validation=True,
+            skip_preprocessing=True,
             rng_or_seed=build_random_generator(0),
         )
 
@@ -489,7 +490,7 @@ class TestPathGrower:
             json.dump(distributions, f)
 
         with pytest.raises(
-            KeyError,
+            NeuroTSValidationError,
             match="'min_bar_length'",
         ):
             _test_full(
@@ -523,24 +524,24 @@ class TestGradientPathGrower:
             rng_or_seed=build_random_generator(0),
         )
 
-    def test_skip_validation(self):
+    def test_skip_preprocessing(self):
         _test_full(
             "path_distances",
             "bio_distribution.json",
             "bio_gradient_path_params_orientation_manager.json",
             "gradient_path_grower.h5",
             "gradient_path_persistence_diagram.json",
-            skip_validation=True,
+            skip_preprocessing=True,
         )
 
-    def test_skip_rng_and_validation(self):
+    def test_skip_rng_and_preprocessing(self):
         _test_full(
             "path_distances",
             "bio_distribution.json",
             "bio_gradient_path_params_orientation_manager.json",
             "gradient_path_grower.h5",
             "gradient_path_persistence_diagram.json",
-            skip_validation=True,
+            skip_preprocessing=True,
             rng_or_seed=build_random_generator(0),
         )
 
@@ -565,24 +566,24 @@ class TestBioRatL5Tpc1:
             rng_or_seed=build_random_generator(0),
         )
 
-    def test_skip_validation(self):
+    def test_skip_preprocessing(self):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
             "params1_orientation_manager.json",
             "expected_bio_rat_L5_TPC_B_with_params1.h5",
             "expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json",
-            skip_validation=True,
+            skip_preprocessing=True,
         )
 
-    def test_skip_rng_and_validation(self):
+    def test_skip_rng_and_preprocessing(self):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
             "params1_orientation_manager.json",
             "expected_bio_rat_L5_TPC_B_with_params1.h5",
             "expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json",
-            skip_validation=True,
+            skip_preprocessing=True,
             rng_or_seed=build_random_generator(0),
         )
 
@@ -607,24 +608,24 @@ class TestBioRatL5Tpc2:
             rng_or_seed=build_random_generator(0),
         )
 
-    def test_skip_validation(self):
+    def test_skip_preprocessing(self):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
             "params2_orientation_manager.json",
             "expected_bio_rat_L5_TPC_B_with_params2.h5",
             "expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json",
-            skip_validation=True,
+            skip_preprocessing=True,
         )
 
-    def test_skip_rng_and_validation(self):
+    def test_skip_rng_and_preprocessing(self):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
             "params2_orientation_manager.json",
             "expected_bio_rat_L5_TPC_B_with_params2.h5",
             "expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json",
-            skip_validation=True,
+            skip_preprocessing=True,
             rng_or_seed=build_random_generator(0),
         )
 
@@ -649,24 +650,24 @@ class TestBioRatL5Tpc3:
             rng_or_seed=build_random_generator(0),
         )
 
-    def test_skip_validation(self):
+    def test_skip_preprocessing(self):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
             "params3_orientation_manager.json",
             "expected_bio_rat_L5_TPC_B_with_params3.h5",
             "expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json",
-            skip_validation=True,
+            skip_preprocessing=True,
         )
 
-    def test_skip_rng_and_validation(self):
+    def test_skip_rng_and_preprocessing(self):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
             "params3_orientation_manager.json",
             "expected_bio_rat_L5_TPC_B_with_params3.h5",
             "expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json",
-            skip_validation=True,
+            skip_preprocessing=True,
             rng_or_seed=build_random_generator(0),
         )
 
@@ -691,23 +692,23 @@ class TestBioRatL5Tpc4:
             rng_or_seed=build_random_generator(0),
         )
 
-    def test_skip_validation(self):
+    def test_skip_preprocessing(self):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
             "params4_orientation_manager.json",
             "expected_bio_rat_L5_TPC_B_with_params4.h5",
             "expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json",
-            skip_validation=True,
+            skip_preprocessing=True,
         )
 
-    def test_skip_rng_and_validation(self):
+    def test_skip_rng_and_preprocessing(self):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
             "params4_orientation_manager.json",
             "expected_bio_rat_L5_TPC_B_with_params4.h5",
             "expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json",
-            skip_validation=True,
+            skip_preprocessing=True,
             rng_or_seed=build_random_generator(0),
         )

@@ -35,7 +35,6 @@ def test_tree_grower_space_colonization_constructor():
 
     grower_distributions = _distributions()
     grower_parameters = _parameters()
-    skip_validation = False
     grower_context = SpaceColonizationContext(_context())
     tree_parameters = grower_parameters["basal"]
     tree_parameters["origin"] = np.zeros(3)
@@ -47,7 +46,6 @@ def test_tree_grower_space_colonization_constructor():
         initial_point,
         tree_parameters,
         tree_distributions,
-        skip_validation,
         grower_context,
     )
 
@@ -65,7 +63,6 @@ def test_tree_grower_space_colonization_constructor():
         initial_point,
         tree_parameters,
         tree_distributions,
-        skip_validation,
         grower_context,
     )
     assert isinstance(tree_grower.active_sections[0], SectionSpatialGrower)

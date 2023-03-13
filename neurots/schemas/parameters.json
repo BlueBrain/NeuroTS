@@ -117,6 +117,67 @@
                                             },
                                             "additionalProperties": false,
                                             "required": ["primary_orientation"]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "direction": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "mean": {
+                                                            "oneOf": [
+                                                                {
+                                                                    "type": "number",
+                                                                    "minimum": 0,
+                                                                    "maximum": 3.1416
+                                                                },
+                                                                {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "number",
+                                                                        "minimum": 0,
+                                                                        "maximum": 3.1416
+                                                                    }
+                                                                }
+                                                            ]
+                                                        },
+                                                        "std":{
+                                                            "oneOf": [
+                                                                {
+                                                                    "type": "number",
+                                                                    "minimum": 0
+                                                                },
+                                                                {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "number",
+                                                                        "minimum": 0
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "additionalProperties": false,
+                                            "required": ["direction"]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "form": {
+                                                    "description": "Form of the 3d angle fit",
+                                                    "type": "string"
+                                                },
+                                                "params": {
+                                                    "items": {
+                                                        "description": "The fit parameters"
+                                                    },
+                                                    "type": "array"
+                                                }
+                                            },
+                                            "additionalProperties": false,
+                                            "required": ["form", "params"]
                                         }
                                     ]
                                 }
