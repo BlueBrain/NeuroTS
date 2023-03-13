@@ -584,10 +584,6 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
 
     If the fit parameters are already in `tmd_parameters`, the fit is skipped.
 
-    We return `None` instead of copy of `tmd_parameters` if there is any `3d_angle` data that
-    was present in `tmd_distributions`, with or without fit data, so this function can be used
-    to detect if `3d_angles` modes can be used in synthesis.
-
     Args:
         tmd_parameters (dict): Input parameters.
         tmd_distributions (dict): Input distributions.
