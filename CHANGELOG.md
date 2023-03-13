@@ -1,28 +1,75 @@
 # Changelog
 
-## [Unreleased](https://github.com/BlueBrain/NeuroTS/compare/3.1.1..HEAD)
+## [3.3.0](https://github.com/BlueBrain/NeuroTS/compare/3.2.0..3.3.0)
 
-> 6 April 2022
+> 13 March 2023
 
-### Uncategorized Changes
+### Build
 
+- Use find_namespace_packages instead of find_packages (Adrien Berchet - [#48](https://github.com/BlueBrain/NeuroTS/pull/48))
+
+### New Features
+
+- new trunk generation algorithm (Alexis Arnaudon - [#49](https://github.com/BlueBrain/NeuroTS/pull/49))
+- Rework input validation process (Adrien Berchet - [#52](https://github.com/BlueBrain/NeuroTS/pull/52))
+
+### Fixes
+
+- Report errors in list properly (Adrien Berchet - [#51](https://github.com/BlueBrain/NeuroTS/pull/51))
+
+### Chores And Housekeeping
+
+- Apply Copier template (Adrien Berchet - [#57](https://github.com/BlueBrain/NeuroTS/pull/57))
+- Fix language detection (Adrien Berchet - [#50](https://github.com/BlueBrain/NeuroTS/pull/50))
+
+### Refactoring and Updates
+
+- Apply Copier template (Adrien Berchet - [#46](https://github.com/BlueBrain/NeuroTS/pull/46))
+
+### CI Improvements
+
+- Separate job for min_versions to speedup the CI (Adrien Berchet - [#58](https://github.com/BlueBrain/NeuroTS/pull/58))
+- Apply Copier template (Adrien Berchet - [#55](https://github.com/BlueBrain/NeuroTS/pull/55))
+- Test with minimal versions of dependencies (Adrien Berchet - [#53](https://github.com/BlueBrain/NeuroTS/pull/53))
+
+### General Changes
+
+- Use diameter-synthesis by default (Alexis Arnaudon - [#47](https://github.com/BlueBrain/NeuroTS/pull/47))
+- Fix schemas and tests (Adrien Berchet - [#44](https://github.com/BlueBrain/NeuroTS/pull/44))
+
+## [3.2.0](https://github.com/BlueBrain/NeuroTS/compare/3.1.1..3.2.0)
+
+> 26 August 2022
+
+### Documentation Changes
+
+- Update DOI to the final article (Adrien Berchet - [#32](https://github.com/BlueBrain/NeuroTS/pull/32))
+
+### CI Improvements
+
+- Use codespellignorelines files for format job (Adrien Berchet - [#41](https://github.com/BlueBrain/NeuroTS/pull/41))
+- Publish wheels on Pypi (Adrien Berchet - [#40](https://github.com/BlueBrain/NeuroTS/pull/40))
+- Use commitlint to check PR titles (Adrien Berchet - [#39](https://github.com/BlueBrain/NeuroTS/pull/39))
+- Move black, codespell, isort, pycodestyle and pydocstyle from tox to pre-commit (Adrien Berchet - [#29](https://github.com/BlueBrain/NeuroTS/pull/29))
+
+### General Changes
+
+- Bar length warning under skip_validation (lidakanari - [#43](https://github.com/BlueBrain/NeuroTS/pull/43))
+- Compatibility of NeuriteType with NeuroM/MorphIO (Alexis Arnaudon - [#42](https://github.com/BlueBrain/NeuroTS/pull/42))
+- Update targeting/randomness to paper values (Alexis Arnaudon - [#30](https://github.com/BlueBrain/NeuroTS/pull/30))
+- Automatically build MyBinder docker image for each tag (Adrien Berchet - [#28](https://github.com/BlueBrain/NeuroTS/pull/28))
+- Update scipy requirement because of QHullError (Adrien Berchet - [#27](https://github.com/BlueBrain/NeuroTS/pull/27))
 - Fix warnings (Eleftherios Zisis - [#25](https://github.com/BlueBrain/NeuroTS/pull/25))
 - Update build-system (Eleftherios Zisis - [#26](https://github.com/BlueBrain/NeuroTS/pull/26))
 - Explicitely states where the examples and related data are located (Adrien Berchet - [#24](https://github.com/BlueBrain/NeuroTS/pull/24))
 - Remove useless installation of several packages in Github CI (Adrien Berchet - [#23](https://github.com/BlueBrain/NeuroTS/pull/23))
 - Setup MyBinder (Adrien Berchet - [#22](https://github.com/BlueBrain/NeuroTS/pull/22))
-- Fix auto-changelog configuration (Adrien Berchet - [ddfc476](https://github.com/BlueBrain/NeuroTS/commit/ddfc476549712d8b2e1e28de06a1d30d48b5d1a9))
-- Allow empty type (Adrien Berchet - [5aa5d9c](https://github.com/BlueBrain/NeuroTS/commit/5aa5d9c4096fc83edfcc874cbd237067fa39ace0))
-
-### CI Improvements
-
-- Move black, codespell, isort, pycodestyle and pydocstyle from tox to pre-commit (Adrien Berchet - [90b0667](https://github.com/BlueBrain/NeuroTS/commit/90b0667a6f87bb72bc7fe76cb9688747437d2607))
 
 ## [3.1.1](https://github.com/BlueBrain/NeuroTS/compare/3.1.0..3.1.1)
 
 > 2 March 2022
 
-### Uncategorized Changes
+### General Changes
 
 - Setup CodeCov (Adrien Berchet - [#20](https://github.com/BlueBrain/NeuroTS/pull/20))
 
