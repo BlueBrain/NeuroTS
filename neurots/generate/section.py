@@ -11,6 +11,7 @@ from numpy.linalg import norm as vectorial_norm  # vectorial_norm used for array
 
 from neurots.morphmath.utils import get_random_point  # norm used for single vectors
 from neurots.morphmath.utils import norm
+from neurots.utils import accept_reject
 
 MEMORY = 5
 DISTANCE_MIN = 1e-8
@@ -82,15 +83,23 @@ class SectionGrower:
 
     def next_point(self, current_point):
         """Returns the next point depending on the growth method and the previous point."""
-        direction = (
-            self.params.targeting * self.direction
-            + self.params.randomness * get_random_point(random_generator=self._rng)
-            + self.params.history * self.history()
-        )
 
-        direction = direction / vectorial_norm(direction)
-        seg_length = self.step_size_distribution.draw_positive()
-        next_point = current_point + seg_length * direction
+        def prob(proposal):
+            return 1.0
+
+        def propose():
+            direction = (
+                self.params.targeting * self.direction
+                + self.params.randomness * get_random_point(random_generator=self._rng)
+                + self.params.history * self.history()
+            )
+
+            direction = direction / vectorial_norm(direction)
+            seg_length = self.step_size_distribution.draw_positive()
+            next_point = current_point + seg_length * direction
+            return next_point, direction, seg_length
+
+        next_point, direction, seg_length = accept_reject(propose, prob, self._rng)
         self.update_pathlength(seg_length)
         return next_point, direction
 

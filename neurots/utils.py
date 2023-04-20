@@ -95,3 +95,26 @@ def point_to_section_segment(neuron, point, rtol=1e-05, atol=1e-08):
             return section.id, offset[0][0]
 
     raise ValueError(f"Cannot find point in morphology that matches: {point}")
+
+
+def accept_reject(propose, prob, rng, null=None, max_tries=100):
+    """Generic accept reject algorithm."""
+    n_try = 0
+    while n_try < max_tries:
+        proposal = propose()
+        _prob = prob(proposal)
+
+        if _prob == 1.0:
+            # this ensures we don't change rng for the tests, but its not really needed
+            return proposal
+
+        if rng.binomial(1, _prob):
+            return proposal
+        n_try += 1
+    warnings.warn(
+        """We could not sample from distribution, so we take a random point.
+                    Consider checking the given probability distribution."""
+    )
+    if null is not None:
+        return null()
+    return proposal
