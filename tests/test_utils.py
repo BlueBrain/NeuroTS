@@ -118,7 +118,7 @@ def test_accept_reject():
         return 0.0
 
     def null():
-        return 0.0
+        return -1.0
 
     # check we always return 1
     for _ in range(10):
@@ -126,11 +126,11 @@ def test_accept_reject():
         assert val == 1.0
 
     def propose_null():
-        return 0
+        return 0.0
 
     # check if we attain max_tries we return null = 0
     val = utils.accept_reject(propose_null, prob, rng, null=null)
-    assert val == 0.0
+    assert val == -1.0
 
     # check if we attain max_tries we return random
     val = utils.accept_reject(propose_null, prob, rng)
