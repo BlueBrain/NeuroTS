@@ -92,7 +92,6 @@ class NeuronGrower:
         """Constructor of the NeuronGrower class."""
         self.neuron = Morphology()
         self.context = context
-        print('-------', context)
         if rng_or_seed is None or isinstance(
             rng_or_seed, (int, np.integer, SeedSequence, BitGenerator)
         ):
