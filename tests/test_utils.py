@@ -131,3 +131,7 @@ def test_accept_reject():
     # check if we attain max_tries we return null = 0
     val = utils.accept_reject(propose_null, prob, rng, null=null)
     assert val == 0.0
+
+    # check if we attain max_tries we return random
+    val = utils.accept_reject(propose_null, prob, rng)
+    assert val == 0.0
