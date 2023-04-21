@@ -112,8 +112,8 @@ def accept_reject(propose, prob, rng, null=None, max_tries=100):
             return proposal
         n_try += 1
     warnings.warn(
-        """We could not sample from distribution, so we take a random point.
-                    Consider checking the given probability distribution."""
+        "We could not sample from distribution, so we take a random point. "
+        "Consider checking the given probability distribution."
     )
     if null is not None:
         return null()
