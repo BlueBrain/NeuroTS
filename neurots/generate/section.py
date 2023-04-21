@@ -84,7 +84,7 @@ class SectionGrower:
     def next_point(self, current_point):
         """Returns the next point depending on the growth method and the previous point."""
 
-        def prob(proposal):
+        def prob(_):
             return 1.0
 
         def propose():
