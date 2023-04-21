@@ -104,3 +104,30 @@ def test_point_to_section_segment():
     section, segment = utils.point_to_section_segment(neuron, [0.0, 15.28, 0.0])
     assert section == 63
     assert segment == 0
+
+
+def test_accept_reject():
+    rng = np.random.default_rng(42)
+
+    def propose():
+        return rng.integers(0, 2)
+
+    def prob(proposal):
+        if proposal > 0.5:
+            return 1.0
+        return 0.0
+
+    def null():
+        return 0.0
+
+    # check we always return 1
+    for _ in range(10):
+        val = utils.accept_reject(propose, prob, rng, null=null)
+        assert val == 1.0
+
+    def propose():
+        return 0
+
+    # check if we attain max_tries we return null = 0
+    val = utils.accept_reject(propose, prob, rng, null=null)
+    assert val == 0.0
