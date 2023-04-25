@@ -167,7 +167,37 @@
             }
         }
     },
-    "axon": {},
+    "axon": {
+        "filtration_metric": "path_distances",
+        "min_bar_length": 1.0,
+        "num_trees": {
+            "data": {
+                "bins": [
+                    1
+                ],
+                "weights": [
+                    1
+                ]
+            }
+        },
+        "absolute_elevation_deviation": {
+            "data": {
+                "bins": [
+                    0
+                ],
+                "weights": [
+                    1
+                ]
+            }
+        },
+        "trunk": {
+            "azimuth": {
+                "uniform": {
+                    "max": 0.0,
+                    "min": 3.14159
+                }
+            }
+    },
     "basal_dendrite": {
         "filtration_metric": "path_distances",
         "min_bar_length": 1.0,
