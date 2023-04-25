@@ -128,7 +128,7 @@ def test_accept_reject():
     def propose_null():
         return 0.0
 
-    # check if we attain max_tries we return null = 0
+    # check if we attain max_tries we return null = -1
     val = utils.accept_reject(propose_null, prob, rng, null=null)
     assert val == -1.0
 
