@@ -1,6 +1,7 @@
 name: Trigger MyBinder build
 
 on:
+  pull_request:  # TODO: REMOVE THIS BEFORE MERGING
   push:
     branches:
       - 'main'
@@ -11,11 +12,10 @@ jobs:
   trigger-binder-build:
     name: Launch the build of the docker image used by MyBinder
     runs-on: ubuntu-latest
-    continue-on-error: true
+    continue-on-error: false
     steps:
-      - uses: s-weigand/trigger-mybinder-build@v1
+      - name: cache binder build on mybinder.org
+        uses: jupyterhub/repo2docker-action@master
         with:
-          target-repo: BlueBrain/NeuroTS
-          service-name: gh
-          target-state: ${{github.ref_name}}
-          debug: true
+          NO_PUSH: true
+          MYBINDERORG_TAG: ${{ github.event.ref }} # This builds the container on mybinder.org with the branch that was pushed on.
