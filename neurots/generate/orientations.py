@@ -301,7 +301,7 @@ class OrientationManager(OrientationManagerBase):
             )
             params = self._parameters[tree_type]["orientation"]["values"]["params"]
             p = _prob(val, *params)
-            if "trunk_prob" in self._context:  # pragma: no cover
+            if self._context is not None and "trunk_prob" in self._context:  # pragma: no cover
                 p *= self._context["trunk_prob"](proposal)
             return p
 

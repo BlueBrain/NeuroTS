@@ -89,7 +89,7 @@ class SectionGrower:
 
             It will always accept unless a context prob function is present.
             """
-            if "section_prob" in self.context:  # pragma: no cover
+            if self.context is not None and "section_prob" in self.context:  # pragma: no cover
                 return self.context["section_prob"](data)
             return 1.0
 
