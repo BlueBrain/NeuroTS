@@ -84,10 +84,17 @@ class SectionGrower:
     def next_point(self, current_point):
         """Returns the next point depending on the growth method and the previous point."""
 
-        def prob(_):
+        def prob(data):
+            """Probability function to accept a next point.
+
+            It will always accept unless a context prob function is present.
+            """
+            if "section_prob" in self.context:  # pragma: no cover
+                return self.context["section_prob"](data)
             return 1.0
 
         def propose():
+            """Propose a next section point."""
             direction = (
                 self.params.targeting * self.direction
                 + self.params.randomness * get_random_point(random_generator=self._rng)

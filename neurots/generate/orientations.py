@@ -289,18 +289,24 @@ class OrientationManager(OrientationManagerBase):
         """
 
         def propose():
+            """Propose a trunk angle."""
             return sample.sample_spherical_unit_vectors(self._rng)
 
         def prob(proposal):
+            """Probability function to accept a trunk angle."""
             val = nm.morphmath.angle_between_vectors(ref_dir, proposal)
             _prob = get_probability_function(
                 form=self._parameters[tree_type]["orientation"]["values"]["form"],
                 with_density=False,
             )
             params = self._parameters[tree_type]["orientation"]["values"]["params"]
-            return _prob(val, *params)
+            p = _prob(val, *params)
+            if "trunk_prob" in self._context:  # pragma: no cover
+                p *= self._context["trunk_prob"](proposal)
+            return p
 
         def null():
+            """Trunk angle returned if we cannot accept one after `max_tries`."""
             return sample.sample_spherical_unit_vectors(self._rng)
 
         return accept_reject(propose, prob, self._rng, null=null, max_tries=max_tries)
