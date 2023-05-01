@@ -109,7 +109,7 @@ def test_point_to_section_segment():
 def test_accept_reject():
     rng = np.random.default_rng(42)
 
-    def propose():
+    def propose(_):
         return rng.integers(0, 2)
 
     def prob(proposal):
@@ -125,7 +125,7 @@ def test_accept_reject():
         val = utils.accept_reject(propose, prob, rng, null=null)
         assert val == 1.0
 
-    def propose_null():
+    def propose_null(_):
         return 0.0
 
     # check if we attain max_tries we return null = -1
