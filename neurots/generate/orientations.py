@@ -288,7 +288,7 @@ class OrientationManager(OrientationManagerBase):
         mostly related to large region of small probabilities.
         """
 
-        def propose():
+        def propose(_):
             """Propose a trunk angle."""
             return sample.sample_spherical_unit_vectors(self._rng)
 

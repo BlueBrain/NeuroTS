@@ -90,23 +90,28 @@ class SectionGrower:
             It will always accept unless a context prob function is present.
             """
             if self.context is not None and "section_prob" in self.context:  # pragma: no cover
-                return self.context["section_prob"](data)
+                return self.context["section_prob"](data, current_point=current_point)
             return 1.0
 
-        def propose():
-            """Propose a next section point."""
+        def propose(noise=0.0):
+            """Propose a next section point.
+
+            Args:
+                noise (float): artificially increase the randomness to allow for context changes
+            """
             direction = (
                 self.params.targeting * self.direction
-                + self.params.randomness * get_random_point(random_generator=self._rng)
+                + self.params.randomness
+                * get_random_point(random_generator=self._rng)
+                * (1 + noise)
                 + self.params.history * self.history()
             )
 
-            direction = direction / vectorial_norm(direction)
-            seg_length = self.step_size_distribution.draw_positive()
-            next_point = current_point + seg_length * direction
-            return next_point, direction, seg_length
+            return direction / vectorial_norm(direction)
 
-        next_point, direction, seg_length = accept_reject(propose, prob, self._rng)
+        direction = accept_reject(propose, prob, self._rng)
+        seg_length = self.step_size_distribution.draw_positive()
+        next_point = current_point + seg_length * direction
         self.update_pathlength(seg_length)
         return next_point, direction
 
