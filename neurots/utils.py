@@ -97,7 +97,7 @@ def point_to_section_segment(neuron, point, rtol=1e-05, atol=1e-08):
     raise ValueError(f"Cannot find point in morphology that matches: {point}")
 
 
-def accept_reject(propose, prob, rng, null=None, max_tries=100, noise_increase=0.2):
+def accept_reject(propose, prob, rng, null=None, max_tries=100, noise_increase=0.5):
     """Generic accept reject algorithm."""
     n_try = 0
     while n_try < max_tries:

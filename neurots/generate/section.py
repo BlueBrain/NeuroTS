@@ -109,7 +109,13 @@ class SectionGrower:
 
             return direction / vectorial_norm(direction)
 
-        direction = accept_reject(propose, prob, self._rng)
+        direction = accept_reject(
+            propose,
+            prob,
+            self._rng,
+            self.context.get("params_section", {}).get("max_tries", 100),
+            self.context.get("params_section", {}).get("noise_increase", 0.5),
+        )
         seg_length = self.step_size_distribution.draw_positive()
         next_point = current_point + seg_length * direction
         self.update_pathlength(seg_length)
