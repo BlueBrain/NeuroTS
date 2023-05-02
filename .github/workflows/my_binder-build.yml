@@ -14,8 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: false
     steps:
-      - name: cache binder build on mybinder.org
+      - name: checkout files in repo
+        uses: actions/checkout@v3
+
+      - name: update jupyter dependencies with repo2docker
         uses: jupyterhub/repo2docker-action@master
         with:
-          NO_PUSH: true
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASS }}
+          IMAGE_NAME: "bluebrain/neurots-mybinder"
+          # MYBINDERORG_TAG: ${{ github.event.pull_request.head.ref }} # This builds the container on mybinder.org with the branch that was pushed on.
           MYBINDERORG_TAG: ${{ github.event.ref }} # This builds the container on mybinder.org with the branch that was pushed on.
