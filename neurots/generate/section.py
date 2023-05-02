@@ -113,8 +113,12 @@ class SectionGrower:
             propose,
             prob,
             self._rng,
-            self.context.get("params_section", {}).get("max_tries", 100),
-            self.context.get("params_section", {}).get("noise_increase", 0.5),
+            self.context.get("params_section", {}).get("max_tries", 100)
+            if self.context is not None
+            else 100,
+            self.context.get("params_section", {}).get("noise_increase", 0.5)
+            if self.context is not None
+            else 0.5,
         )
         seg_length = self.step_size_distribution.draw_positive()
         next_point = current_point + seg_length * direction
