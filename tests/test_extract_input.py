@@ -305,6 +305,20 @@ class TestDistributions:
         assert_equal(distr["basal_dendrite"]["filtration_metric"], "path_distances")
         validator.validate_neuron_distribs(distr)
 
+    def test_threshold_too_small(self):
+        with pytest.raises(
+            ValueError,
+            match=(
+                "The given threshold excluded all bars of the persistence diagram, please use a "
+                "lower threshold value."
+            ),
+        ):
+            extract_input.distributions(
+                os.path.join(_PATH, "diam_simple.swc"),
+                feature="path_distances",
+                neurite_types=["basal_dendrite"],
+            )
+
     def test_trunk_length(self, filename):
         distr = extract_input.distributions(filename, feature="trunk_length")
         assert "persistence_diagram" not in distr["basal_dendrite"]
