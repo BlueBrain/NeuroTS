@@ -320,11 +320,14 @@ class TestDistributions:
             )
 
     def test_missing_neurite_type(self):
-        with pytest.raises(NeuroTSError):
+        with pytest.raises(
+            NeuroTSError,
+            match="The given population does contain any tree of axon type.",
+        ):
             extract_input.distributions(
                 os.path.join(_PATH, "diam_simple.swc"),
                 feature="path_distances",
-                neurite_types=["basal_dendrite", "apical_dendrite"],
+                neurite_types=["axon"],
             )
 
     def test_trunk_length(self, filename):

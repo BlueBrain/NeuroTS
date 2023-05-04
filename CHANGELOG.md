@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.3.2](https://github.com/BlueBrain/NeuroTS/compare/3.3.1..3.3.2)
+
+> 4 May 2023
+
+### Fixes
+
+- Raise clear errors for empty angles (Adrien Berchet - [#65](https://github.com/BlueBrain/NeuroTS/pull/65))
+
+## [3.3.1](https://github.com/BlueBrain/NeuroTS/compare/3.3.0..3.3.1)
+
+> 13 March 2023
+
+### Fixes
+
+- Convert apical_sections to new id (Alexis Arnaudon - [#60](https://github.com/BlueBrain/NeuroTS/pull/60))
+
 ## [3.3.0](https://github.com/BlueBrain/NeuroTS/compare/3.2.0..3.3.0)
 
 > 13 March 2023
