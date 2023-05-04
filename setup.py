@@ -22,13 +22,13 @@ from setuptools import setup
 
 reqs = [
     "jsonschema>=3.0.1",
-    "matplotlib>=3.2.1",
-    "morphio>=3.3.3,<4.0",
+    "matplotlib>=3.4",
+    "morphio>=3.3.4,<4.0",
     "neurom>=3.0,<4.0",
     "numpy>=1.22.0",
     "scipy>=1.6",
-    "tmd>=2.2.0",
-    "diameter-synthesis>=0.5.2",
+    "tmd>=2.3.0",
+    "diameter-synthesis>=0.5.4",
 ]
 
 doc_reqs = [
@@ -40,7 +40,6 @@ doc_reqs = [
 ]
 
 test_reqs = [
-    "diameter-synthesis>=0.5.0",
     "dictdiffer>=0.5",
     "mock>=3",
     "morph-tool>=2.9",
