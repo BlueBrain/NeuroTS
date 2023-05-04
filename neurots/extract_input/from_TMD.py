@@ -17,6 +17,8 @@
 
 import tmd
 
+from neurots.utils import NeuroTSError
+
 
 def persistent_homology_angles(
     pop, threshold=2, neurite_type="basal_dendrite", feature="radial_distances"
@@ -35,10 +37,17 @@ def persistent_homology_angles(
     ph_ang = [
         tmd.methods.get_ph_angles(tree, feature=feature) for tree in getattr(pop, neurite_type)
     ]
+    if not ph_ang:
+        raise NeuroTSError(f"The given population does contain any tree of {neurite_type} type.")
 
     # Keep only the trees whose number of terminations is above the threshold
     # Saves the list of persistence diagrams for the selected neurite_type
     phs = [p for p in ph_ang if len(p) > threshold]
+    if not phs:
+        raise NeuroTSError(
+            "The given threshold excluded all bars of the persistence diagram, please use a "
+            "lower threshold value."
+        )
     min_bar_length = min(min(tmd.analysis.get_lengths(ph)) for ph in phs)
 
     return {"persistence_diagram": phs, "min_bar_length": min_bar_length}
