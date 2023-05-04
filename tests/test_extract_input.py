@@ -307,7 +307,7 @@ class TestDistributions:
 
     def test_threshold_too_small(self):
         with pytest.raises(
-            ValueError,
+            NeuroTSError,
             match=(
                 "The given threshold excluded all bars of the persistence diagram, please use a "
                 "lower threshold value."
@@ -317,6 +317,14 @@ class TestDistributions:
                 os.path.join(_PATH, "diam_simple.swc"),
                 feature="path_distances",
                 neurite_types=["basal_dendrite"],
+            )
+
+    def test_missing_neurite_type(self):
+        with pytest.raises(NeuroTSError):
+            extract_input.distributions(
+                os.path.join(_PATH, "diam_simple.swc"),
+                feature="path_distances",
+                neurite_types=["basal_dendrite", "apical_dendrite"],
             )
 
     def test_trunk_length(self, filename):
