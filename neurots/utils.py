@@ -99,9 +99,9 @@ def point_to_section_segment(neuron, point, rtol=1e-05, atol=1e-08):
 
 def accept_reject(propose, prob, rng, null=None, max_tries=100, noise_increase=0.5):
     """Generic accept reject algorithm."""
-    n_try = 0
-    while n_try < max_tries:
-        proposal = propose(n_try * noise_increase)
+    n_tries = 0
+    while n_tries < max_tries:
+        proposal = propose(n_tries * noise_increase)
         _prob = prob(proposal)
 
         if _prob == 1.0:
@@ -110,7 +110,7 @@ def accept_reject(propose, prob, rng, null=None, max_tries=100, noise_increase=0
 
         if rng.binomial(1, _prob):
             return proposal
-        n_try += 1
+        n_tries += 1
     warnings.warn(
         "We could not sample from distribution, so we take a random point. "
         "Consider checking the given probability distribution."
