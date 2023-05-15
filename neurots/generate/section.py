@@ -109,14 +109,12 @@ class SectionGrower:
                 self._propose,
                 self.context["section_prob"],
                 self._rng,
-                max_tries=self.context.get("params_section", {}).get("max_tries", DEFAULT_MAX_TRIES)
-                if self.context is not None
-                else DEFAULT_MAX_TRIES,
+                max_tries=self.context.get("params_section", {}).get(
+                    "max_tries", DEFAULT_MAX_TRIES
+                ),
                 noise_increase=self.context.get("params_section", {}).get(
                     "noise_increase", DEFAULT_NOISE_INCREASE
-                )
-                if self.context is not None
-                else DEFAULT_NOISE_INCREASE,
+                ),
                 current_point=current_point,
             )
         else:
