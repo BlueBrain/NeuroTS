@@ -19,6 +19,10 @@ DISTANCE_MIN = 1e-8
 # Memory decreases with distance from current point
 WEIGHTS = np.exp(np.arange(1, MEMORY + 1) - MEMORY)
 
+# default parameters for accept/reject
+DEFAULT_MAX_TRIES = 100
+DEFAULT_NOISE_INCREASE = 0.5
+
 
 class SectionGrower:
     """Class for the section growth.
@@ -81,45 +85,43 @@ class SectionGrower:
         """Increases the path distance."""
         self.pathlength += length
 
-    def next_point(self, current_point):
-        """Returns the next point depending on the growth method and the previous point."""
+    def _propose(self, noise=0.0):
+        """Propose the direction for a next section point.
 
-        def prob(data):
-            """Probability function to accept a next point.
-
-            It will always accept unless a context prob function is present.
-            """
-            if self.context is not None and "section_prob" in self.context:  # pragma: no cover
-                return self.context["section_prob"](data, current_point=current_point)
-            return 1.0
-
-        def propose(noise=0.0):
-            """Propose a next section point.
-
-            Args:
-                noise (float): artificially increase the randomness to allow for context changes
-            """
-            direction = (
-                self.params.targeting * self.direction
-                + self.params.randomness
-                * get_random_point(random_generator=self._rng)
-                * (1 + noise)
-                + self.params.history * self.history()
-            )
-
-            return direction / vectorial_norm(direction)
-
-        direction = accept_reject(
-            propose,
-            prob,
-            self._rng,
-            max_tries=self.context.get("params_section", {}).get("max_tries", 100)
-            if self.context is not None
-            else 100,
-            noise_increase=self.context.get("params_section", {}).get("noise_increase", 0.5)
-            if self.context is not None
-            else 0.5,
+        Args:
+            noise (float): artificially increase the randomness to allow for context changes
+        """
+        direction = (
+            self.params.targeting * self.direction
+            + self.params.randomness * get_random_point(random_generator=self._rng) * (1.0 + noise)
+            + self.params.history * self.history()
         )
+
+        return direction / vectorial_norm(direction)
+
+    def next_point(self, current_point):
+        """Returns the next point depending on the growth method and the previous point.
+
+        If a context is present, an accept-reject mechanisms will be used to alter the next point.
+        """
+        if self.context is not None and "section_prob" in self.context:  # pragma: no cover
+            direction = accept_reject(
+                self._propose,
+                self.context["section_prob"],
+                self._rng,
+                max_tries=self.context.get("params_section", {}).get("max_tries", DEFAULT_MAX_TRIES)
+                if self.context is not None
+                else DEFAULT_MAX_TRIES,
+                noise_increase=self.context.get("params_section", {}).get(
+                    "noise_increase", DEFAULT_NOISE_INCREASE
+                )
+                if self.context is not None
+                else DEFAULT_NOISE_INCREASE,
+                current_point=current_point,
+            )
+        else:
+            direction = self._propose()
+
         seg_length = self.step_size_distribution.draw_positive()
         next_point = current_point + seg_length * direction
         self.update_pathlength(seg_length)
