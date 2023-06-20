@@ -53,4 +53,6 @@ def test_rotation_matrix_from_vectors():
             ]
         ),
     )
-    print(rot)
+
+    rot = test_module.rotation_matrix_from_vectors(vec1, vec1)
+    assert_array_almost_equal(rot, np.eye(3))
