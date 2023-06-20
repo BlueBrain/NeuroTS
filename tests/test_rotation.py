@@ -17,6 +17,7 @@
 
 # pylint: disable=missing-function-docstring
 from numpy.testing import assert_array_almost_equal
+import numpy as np
 
 import neurots.morphmath.rotation as test_module
 
@@ -36,3 +37,20 @@ def test_rotate_vector():
 
 def test_angle3D():
     assert_array_almost_equal(test_module.angle3D([1, 1, 1], [2, 3, 4]), 0.265729)
+
+
+def test_rotation_matrix_from_vectors():
+    vec1 = np.array([0, 1, 0])
+    vec2 = np.array([1, 1, 1])
+    rot = test_module.rotation_matrix_from_vectors(vec1, vec2)
+    assert_array_almost_equal(
+        rot,
+        np.array(
+            [
+                [0.78867513, 0.57735027, -0.21132487],
+                [-0.57735027, 0.57735027, -0.57735027],
+                [-0.21132487, 0.57735027, 0.78867513],
+            ]
+        ),
+    )
+    print(rot)
