@@ -231,12 +231,13 @@ class OrientationManager(OrientationManagerBase):
         resulting angle must be in `[0, 2 * pi]`, we clip the obtained angle and uniformly sample
         the second angle to obtain a 3d direction. For multiple apical trees, `mean` and `std`
         should be two lists with lengths equal to number of trees, otherwise it can be a float.
+
+        Pia direction can be overwritten by the parameter 'pia_direction' value.
         """
         means = values_dict["direction"]["mean"]
         means = means if isinstance(means, list) else [means]
         stds = values_dict["direction"]["std"]
         stds = stds if isinstance(stds, list) else [stds]
-
         thetas = []
         for mean, std in zip(means, stds):
             if mean == 0:
@@ -248,7 +249,9 @@ class OrientationManager(OrientationManagerBase):
                 thetas.append(np.clip(self._rng.normal(mean, std), 0, np.pi))
 
         phis = self._rng.uniform(0, 2 * np.pi, len(means))
-        return spherical_angles_to_pia_orientations(phis, thetas)
+        return spherical_angles_to_pia_orientations(
+            phis, thetas, self._parameters.get("pia_direction", None)
+        )
 
     def _mode_pia_constraint(self, _, tree_type):
         """Create trunks from distribution of angles with pia (`[0 , 1, 0]`) direction.
@@ -443,19 +446,25 @@ def compute_interval_n_tree(soma, n_trees, rng=np.random):
     return phi_intervals, interval_n_trees
 
 
-def spherical_angles_to_pia_orientations(phis, thetas):
-    """Compute orientation from spherical angles where thetas are wrt to pia at `[0, 1, 0]`.
+def spherical_angles_to_pia_orientations(phis, thetas, pia_direction=None):
+    """Compute orientation from spherical angles where thetas are wrt to pia (default=`[0, 1, 0]`).
 
     Args:
         phis (numpy.ndarray): Polar angles.
         thetas (numpy.ndarray): Azimuthal angles.
+        pia_direction (numpy.ndarray): Direction of pia if different from `[0, 1, 0]`.
 
     Returns:
         numpy.ndarray: The orientation vectors where each row corresponds to a phi-theta pair.
     """
-    return np.column_stack(
+    from morph_tool.transform import rotation_matrix_from_vectors
+
+    vector = np.column_stack(
         (np.cos(phis) * np.sin(thetas), np.cos(thetas), np.sin(phis) * np.sin(thetas))
     )
+    if pia_direction is not None:
+        vector = vector.dot(rotation_matrix_from_vectors(PIA_DIRECTION, pia_direction).T)
+    return vector
 
 
 def get_probability_function(form="step", with_density=True):
