@@ -457,13 +457,12 @@ def spherical_angles_to_pia_orientations(phis, thetas, pia_direction=None):
     Returns:
         numpy.ndarray: The orientation vectors where each row corresponds to a phi-theta pair.
     """
-    from morph_tool.transform import rotation_matrix_from_vectors
 
     vector = np.column_stack(
         (np.cos(phis) * np.sin(thetas), np.cos(thetas), np.sin(phis) * np.sin(thetas))
     )
     if pia_direction is not None:
-        vector = vector.dot(rotation_matrix_from_vectors(PIA_DIRECTION, pia_direction).T)
+        vector = vector.dot(rotation.rotation_matrix_from_vectors(PIA_DIRECTION, pia_direction).T)
     return vector
 
 

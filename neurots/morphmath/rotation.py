@@ -69,3 +69,34 @@ def angle3D(v1, v2):
 def rotate_vector(vec, axis, angle):
     """Rotate the input vector vec by a selected angle around a specific axis."""
     return np.dot(rotation_around_axis(axis, angle), vec)
+
+
+def rotation_matrix_from_vectors(vec1, vec2):
+    """Find the rotation matrix that aligns vec1 to vec2.
+
+    Picked from morph_tool.transform
+    Picked from: https://stackoverflow.com/a/59204638/3868743
+
+    Args:
+        vec1: A 3d "source" vector
+        vec2: A 3d "destination" vector
+
+    Returns:
+        A transform matrix (3x3) which when applied to vec1, aligns it with vec2.
+    """
+    vec1, vec2 = vec1 / np.linalg.norm(vec1), vec2 / np.linalg.norm(vec2)
+
+    v_cross = np.cross(vec1, vec2)
+    v_cross_norm = np.linalg.norm(v_cross)
+    if v_cross_norm == 0:
+        return np.eye(3)
+
+    kmat = np.array(
+        [
+            [0.0, -v_cross[2], v_cross[1]],
+            [v_cross[2], 0.0, -v_cross[0]],
+            [-v_cross[1], v_cross[0], 0.0],
+        ]
+    )
+
+    return np.eye(3) + kmat + kmat.dot(kmat) * ((1 - np.dot(vec1, vec2)) / (v_cross_norm**2))
