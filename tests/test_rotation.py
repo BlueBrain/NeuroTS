@@ -16,8 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # pylint: disable=missing-function-docstring
-from numpy.testing import assert_array_almost_equal
 import numpy as np
+from numpy.testing import assert_array_almost_equal
 
 import neurots.morphmath.rotation as test_module
 
