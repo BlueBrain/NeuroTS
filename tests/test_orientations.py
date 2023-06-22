@@ -403,6 +403,23 @@ def test_orientation_manager__mode_normal_pia_constraint():
     expected = np.array([[-0.10517952, 0.52968005, 0.84165095]])
     npt.assert_allclose(actual, expected, rtol=1e-5)
 
+    # test other pia direction
+    parameters["pia_direction"] = [1, 0, 0]
+    om = tested.OrientationManager(
+        soma=None,
+        parameters=parameters,
+        distributions=distributions,
+        context=None,
+        rng=np.random.default_rng(seed=0),
+    )
+
+    for tree_type in parameters["grow_types"]:
+        om.compute_tree_type_orientations(tree_type)
+
+    actual = om.get_tree_type_orientations("apical_dendrite")
+    expected = np.array([[0.52968, 0.10518, 0.841651]])
+    npt.assert_allclose(actual, expected, rtol=1e-5)
+
 
 def test_orientation_manager__pia_constraint():
     parameters = {
