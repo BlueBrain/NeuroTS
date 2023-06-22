@@ -104,19 +104,32 @@ class SectionGrower:
 
         If a context is present, an accept-reject mechanisms will be used to alter the next point.
         """
-        if self.context is not None and "section_prob" in self.context:  # pragma: no cover
-            direction = accept_reject(
-                self._propose,
-                self.context["section_prob"],
-                self._rng,
-                max_tries=self.context.get("params_section", {}).get(
-                    "max_tries", DEFAULT_MAX_TRIES
-                ),
-                noise_increase=self.context.get("params_section", {}).get(
-                    "noise_increase", DEFAULT_NOISE_INCREASE
-                ),
-                current_point=current_point,
-            )
+        if self.context is not None and "boundaries" in self.context:  # pragma: no cover
+            for boundary in self.context["boundaries"]:
+                # we only consider boundary for certain neurite types
+                neurite_types = boundary.get("neurite_types", None)
+                if (
+                    self.parent is not None
+                    and neurite_types is not None
+                    and self.parent.type.name not in neurite_types
+                ):
+                    direction = self._propose()
+
+                elif "section_prob" in boundary:
+                    direction = accept_reject(
+                        self._propose,
+                        boundary["section_prob"],
+                        self._rng,
+                        max_tries=boundary.get("params_section", {}).get(
+                            "max_tries", DEFAULT_MAX_TRIES
+                        ),
+                        noise_increase=boundary.get("params_section", {}).get(
+                            "noise_increase", DEFAULT_NOISE_INCREASE
+                        ),
+                        current_point=current_point,
+                    )
+                else:
+                    direction = self._propose()
         else:
             direction = self._propose()
 

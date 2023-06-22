@@ -164,7 +164,6 @@ class TreeGrower:
             children (int): The number of children.
         """
         SGrower = section_growers[self.params["metric"]]
-
         sec_grower = SGrower(
             parent=parent,
             first_point=first_point,

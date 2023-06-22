@@ -105,7 +105,6 @@ def accept_reject(
     while n_tries < max_tries:
         proposal = propose(n_tries * noise_increase)
         _prob = probability(proposal, **probability_kwargs)
-
         if _prob == 1.0:
             # this ensures we don't change rng for the tests, but its not really needed
             return proposal
