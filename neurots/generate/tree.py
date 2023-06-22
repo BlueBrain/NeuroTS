@@ -197,12 +197,12 @@ class TreeGrower:
     @staticmethod
     def order_per_process(secs):
         """Orders sections according to process type, major first."""
-        return np.copy(secs)[np.argsort([ss.process for ss in secs])]
+        return np.copy(secs)[np.argsort([ss.process for ss in secs], kind="stable")]
 
     @staticmethod
     def order_per_bif(secs):
         """Orders sections according to bifurcation times."""
-        ordered_list = np.argsort([ss.stop_criteria["TMD"].bif for ss in secs])
+        ordered_list = np.argsort([ss.stop_criteria["TMD"].bif for ss in secs], kind="stable")
         return np.copy(secs)[ordered_list]
 
     def append_section(self, section):

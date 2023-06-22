@@ -27,6 +27,7 @@ Finally, we need to check the TMD of the produced cells.
 # pylint: disable=protected-access
 import json
 import os
+from os.path import basename
 from os.path import join
 from tempfile import TemporaryDirectory
 
@@ -80,9 +81,9 @@ def _test_full(
     parameters,
     ref_cell,
     ref_persistence_diagram,
-    save=False,
     rng_or_seed=None,
     skip_preprocessing=False,
+    output_dir=None,
 ):
     distributions, params = _load_inputs(join(_path, distributions), join(_path, parameters))
     if rng_or_seed is None:
@@ -101,12 +102,14 @@ def _test_full(
         ).grow()
 
     with TemporaryDirectory("test_grower") as folder:
-        out_neuron = os.path.join(folder, "test_output_neuron_.h5")
+        out_neuron = join(folder, "test_output_neuron_.h5")
         n.write(out_neuron)
 
         # For checking purposes, we can output the cells as swc
-        if save:
-            n.write(ref_cell.replace(".h5", "NEW.h5"))
+        if output_dir is not None:
+            if not os.path.exists(output_dir):
+                os.mkdir(output_dir)
+            n.write(join(output_dir, basename(ref_cell)))
 
         if ref_persistence_diagram is not None:
             # Load with TMD and extract radial persistence
@@ -115,8 +118,11 @@ def _test_full(
             actual_persistence_diagram = tmd.methods.get_persistence_diagram(
                 n0.apical_dendrite[0], feature=feature
             )
-            if save:
-                print(actual_persistence_diagram)
+            if output_dir is not None:
+                with open(
+                    join(output_dir, basename(ref_persistence_diagram)), "w", encoding="utf-8"
+                ) as f:
+                    json.dump(actual_persistence_diagram, f, sort_keys=True, indent=2)
 
             with open(join(_path, ref_persistence_diagram), encoding="utf-8") as f:
                 expected_persistence_diagram = json.load(f)
@@ -125,7 +131,7 @@ def _test_full(
                 actual_persistence_diagram, expected_persistence_diagram
             )
 
-        assert not diff(out_neuron, os.path.join(_path, ref_cell))
+        assert not diff(out_neuron, join(_path, ref_cell))
 
 
 def test_wrong_filtration():
@@ -315,7 +321,7 @@ def test_breaker_of_tmd_algo():
     )
 
 
-def test_axon_grower():
+def test_axon_grower(tmpdir):
     """Test axon grower, which should only grow trunks with 1 section to allow later axon grafting.
 
     The num_seg value in the parameters is set to 999 but only 1 segment should be synthesized.
@@ -327,6 +333,7 @@ def test_axon_grower():
         "axon_trunk_parameters.json",
         "test_axon_grower.h5",
         None,
+        output_dir=tmpdir / "default",
     )
     _test_full(
         "radial_distances",
@@ -335,6 +342,7 @@ def test_axon_grower():
         "test_axon_grower.h5",
         None,
         rng_or_seed=build_random_generator(0),
+        output_dir=tmpdir / "rng",
     )
     _test_full(
         "radial_distances",
@@ -343,6 +351,7 @@ def test_axon_grower():
         "test_axon_grower.h5",
         None,
         skip_preprocessing=True,
+        output_dir=tmpdir / "skip_preprocessing",
     )
     _test_full(
         "radial_distances",
@@ -352,6 +361,7 @@ def test_axon_grower():
         None,
         rng_or_seed=build_random_generator(0),
         skip_preprocessing=True,
+        output_dir=tmpdir / "rng_and_skip_preprocessing",
     )
 
     _test_full(
@@ -360,6 +370,7 @@ def test_axon_grower():
         "axon_trunk_parameters_absolute.json",
         "test_axon_grower_absolute.h5",
         None,
+        output_dir=tmpdir / "default_absolute",
     )
     _test_full(
         "radial_distances",
@@ -368,6 +379,7 @@ def test_axon_grower():
         "test_axon_grower_absolute.h5",
         None,
         rng_or_seed=build_random_generator(0),
+        output_dir=tmpdir / "rng_absolute",
     )
     _test_full(
         "radial_distances",
@@ -376,6 +388,7 @@ def test_axon_grower():
         "test_axon_grower_absolute.h5",
         None,
         skip_preprocessing=True,
+        output_dir=tmpdir / "skip_preprocessing_absolute",
     )
     _test_full(
         "radial_distances",
@@ -385,16 +398,18 @@ def test_axon_grower():
         None,
         rng_or_seed=build_random_generator(0),
         skip_preprocessing=True,
+        output_dir=tmpdir / "rng_and_skip_preprocessing_absolute",
     )
 
 
-def test_basic_grower():
+def test_basic_grower(tmpdir):
     _test_full(
         "radial_distances",
         "bio_trunk_distribution.json",
         "trunk_parameters.json",
         "test_trunk_grower.h5",
         None,
+        output_dir=tmpdir / "default",
     )
     _test_full(
         "radial_distances",
@@ -403,6 +418,7 @@ def test_basic_grower():
         "test_trunk_grower.h5",
         None,
         rng_or_seed=build_random_generator(0),
+        output_dir=tmpdir / "rng",
     )
 
 
@@ -440,16 +456,17 @@ def test_basic_grower_with_generator():
 class TestPathGrower:
     """test tmd_path and tmd_apical_path"""
 
-    def test_default(self):
+    def test_default(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_distribution.json",
             "bio_path_params.json",
             "path_grower.h5",
             "bio_path_persistence_diagram.json",
+            output_dir=tmpdir,
         )
 
-    def test_with_rng(self):
+    def test_with_rng(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_distribution.json",
@@ -457,9 +474,10 @@ class TestPathGrower:
             "path_grower.h5",
             "bio_path_persistence_diagram.json",
             rng_or_seed=build_random_generator(0),
+            output_dir=tmpdir,
         )
 
-    def test_skip_preprocessing(self):
+    def test_skip_preprocessing(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_distribution.json",
@@ -467,9 +485,10 @@ class TestPathGrower:
             "path_grower.h5",
             "bio_path_persistence_diagram.json",
             skip_preprocessing=True,
+            output_dir=tmpdir,
         )
 
-    def test_skip_rng_and_preprocessing(self):
+    def test_skip_rng_and_preprocessing(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_distribution.json",
@@ -478,6 +497,7 @@ class TestPathGrower:
             "bio_path_persistence_diagram.json",
             skip_preprocessing=True,
             rng_or_seed=build_random_generator(0),
+            output_dir=tmpdir,
         )
 
     def test_min_bar_length_missing(self, tmpdir):
@@ -499,22 +519,24 @@ class TestPathGrower:
                 "bio_path_params.json",
                 "path_grower.h5",
                 "bio_path_persistence_diagram.json",
+                output_dir=tmpdir,
             )
 
 
 class TestGradientPathGrower:
     """test tmd_path"""
 
-    def test_default(self):
+    def test_default(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_distribution.json",
             "bio_gradient_path_params.json",
             "gradient_path_grower.h5",
             "gradient_path_persistence_diagram.json",
+            output_dir=tmpdir,
         )
 
-    def test_with_rng(self):
+    def test_with_rng(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_distribution.json",
@@ -522,9 +544,10 @@ class TestGradientPathGrower:
             "gradient_path_grower.h5",
             "gradient_path_persistence_diagram.json",
             rng_or_seed=build_random_generator(0),
+            output_dir=tmpdir,
         )
 
-    def test_skip_preprocessing(self):
+    def test_skip_preprocessing(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_distribution.json",
@@ -532,9 +555,10 @@ class TestGradientPathGrower:
             "gradient_path_grower.h5",
             "gradient_path_persistence_diagram.json",
             skip_preprocessing=True,
+            output_dir=tmpdir,
         )
 
-    def test_skip_rng_and_preprocessing(self):
+    def test_skip_rng_and_preprocessing(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_distribution.json",
@@ -543,20 +567,22 @@ class TestGradientPathGrower:
             "gradient_path_persistence_diagram.json",
             skip_preprocessing=True,
             rng_or_seed=build_random_generator(0),
+            output_dir=tmpdir,
         )
 
 
 class TestBioRatL5Tpc1:
-    def test_default(self):
+    def test_default(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
             "params1.json",
             "expected_bio_rat_L5_TPC_B_with_params1.h5",
             "expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json",
+            output_dir=tmpdir,
         )
 
-    def test_with_rng(self):
+    def test_with_rng(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
@@ -564,9 +590,10 @@ class TestBioRatL5Tpc1:
             "expected_bio_rat_L5_TPC_B_with_params1.h5",
             "expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json",
             rng_or_seed=build_random_generator(0),
+            output_dir=tmpdir,
         )
 
-    def test_skip_preprocessing(self):
+    def test_skip_preprocessing(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
@@ -574,9 +601,10 @@ class TestBioRatL5Tpc1:
             "expected_bio_rat_L5_TPC_B_with_params1.h5",
             "expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json",
             skip_preprocessing=True,
+            output_dir=tmpdir,
         )
 
-    def test_skip_rng_and_preprocessing(self):
+    def test_skip_rng_and_preprocessing(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
@@ -585,20 +613,22 @@ class TestBioRatL5Tpc1:
             "expected_bio_rat_L5_TPC_B_with_params1_persistence_diagram.json",
             skip_preprocessing=True,
             rng_or_seed=build_random_generator(0),
+            output_dir=tmpdir,
         )
 
 
 class TestBioRatL5Tpc2:
-    def test_default(self):
+    def test_default(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
             "params2.json",
             "expected_bio_rat_L5_TPC_B_with_params2.h5",
             "expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json",
+            output_dir=tmpdir,
         )
 
-    def test_with_rng(self):
+    def test_with_rng(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
@@ -606,9 +636,10 @@ class TestBioRatL5Tpc2:
             "expected_bio_rat_L5_TPC_B_with_params2.h5",
             "expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json",
             rng_or_seed=build_random_generator(0),
+            output_dir=tmpdir,
         )
 
-    def test_skip_preprocessing(self):
+    def test_skip_preprocessing(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
@@ -616,9 +647,10 @@ class TestBioRatL5Tpc2:
             "expected_bio_rat_L5_TPC_B_with_params2.h5",
             "expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json",
             skip_preprocessing=True,
+            output_dir=tmpdir,
         )
 
-    def test_skip_rng_and_preprocessing(self):
+    def test_skip_rng_and_preprocessing(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
@@ -627,20 +659,22 @@ class TestBioRatL5Tpc2:
             "expected_bio_rat_L5_TPC_B_with_params2_persistence_diagram.json",
             skip_preprocessing=True,
             rng_or_seed=build_random_generator(0),
+            output_dir=tmpdir,
         )
 
 
 class TestBioRatL5Tpc3:
-    def test_default(self):
+    def test_default(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
             "params3.json",
             "expected_bio_rat_L5_TPC_B_with_params3.h5",
             "expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json",
+            output_dir=tmpdir,
         )
 
-    def test_with_rng(self):
+    def test_with_rng(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
@@ -648,9 +682,10 @@ class TestBioRatL5Tpc3:
             "expected_bio_rat_L5_TPC_B_with_params3.h5",
             "expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json",
             rng_or_seed=build_random_generator(0),
+            output_dir=tmpdir,
         )
 
-    def test_skip_preprocessing(self):
+    def test_skip_preprocessing(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
@@ -658,9 +693,10 @@ class TestBioRatL5Tpc3:
             "expected_bio_rat_L5_TPC_B_with_params3.h5",
             "expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json",
             skip_preprocessing=True,
+            output_dir=tmpdir,
         )
 
-    def test_skip_rng_and_preprocessing(self):
+    def test_skip_rng_and_preprocessing(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
@@ -669,20 +705,22 @@ class TestBioRatL5Tpc3:
             "expected_bio_rat_L5_TPC_B_with_params3_persistence_diagram.json",
             skip_preprocessing=True,
             rng_or_seed=build_random_generator(0),
+            output_dir=tmpdir,
         )
 
 
 class TestBioRatL5Tpc4:
-    def test_default(self):
+    def test_default(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
             "params4.json",
             "expected_bio_rat_L5_TPC_B_with_params4.h5",
             "expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json",
+            output_dir=tmpdir,
         )
 
-    def test_with_rng(self):
+    def test_with_rng(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
@@ -690,9 +728,10 @@ class TestBioRatL5Tpc4:
             "expected_bio_rat_L5_TPC_B_with_params4.h5",
             "expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json",
             rng_or_seed=build_random_generator(0),
+            output_dir=tmpdir,
         )
 
-    def test_skip_preprocessing(self):
+    def test_skip_preprocessing(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
@@ -700,9 +739,10 @@ class TestBioRatL5Tpc4:
             "expected_bio_rat_L5_TPC_B_with_params4.h5",
             "expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json",
             skip_preprocessing=True,
+            output_dir=tmpdir,
         )
 
-    def test_skip_rng_and_preprocessing(self):
+    def test_skip_rng_and_preprocessing(self, tmpdir):
         _test_full(
             "path_distances",
             "bio_rat_L5_TPC_B_distribution.json",
@@ -711,4 +751,5 @@ class TestBioRatL5Tpc4:
             "expected_bio_rat_L5_TPC_B_with_params4_persistence_diagram.json",
             skip_preprocessing=True,
             rng_or_seed=build_random_generator(0),
+            output_dir=tmpdir,
         )
