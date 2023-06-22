@@ -352,7 +352,7 @@ def trunk_to_spherical_angles(trunk_angles, z_angles, phi_interval=None):
     z_angles = np.asarray(z_angles)
 
     n_angles = len(trunk_angles)
-    sorted_ids = np.argsort(trunk_angles)
+    sorted_ids = np.argsort(trunk_angles, kind="stable")
 
     sorted_phi_devs = trunk_angles[sorted_ids]
 
@@ -376,7 +376,7 @@ def trunk_absolute_orientation_to_spherical_angles(orientation, trunk_absolute_a
         tuple[numpy.ndarray[float], numpy.ndarray[float]]: The phi and theta angles.
     """
     # Sort angles
-    sort_ids = np.argsort(trunk_absolute_angles)
+    sort_ids = np.argsort(trunk_absolute_angles, kind="stable")
     sorted_phis = np.asarray(trunk_absolute_angles)[sort_ids]
     sorted_thetas = np.asarray(z_angles)[sort_ids]
 
