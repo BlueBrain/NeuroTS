@@ -158,7 +158,8 @@
                                                                 }
                                                             ]
                                                         }
-                                                    }
+                                                    },
+                                                    "required": ["mean", "std"]
                                                 }
                                             },
                                             "additionalProperties": false,
