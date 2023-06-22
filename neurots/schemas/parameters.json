@@ -121,9 +121,11 @@
                                         {
                                             "type": "object",
                                             "properties": {
+                                                "additionalProperties": false,
                                                 "direction": {
                                                     "type": "object",
                                                     "properties": {
+                                                        "additionalProperties": false,
                                                         "mean": {
                                                             "oneOf": [
                                                                 {
@@ -349,6 +351,10 @@
                 "type": "string"
             },
             "type": "array"
+        },
+        "pia_direction":{
+            "$ref": "#/definitions/point",
+            "description": "Pia direction"
         },
         "origin": {
             "$ref": "#/definitions/point",
