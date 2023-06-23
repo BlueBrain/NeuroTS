@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.4.0](https://github.com/BlueBrain/NeuroTS/compare/3.3.2..3.4.0)
+
+> 23 June 2023
+
+### Build
+
+- Relax numpy max version (Adrien Berchet - [#72](https://github.com/BlueBrain/NeuroTS/pull/72))
+
+### Fixes
+
+- Allow for normal_pia to have any pia direction (Alexis Arnaudon - [#70](https://github.com/BlueBrain/NeuroTS/pull/70))
+- Relax soma/first point check (Alexis Arnaudon - [#68](https://github.com/BlueBrain/NeuroTS/pull/68))
+
+### CI Improvements
+
+- Add template for issues and pull requests (Adrien Berchet - [#73](https://github.com/BlueBrain/NeuroTS/pull/73))
+
 ## [3.3.2](https://github.com/BlueBrain/NeuroTS/compare/3.3.1..3.3.2)
 
 > 4 May 2023
