@@ -1,21 +1,21 @@
-# SETUPTOOLS
 [build-system]
 requires = [
-    "setuptools>=42",
-    "wheel",
-    "setuptools_scm[toml]>=3.4",
+    "setuptools>=45",
+    "setuptools_scm[toml]>=6.2",
 ]
 build-backend = "setuptools.build_meta"
 
-# BLACK
+[tool.setuptools_scm]
+
 [tool.black]
 line-length = 100
 target-version = [
     "py38",
     "py39",
+    "py310",
+    "py311",
 ]
 
-# PYDOCSTYLE
 [tool.pydocstyle]
 # ignore the following:
 #   - D107: Missing docstring in __init__
@@ -25,13 +25,11 @@ add-ignore = [
 convention = "google"
 match = 'neurots\/.*\.py$|docs\/source\/conf\.py$|setup\.py$|examples\/.*.py$'
 
-# ISORT
 [tool.isort]
 profile = "black"
 line_length = 100
 force_single_line = true
 
-# PYTEST
 [tool.pytest.ini_options]
 testpaths = [
     "tests",
