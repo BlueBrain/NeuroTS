@@ -245,7 +245,7 @@ class TMDApicalAlgo(TMDAlgo):
             self.apical_point_distance_from_soma = selected_length - 10 * step_size
         return stop, num_sec
 
-    def bifurcate(self, current_section):
+    def bifurcate(self, current_section, two_major=0):
         """When the section bifurcates two new sections need to be created.
 
         This method computes from the current state the data required for the
@@ -261,13 +261,19 @@ class TMDApicalAlgo(TMDAlgo):
 
         if current_section.process == "major":
             dir1, dir2 = bif_methods["directional"](current_section.direction, angles=ang)
+            if two_major:
+                dir2 = dir1 + np.array([0.5, 0, 0])
+                dir1 = dir1 - np.array([0.5, 0, 0])
 
             if not self._found_last_bif:
                 self.apical_section = current_section.id
 
             if current_pd <= self.apical_point_distance_from_soma:
                 process1 = "major"
-                process2 = "secondary"
+                if two_major:
+                    process2 = "major"
+                else:
+                    process2 = "secondary"
             else:
                 process1 = "secondary"
                 process2 = "secondary"

@@ -118,7 +118,7 @@ class SectionGrower:
         direction = self.params.targeting * self.direction + self.params.history * self.history()
 
         direction = direction / vectorial_norm(direction)
-        seg_length = self.step_size_distribution.draw_positive()
+        seg_length = 1.0  # self.step_size_distribution.draw_positive()
         point = self.last_point + seg_length * direction
         self.update_pathlength(seg_length)
 
