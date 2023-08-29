@@ -74,7 +74,7 @@ def parameters(
                 "growth_method": method,
                 "branching_method": branching,
                 "modify": None,
-                "step_size": {"norm": {"mean": 1.0, "std": 0.2}},
+                "step_size": {"norm": {"mean": 1.0, "std": 0.0}},
                 "metric": feature,
             }
         )

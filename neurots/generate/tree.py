@@ -120,7 +120,7 @@ class TreeGrower:
         self.active_sections = []
         self.context = context
         self._rng = random_generator
-        self.two_major = 1  # local hack to have two major branches in first bif
+        self.two_major = parameters.get('two_major', False)  # local hack to have two major branches in first bif
 
         # Creates the distribution from which the segment lengths
         # To sample a new seg_len call self.seg_len.draw()
