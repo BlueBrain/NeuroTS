@@ -160,7 +160,7 @@ class TMDAlgo(AbstractAlgo):
 
         return stop, num_sec
 
-    def bifurcate(self, current_section, two_major=False):
+    def bifurcate(self, current_section, two_major=False):  # pylint: disable=unused-argument
         """When the section bifurcates two new sections need to be created.
 
         This method computes from the current state the data required for the
