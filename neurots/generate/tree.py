@@ -120,7 +120,9 @@ class TreeGrower:
         self.active_sections = []
         self.context = context
         self._rng = random_generator
-        self.two_major = parameters.get("two_major", False)
+        self.two_major = parameters.get(
+            "two_major", False
+        )  # local hack to have two major branches in first bif
 
         # Creates the distribution from which the segment lengths
         # To sample a new seg_len call self.seg_len.draw()
@@ -270,7 +272,7 @@ class TreeGrower:
                         # Copy the final normed direction of parent to all children
                         child.latest_directions.append(latest)
                         # Generate the first point of the section
-                        # child.first_point()
+                        child.first_point()
                     self.active_sections.remove(section_grower)
 
                 elif state == "terminate":
@@ -281,3 +283,6 @@ class TreeGrower:
                 # TODO: Can the state be something else than "bifurcate" or "terminate" here?
                 # If not we could add an else statement to raise a warning or an exception if the
                 # value is anything else.
+            elif state == "continue":
+                # we need this so that the pathlenght match due the child.first_point() in bifs
+                section_grower.next()
