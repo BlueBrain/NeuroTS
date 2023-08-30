@@ -277,3 +277,6 @@ class TreeGrower:
                 # TODO: Can the state be something else than "bifurcate" or "terminate" here?
                 # If not we could add an else statement to raise a warning or an exception if the
                 # value is anything else.
+            else:
+                # we need this so that the pathlenght match due the child.first_point() in bifs
+                section_grower.next()
