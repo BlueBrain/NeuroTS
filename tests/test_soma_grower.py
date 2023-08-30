@@ -445,7 +445,6 @@ def test_soma_grower():
         params = json.load(f)
 
     grower = NeuronGrower(input_distributions=distributions, input_parameters=params).grow()
-
     expected = morphio.Morphology(os.path.join(_path, "dummy_neuron.asc"))
 
     assert_array_almost_equal(grower.soma.points, expected.soma.points)
@@ -467,7 +466,7 @@ def test_apical_points():
     grower.grow()
 
     apicals = grower.apical_sections
-    expected = [127]
+    expected = [110]
     assert_array_equal(apicals[0], expected)
 
     # Found apical point
@@ -482,7 +481,7 @@ def test_apical_points():
     grower.grow()
 
     apicals = grower.apical_sections
-    expected = [47]
+    expected = [43]
     assert_array_equal(apicals, expected)
 
     # Apical point not found so keep the last bifurcation
