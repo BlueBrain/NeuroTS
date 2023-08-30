@@ -120,9 +120,6 @@ class TreeGrower:
         self.active_sections = []
         self.context = context
         self._rng = random_generator
-        self.two_major = parameters.get(
-            "two_major", False
-        )  # local hack to have two major branches in first bif
 
         # Creates the distribution from which the segment lengths
         # To sample a new seg_len call self.seg_len.draw()
@@ -262,10 +259,7 @@ class TreeGrower:
                     section_grower.id = section.id
                     # the current section_grower bifurcates
                     # Returns two section_grower dictionaries: (S1, S2)
-                    for child_section in self.growth_algo.bifurcate(
-                        section_grower, two_major=self.two_major
-                    ):
-                        self.two_major = 0
+                    for child_section in self.growth_algo.bifurcate(section_grower):
                         child = self.add_section(
                             parent=section, pathlength=section_grower.pathlength, **child_section
                         )

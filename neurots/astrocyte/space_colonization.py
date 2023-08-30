@@ -412,7 +412,7 @@ class SpaceColonization(TMDAlgo):
 
         return persistence
 
-    def bifurcate(self, current_section, two_major=False):  # pylint: disable=unused-argument
+    def bifurcate(self, current_section):
         """When the section bifurcates two new sections need to be created.
 
         This method computes from the current state the data required for the

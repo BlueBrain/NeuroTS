@@ -160,7 +160,7 @@ class TMDAlgo(AbstractAlgo):
 
         return stop, num_sec
 
-    def bifurcate(self, current_section, two_major=False):  # pylint: disable=unused-argument
+    def bifurcate(self, current_section):
         """When the section bifurcates two new sections need to be created.
 
         This method computes from the current state the data required for the
@@ -245,7 +245,7 @@ class TMDApicalAlgo(TMDAlgo):
             self.apical_point_distance_from_soma = selected_length - 10 * step_size
         return stop, num_sec
 
-    def bifurcate(self, current_section, two_major=False):
+    def bifurcate(self, current_section):
         """When the section bifurcates two new sections need to be created.
 
         This method computes from the current state the data required for the
@@ -261,18 +261,13 @@ class TMDApicalAlgo(TMDAlgo):
 
         if current_section.process == "major":
             dir1, dir2 = bif_methods["directional"](current_section.direction, angles=ang)
-            if two_major:
-                dir2 = dir1
 
             if not self._found_last_bif:
                 self.apical_section = current_section.id
 
             if current_pd <= self.apical_point_distance_from_soma:
                 process1 = "major"
-                if two_major:
-                    process2 = "major"
-                else:
-                    process2 = "secondary"
+                process2 = "secondary"
             else:
                 process1 = "secondary"
                 process2 = "secondary"
@@ -312,7 +307,7 @@ class TMDGradientAlgo(TMDApicalAlgo):
             return "major", direct / norm(direct)
         return process, input_dir
 
-    def bifurcate(self, current_section, two_major=False):
+    def bifurcate(self, current_section):
         """When the section bifurcates two new sections need to be created.
 
         This method computes from the current state the data required for the
@@ -321,7 +316,7 @@ class TMDGradientAlgo(TMDApicalAlgo):
         Returns:
             tuple[dict, dict]: Two dictionaries containing the two children sections data.
         """
-        s1, s2 = super().bifurcate(current_section, two_major=two_major)
+        s1, s2 = super().bifurcate(current_section)
 
         if s1["process"] != "major":
             s1["process"], s1["direction"] = self._majorize_process(
