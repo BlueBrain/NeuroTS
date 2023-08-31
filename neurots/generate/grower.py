@@ -21,8 +21,8 @@ import logging
 
 import numpy as np
 from diameter_synthesis import build_diameters
-from morphio.mut import Morphology
 from morphio import SomaType
+from morphio.mut import Morphology
 from numpy.random import BitGenerator
 from numpy.random import Generator
 from numpy.random import RandomState
