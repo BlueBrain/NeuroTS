@@ -248,7 +248,20 @@ class TreeGrower:
         for section_grower in ordered_sections:
             # the current section_grower is generated
             # In here the stop criterion can be modified accordingly
+
+            if "cut_major_length" in self.params:
+                # this makes an early termination of major branch
+                # it needs to revert the value after getting the state to preserve
+                # the original topology
+                if section_grower.process == "major":
+                    _term = section_grower.stop_criteria["TMD"].term
+                    section_grower.stop_criteria["TMD"].term = self.params["cut_major_length"]
+
             state = self.growth_algo.extend(section_grower)
+
+            if "cut_major_length" in self.params:
+                if section_grower.process == "major":
+                    section_grower.stop_criteria["TMD"].term = _term
 
             if state != "continue":
                 section = self.append_section(section_grower)
