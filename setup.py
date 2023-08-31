@@ -23,7 +23,7 @@ from setuptools import setup
 reqs = [
     "jsonschema>=3.0.1",
     "matplotlib>=3.4",
-    "morphio>=3.3.4,<4.0",
+    "morphio>=3.3.6,<4.0",
     "neurom>=3.0,<4.0",
     "numpy>=1.22.0",
     "scipy>=1.6",
