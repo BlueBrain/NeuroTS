@@ -22,6 +22,7 @@ import logging
 import numpy as np
 from diameter_synthesis import build_diameters
 from morphio.mut import Morphology
+from morphio import SomaType
 from numpy.random import BitGenerator
 from numpy.random import Generator
 from numpy.random import RandomState
@@ -407,3 +408,8 @@ class NeuronGrower:
         points, diameters = self.soma_grower.build(soma_type)
         self.neuron.soma.points = points
         self.neuron.soma.diameters = diameters
+
+        if soma_type == "contour":
+            self.neuron.soma.type = SomaType.SOMA_SIMPLE_CONTOUR
+        if soma_type == "one_point":
+            self.neuron.soma.type = SomaType.SOMA_SINGLE_POINT
