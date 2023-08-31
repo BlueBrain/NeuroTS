@@ -409,12 +409,7 @@ class NeuronGrower:
         self.neuron.soma.points = points
         self.neuron.soma.diameters = diameters
 
-        try:
-            # see https://github.com/BlueBrain/NeuroTS/issues/76
-            if soma_type == "contour":
-                self.neuron.soma.type = SomaType.SOMA_SIMPLE_CONTOUR
-            if soma_type == "one_point":
-                self.neuron.soma.type = SomaType.SOMA_SINGLE_POINT
-        except AttributeError:
-            # astrocytes don't allow this
-            pass
+        if soma_type == "contour":
+            self.neuron.soma.type = SomaType.SOMA_SIMPLE_CONTOUR
+        if soma_type == "one_point":
+            self.neuron.soma.type = SomaType.SOMA_SINGLE_POINT
