@@ -55,18 +55,17 @@ jobs:
       with:
         report_paths: 'reports/pytest-*.xml'
     - name: Upload to codecov
-      if: ${{matrix.python-version == '3.9'}}
       uses: codecov/codecov-action@v3
       with:
         fail_ci_if_error: false
         files: ./coverage.xml
         flags: pytest
-        name: "NeuroTS-py${{ matrix.python-version }}"
+        name: "NeuroTS-py${{ matrix.python-version }}-${{ matrix.min_versions }}"
     - name: Upload test artifacts
       uses: actions/upload-artifact@v3
       if: always()
       with:
-        name: tests-${{ matrix.python-version }}
+        name: tests-${{ matrix.python-version }}-${{ matrix.min_versions }}
         retention-days: 4
         path: |
           .tox/py*/tmp
