@@ -104,32 +104,36 @@ class SectionGrower:
 
         If a context is present, an accept-reject mechanisms will be used to alter the next point.
         """
-        if self.context is not None and "boundaries" in self.context:  # pragma: no cover
-            for boundary in self.context["boundaries"]:
-                # we only consider boundary for certain neurite types
-                neurite_types = boundary.get("neurite_types", None)
-                if (
-                    self.parent is not None
-                    and neurite_types is not None
-                    and self.parent.type.name not in neurite_types
-                ):
-                    direction = self._propose()
+        if self.context is not None and "constraints" in self.context:  # pragma: no cover
 
-                elif "section_prob" in boundary:
-                    direction = accept_reject(
-                        self._propose,
-                        boundary["section_prob"],
-                        self._rng,
-                        max_tries=boundary.get("params_section", {}).get(
-                            "max_tries", DEFAULT_MAX_TRIES
-                        ),
-                        noise_increase=boundary.get("params_section", {}).get(
-                            "noise_increase", DEFAULT_NOISE_INCREASE
-                        ),
-                        current_point=current_point,
-                    )
-                else:
-                    direction = self._propose()
+            def prob(*args, **kwargs):
+                p = 1.0
+                for i, constraint in enumerate(self.context["constraints"]):
+                    p *= constraint["section_prob"](*args, **kwargs)
+                return p
+
+            max_tries = DEFAULT_MAX_TRIES
+            noise_increase = DEFAULT_NOISE_INCREASE
+            for constraint in self.context["constraints"]:
+                max_tries = max(
+                    max_tries,
+                    constraint.get("params_section", {}).get("max_tries", DEFAULT_MAX_TRIES),
+                )
+                noise_increase = max(
+                    noise_increase,
+                    constraint.get("params_section", {}).get(
+                        "noise_increase", DEFAULT_NOISE_INCREASE
+                    ),
+                )
+
+            direction = accept_reject(
+                self._propose,
+                prob,
+                self._rng,
+                max_tries=max_tries,
+                noise_increase=noise_increase,
+                current_point=current_point,
+            )
         else:
             direction = self._propose()
 
