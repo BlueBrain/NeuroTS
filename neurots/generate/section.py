@@ -108,7 +108,7 @@ class SectionGrower:
 
             def prob(*args, **kwargs):
                 p = 1.0
-                for i, constraint in enumerate(self.context["constraints"]):
+                for constraint in self.context["constraints"]:
                     p *= constraint["section_prob"](*args, **kwargs)
                 return p
 
