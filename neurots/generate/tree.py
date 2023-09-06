@@ -255,10 +255,12 @@ class TreeGrower:
                 # the original topology
                 _term = section_grower.stop_criteria["TMD"].term
                 section_grower.stop_criteria["TMD"].term = self.params["cut_major_length"]
+            else:
+                _term = None
 
             state = self.growth_algo.extend(section_grower)
 
-            if section_grower.process == "major" and "cut_major_length" in self.params:
+            if _term is not None:  # pragma: no cover
                 section_grower.stop_criteria["TMD"].term = _term
 
             if state != "continue":
