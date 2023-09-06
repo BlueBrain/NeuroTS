@@ -102,7 +102,7 @@ class SectionGrower:
     def next_point(self, current_point):
         """Returns the next point depending on the growth method and the previous point.
 
-        If a context is present, an accept-reject mechanisms will be used to alter the next point.
+        If a context is present, an accept-reject mechanism will be used to alter the next point.
         """
         if self.context is not None and "constraints" in self.context:  # pragma: no cover
 
