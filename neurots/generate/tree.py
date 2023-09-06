@@ -249,7 +249,9 @@ class TreeGrower:
             # the current section_grower is generated
             # In here the stop criterion can be modified accordingly
 
-            if section_grower.process == "major" and "cut_major_length" in self.params:  # pragma: no cover
+            if (
+                section_grower.process == "major" and "cut_major_length" in self.params
+            ):  # pragma: no cover
                 # this makes an early termination of major branch
                 # it needs to revert the value after getting the state to preserve
                 # the original topology
