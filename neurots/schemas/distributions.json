@@ -206,7 +206,7 @@
             "description": "The diameter specifications",
             "oneOf": [
                 {
-                    "additionalproperties": true,
+                    "additionalProperties": true,
                     "properties": {
                         "method": {
                             "enum": [
@@ -217,7 +217,7 @@
                     }
                 },
                 {
-                    "additionalproperties": false,
+                    "additionalProperties": false,
                     "properties": {
                         "method": {
                             "enum": [
@@ -226,12 +226,21 @@
                             "type": "string"
                         },
                         "apical_dendrite": {
+                            items": {
+                                "type": "number"
+                            },
                             "type": "array"
                         },
                         "basal_dendrite": {
+                            items": {
+                                "type": "number"
+                            },
                             "type": "array"
                         },
                         "axon": {
+                            items": {
+                                "type": "number"
+                            },
                             "type": "array"
                         }
                     }
