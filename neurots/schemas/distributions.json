@@ -206,13 +206,33 @@
             "description": "The diameter specifications",
             "oneOf": [
                 {
-                    "additionalProperties": true,
+                    "additionalproperties": true,
                     "properties": {
                         "method": {
                             "enum": [
-                                "external", "default"
+                                "external"
                             ],
                             "type": "string"
+                        }
+                    }
+                },
+                {
+                    "additionalproperties": false,
+                    "properties": {
+                        "method": {
+                            "enum": [
+                                "default"
+                            ],
+                            "type": "string"
+                        },
+                        "apical_dendrite": {
+                            "type": "array"
+                        },
+                        "basal_dendrite": {
+                            "type": "array"
+                        },
+                        "axon": {
+                            "type": "array"
                         }
                     }
                 },
