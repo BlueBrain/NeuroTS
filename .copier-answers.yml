@@ -1,6 +1,6 @@
 # Changes here will be overwritten by Copier
 
-_commit: 0.1.44
+_commit: 0.1.51
 _src_path: git@bbpgitlab.epfl.ch:neuromath/python-template.git
 author_email: ''
 author_name: Blue Brain Project, EPFL
@@ -18,8 +18,8 @@ project_url: https://NeuroTS.readthedocs.io
 repository_name: NeuroTS
 repository_namespace: BlueBrain
 repository_provider: github
+setup_codeql: false
 ssh_url: git@github.com:BlueBrain/NeuroTS.git
-support_py37: false
 team_name: neuromath
 tracker_url: https://github.com/BlueBrain/NeuroTS/issues
 use_pyproject_toml: false
