@@ -226,19 +226,19 @@
                             "type": "string"
                         },
                         "apical_dendrite": {
-                            items": {
+                            "items": {
                                 "type": "number"
                             },
                             "type": "array"
                         },
                         "basal_dendrite": {
-                            items": {
+                            "items": {
                                 "type": "number"
                             },
                             "type": "array"
                         },
                         "axon": {
-                            items": {
+                            "items": {
                                 "type": "number"
                             },
                             "type": "array"

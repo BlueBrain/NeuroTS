@@ -116,7 +116,9 @@ def parameters(
             input_parameters["diameter_params"]["neurite_types"] = diameter_parameters[
                 "neurite_types"
             ]
-    elif isinstance(diameter_parameters, dict):
+    elif isinstance(diameter_parameters, dict) and list(diameter_parameters.keys()) != [
+        "neurite_types"
+    ]:
         input_parameters["diameter_params"] = diameter_parameters
         input_parameters["diameter_params"]["method"] = "external"
     else:
