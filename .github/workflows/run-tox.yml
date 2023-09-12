@@ -58,7 +58,7 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         fail_ci_if_error: false
-        files: ./coverage.xml
+        directory: ./reports
         flags: pytest
         name: "NeuroTS-py${{ matrix.python-version }}-${{ matrix.min_versions }}"
     - name: Upload test artifacts

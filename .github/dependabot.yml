@@ -11,3 +11,6 @@ updates:
     directory: "/" # Check the repository's workflows under /.github/workflows/
     schedule:
       interval: "weekly"
+    commit-message:
+      # Prefix all commit messages with "CI(dependabot): "
+      prefix: "CI(dependabot): "
