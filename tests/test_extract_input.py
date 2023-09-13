@@ -705,6 +705,13 @@ def test_parameters():
         diameter_parameters="some_diametrizer",
     )
 
+    # test default input with custom neurite_types
+    extract_input.parameters(
+        neurite_types=["axon"],
+        method="trunk",
+        diameter_parameters={"neurite_types": "axon"},
+    )
+
 
 def test_from_TMD():
     files = sorted([os.path.join(POP_PATH, neuron_dir) for neuron_dir in os.listdir(POP_PATH)])

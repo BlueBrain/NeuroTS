@@ -104,12 +104,21 @@ def parameters(
             input_parameters["apical_dendrite"]["growth_method"] = "tmd_apical"
 
     input_parameters["diameter_params"] = {}
-    if diameter_parameters is None:
+    if isinstance(diameter_parameters, str):
+        input_parameters["diameter_params"]["method"] = diameter_parameters
+    elif diameter_parameters is None or (
+        isinstance(diameter_parameters, dict)
+        and list(diameter_parameters.keys()) == ["neurite_types"]
+    ):
         input_parameters["diameter_params"]["method"] = "default"
         input_parameters["diameter_params"]["models"] = ["simpler"]
-    elif isinstance(diameter_parameters, str):
-        input_parameters["diameter_params"]["method"] = diameter_parameters
-    elif isinstance(diameter_parameters, dict):
+        if diameter_parameters is not None:
+            input_parameters["diameter_params"]["neurite_types"] = diameter_parameters[
+                "neurite_types"
+            ]
+    elif isinstance(diameter_parameters, dict) and list(diameter_parameters.keys()) != [
+        "neurite_types"
+    ]:
         input_parameters["diameter_params"] = diameter_parameters
         input_parameters["diameter_params"]["method"] = "external"
     else:

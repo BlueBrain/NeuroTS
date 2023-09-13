@@ -210,9 +210,38 @@
                     "properties": {
                         "method": {
                             "enum": [
-                                "external", "default"
+                                "external"
                             ],
                             "type": "string"
+                        }
+                    }
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "method": {
+                            "enum": [
+                                "default"
+                            ],
+                            "type": "string"
+                        },
+                        "apical_dendrite": {
+                            "items": {
+                                "type": "number"
+                            },
+                            "type": "array"
+                        },
+                        "basal_dendrite": {
+                            "items": {
+                                "type": "number"
+                            },
+                            "type": "array"
+                        },
+                        "axon": {
+                            "items": {
+                                "type": "number"
+                            },
+                            "type": "array"
                         }
                     }
                 },
