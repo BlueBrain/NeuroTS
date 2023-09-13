@@ -1,5 +1,37 @@
 # Changelog
 
+## [3.4.2](https://github.com/BlueBrain/NeuroTS/compare/3.4.1..3.4.2)
+
+> 13 September 2023
+
+### New Features
+
+- Fix default diam distr (Alexis Arnaudon - [#83](https://github.com/BlueBrain/NeuroTS/pull/83))
+
+### Chores And Housekeeping
+
+- Apply Copier template (Adrien Berchet - [#82](https://github.com/BlueBrain/NeuroTS/pull/82))
+
+## [3.4.1](https://github.com/BlueBrain/NeuroTS/compare/3.4.0..3.4.1)
+
+> 4 September 2023
+
+### Fixes
+
+- Explicitly write soma type (Alexis Arnaudon - [#77](https://github.com/BlueBrain/NeuroTS/pull/77))
+
+### CI Improvements
+
+- Push all versions to Codecov and artifacts (Adrien Berchet - [#79](https://github.com/BlueBrain/NeuroTS/pull/79))
+
+### General Changes
+
+- Bump actions/checkout from 3 to 4 (dependabot[bot] - [#80](https://github.com/BlueBrain/NeuroTS/pull/80))
+
+### Fixes
+
+- Ensure growing from bifurcation is symmetrical(#75) (Alexis Arnaudon - [c3495bb](https://github.com/BlueBrain/NeuroTS/commit/c3495bb528fd14af2f9deb60302651c473dd647e))
+
 ## [3.4.0](https://github.com/BlueBrain/NeuroTS/compare/3.3.2..3.4.0)
 
 > 23 June 2023
@@ -17,6 +49,10 @@
 
 - Add template for issues and pull requests (Adrien Berchet - [#73](https://github.com/BlueBrain/NeuroTS/pull/73))
 
+### General Changes
+
+- Release: 3.4.0 (Adrien Berchet - [#74](https://github.com/BlueBrain/NeuroTS/pull/74))
+
 ## [3.3.2](https://github.com/BlueBrain/NeuroTS/compare/3.3.1..3.3.2)
 
 > 4 May 2023
@@ -24,6 +60,10 @@
 ### Fixes
 
 - Raise clear errors for empty angles (Adrien Berchet - [#65](https://github.com/BlueBrain/NeuroTS/pull/65))
+
+### General Changes
+
+- Release: 3.3.2 (Adrien Berchet - [#66](https://github.com/BlueBrain/NeuroTS/pull/66))
 
 ## [3.3.1](https://github.com/BlueBrain/NeuroTS/compare/3.3.0..3.3.1)
 
@@ -67,6 +107,7 @@
 
 ### General Changes
 
+- Release: 3.3.0 (Alexis Arnaudon - [#59](https://github.com/BlueBrain/NeuroTS/pull/59))
 - Use diameter-synthesis by default (Alexis Arnaudon - [#47](https://github.com/BlueBrain/NeuroTS/pull/47))
 - Fix schemas and tests (Adrien Berchet - [#44](https://github.com/BlueBrain/NeuroTS/pull/44))
 
@@ -104,6 +145,7 @@
 
 ### General Changes
 
+- Release 3.1.1 (Adrien Berchet - [#21](https://github.com/BlueBrain/NeuroTS/pull/21))
 - Setup CodeCov (Adrien Berchet - [#20](https://github.com/BlueBrain/NeuroTS/pull/20))
 
 <!-- auto-changelog-above -->
