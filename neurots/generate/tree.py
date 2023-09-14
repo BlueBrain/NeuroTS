@@ -223,7 +223,7 @@ class TreeGrower:
             data = {
                 "parent": section.parent.id if section.parent else None,
                 "coord": np.vstack(section.points).tolist(),
-                "radius": [self.params["radius"] * 2] * len(section.points),
+                "radius": [0.5] * len(section.points),
                 "type": int(SectionType(self.params["tree_type"])),
             }
             L.debug("appended_data=%s", json.dumps(data))
@@ -231,7 +231,7 @@ class TreeGrower:
         return append_fun(
             PointLevel(
                 np.array(section.points).tolist(),
-                [self.params["radius"] * 2] * len(section.points),
+                [1] * len(section.points),
             ),
             SectionType(self.params["tree_type"]),
         )
