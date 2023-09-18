@@ -250,13 +250,13 @@ class TreeGrower:
             # In here the stop criterion can be modified accordingly
 
             if (
-                section_grower.process == "major" and "cut_major_length" in self.params
+                section_grower.process == "major" and "major_termination_length" in self.params
             ):  # pragma: no cover
                 # this makes an early termination of major branch
                 # it needs to revert the value after getting the state to preserve
                 # the original topology
                 _term = section_grower.stop_criteria["TMD"].term
-                section_grower.stop_criteria["TMD"].term = self.params["cut_major_length"]
+                section_grower.stop_criteria["TMD"].term = self.params["major_termination_length"]
             else:
                 _term = None
 
