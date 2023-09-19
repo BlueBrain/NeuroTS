@@ -98,9 +98,29 @@ def point_to_section_segment(neuron, point, rtol=1e-05, atol=1e-08):
 
 
 def accept_reject(
-    propose, probability, rng, null=None, max_tries=100, noise_increase=0.5, **probability_kwargs
+    propose,
+    probability,
+    rng,
+    default_propose=None,
+    max_tries=100,
+    noise_increase=0.5,
+    **probability_kwargs,
 ):
-    """Generic accept/reject algorithm."""
+    """Generic accept/reject algorithm.
+
+    Args:
+        propose (callable): function to propose a move, which has an 'noise' argument to allow
+            for increasing randomness and faster acceptance (to allow sharp turns, etc...)
+        probability (callable): function to compute probability, first arg is the poposal (output of
+            `propose` function), and takes extra kwargs via `probability_kwargs`
+        rng (np.random._generator.Generator): random number generator
+        default_propose (callable): function to use if we cannot accept a proposal,
+            if None, propose is used
+        max_tries (int): maximum number of tries to accept before `default_propose` is called
+        noise_increase (float): increase of noise amplitude after each try
+        probability_kwargs (dict): parameters for `probability` function
+
+    """
     n_tries = 0
     while n_tries < max_tries:
         proposal = propose(n_tries * noise_increase)
@@ -113,9 +133,9 @@ def accept_reject(
             return proposal
         n_tries += 1
     warnings.warn(
-        "We could not sample from distribution, so we take a random point. "
-        "Consider checking the given probability distribution."
+        "We could not sample from distribution, we take a random point unless a 'default_propose' "
+        "function is provided. Consider checking the given probability distribution."
     )
-    if null is not None:
-        return null()
+    if default_propose is not None:
+        return default_propose()
     return proposal
