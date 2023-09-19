@@ -117,19 +117,19 @@ def test_accept_reject():
             return 1.0
         return 0.0
 
-    def null():
+    def default_propose():
         return -1.0
 
     # check we always return 1
     for _ in range(10):
-        val = utils.accept_reject(propose, prob, rng, null=null)
+        val = utils.accept_reject(propose, prob, rng, default_propose=default_propose)
         assert val == 1.0
 
     def propose_null(_):
         return 0.0
 
-    # check if we attain max_tries we return null = -1
-    val = utils.accept_reject(propose_null, prob, rng, null=null)
+    # check if we attain max_tries we return default_propose = -1
+    val = utils.accept_reject(propose_null, prob, rng, default_propose=default_propose)
     assert val == -1.0
 
     # check if we attain max_tries we return random
