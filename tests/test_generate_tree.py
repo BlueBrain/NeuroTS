@@ -88,6 +88,30 @@ def test_TreeGrower():
         )
 
 
+def test_TreeGrower_termination_length():
+    np.random.seed(0)
+    with open(os.path.join(_path, "bio_distribution.json"), encoding="utf-8") as f:
+        distributions = json.load(f)
+
+    with open(os.path.join(_path, "bio_path_params.json"), encoding="utf-8") as f:
+        params = json.load(f)
+
+    params["apical_dendrite"]["major_termination_length"] = 200
+    grower = NeuronGrower(input_distributions=distributions, input_parameters=params)
+    grower.grow()
+
+    # Test order_per_process()
+    sections = [i.active_sections[0] for i in grower.active_neurites]
+    for num, i in enumerate(sections):
+        i.process = str(len(sections) - num - 1)
+    res = TreeGrower.order_per_process(sections)
+    for num, i in enumerate(res):
+        assert i == sections[len(sections) - num - 1], (
+            i,
+            sections[len(sections) - num - 1],
+        )
+
+
 def test_TreeGrower_3d_angles():
     np.random.seed(0)
     with open(os.path.join(_path, "bio_distribution_3d_angles.json"), encoding="utf-8") as f:

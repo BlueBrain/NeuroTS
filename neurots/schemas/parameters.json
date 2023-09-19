@@ -45,6 +45,12 @@
                     ],
                     "type": "string"
                 },
+                "major_termination_length": {
+                    "description": "Termination length of major branches, to use mostly for main axon to connect to long-range axon",
+                    "type": "number",
+                    "minimum": 0
+                },
+
                 "has_apical_tuft": {
                     "description": "Select True if the tree is an apical and is expected to have a tuft",
                     "type": "boolean"
