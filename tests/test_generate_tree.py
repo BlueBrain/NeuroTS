@@ -98,7 +98,7 @@ def test_TreeGrower_termination_length():
 
     params["apical_dendrite"]["major_termination_length"] = 200
     grower = NeuronGrower(input_distributions=distributions, input_parameters=params)
-    grower._grow_soma()
+    grower.grow()
 
     # Test order_per_process()
     sections = [i.active_sections[0] for i in grower.active_neurites]
