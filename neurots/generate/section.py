@@ -104,7 +104,7 @@ class SectionGrower:
 
         If a context is present, an accept-reject mechanism will be used to alter the next point.
         """
-        if self.context is not None and "constraints" in self.context:  # pragma: no cover
+        if self.context is not None and self.context.get("constraints", []):  # pragma: no cover
 
             def prob(*args, **kwargs):
                 p = 1.0

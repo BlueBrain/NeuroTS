@@ -166,7 +166,7 @@ class TreeGrower:
         SGrower = section_growers[self.params["metric"]]
         context = copy.deepcopy(self.context)
         if self.context is not None and "constraints" in self.context:  # pragma: no cover
-            constraints = [
+            context["constraints"] = [
                 constraint
                 for constraint in self.context["constraints"]
                 if "section_prob" in constraint
@@ -174,10 +174,6 @@ class TreeGrower:
                 in constraint.get("neurite_types", [])
                 and process in constraint.get("processes", ["major", "secondary"])
             ]
-            if constraints:
-                context["constraints"] = constraints
-            else:
-                del context["constraints"]
 
         sec_grower = SGrower(
             parent=parent,
