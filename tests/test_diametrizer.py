@@ -425,7 +425,7 @@ def test_build_unknown_model(neu1):
         KeyError,
         match=(
             "The name of the diametrization method is unknown: 'UNKNOWN' is not in "
-            r"\['M1', 'M2', 'M3', 'M4', 'M5'\]"
+            r"\['uniform', 'M1', 'M2', 'M3', 'M4', 'M5'\]"
         ),
     ):
         diametrizer.build(neu1, None, None, "UNKNOWN")

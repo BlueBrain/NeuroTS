@@ -189,8 +189,8 @@ def test_external_diametrizer():
         os.path.join(_path, "bio_path_distribution.json"),
         os.path.join(_path, "bio_path_params.json"),
     )
-    distributions["diameter"]["method"] = "M1"
-    parameters["diameter_params"]["method"] = "M1"
+    distributions["diameter"] = {"method": "M1"}
+    parameters["diameter_params"] = {"method": "M1"}
     ng = NeuronGrower(parameters, distributions, rng_or_seed=0)
     ng.grow()
 
@@ -233,8 +233,8 @@ def test_convert_orientation2points():
         os.path.join(_path, "bio_path_distribution.json"),
         os.path.join(_path, "bio_path_params.json"),
     )
-    distributions["diameter"]["method"] = "M1"
-    parameters["diameter_params"]["method"] = "M1"
+    distributions["diameter"] = {"method": "M1"}
+    parameters["diameter_params"] = {"method": "M1"}
     ng = NeuronGrower(parameters, distributions)
 
     pts = ng._convert_orientation2points([[0, 1, 0]], 1, distributions["apical_dendrite"], {})

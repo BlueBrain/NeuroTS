@@ -99,13 +99,15 @@ def check_diameter_consistency(params, distrs):
 
 
 @register_global_validator()
-def check_deprecated_radius(params, distrs):
+def check_deprecated_radius(params, distrs):  # pylint: disable=unused-argument
+    """Check that the 'radius' parameter is not present or raise a warning."""
     grow_types = params.get("grow_types", [])
     for i in grow_types:
         neurite_type_params = params.get(i, {})
         if "radius" in neurite_type_params:
             warnings.warn(
                 f"The 'radius' parameter (in {i}) is deprecated and will be forbidden in a future "
-                "version",
+                "version, most of the time it's not used but if you want to retrieve the same "
+                "results as before please use the 'uniform' diameter model.",
                 FutureWarning,
             )

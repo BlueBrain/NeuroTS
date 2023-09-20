@@ -1,7 +1,6 @@
 {"axon": {"randomness": 0.0,
            "metric": "trunk_length",
            "targeting": 0.2,
-           "radius": 0.3,
            "num_seg": 999,
            "orientation": {
                "mode": "use_predefined",
@@ -18,4 +17,5 @@
            0.0,
            0.0],
 "grow_types": ["axon"],
-"diameter_params": {"method": "default"}}
+"diameter_params": {"method": "uniform",
+                    "axon": 0.6}}

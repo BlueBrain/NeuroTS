@@ -373,6 +373,6 @@
         }
     },
     "diameter": {
-        "method": "default"
+        "method": "uniform"
     }
 }
