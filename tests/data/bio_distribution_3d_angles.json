@@ -34940,7 +34940,7 @@
         }
     },
     "diameter": {
-        "method": "default"
+        "method": "uniform"
     },
     "soma": {
         "size": {

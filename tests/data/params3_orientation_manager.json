@@ -28,4 +28,7 @@
 "origin": [0.0,
            0.0,
            0.0],
-"diameter_params": {"method": "default"}}
+"diameter_params": {"method": "uniform",
+                    "basal_dendrite": 0.6,
+                    "apical_dendrite": 0.6,
+                    "axon": 0.6}}

@@ -355,6 +355,24 @@ def diametrize_constant_per_neurite(neuron, neurite_type=None):
             sec.diameters = mean_diam * np.ones(len(sec.diameters))
 
 
+def diametrize_uniform(neuron, neurite_type=None, *, diam_params):
+    """Set all diameters of a morphio-neuron to a given value.
+
+    Args:
+        neuron (morphio.mut.Morphology): The morphology that will be diametrized.
+        neurite_type (morphio.SectionType): Only the neurites of this type are diametrized.
+        diam_params (dict): The model parameters (should only contain a 'diameter' entry).
+    """
+    diameter = diam_params.get(neurite_type.name, None)
+    if diameter is None:
+        return
+    roots = root_section_filter(neuron, neurite_type)
+
+    for root in roots:
+        for sec in root.iter():
+            sec.diameters = diameter * np.ones(len(sec.diameters))
+
+
 def diametrize_smoothing(neuron, neurite_type=None):
     """Corrects the diameters of a morphio-neuron, by smoothing them within each section.
 
@@ -367,6 +385,7 @@ def diametrize_smoothing(neuron, neurite_type=None):
 
 
 diam_methods = {
+    "uniform": diametrize_uniform,
     "M1": diametrize_constant_per_neurite,
     "M2": diametrize_constant_per_section,
     "M3": diametrize_smoothing,

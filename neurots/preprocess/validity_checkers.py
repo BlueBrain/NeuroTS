@@ -24,6 +24,8 @@ The checkers should be registered to be executed in the preprocess step using th
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import warnings
+
 from neurots.preprocess.exceptions import NeuroTSValidationError
 from neurots.preprocess.relevance_checkers import check_min_bar_length
 from neurots.preprocess.utils import register_global_validator
@@ -94,3 +96,18 @@ def check_diameter_consistency(params, distrs):
             "Diameters methods of parameters and distributions is inconsistent:"
             + f" {method1} != {method2}"
         )
+
+
+@register_global_validator()
+def check_deprecated_radius(params, distrs):  # pylint: disable=unused-argument
+    """Check that the 'radius' parameter is not present or raise a warning."""
+    grow_types = params.get("grow_types", [])
+    for i in grow_types:
+        neurite_type_params = params.get(i, {})
+        if "radius" in neurite_type_params:
+            warnings.warn(
+                f"The 'radius' parameter (in {i}) is deprecated and will be forbidden in a future "
+                "version, most of the time it's not used but if you want to retrieve the same "
+                "results as before please use the 'uniform' diameter model.",
+                FutureWarning,
+            )

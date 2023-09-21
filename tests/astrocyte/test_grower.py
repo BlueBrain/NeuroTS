@@ -34,7 +34,6 @@ def _parameters():
             "metric": "path_distances",
             "randomness": 0.0,
             "targeting": 0.2,
-            "radius": 0.3,
             "orientation": None,
             "growth_method": "tmd_space_colonization",
             "branching_method": "bio_oriented",
@@ -48,7 +47,6 @@ def _parameters():
             "metric": "path_distances",
             "randomness": 0.0,
             "targeting": 0.2,
-            "radius": 0.3,
             "target_ids": [0, 1],
             "growth_method": "tmd_space_colonization_target",
             "branching_method": "bio_oriented",
@@ -63,7 +61,6 @@ def _parameters():
             "metric": "path_distances",
             "randomness": 0.0,
             "targeting": 0.2,
-            "radius": 0.3,
             "orientation": [[1.0, 0.0, 0.0], [0.1, 0.1, 0.1]],
             "growth_method": "tmd_space_colonization",
             "branching_method": "bio_oriented",
@@ -75,7 +72,12 @@ def _parameters():
         },
         "origin": [0.0, 0.0, 0.0],
         "grow_types": ["basal", "axon", "apical"],
-        "diameter_params": {"method": "default"},
+        "diameter_params": {
+            "method": "uniform",
+            "basal_dendrite": 0.6,
+            "apical_dendrite": 0.6,
+            "axon": 0.6,
+        },
     }
 
 
