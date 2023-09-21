@@ -34,8 +34,11 @@ from neurots.utils import NeuroTSError
 
 L = logging.getLogger("neurots")
 
-# LAMBDA: parameter that defines the slope of exponential probability
 LAMBDA = 1.0
+"""Parameter that defines the slope of exponential probability."""
+
+DEFAULT_DIAMETER = 1
+"""The default diameter used to add new sections before they are diametrized later."""
 
 growth_algorithms = {
     "tmd": tmdgrower.TMDAlgo,
@@ -230,7 +233,7 @@ class TreeGrower:
         return append_fun(
             PointLevel(
                 np.array(section.points).tolist(),
-                [1] * len(section.points),
+                [DEFAULT_DIAMETER] * len(section.points),
             ),
             SectionType(self.params["tree_type"]),
         )
