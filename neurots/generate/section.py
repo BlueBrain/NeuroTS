@@ -89,7 +89,7 @@ class SectionGrower:
         """Propose the direction for a next section point.
 
         Args:
-            extra_randomness (float): artificially increase the randomness to allow for context changes
+            extra_randomness (float): artificially increase the randomness to allow for context
         """
         direction = self.params.targeting * self.direction + self.params.history * self.history()
         if extra_randomness > -1:
@@ -107,7 +107,7 @@ class SectionGrower:
         If a context is present, an accept-reject mechanism will be used to alter the next point.
 
         Args:
-            extra_randomness (float): only used without constraints, if -1.0, no randomness is applied
+            extra_randomness (float): only used without constraints if -1.0 no randomness is applied
         """
         if self.context is not None and self.context.get("constraints", []):  # pragma: no cover
 
