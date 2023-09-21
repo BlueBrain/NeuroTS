@@ -21,7 +21,7 @@ WEIGHTS = np.exp(np.arange(1, MEMORY + 1) - MEMORY)
 
 # default parameters for accept/reject
 DEFAULT_MAX_TRIES = 100
-DEFAULT_NOISE_INCREASE = 0.5
+DEFAULT_RANDOMNESS_INCREASE = 0.5
 
 
 class SectionGrower:
@@ -85,24 +85,29 @@ class SectionGrower:
         """Increases the path distance."""
         self.pathlength += length
 
-    def _propose(self, noise=0.0):
+    def _propose(self, extra_randomness=0.0):
         """Propose the direction for a next section point.
 
         Args:
-            noise (float): artificially increase the randomness to allow for context changes
+            extra_randomness (float): artificially increase the randomness to allow for context changes
         """
-        direction = (
-            self.params.targeting * self.direction
-            + self.params.randomness * get_random_point(random_generator=self._rng) * (1.0 + noise)
-            + self.params.history * self.history()
-        )
+        direction = self.params.targeting * self.direction + self.params.history * self.history()
+        if extra_randomness > -1:
+            direction += (
+                self.params.randomness
+                * get_random_point(random_generator=self._rng)
+                * (1.0 + extra_randomness)
+            )
 
         return direction / vectorial_norm(direction)
 
-    def next_point(self, current_point):
+    def next_point(self, extra_randomness=0):
         """Returns the next point depending on the growth method and the previous point.
 
         If a context is present, an accept-reject mechanism will be used to alter the next point.
+
+        Args:
+            extra_randomness (float): only used without constraints, if -1.0, no randomness is applied
         """
         if self.context is not None and self.context.get("constraints", []):  # pragma: no cover
 
@@ -113,16 +118,16 @@ class SectionGrower:
                 return p
 
             max_tries = DEFAULT_MAX_TRIES
-            noise_increase = DEFAULT_NOISE_INCREASE
+            randomness_increase = DEFAULT_RANDOMNESS_INCREASE
             for constraint in self.context["constraints"]:
                 max_tries = max(
                     max_tries,
                     constraint.get("params_section", {}).get("max_tries", DEFAULT_MAX_TRIES),
                 )
-                noise_increase = max(
-                    noise_increase,
+                randomness_increase = max(
+                    randomness_increase,
                     constraint.get("params_section", {}).get(
-                        "noise_increase", DEFAULT_NOISE_INCREASE
+                        "randomness_increase", DEFAULT_RANDOMNESS_INCREASE
                     ),
                 )
 
@@ -131,16 +136,19 @@ class SectionGrower:
                 prob,
                 self._rng,
                 max_tries=max_tries,
-                noise_increase=noise_increase,
-                current_point=current_point,
+                randomness_increase=randomness_increase,
+                current_point=self.last_point,
             )
         else:
-            direction = self._propose()
+            direction = self._propose(extra_randomness)
 
         seg_length = self.step_size_distribution.draw_positive()
-        next_point = current_point + seg_length * direction
+        next_point = self.last_point + seg_length * direction
         self.update_pathlength(seg_length)
-        return next_point, direction
+
+        self.latest_directions.append(direction)
+        self.points.append(next_point)
+        self.post_next_point()
 
     def first_point(self):
         """Generates the first point of the section from the growth method and the previous point.
@@ -152,16 +160,7 @@ class SectionGrower:
             The growth process cannot terminate before this point, as a first point will always be
             added to an active section.
         """
-        direction = self.params.targeting * self.direction + self.params.history * self.history()
-
-        direction = direction / vectorial_norm(direction)
-        seg_length = self.step_size_distribution.draw_positive()
-        point = self.last_point + seg_length * direction
-        self.update_pathlength(seg_length)
-
-        self.latest_directions.append(direction)
-        self.points.append(point)
-        self.post_next_point()
+        self.next_point(extra_randomness=-1.0)
 
     def check_stop(self):
         """Checks if any num_seg criteria is fulfilled.
@@ -187,11 +186,7 @@ class SectionGrower:
 
     def next(self):
         """Creates one point and returns the next state: bifurcate, terminate or continue."""
-        curr_point = self.last_point
-        point, direction = self.next_point(curr_point)
-        self.latest_directions.append(direction)
-        self.points.append(point)
-        self.post_next_point()
+        self.next_point()
 
         if self.check_stop():
             return "continue"

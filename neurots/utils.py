@@ -103,7 +103,7 @@ def accept_reject(
     rng,
     default_propose=None,
     max_tries=100,
-    noise_increase=0.5,
+    randomness_increase=0.5,
     **probability_kwargs,
 ):
     """Generic accept/reject algorithm.
@@ -117,13 +117,13 @@ def accept_reject(
         default_propose (callable): function to use if we cannot accept a proposal,
             if None, propose is used
         max_tries (int): maximum number of tries to accept before `default_propose` is called
-        noise_increase (float): increase of noise amplitude after each try
+        randomness_increase (float): increase of noise amplitude after each try
         probability_kwargs (dict): parameters for `probability` function
 
     """
     n_tries = 0
     while n_tries < max_tries:
-        proposal = propose(n_tries * noise_increase)
+        proposal = propose(n_tries * randomness_increase)
         _prob = probability(proposal, **probability_kwargs)
         if _prob == 1.0:
             # this ensures we don't change rng for the tests, but its not really needed
