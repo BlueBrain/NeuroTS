@@ -317,6 +317,15 @@ def test_redefine_diameter_section(neu1):
         diametrizer.redefine_diameter_section(section, 1, 2)
 
 
+def test_build_uniform(neu2):
+    diametrizer.build(neu2, diam_method="uniform", diam_params={"basal_dendrite": 10})
+    for sec_id, sec in neu2.sections.items():
+        if sec.type == SectionType.basal_dendrite:
+            assert (sec.diameters == 10).all()
+        else:
+            assert (sec.diameters != 10).all()
+
+
 def test_build_M1(neu1):
     diametrizer.build(neu1, diam_method="M1")
     diameters = [i.diameters for i in neu1.sections.values()]
