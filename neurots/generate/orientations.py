@@ -541,7 +541,7 @@ def _fit_single_3d_angles(data, neurite_type, morph_class, fit_params=None):
     """
     _fit_params = deepcopy(FIT_3D_ANGLES_PARAMS)
     if fit_params is not None:
-        if neurite_type not in _fit_params[morph_class]:
+        if neurite_type not in _fit_params[morph_class]:  # pragma: no cover
             _fit_params[morph_class][neurite_type] = {}
         _fit_params[morph_class][neurite_type].update(fit_params)
 
