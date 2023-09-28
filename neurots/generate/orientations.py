@@ -222,7 +222,7 @@ class OrientationManager(OrientationManagerBase):
             [sample.sample_spherical_unit_vectors(rng=self._rng) for _ in range(n_orientations)]
         )
 
-    def _mode_normal_pia_constraint(self, values_dict, _):
+    def _mode_normal_pia_constraint(self, values_dict, tree_type):
         """Returns orientations using normal/exp distribution along a direction.
 
         The `direction` value should be a dict with two entries: `mean` and `std`. The mean is the
@@ -234,24 +234,35 @@ class OrientationManager(OrientationManagerBase):
 
         Pia direction can be overwritten by the parameter 'pia_direction' value.
         """
-        means = values_dict["direction"]["mean"]
-        means = means if isinstance(means, list) else [means]
-        stds = values_dict["direction"]["std"]
-        stds = stds if isinstance(stds, list) else [stds]
-        thetas = []
-        for mean, std in zip(means, stds):
-            if mean == 0:
-                if std > 0:
-                    thetas.append(np.clip(self._rng.exponential(std), 0, np.pi))
-                else:
-                    thetas.append(0)
-            else:
-                thetas.append(np.clip(self._rng.normal(mean, std), 0, np.pi))
+        n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
+        if (
+            isinstance(values_dict["direction"]["mean"], list)
+            and len(values_dict["direction"]["mean"]) == n_orientations
+        ):
+            # to force the direction of possibly 2 apicals, otherwise it is for basals
+            n_orientations = 1
 
-        phis = self._rng.uniform(0, 2 * np.pi, len(means))
-        return spherical_angles_to_pia_orientations(
-            phis, thetas, self._parameters.get("pia_direction", None)
-        )
+        angles = []
+        for _ in range(n_orientations):
+            means = values_dict["direction"]["mean"]
+            means = means if isinstance(means, list) else [means]
+            stds = values_dict["direction"]["std"]
+            stds = stds if isinstance(stds, list) else [stds]
+            thetas = []
+            for mean, std in zip(means, stds):
+                if mean == 0:
+                    if std > 0:
+                        thetas.append(np.clip(self._rng.exponential(std), 0, np.pi))
+                    else:
+                        thetas.append(0)
+                else:
+                    thetas.append(np.clip(self._rng.normal(mean, std), 0, np.pi))
+
+            phis = self._rng.uniform(0, 2 * np.pi, len(means))
+            angles += spherical_angles_to_pia_orientations(
+                phis, thetas, self._parameters.get("pia_direction", None)
+            ).tolist()
+        return np.array(angles)
 
     def _mode_pia_constraint(self, _, tree_type):
         """Create trunks from distribution of angles with pia (`[0 , 1, 0]`) direction.
