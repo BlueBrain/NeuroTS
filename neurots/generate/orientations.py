@@ -256,7 +256,6 @@ class OrientationManager(OrientationManagerBase):
             angles += spherical_angles_to_pia_orientations(
                 phis, thetas, self._parameters.get("pia_direction", None)
             ).tolist()
-        print(angles)
         return np.array(angles)
 
     def _mode_pia_constraint(self, _, tree_type):
