@@ -282,14 +282,6 @@ def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE):
     nneurites = np.asarray(
         nm.get("number_of_neurites", pop, neurite_type=neurite_type), dtype=np.int32
     )
-    # Clean the data from single basal trees cells
-    if neurite_type == nm.BASAL_DENDRITE and len(np.where(nneurites == 1)[0]) > 0:
-        nneurites[np.where(nneurites == 1)[0]] = 2
-        print(
-            "Warning, input population includes cells with single basal trees! "
-            + "The distribution has been altered to include 2 basals minimum."
-        )
-
     heights, bins = np.histogram(
         nneurites, bins=np.arange(np.min(nneurites), np.max(nneurites) + 2)
     )
