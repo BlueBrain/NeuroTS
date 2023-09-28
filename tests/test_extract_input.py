@@ -421,14 +421,14 @@ def test_number_neurites_cut_pop(POPUL):
         smallest = 0
         biggest = 1
 
-    for i in list(range(2, len(neurons[biggest].root_sections) - 1))[::-1]:
+    for i in list(range(0, len(neurons[biggest].root_sections) - 1))[::-1]:
         neurons[biggest].delete_section(neurons[biggest].root_sections[i], recursive=True)
 
     POPUL = neurom.core.population.Population(neurons)
     assert_equal(len(neurons), 2)
-    assert_equal(len(neurons[biggest].neurites), 3)
+    assert_equal(len(neurons[biggest].neurites), 1)
     assert_equal(len(neurons[smallest].neurites), 6)
-    assert_equal(len(list(POPUL.neurites)), 9)
+    assert_equal(len(list(POPUL.neurites)), 7)
     res_cut = extract_input.from_neurom.number_neurites(POPUL)
     assert_equal(res_cut, {"num_trees": {"data": {"bins": [1, 2, 3, 4], "weights": [1, 0, 0, 1]}}})
 

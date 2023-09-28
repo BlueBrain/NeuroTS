@@ -286,8 +286,8 @@ def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE, min_n_basals=1):
     if neurite_type == nm.BASAL_DENDRITE and len(np.where(nneurites == min_n_basals - 1)[0]) > 0:
         nneurites[np.where(nneurites == min_n_basals - 1)[0]] = min_n_basals
         print(
-            "Warning, input population includes cells with single basal trees! "
-            + "The distribution has been altered to include 2 basals minimum."
+            "Warning, input population includes cells with too few basal trees! "
+            + f"The distribution has been altered to include {min_n_basals} basal(s) minimum."
         )
 
     heights, bins = np.histogram(
