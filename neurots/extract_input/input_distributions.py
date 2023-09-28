@@ -48,6 +48,7 @@ def distributions(
     diameter_input_morph=None,
     feature="path_distances",
     diameter_model=None,
+    min_n_basals=1,
 ):
     """Extracts the input distributions from an input population.
 
@@ -66,6 +67,7 @@ def distributions(
             ``{<neurite type 1>: <feature 1>, ...}``.
         diameter_model (str): model for diameters, internal models are `M1`, `M2`, `M3`, `M4` and
             `M5`. Can be set to `external` for external model.
+        min_n_basals (int): minimum number of basals, if less we enforce this value (default=1)
 
     Returns:
         dict: The input distributions.
@@ -112,7 +114,7 @@ def distributions(
         nm_type = getattr(NeuriteType, neurite_type)
 
         input_distributions[neurite_type] = _append_dicts(
-            trunk_neurite(pop_nm, nm_type), number_neurites(pop_nm, nm_type)
+            trunk_neurite(pop_nm, nm_type), number_neurites(pop_nm, nm_type, min_n_basals)
         )
         if type_feature in ["path_distances", "radial_distances"]:
             _append_dicts(

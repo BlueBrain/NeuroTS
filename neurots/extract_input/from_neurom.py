@@ -255,7 +255,7 @@ def trunk_neurite(pop, neurite_type=nm.BASAL_DENDRITE, bins=30):
     return trunk_data
 
 
-def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE):
+def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE, min_n_basals=1):
     """Extract the number of trees for a specific tree type from a given population.
 
     Args:
@@ -283,11 +283,11 @@ def number_neurites(pop, neurite_type=nm.BASAL_DENDRITE):
         nm.get("number_of_neurites", pop, neurite_type=neurite_type), dtype=np.int32
     )
     # Clean the data from single basal trees cells
-    if neurite_type == nm.BASAL_DENDRITE and len(np.where(nneurites == 1)[0]) > 0:
-        nneurites[np.where(nneurites == 1)[0]] = 2
+    if neurite_type == nm.BASAL_DENDRITE and len(np.where(nneurites == min_n_basals - 1)[0]) > 0:
+        nneurites[np.where(nneurites == min_n_basals - 1)[0]] = min_n_basals
         print(
-            "Warning, input population includes cells with single basal trees! "
-            + "The distribution has been altered to include 2 basals minimum."
+            "Warning, input population includes cells with too few basal trees! "
+            + f"The distribution has been altered to include {min_n_basals} basal(s) minimum."
         )
 
     heights, bins = np.histogram(
