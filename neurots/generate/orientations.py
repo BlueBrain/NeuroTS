@@ -235,7 +235,10 @@ class OrientationManager(OrientationManagerBase):
         Pia direction can be overwritten by the parameter 'pia_direction' value.
         """
         n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
-        if len(values_dict["direction"]["mean"]) == n_orientations:
+        if (
+            isinstance(values_dict["direction"]["mean"], list)
+            and len(values_dict["direction"]["mean"]) == n_orientations
+        ):
             # to force the direction of possibly 2 apicals, otherwise it is for basals
             n_orientations = 1
 
