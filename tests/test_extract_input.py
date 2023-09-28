@@ -430,7 +430,7 @@ def test_number_neurites_cut_pop(POPUL):
     assert_equal(len(neurons[smallest].neurites), 6)
     assert_equal(len(list(POPUL.neurites)), 9)
     res_cut = extract_input.from_neurom.number_neurites(POPUL)
-    assert_equal(res_cut, {"num_trees": {"data": {"bins": [2, 3, 4], "weights": [1, 0, 1]}}})
+    assert_equal(res_cut, {"num_trees": {"data": {"bins": [1, 2, 3, 4], "weights": [1, 0, 0, 1]}}})
 
 
 def test_parameters():
