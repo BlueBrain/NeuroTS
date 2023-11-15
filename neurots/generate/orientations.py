@@ -301,8 +301,13 @@ class OrientationManager(OrientationManagerBase):
             )
             params = self._parameters[tree_type]["orientation"]["values"]["params"]
             p = _prob(val, *params)
-            if self._context is not None and "trunk_prob" in self._context:  # pragma: no cover
-                p *= self._context["trunk_prob"](proposal, self._soma.center)
+
+            if self._context is not None and self._context.get(
+                "constraints", []
+            ):  # pragma: no cover
+                for constraint in self._context["constraints"]:
+                    if "trunk_prob" in constraint:
+                        p *= constraint["trunk_prob"](proposal, self._soma.center)
             return p
 
         def default_propose():
