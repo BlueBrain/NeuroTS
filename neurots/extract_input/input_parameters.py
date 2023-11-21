@@ -69,7 +69,6 @@ def parameters(
             {
                 "randomness": 0.24,
                 "targeting": 0.14,
-                "radius": 0.3,
                 "orientation": None,
                 "growth_method": method,
                 "branching_method": branching,
