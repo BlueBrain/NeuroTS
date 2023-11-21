@@ -284,11 +284,12 @@ class TestDistributions:
         assert_equal(
             set(distr.keys()), {"soma", "basal_dendrite", "apical_dendrite", "axon", "diameter"}
         )
-        distr_legacy = extract_input.distributions(
-            filename,
-            feature="radial_distances",
-            neurite_types=["basal_dendrite", "apical_dendrite", "axon"],
-        )
+        with pytest.warns(DeprecationWarning):
+            distr_legacy = extract_input.distributions(
+                filename,
+                feature="radial_distances",
+                neurite_types=["basal", "apical", "axon"],
+            )
         assert_equal(
             set(distr_legacy.keys()),
             {"soma", "basal_dendrite", "apical_dendrite", "axon", "diameter"},
@@ -471,11 +472,12 @@ def test_parameters():
     }
     assert_equal(params, expected_params)
 
-    legacy_params = extract_input.parameters(
-        neurite_types=["basal_dendrite", "apical_dendrite"],
-        method="tmd",
-        feature="radial_distances",
-    )
+    with pytest.warns(DeprecationWarning):
+        legacy_params = extract_input.parameters(
+            neurite_types=["basal", "apical"],
+            method="tmd",
+            feature="radial_distances",
+        )
     assert_equal(legacy_params, expected_params)
 
     default_params = extract_input.parameters(method="tmd", feature="radial_distances")
