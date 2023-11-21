@@ -197,7 +197,7 @@
                     "description": "Defines the target orientation of a tree, as it emanates from the soma"
                 },
                 "radius": {
-                    "description": "Defines the radius of the tree. If default diameter is chosen, diameter will be constant. If external diametrization is used, the radius value is not important",
+                    "description": "[Deprecated] Defines the radius of the tree. If default diameter is chosen, diameter will be constant. If external diametrization is used, the radius value is not important",
                     "minimum": 0,
                     "type": "number"
                 },

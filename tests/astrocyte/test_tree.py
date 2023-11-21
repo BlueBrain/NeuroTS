@@ -36,9 +36,9 @@ def test_tree_grower_space_colonization_constructor():
     grower_distributions = _distributions()
     grower_parameters = _parameters()
     grower_context = SpaceColonizationContext(_context())
-    tree_parameters = grower_parameters["basal"]
+    tree_parameters = grower_parameters["basal_dendrite"]
     tree_parameters["origin"] = np.zeros(3)
-    tree_distributions = grower_distributions["basal"]
+    tree_distributions = grower_distributions["basal_dendrite"]
 
     tree_grower = TreeGrowerSpaceColonization(
         neuron,

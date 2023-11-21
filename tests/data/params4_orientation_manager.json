@@ -7,7 +7,6 @@
                 "mode": "use_predefined",
                 "values": {"orientations": [[0.0,1.0,0.0]]}
             },
-            "radius": 0.3,
             "randomness": 0.15,
             "targeting": 0.12,
             "tree_type": 4,
@@ -21,7 +20,6 @@
               "mode": "sample_pairwise_angles",
               "values": null
           },
-          "radius": 0.3,
           "randomness": 0.15,
           "targeting": 0.12,
           "tree_type": 3,

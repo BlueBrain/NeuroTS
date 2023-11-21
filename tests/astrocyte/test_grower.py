@@ -30,7 +30,7 @@ _path = Path(__file__).parent / "data"
 
 def _parameters():
     return {
-        "basal": {
+        "basal_dendrite": {
             "metric": "path_distances",
             "randomness": 0.0,
             "targeting": 0.2,
@@ -57,7 +57,7 @@ def _parameters():
             "barcode_scaling": False,
             "bias": 0.9,
         },
-        "apical": {
+        "apical_dendrite": {
             "metric": "path_distances",
             "randomness": 0.0,
             "targeting": 0.2,
@@ -71,7 +71,7 @@ def _parameters():
             "barcode_scaling": False,
         },
         "origin": [0.0, 0.0, 0.0],
-        "grow_types": ["basal", "axon", "apical"],
+        "grow_types": ["basal_dendrite", "axon", "apical_dendrite"],
         "diameter_params": {
             "method": "uniform",
             "basal_dendrite": 0.6,

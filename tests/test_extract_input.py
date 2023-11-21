@@ -285,7 +285,9 @@ class TestDistributions:
             set(distr.keys()), {"soma", "basal_dendrite", "apical_dendrite", "axon", "diameter"}
         )
         distr_legacy = extract_input.distributions(
-            filename, feature="radial_distances", neurite_types=["basal", "apical", "axon"]
+            filename,
+            feature="radial_distances",
+            neurite_types=["basal_dendrite", "apical_dendrite", "axon"],
         )
         assert_equal(
             set(distr_legacy.keys()),
@@ -470,7 +472,7 @@ def test_parameters():
     assert_equal(params, expected_params)
 
     legacy_params = extract_input.parameters(
-        neurite_types=["basal", "apical"],
+        neurite_types=["basal_dendrite", "apical_dendrite"],
         method="tmd",
         feature="radial_distances",
     )

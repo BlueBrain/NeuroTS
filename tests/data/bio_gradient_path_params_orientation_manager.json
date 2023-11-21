@@ -1,7 +1,6 @@
 {"basal_dendrite": {"metric":"path_distances",
            "randomness": 0.0,
            "targeting": 0.2,
-           "radius": 0.3,
            "orientation": {
                "mode": "sample_pairwise_angles",
                "values": null
@@ -15,7 +14,6 @@
            "has_apical_tuft": true,
            "randomness": 0.0,
            "targeting": 0.2,
-           "radius": 0.3,
            "orientation": {
               "mode": "use_predefined",
               "values": {

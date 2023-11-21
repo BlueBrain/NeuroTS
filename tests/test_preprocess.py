@@ -86,85 +86,6 @@ def test_params_and_distrs(params_file, distrs_file):
     preprocess.preprocess_inputs(params, distrs)
 
 
-def test_check_num_seg():
-    """Check that the parametesr have a 'num_seg' entry.
-
-    Note: The type is already checked in the validation step with the JSON schema.
-    """
-    params = {}
-
-    with pytest.raises(
-        NeuroTSValidationError,
-        match=(
-            "The parameters must contain a 'num_seg' entry when the "
-            "'growth_method' entry in parameters is 'trunk'."
-        ),
-    ):
-        preprocess.validity_checkers.check_num_seg(params, {})
-
-    params["num_seg"] = 1
-    preprocess.validity_checkers.check_num_seg(params, {})
-
-
-def test_check_min_bar_length(caplog):
-    """Check that the parametesr have a 'num_seg' entry.
-
-    Note: The type is already checked in the validation step with the JSON schema.
-    """
-
-    with pytest.raises(
-        NeuroTSValidationError,
-        match=(
-            r"The distributions must contain a 'min_bar_length' entry when the "
-            r"'growth_method' entry in parameters is in \['tmd', 'tmd_apical', 'tmd_gradient'\]\."
-        ),
-    ):
-        preprocess.validity_checkers.check_bar_length({}, {})
-
-    distrs = {
-        "min_bar_length": 1,
-    }
-
-    with pytest.raises(
-        NeuroTSValidationError,
-        match=(
-            r"The parameters must contain a 'step_size' entry when the "
-            r"'growth_method' entry in parameters is in \['tmd', 'tmd_apical', 'tmd_gradient'\]\."
-        ),
-    ):
-        preprocess.validity_checkers.check_bar_length({}, distrs)
-
-    params = {
-        "step_size": {
-            "norm": {
-                "mean": 999,
-            }
-        }
-    }
-    caplog.clear()
-    with caplog.at_level(logging.DEBUG):
-        preprocess.validity_checkers.check_bar_length(params, distrs)
-    assert caplog.record_tuples == [
-        (
-            "neurots.preprocess.relevance_checkers",
-            30,
-            "Selected step size 999.000000 is too big for bars of size 1.000000",
-        )
-    ]
-
-    params = {
-        "step_size": {
-            "norm": {
-                "mean": 0.1,
-            }
-        }
-    }
-    caplog.clear()
-    with caplog.at_level(logging.DEBUG):
-        preprocess.validity_checkers.check_bar_length(params, distrs)
-    assert caplog.record_tuples == []
-
-
 @pytest.fixture
 def dummy_register(monkeypatch):
     """Monkeypatch the registered functions and reset it at the end of the test."""
@@ -220,3 +141,135 @@ def test_register_preprocessor(dummy_register):
 
     assert preprocessed_params["axon"]["randomness"] == 999
     assert preprocessed_distrs["axon"]["num_trees"]["data"]["bins"] == [999]
+
+
+def test_check_num_seg():
+    """Check that the parameters have a 'num_seg' entry.
+
+    Note: The type is already checked in the validation step with the JSON schema.
+    """
+    params = {}
+
+    with pytest.raises(
+        NeuroTSValidationError,
+        match=(
+            "The parameters must contain a 'num_seg' entry when the "
+            "'growth_method' entry in parameters is 'trunk'."
+        ),
+    ):
+        preprocess.validity_checkers.check_num_seg(params, {})
+
+    params["num_seg"] = 1
+    preprocess.validity_checkers.check_num_seg(params, {})
+
+
+def test_check_min_bar_length(caplog):
+    """Check that the parameters have a 'num_seg' entry.
+
+    Note: The type is already checked in the validation step with the JSON schema.
+    """
+    with pytest.raises(
+        NeuroTSValidationError,
+        match=(
+            r"The distributions must contain a 'min_bar_length' entry when the "
+            r"'growth_method' entry in parameters is in \['tmd', 'tmd_apical', 'tmd_gradient'\]\."
+        ),
+    ):
+        preprocess.validity_checkers.check_bar_length({}, {})
+
+    distrs = {
+        "min_bar_length": 1,
+    }
+
+    with pytest.raises(
+        NeuroTSValidationError,
+        match=(
+            r"The parameters must contain a 'step_size' entry when the "
+            r"'growth_method' entry in parameters is in \['tmd', 'tmd_apical', 'tmd_gradient'\]\."
+        ),
+    ):
+        preprocess.validity_checkers.check_bar_length({}, distrs)
+
+    params = {
+        "step_size": {
+            "norm": {
+                "mean": 999,
+            }
+        }
+    }
+    caplog.clear()
+    with caplog.at_level(logging.DEBUG):
+        preprocess.validity_checkers.check_bar_length(params, distrs)
+    assert caplog.record_tuples == [
+        (
+            "neurots.preprocess.relevance_checkers",
+            30,
+            "Selected step size 999.000000 is too big for bars of size 1.000000",
+        )
+    ]
+
+    params = {
+        "step_size": {
+            "norm": {
+                "mean": 0.1,
+            }
+        }
+    }
+    caplog.clear()
+    with caplog.at_level(logging.DEBUG):
+        preprocess.validity_checkers.check_bar_length(params, distrs)
+    assert caplog.record_tuples == []
+
+
+def test_check_metric_consistency():
+    """ValueError should be raised if params and distrs have different 'method' entries."""
+    params = {
+        "apical_dendrite": {
+            "metric": "ANY_METRIC",
+        },
+        "grow_types": ["apical_dendrite"],
+    }
+    distrs = {
+        "apical_dendrite": {
+            "filtration_metric": "INCONSISTENT_METRIC",
+        }
+    }
+    with pytest.raises(ValueError, match="Metric of parameters and distributions is inconsistent"):
+        preprocess.validity_checkers.check_metric_consistency(params, distrs)
+
+
+def test_check_diameter_consistency():
+    """ValueError should be raised if params and distrs have different diameter 'method' entries."""
+    params = {
+        "diameter_params": {
+            "method": "ANY_METHOD",
+        },
+        "grow_types": ["apical_dendrite"],
+    }
+    distrs = {
+        "diameter": {
+            "method": "INCONSISTENT_METHOD",
+        }
+    }
+    with pytest.raises(
+        ValueError, match="Diameters methods of parameters and distributions is inconsistent"
+    ):
+        preprocess.validity_checkers.check_diameter_consistency(params, distrs)
+
+
+def test_check_deprecated_radius():
+    """Check that a warning is emitted when the parameters have deprecated 'radius' entries."""
+    params = {
+        "apical_dendrite": {
+            "radius": 1,
+        },
+        "grow_types": ["apical_dendrite"],
+    }
+    with pytest.warns(FutureWarning) as record:
+        preprocess.validity_checkers.check_deprecated_radius(params, {})
+
+    assert len(record.list) == 1
+    assert str(record.list[0].message).startswith(
+        "The 'radius' parameter (in apical_dendrite) is deprecated and will be forbidden in a "
+        "future version"
+    )

@@ -38,7 +38,7 @@ def format_values(obj, decimals=None):
             obj = round(obj, ndigits=decimals)
     elif isinstance(obj, np.integer):
         obj = int(obj)
-    elif isinstance(obj, (np.bool8, np.bool_)):
+    elif isinstance(obj, np.bool_):
         obj = bool(obj)
     elif isinstance(obj, dict):
         obj = {k: format_values(v, decimals=decimals) for k, v in obj.items()}

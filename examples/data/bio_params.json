@@ -1,7 +1,6 @@
 {"basal_dendrite": {"metric":"path_distances",
            "randomness": 0.2,
            "targeting": 0.2,
-           "radius": 0.3,
            "orientation": null,
            "growth_method": "tmd",
            "branching_method": "bio_oriented",
@@ -12,7 +11,6 @@
            "has_apical_tuft": true,
            "randomness": 0.2,
            "targeting": 0.2,
-           "radius": 0.3,
            "orientation": [
                     [0.0,
                      1.0,
