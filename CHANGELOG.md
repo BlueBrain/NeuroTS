@@ -1,5 +1,25 @@
 # Changelog
 
+## [3.5.0](https://github.com/BlueBrain/NeuroTS/compare/3.4.2..3.5.0)
+
+> 21 November 2023
+
+### New Features
+
+- Drop radius entry from parameters (Alexis Arnaudon - [#92](https://github.com/BlueBrain/NeuroTS/pull/92))
+- Allow for single basal (Alexis Arnaudon - [#89](https://github.com/BlueBrain/NeuroTS/pull/89))
+- Add a uniform diameter model and deprecate the 'radius' parameter (Adrien Berchet - [#85](https://github.com/BlueBrain/NeuroTS/pull/85))
+- Add major_termination_length parameter (Alexis Arnaudon - [#78](https://github.com/BlueBrain/NeuroTS/pull/78))
+
+### Fixes
+
+- Allow for normal orientation with basals (Alexis Arnaudon - [#90](https://github.com/BlueBrain/NeuroTS/pull/90))
+- Allow for non-default neurite_types (Alexis Arnaudon - [#86](https://github.com/BlueBrain/NeuroTS/pull/86))
+
+### Changes to Test Assests
+
+- Improve coverage for the uniform diameter model (Adrien Berchet - [#88](https://github.com/BlueBrain/NeuroTS/pull/88))
+
 ## [3.4.2](https://github.com/BlueBrain/NeuroTS/compare/3.4.1..3.4.2)
 
 > 13 September 2023
@@ -11,6 +31,8 @@
 ### Chores And Housekeeping
 
 - Apply Copier template (Adrien Berchet - [#82](https://github.com/BlueBrain/NeuroTS/pull/82))
+
+<!-- auto-changelog-above -->
 
 ## [3.4.1](https://github.com/BlueBrain/NeuroTS/compare/3.4.0..3.4.1)
 
@@ -147,8 +169,6 @@
 
 - Release 3.1.1 (Adrien Berchet - [#21](https://github.com/BlueBrain/NeuroTS/pull/21))
 - Setup CodeCov (Adrien Berchet - [#20](https://github.com/BlueBrain/NeuroTS/pull/20))
-
-<!-- auto-changelog-above -->
 
 ## [3.1.0](https://github.com/BlueBrain/NeuroTS/compare/3.0.1..3.1.0)
 

@@ -8,5 +8,5 @@
     "issueUrl": "https://github.com/BlueBrain/NeuroTS/issues/{id}",
     "mergeUrl": "https://github.com/BlueBrain/NeuroTS/pull/{id}",
     "compareUrl": "https://github.com/BlueBrain/NeuroTS/compare/{from}..{to}",
-    "startingVersion": "3.1.1"
+    "startingVersion": "3.4.2"
 }
