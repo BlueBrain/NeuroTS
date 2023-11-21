@@ -284,9 +284,12 @@ class TestDistributions:
         assert_equal(
             set(distr.keys()), {"soma", "basal_dendrite", "apical_dendrite", "axon", "diameter"}
         )
-        distr_legacy = extract_input.distributions(
-            filename, feature="radial_distances", neurite_types=["basal", "apical", "axon"]
-        )
+        with pytest.warns(DeprecationWarning):
+            distr_legacy = extract_input.distributions(
+                filename,
+                feature="radial_distances",
+                neurite_types=["basal", "apical", "axon"],
+            )
         assert_equal(
             set(distr_legacy.keys()),
             {"soma", "basal_dendrite", "apical_dendrite", "axon", "diameter"},
@@ -443,7 +446,6 @@ def test_parameters():
         "basal_dendrite": {
             "randomness": 0.24,
             "targeting": 0.14,
-            "radius": 0.3,
             "orientation": None,
             "growth_method": "tmd",
             "branching_method": "bio_oriented",
@@ -455,7 +457,6 @@ def test_parameters():
         "apical_dendrite": {
             "randomness": 0.24,
             "targeting": 0.14,
-            "radius": 0.3,
             "orientation": [[0.0, 1.0, 0.0]],
             "growth_method": "tmd_apical",
             "branching_method": "directional",
@@ -471,18 +472,18 @@ def test_parameters():
     }
     assert_equal(params, expected_params)
 
-    legacy_params = extract_input.parameters(
-        neurite_types=["basal", "apical"],
-        method="tmd",
-        feature="radial_distances",
-    )
+    with pytest.warns(DeprecationWarning):
+        legacy_params = extract_input.parameters(
+            neurite_types=["basal", "apical"],
+            method="tmd",
+            feature="radial_distances",
+        )
     assert_equal(legacy_params, expected_params)
 
     default_params = extract_input.parameters(method="tmd", feature="radial_distances")
     expected_params["axon"] = {
         "randomness": 0.24,
         "targeting": 0.14,
-        "radius": 0.3,
         "orientation": [[0.0, -1.0, 0.0]],
         "growth_method": "tmd",
         "branching_method": "bio_oriented",
@@ -506,7 +507,6 @@ def test_parameters():
             "basal_dendrite": {
                 "randomness": 0.24,
                 "targeting": 0.14,
-                "radius": 0.3,
                 "orientation": None,
                 "growth_method": "tmd",
                 "branching_method": "bio_oriented",
@@ -518,7 +518,6 @@ def test_parameters():
             "apical_dendrite": {
                 "randomness": 0.24,
                 "targeting": 0.14,
-                "radius": 0.3,
                 "orientation": [[0.0, 1.0, 0.0]],
                 "growth_method": "tmd_apical",
                 "branching_method": "directional",
@@ -545,7 +544,6 @@ def test_parameters():
             "axon": {
                 "randomness": 0.24,
                 "targeting": 0.14,
-                "radius": 0.3,
                 "orientation": [[0.0, -1.0, 0.0]],
                 "growth_method": "tmd",
                 "branching_method": "bio_oriented",
@@ -571,7 +569,6 @@ def test_parameters():
             "axon": {
                 "randomness": 0.24,
                 "targeting": 0.14,
-                "radius": 0.3,
                 "orientation": [[0.0, -1.0, 0.0]],
                 "growth_method": "trunk",
                 "branching_method": "random",
@@ -599,7 +596,6 @@ def test_parameters():
             "axon": {
                 "randomness": 0.24,
                 "targeting": 0.14,
-                "radius": 0.3,
                 "orientation": [[0.0, -1.0, 0.0]],
                 "growth_method": "trunk",
                 "branching_method": "random",
@@ -629,7 +625,6 @@ def test_parameters():
             "axon": {
                 "randomness": 0.24,
                 "targeting": 0.14,
-                "radius": 0.3,
                 "orientation": [[0.0, -1.0, 0.0]],
                 "growth_method": "trunk",
                 "branching_method": "random",
@@ -664,7 +659,6 @@ def test_parameters():
             "basal_dendrite": {
                 "randomness": 0.24,
                 "targeting": 0.14,
-                "radius": 0.3,
                 "orientation": None,
                 "growth_method": "tmd",
                 "branching_method": "bio_oriented",
@@ -676,7 +670,6 @@ def test_parameters():
             "apical_dendrite": {
                 "randomness": 0.24,
                 "targeting": 0.14,
-                "radius": 0.3,
                 "orientation": [[0.0, 1.0, 0.0]],
                 "growth_method": "tmd_apical",
                 "branching_method": "directional",

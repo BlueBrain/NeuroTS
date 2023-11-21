@@ -21,7 +21,6 @@
                 }
             }
         },
-        "radius": 0.3,
         "randomness": 0.24,
         "step_size": {
             "norm": {
@@ -41,7 +40,6 @@
         "orientation": {
             "mode": "pia_constraint"
         },
-        "radius": 0.3,
         "randomness": 0.24,
         "step_size": {
             "norm": {

@@ -317,7 +317,7 @@ def diametrize_from_tips(neuron, neurite_type=None, *, model_params, random_gene
 
                 if not section.is_root:
                     par = section.parent
-                    if np.alltrue([status[ch.id] for ch in par.children]):
+                    if np.all([status[ch.id] for ch in par.children]):
                         # Assign a new diameter to the last point if section is not terminal
                         merger(par, trunk_diam, model["Rall_ratio"])
                         active.append(par)

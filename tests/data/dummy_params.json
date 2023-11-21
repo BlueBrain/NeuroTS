@@ -11,7 +11,6 @@
                 0.0
             ]
         ],
-        "radius": 0.3,
         "randomness": 0.15,
         "targeting": 0.12,
         "tree_type": 4,
@@ -24,7 +23,6 @@
         "metric": "path_distances",
         "modify": null,
         "orientation": null,
-        "radius": 0.3,
         "randomness": 0.15,
         "targeting": 0.12,
         "tree_type": 3,

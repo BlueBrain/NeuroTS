@@ -41,7 +41,7 @@ def test_format_values():
         "float32": np.float32(1.1),
         "float64": np.float64(1.1),
         "int32": np.int32(1),
-        "bool8": np.bool8(True),
+        "bool8": np.bool_(True),
     }
     data["sub_dict"] = deepcopy(data)
     data["sub_list"] = [deepcopy(data), deepcopy(data)]
@@ -78,7 +78,8 @@ def test_convert_from_legacy_neurite_type():
     with open(DATA / "dummy_distribution_legacy.json", encoding="utf-8") as f:
         data_legacy = json.load(f)
 
-    data_converted = utils.convert_from_legacy_neurite_type(data_legacy)
+    with pytest.warns(DeprecationWarning):
+        data_converted = utils.convert_from_legacy_neurite_type(data_legacy)
     assert data_converted == data
 
     with open(DATA / "dummy_params.json", encoding="utf-8") as f:
@@ -90,7 +91,8 @@ def test_convert_from_legacy_neurite_type():
     with open(DATA / "dummy_params_legacy.json", encoding="utf-8") as f:
         data_legacy = json.load(f)
 
-    data_converted = utils.convert_from_legacy_neurite_type(data_legacy)
+    with pytest.warns(DeprecationWarning):
+        data_converted = utils.convert_from_legacy_neurite_type(data_legacy)
     assert data_converted == data
 
 

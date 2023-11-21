@@ -19,6 +19,8 @@ import json
 import os
 from pathlib import Path
 
+import pytest
+
 from neurots import validator
 from neurots.utils import convert_from_legacy_neurite_type
 
@@ -39,7 +41,11 @@ def test_json_schema():
             continue
 
         with i.open(encoding="utf-8") as f:
-            data = convert_from_legacy_neurite_type(json.load(f))
+            if i.stem.endswith("_legacy"):
+                with pytest.warns(DeprecationWarning):
+                    data = convert_from_legacy_neurite_type(json.load(f))
+            else:
+                data = convert_from_legacy_neurite_type(json.load(f))
 
         if "param" in str(i):
             _validation(i, validator.validate_neuron_params, "parameters", data)

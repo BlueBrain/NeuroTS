@@ -289,9 +289,8 @@ class TreeGrower:
                     self.growth_algo.terminate(section_grower)
                     self.active_sections.remove(section_grower)
 
-                # TODO: Can the state be something else than "bifurcate" or "terminate" here?
-                # If not we could add an else statement to raise a warning or an exception if the
-                # value is anything else.
+                else:
+                    raise NeuroTSError(f"Unknown state during growth: {state}")  # pragma: no cover
             else:
                 # we need this so that the pathlenght match due the child.first_point() in bifs
                 section_grower.next()

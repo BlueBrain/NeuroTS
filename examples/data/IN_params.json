@@ -7,7 +7,6 @@
         "metric": "path_distances",
         "modify": null,
         "orientation": null,
-        "radius": 0.3,
         "randomness": 0.24,
         "step_size": {
             "norm": {
