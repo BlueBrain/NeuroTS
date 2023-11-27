@@ -250,7 +250,7 @@ class OrientationManager(OrientationManagerBase):
 
             phis = self._rng.uniform(0, 2 * np.pi, len(means))
             angles += spherical_angles_to_pia_orientations(
-                phis, thetas, self._parameters.get("pia_direction", None)
+                phis, thetas, self._parameters[tree_type].get("pia_direction", None)
             ).tolist()
         return np.array(angles)
 

@@ -363,11 +363,7 @@ class NeuronGrower:
                 )
 
     def _3d_angles_grow_trunks(self):
-        """Grow trunk with 3d_angles method via :func:`.orientation.OrientationManager` class.
-
-        Args:
-            input_parameters_with_3d_anglles (dict): input_parameters with fits for 3d angles
-        """
+        """Grow trunk with 3d_angles method via :func:`.orientation.OrientationManager` class."""
         trunk_orientations_manager = self._trunk_orientations_class(
             soma=self.soma_grower.soma,
             parameters=self.input_parameters,

@@ -19,6 +19,7 @@ from neurots.generate.section import SectionGrower
 from neurots.generate.section import SectionGrowerPath
 from neurots.generate.section import SectionGrowerTMD
 from neurots.morphmath import sample
+from neurots.utils import PIA_DIRECTION
 from neurots.utils import NeuroTSError
 
 L = logging.getLogger("neurots")
@@ -279,7 +280,9 @@ class TreeGrower:
 
                     # the current section_grower bifurcates
                     # Returns two section_grower dictionaries: (S1, S2)
-                    for child_section in self.growth_algo.bifurcate(section_grower):
+                    for child_section in self.growth_algo.bifurcate(
+                        section_grower, self.params.get('pia_direction', PIA_DIRECTION)
+                    ):
                         child = self.add_section(
                             parent=section, pathlength=section_grower.pathlength, **child_section
                         )

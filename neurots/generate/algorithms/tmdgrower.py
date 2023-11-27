@@ -149,7 +149,7 @@ class TMDAlgo(AbstractAlgo):
 
         return stop, num_sec
 
-    def bifurcate(self, current_section):
+    def bifurcate(self, current_section, pia_direction):
         """When the section bifurcates two new sections need to be created.
 
         This method computes from the current state the data required for the
@@ -161,7 +161,9 @@ class TMDAlgo(AbstractAlgo):
         self.barcode.remove_bif(current_section.stop_criteria["TMD"].bif_id)
         ang = self.barcode.angles[current_section.stop_criteria["TMD"].bif_id]
 
-        dir1, dir2 = self.bif_method(current_section.history(), angles=ang)
+        dir1, dir2 = self.bif_method(
+            current_section.history(), angles=ang, pia_direction=pia_direction
+        )
         first_point = np.array(current_section.last_point)
 
         stop1, stop2 = self.get_stop_criteria(current_section)
