@@ -161,6 +161,11 @@ class SectionGrower:
         self.points.append(next_point)
         self.post_next_point()
 
+        with open("data.csv", "a", encoding="utf8") as file:
+            x, y, z = next_point
+            print(f"{x}, {y},{z}", file=file)
+        return next_point, direction
+
     def first_point(self):
         """Generates the first point of the section from the growth method and the previous point.
 
