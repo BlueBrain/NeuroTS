@@ -284,6 +284,10 @@ class TreeGrower:
                         child.first_point()
                     self.active_sections.remove(section_grower)
 
+                    # we need this so that the pathlenght match due the child.first_point() in bifs
+                    for section in self.active_sections:
+                        section.next_point()
+
                 elif state == "terminate":
                     # the current section_grower terminates
                     self.growth_algo.terminate(section_grower)
@@ -291,6 +295,3 @@ class TreeGrower:
 
                 else:
                     raise NeuroTSError(f"Unknown state during growth: {state}")  # pragma: no cover
-            else:
-                # we need this so that the pathlenght match due the child.first_point() in bifs
-                section_grower.next()
