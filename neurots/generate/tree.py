@@ -284,7 +284,7 @@ class TreeGrower:
                         child.first_point()
                     self.active_sections.remove(section_grower)
 
-                    # we need this so that the pathlenght match due the child.first_point() in bifs
+                    # we need this so that the path length matches due to the child.first_point() in bifs
                     for section in self.active_sections:
                         section.next_point()
 
