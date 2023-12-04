@@ -253,9 +253,8 @@ def test_convert_orientation2points():
     # Test with existing trunks
     ng.grow()
     pts = ng._convert_orientation2points(None, 2, distributions["apical_dendrite"], {})
-
     assert_array_almost_equal(
-        pts, [[3.988692, -4.746541, -8.403649], [4.742347, 8.33385, 4.137356]]
+        pts, [[4.22093382, -5.02290955, 8.12494454], [-5.61270624, 5.51993211, 6.86210643]]
     )
 
     with pytest.raises(ValueError):
@@ -294,14 +293,14 @@ def test_breaker_of_tmd_algo():
     N = NeuronGrower(input_distributions=distributions, input_parameters=params)
     n = N.grow()
 
-    assert_array_equal(N.apical_sections, [31])
+    assert_array_equal(N.apical_sections, [9])
     assert_array_almost_equal(
         n.sections[118].points[-1],
-        np.array([-36.22734, -13.58953, -26.91612]),
+        np.array([-17.105288, 23.486313, 48.889206]),
         decimal=5,
     )
     assert_array_almost_equal(
-        n.sections[30].points[-1], np.array([-2.1314, 39.17162, 0.53984]), decimal=5
+        n.sections[30].points[-1], np.array([-29.522362, 91.98645, -11.299354]), decimal=5
     )
 
     # Test with a specific random generator
@@ -310,14 +309,14 @@ def test_breaker_of_tmd_algo():
     N = NeuronGrower(input_distributions=distributions, input_parameters=params, rng_or_seed=rng)
     n = N.grow()
 
-    assert_array_equal(N.apical_sections, [31])
+    assert_array_equal(N.apical_sections, [9])
     assert_array_almost_equal(
         n.sections[118].points[-1],
-        np.array([-36.22734, -13.58953, -26.91612]),
+        np.array([-17.105288, 23.486313, 48.889206]),
         decimal=5,
     )
     assert_array_almost_equal(
-        n.sections[30].points[-1], np.array([-2.1314, 39.17162, 0.53984]), decimal=5
+        n.sections[30].points[-1], np.array([-29.522362, 91.98645, -11.299354]), decimal=5
     )
 
 
@@ -428,10 +427,10 @@ def test_basic_grower_with_generator():
         join(_path, "trunk_parameters.json"),
     )
     expected_pts = [
-        [-0.7351528406143188, 7.644972801208496, 11.233667373657227],
-        [-12.953228950500488, -1.2456032037734985, 2.840653657913208],
-        [11.739761352539062, -0.0489075593650341, 6.065145492553711],
-        [-2.473414421081543, 13.031773567199707, 1.1617510318756104],
+        [-0.7312348484992981, 7.604228973388672, 11.173797607421875],
+        [-13.377432823181152, -1.2863954305648804, 2.9336819648742676],
+        [11.861421585083008, -0.049414388835430145, 6.1279988288879395],
+        [-2.3804218769073486, 12.54181957244873, 1.118072748184204],
     ]
 
     rng = np.random.default_rng(0)

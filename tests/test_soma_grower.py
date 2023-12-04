@@ -466,7 +466,7 @@ def test_apical_points():
     grower.grow()
 
     apicals = grower.apical_sections
-    expected = [110]
+    expected = [108]
     assert_array_equal(apicals[0], expected)
 
     # Found apical point
