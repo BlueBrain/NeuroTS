@@ -301,7 +301,7 @@ def spherical_angles_to_orientations(phis, thetas):
         thetas (numpy.ndarray): Azimuthal angles.
 
     Returns:
-        numpy.ndarray: The orientation vectors where each row correspnds to a phi-theta pair.
+        numpy.ndarray: The orientation vectors where each row corresponds to a phi-theta pair.
     """
     return np.column_stack(
         (np.cos(phis) * np.sin(thetas), np.sin(phis) * np.sin(thetas), np.cos(thetas))
@@ -491,7 +491,7 @@ def get_probability_function(form="step", with_density=True):
 
     Each sigmoid is parametrized by a scale and a rate.
 
-    In practice, the `flat` function is used when no asymetry is present in the data, and the other
+    In practice, the `flat` function is used when no asymmetry is present in the data, and the other
     two are when an asymmetry towards one direction, usually opposite to pia or apical,
     or two directions, usually along and opposite to pia.
 

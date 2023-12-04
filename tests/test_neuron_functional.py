@@ -57,7 +57,7 @@ def build_random_generator(seed=None):
 def assert_close_persistent_diagram(actual, expected):
     # compute distances between points
     distances = np.min(cdist(np.array(tmd.analysis.sort_ph(expected)), actual), axis=0)
-    # We compare distances between expected and generated peristence as it is more stable to check.
+    # We compare distances between expected and generated persistence as it is more stable to check.
     # This comparison does not depend on ordering of the points
     # and ensures that the points of the original persistence are consistently generated.
     assert_almost_equal(len(expected), len(actual))
