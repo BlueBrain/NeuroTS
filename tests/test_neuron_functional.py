@@ -254,7 +254,7 @@ def test_convert_orientation2points():
     ng.grow()
     pts = ng._convert_orientation2points(None, 2, distributions["apical_dendrite"], {})
     assert_array_almost_equal(
-        pts, [[4.22093382, -5.02290955, 8.12494454], [-5.61270624, 5.51993211, 6.86210643]]
+        pts, [[7.67743835, -1.93761793, 6.80905306], [9.98169472, 2.83123167, -1.18765494]]
     )
 
     with pytest.raises(ValueError):
@@ -293,14 +293,14 @@ def test_breaker_of_tmd_algo():
     N = NeuronGrower(input_distributions=distributions, input_parameters=params)
     n = N.grow()
 
-    assert_array_equal(N.apical_sections, [9])
+    assert_array_equal(N.apical_sections, [10])
     assert_array_almost_equal(
         n.sections[118].points[-1],
-        np.array([-17.105288, 23.486313, 48.889206]),
+        np.array([-170.45485, 42.04766, -26.375393]),
         decimal=5,
     )
     assert_array_almost_equal(
-        n.sections[30].points[-1], np.array([-29.522362, 91.98645, -11.299354]), decimal=5
+        n.sections[30].points[-1], np.array([55.375633, 63.321762, -3.612582]), decimal=5
     )
 
     # Test with a specific random generator
@@ -309,14 +309,14 @@ def test_breaker_of_tmd_algo():
     N = NeuronGrower(input_distributions=distributions, input_parameters=params, rng_or_seed=rng)
     n = N.grow()
 
-    assert_array_equal(N.apical_sections, [9])
+    assert_array_equal(N.apical_sections, [10])
     assert_array_almost_equal(
         n.sections[118].points[-1],
-        np.array([-17.105288, 23.486313, 48.889206]),
+        np.array([-170.45485, 42.04766, -26.375393]),
         decimal=5,
     )
     assert_array_almost_equal(
-        n.sections[30].points[-1], np.array([-29.522362, 91.98645, -11.299354]), decimal=5
+        n.sections[30].points[-1], np.array([55.375633, 63.321762, -3.612582]), decimal=5
     )
 
 

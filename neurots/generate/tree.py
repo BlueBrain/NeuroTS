@@ -272,6 +272,12 @@ class TreeGrower:
                     # Save the final normed direction of parent
                     latest = section_grower.latest_directions[-1]
                     section_grower.id = section.id
+
+                    # we need this so that the path length matches due to the child.first_point()
+                    for other_section in self.active_sections:
+                        if other_section != section_grower:
+                            other_section.next()
+
                     # the current section_grower bifurcates
                     # Returns two section_grower dictionaries: (S1, S2)
                     for child_section in self.growth_algo.bifurcate(section_grower):
@@ -283,10 +289,6 @@ class TreeGrower:
                         # Generate the first point of the section
                         child.first_point()
                     self.active_sections.remove(section_grower)
-
-                    # we need this so that the path length matches due to the child.first_point()
-                    for section in self.active_sections:
-                        section.next_point(section.last_point)
 
                 elif state == "terminate":
                     # the current section_grower terminates
