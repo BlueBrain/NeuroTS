@@ -143,6 +143,7 @@ def accept_reject(
         if rng.binomial(1, _prob):
             return proposal
         n_tries += 1
+    print('failed', randomness_increase, _prob)
     warnings.warn(
         "We could not sample from distribution, we take a random point unless a 'default_propose' "
         "function is provided. Consider checking the given probability distribution."

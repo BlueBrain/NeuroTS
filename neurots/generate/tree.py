@@ -248,6 +248,20 @@ class TreeGrower:
             SectionType(self.params["tree_type"]),
         )
 
+    def update_all_points(self, section):
+        points = []
+        for sec in self.neuron.iter():
+            points += sec.points[:,:3].tolist()
+            #if np.linalg.norm(section.points[-1] - sec.points[-1])>1e-5:
+            #    points += sec.points[:-1,:3].tolist()
+            #else:
+            #    print('same')
+        #points = points[:-1]
+        for sec in self.active_sections:
+            #if sec != section and sec !=section.parent:
+            points += np.array(sec.points)[:-1, :3].tolist()
+        section.all_points = points
+
     def next_point(self):
         """Operates the tree growth according to the selected algorithm."""
         if not isinstance(self.growth_algo, basicgrower.TrunkAlgo):
@@ -270,6 +284,7 @@ class TreeGrower:
             else:
                 _term = None
 
+            self.update_all_points(section_grower)
             state = self.growth_algo.extend(section_grower)
 
             if _term is not None:
@@ -289,10 +304,14 @@ class TreeGrower:
                             parent=section, pathlength=section_grower.pathlength, **child_section
                         )
                         # Copy the final normed direction of parent to all children
-                        #child.latest_directions.append(latest)
+                        # child.latest_directions.append(latest)
                         # Generate the first point of the section
+                        self.update_all_points(child)
                         child.first_point()
                     self.active_sections.remove(section_grower)
+                    for section in self.active_sections:
+                        self.update_all_points(section)
+                        section.next_point()
 
                 elif state == "terminate":
                     # the current section_grower terminates
@@ -301,6 +320,3 @@ class TreeGrower:
 
                 else:
                     raise NeuroTSError(f"Unknown state during growth: {state}")  # pragma: no cover
-            else:
-                # we need this so that the pathlenght match due the child.first_point() in bifs
-                section_grower.next()

@@ -76,6 +76,7 @@ class SectionGrower:
         self.direction = direction / vectorial_norm(direction)
         self.children = children
         self.points = [np.array(first_point[:3])]
+        self.all_points = None
 
         self.params = parameters
 
@@ -103,12 +104,13 @@ class SectionGrower:
             extra_randomness (float): artificially increase the randomness to allow for context
         """
         direction = self.params.targeting * self.direction + self.params.history * self.history()
+        #direction = 0.05 * self.direction + self.params.history * self.history()
         if extra_randomness > -1:
-            direction += (
-                self.params.randomness
-                * get_random_point(random_generator=self._rng)
-                * (1.0 + extra_randomness)
-            )
+            # random = self.params.randomness * get_random_point(random_generator=self._rng)
+            random = 0.1 * get_random_point(random_generator=self._rng)
+            # random = get_random_point(random_generator=self._rng)
+            random[2] = 0
+            direction += random * (1.0 + extra_randomness)
 
         return direction / vectorial_norm(direction)
 
@@ -120,6 +122,82 @@ class SectionGrower:
         Args:
             extra_randomness (float): only used without constraints if -1.0 no randomness is applied
         """
+
+        def prob_purkinje(seg_direction, current_point):
+            points = self.all_points
+            if points is None or not len(points):
+                return 1.0
+
+            points = np.array(points)
+            import matplotlib.pyplot as plt
+
+            plt.figure()
+            plt.scatter(points[:, 0], points[:, 1], color="k", s=5)
+            plt.scatter(current_point[0], current_point[1], color="r", s=4)
+            plt.plot(
+                [current_point[0], current_point[0] + 10 * seg_direction[0]],
+                [current_point[1], current_point[1] + 10 * seg_direction[1]],
+                c="k",
+            )
+
+            # distances to the direction
+            closest_dists = np.cross(
+                np.array(seg_direction)[np.newaxis],
+                points - np.array(current_point)[np.newaxis],
+                axis=1,
+            )[:, 2]
+
+            # only points close enough to direction
+            _points = points[abs(closest_dists) < 50]
+
+            # only forward points
+            _points = _points[np.dot(_points - current_point, seg_direction) > 0.1]
+
+            # if no points are in front, we accept
+            if not len(_points):
+                return 1.0
+
+            plt.scatter(_points[:, 0], _points[:, 1], color="g", s=10)
+
+            # distance closest to the direction
+            dists = np.linalg.norm(current_point - _points, axis=1)
+            plt.scatter(_points[np.argmin(dists), 0], _points[np.argmin(dists), 1], color="m", s=7)
+
+            # closest points on the direction
+            point = _points[np.argmin(dists)]
+            direction = point - current_point
+            plt.plot(
+                [current_point[0],  point[0]],
+                [current_point[1], point[1]],
+                c="g",
+            )
+
+
+            dist = np.linalg.norm(direction)
+            direction /= dist
+            #if dist > 50:
+            #    return 1.0
+            angle =  np.arccos(np.dot(direction, seg_direction)) / np.pi
+            params = {"d_min": 0.2, "d_max": 1.0, "power": 2.0}
+            p = (angle - params.get("d_min", 1)) / (
+                params.get("d_max", 10) - max(0, params.get("d_min", 1))
+            ) ** params.get("power", 1.0)
+
+            plt.title(f"p={p}, angle={angle}")
+            from pathlib import Path
+
+            f = Path(f"tests/test_{len(points)}_0.pdf")
+            i = 0
+            while f.exists():
+                i += 1
+                f = Path(f"tests/test_{len(points)}_{i}.pdf")
+            plt.savefig(f)
+            plt.close("all")
+            #return 1.0
+            return np.clip(p, 0, 1)
+
+        self.context = {"constraints": [{"section_prob": prob_purkinje}]}
+
         if self.context is not None and self.context.get("constraints", []):  # pragma: no cover
 
             def prob(*args, **kwargs):
@@ -128,7 +206,7 @@ class SectionGrower:
                     p *= constraint["section_prob"](*args, **kwargs)
                 return p
 
-            max_tries = DEFAULT_MAX_TRIES
+            max_tries = 100#DEFAULT_MAX_TRIES
             randomness_increase = DEFAULT_RANDOMNESS_INCREASE
             for constraint in self.context["constraints"]:
                 max_tries = max(
@@ -147,7 +225,7 @@ class SectionGrower:
                 prob,
                 self._rng,
                 max_tries=max_tries,
-                randomness_increase=randomness_increase,
+                randomness_increase=1,  # randomness_increase,
                 current_point=self.last_point,
             )
         else:
@@ -164,6 +242,7 @@ class SectionGrower:
         with open("data.csv", "a", encoding="utf8") as file:
             x, y, z = next_point
             print(f"{x}, {y},{z}", file=file)
+
         return next_point, direction
 
     def first_point(self):
