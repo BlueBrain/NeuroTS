@@ -108,9 +108,8 @@ def _fallback_strategy(section_direction, angles, repulsion):
 
     dir2 -= repulsion
     dir2 /= vectorial_norm(dir2)
-    if np.round(dir2[0], 5) == -0.18945:
-        print(dir1, dir2, section_direction)
-        raise
+
+    dir2 = np.array([0, 1, 1])
     return dir1, dir2
 
 
@@ -428,8 +427,6 @@ class SpaceColonization(TMDAlgo):
             current_section, ang, self.params, self.context
         )
 
-        import numpy as np
-        dir2 = np.array([0, 1, 1])
         first_point = np.array(current_section.last_point)
 
         stop1, stop2 = self.get_stop_criteria(current_section)
