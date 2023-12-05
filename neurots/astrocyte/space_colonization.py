@@ -108,7 +108,9 @@ def _fallback_strategy(section_direction, angles, repulsion):
 
     dir2 -= repulsion
     dir2 /= vectorial_norm(dir2)
-
+    if np.round(dir2[0], 5) == -0.18945:
+        print(dir1, dir2, section_direction)
+        raise
     return dir1, dir2
 
 
@@ -225,6 +227,7 @@ def _colonization_split(section, angles, parameters, context):
     segment_length = parameters["step_size"]["norm"]["mean"]
     kill_distance = context.kill_distance(segment_length)
     influence_distance = context.influence_distance(segment_length)
+
 
     point_cloud = context.point_cloud
 
