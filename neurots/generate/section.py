@@ -71,6 +71,7 @@ class SectionGrower:
         self.direction = direction / vectorial_norm(direction)
         self.direction = np.array([0, 1, 0])
         print(np.round(self.direction,5).tolist(), file=open('test.txt', 'a'))
+        #raise
         self.children = children
         self.points = [np.array(first_point[:3])]
 

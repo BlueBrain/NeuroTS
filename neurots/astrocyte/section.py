@@ -165,7 +165,7 @@ class SectionSpatialGrower(SectionGrowerPath):
         return normalize_inplace(
             self.params.targeting * self.direction
             + self.params.history * self.history()
-            #+ self.params.randomness * self._neighbor_contribution(current_point)
+            + self.params.randomness * self._neighbor_contribution(current_point)
         )
 
     def _next_point(self, current_point):
