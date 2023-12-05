@@ -429,7 +429,7 @@ class SpaceColonization(TMDAlgo):
         )
 
         import numpy as np
-        dir2 = np.array([0, 1, 0])
+        dir2 = np.array([0, 1, 1])
         first_point = np.array(current_section.last_point)
 
         stop1, stop2 = self.get_stop_criteria(current_section)
