@@ -550,7 +550,7 @@ def test_probability_function():
     npt.assert_equal(func(2.1, 0.5, 5), 0.7949219421515932)
 
     func = tested.get_probability_function(form="double_step")
-    npt.assert_equal(func(2.1, 0.5, 5, -0.5, 1), 0.5877841415613994)
+    npt.assert_equal(func(2.1, 0.5, 5, -0.5, 1), 0.5877841415613995)
 
     func = tested.get_probability_function(form="flat", with_density=False)
     npt.assert_equal(func(1.0), 1.0)
