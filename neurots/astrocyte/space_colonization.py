@@ -84,7 +84,7 @@ def _repulsion(points, current_point, length_constant):
     u_vectors = vectors / lengths[:, None]
 
     #contributions = np.exp(lengths * -decay_rate)
-    contributions = 1+ lengths * -decay_rate
+    contributions = 1+ np.around(lengths * -decay_rate, 3)
     return contributions.dot(u_vectors) / len(vectors)
 
 
