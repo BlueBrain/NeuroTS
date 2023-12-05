@@ -19,7 +19,6 @@ import json
 from pathlib import Path
 
 import numpy as np
-import scipy.special
 import pytest
 from morph_tool import diff
 from numpy import testing as npt
@@ -234,11 +233,11 @@ def _check_neurots_soma(soma):
     npt.assert_allclose(soma.points, expected_points, atol=1e-6, rtol=1e-6)
     npt.assert_equal(soma.radius, 15.279949720206192)
 
+
 _default_cos = np.cos
 _default_sin = np.sin
 _default_arctan2 = np.arctan2
 _default_arccos = np.arccos
-_default_logit= scipy.special.logit
 
 
 def _rounded_arctan2(x, y):
@@ -255,10 +254,6 @@ def _rounded_cos(x):
 
 def _rounded_arccos(x):
     return np.round(_default_arccos(x), 3)
-
-def _rounded_logit(x):
-    raise
-    return np.round(_default_logit(x), 3)
 
 
 @pytest.mark.parametrize(
@@ -289,7 +284,6 @@ def test_grow__run(rng_type, monkeypatch):
     monkeypatch.setattr(np, "sin", _rounded_sin)
     monkeypatch.setattr(np, "arctan2", _rounded_arctan2)
     monkeypatch.setattr(np, "arccos", _rounded_arccos)
-    #monkeypatch.setattr(scipy.special, "logit", _rounded_logit)
 
     astro_grower = AstrocyteGrower(
         input_distributions=distributions,
@@ -303,5 +297,4 @@ def test_grow__run(rng_type, monkeypatch):
     # rtol is to to inconsistencies accross machines
     #astro_grower.neuron.write(_path / "astrocyte.h5")
     difference = diff(astro_grower.neuron, _path / "astrocyte.h5", rtol=1e-1, atol=1e-1)
-    print(difference.info)
     assert not difference, difference.info

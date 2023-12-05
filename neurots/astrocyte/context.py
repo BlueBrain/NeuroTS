@@ -102,7 +102,6 @@ class SpaceColonizationContext:
 
         field = params["field"]
         if field["type"] == "logit":
-            #self.field = lambda x: field["slope"] * np.round(logit(x), 3) + field["intercept"]
             self.field = lambda x: field["slope"] * logit(x) + field["intercept"]
         else:
             raise NeuroTSError(f"{field['type']} function type is not available")
