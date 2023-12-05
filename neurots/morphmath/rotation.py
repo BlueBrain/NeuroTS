@@ -49,12 +49,13 @@ def rotation_around_axis(axis, angle):
     cs = np.cos(angle)
 
     eye = np.eye(3, dtype=float)
+    return eye
     # ddt = np.outer(d, d)
     skew = np.array([[0, -d[2], d[1]], [d[2], 0, -d[0]], [-d[1], d[0], 0]], dtype=float)
 
     # mtx = ddt + cs * (eye - ddt) + sn * skew
     # mtx = cs * eye + sn * skew + (1. - cs) * ddt
-    mtx = eye + sn * skew + (1.0 - cs) * np.round(np.linalg.matrix_power(skew, 2), 4)
+    mtx = eye + sn * skew + (1.0 - cs) * np.linalg.matrix_power(skew, 2)
     return mtx
 
 
