@@ -81,6 +81,8 @@ def _repulsion(points, current_point, length_constant):
 
     decay_rate = 1.0 / length_constant
     lengths = np.linalg.norm(vectors, axis=1)
+    # we round below as if lenghts is small, this become sensitive to numerical error
+    # for example small differences accross systems
     u_vectors = np.round(vectors / lengths[:, None], 6)
 
     contributions = np.exp(lengths * -decay_rate)
@@ -225,7 +227,6 @@ def _colonization_split(section, angles, parameters, context):
     segment_length = parameters["step_size"]["norm"]["mean"]
     kill_distance = context.kill_distance(segment_length)
     influence_distance = context.influence_distance(segment_length)
-
 
     point_cloud = context.point_cloud
 

@@ -160,8 +160,6 @@ class SectionSpatialGrower(SectionGrowerPath):
         Returns:
             numpy.ndarray: The normalized direction.
         """
-        #self.direction = np.array([0, 1, 0])
-        print(np.round(self.direction,5).tolist(), file=open('test.txt', 'a'))
         return normalize_inplace(
             self.params.targeting * self.direction
             + self.params.history * self.history()
@@ -181,7 +179,6 @@ class SectionSpatialGrower(SectionGrowerPath):
         new_point = current_point + segment_length * new_direction
 
         if self.process == "endfoot":
-            print('endfoot')
             self._add_new_data(new_point, new_direction, segment_length)
             self._grow_endfoot_section(new_point, new_direction, segment_length)
             return None

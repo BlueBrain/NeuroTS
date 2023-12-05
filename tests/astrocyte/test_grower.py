@@ -235,18 +235,7 @@ def _check_neurots_soma(soma):
 
 
 _default_cos = np.cos
-_default_sin = np.sin
-_default_arctan2 = np.arctan2
 _default_arccos = np.arccos
-
-
-def _rounded_arctan2(x, y):
-    return np.round(_default_arctan2(x, y), 3)
-
-
-def _rounded_sin(x):
-    return np.round(_default_sin(x), 3)
-
 
 def _rounded_cos(x):
     return np.round(_default_cos(x), 3)
@@ -281,8 +270,6 @@ def test_grow__run(rng_type, monkeypatch):
     # functions can return different value, depending on the system libraries used to actually
     # compute these values.
     monkeypatch.setattr(np, "cos", _rounded_cos)
-    monkeypatch.setattr(np, "sin", _rounded_sin)
-    monkeypatch.setattr(np, "arctan2", _rounded_arctan2)
     monkeypatch.setattr(np, "arccos", _rounded_arccos)
 
     astro_grower = AstrocyteGrower(
@@ -293,8 +280,7 @@ def test_grow__run(rng_type, monkeypatch):
     )
     astro_grower.grow()
 
-    # _check_neurots_soma(astro_grower.soma_grower.soma)
-    # rtol is to to inconsistencies accross machines
+    _check_neurots_soma(astro_grower.soma_grower.soma)
     astro_grower.neuron.write(_path / "astrocyte.h5")
-    difference = diff(astro_grower.neuron, _path / "astrocyte.h5", rtol=1e-1, atol=1e-1)
+    difference = diff(astro_grower.neuron, _path / "astrocyte.h5")
     assert not difference, difference.info

@@ -69,9 +69,6 @@ class SectionGrower:
         self.id = None
         assert not np.isclose(vectorial_norm(direction), 0.0), "Nan direction not recognized"
         self.direction = direction / vectorial_norm(direction)
-        #self.direction = np.array([0, 1, 0])
-        print(np.round(self.direction,5).tolist(), file=open('test.txt', 'a'))
-        #raise
         self.children = children
         self.points = [np.array(first_point[:3])]
 
