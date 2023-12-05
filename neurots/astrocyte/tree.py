@@ -50,8 +50,6 @@ class TreeGrowerSpaceColonization(TreeGrower):
 
         stop, num_sec = growth_algo.initialize()
 
-        import numpy as np
-        self.direction = np.array([0, 1, 0])
         section = self.add_section(
             parent=None,
             direction=self.direction,
@@ -75,7 +73,7 @@ class TreeGrowerSpaceColonization(TreeGrower):
         The section is added to the neuron.sections and activated.
         """
         SGrower = SECTION_GROWERS[self.params["growth_method"]]
-        #direction = np.array([0, 1, 0])
+
         sec_grower = SGrower(
             parent=parent,
             children=children,

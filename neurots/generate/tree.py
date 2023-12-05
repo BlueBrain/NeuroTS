@@ -282,6 +282,8 @@ class TreeGrower:
                     # Returns two section_grower dictionaries: (S1, S2)
                     for child_section in self.growth_algo.bifurcate(section_grower):
                         print('lkjlkj', section_grower.last_point)
+                        import numpy as np
+                        child_section['direction'] = np.array([0, 1, 0])
                         child = self.add_section(
                             parent=section, pathlength=section_grower.pathlength, **child_section
                         )
