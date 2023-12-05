@@ -106,7 +106,7 @@ def _fallback_strategy(section_direction, angles, repulsion):
 
     _, dir2 = directional(dir1, angles=angles)
 
-    dir2 -= repulsion
+    #dir2 -= repulsion
     dir2 /= vectorial_norm(dir2)
 
     return dir1, dir2
