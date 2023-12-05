@@ -83,7 +83,8 @@ def _repulsion(points, current_point, length_constant):
     lengths = np.linalg.norm(vectors, axis=1)
     u_vectors = vectors / lengths[:, None]
 
-    contributions = np.exp(lengths * -decay_rate)
+    #contributions = np.exp(lengths * -decay_rate)
+    contributions = 1+ lengths * -decay_rate
     return contributions.dot(u_vectors) / len(vectors)
 
 
@@ -235,7 +236,7 @@ def _colonization_split(section, angles, parameters, context):
 
     # repulsion contribution only from points in the hemisphere aligned to direction
     ids = upper_half_ball_query(morphology_points, current_point, kill_distance, section_direction)
-    repulsion = 0.1 #_repulsion(morphology_points[ids], current_point, kill_distance)
+    repulsion = _repulsion(morphology_points[ids], current_point, kill_distance)
 
     if section.process == "major":
         seed_ids = point_cloud.partial_ball_query(
