@@ -109,7 +109,6 @@ def _fallback_strategy(section_direction, angles, repulsion):
     dir2 -= repulsion
     dir2 /= vectorial_norm(dir2)
 
-    dir2 = np.array([0, 1, 1])
     return dir1, dir2
 
 
