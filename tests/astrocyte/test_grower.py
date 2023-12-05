@@ -280,8 +280,8 @@ def test_grow__run(rng_type, monkeypatch):
     # In this test all the cos and arccos values are rounded because np.cos and np.arccos
     # functions can return different value, depending on the system libraries used to actually
     # compute these values.
-    # monkeypatch.setattr(np, "cos", _rounded_cos)
-    # monkeypatch.setattr(np, "sin", _rounded_sin)
+    monkeypatch.setattr(np, "cos", _rounded_cos)
+    monkeypatch.setattr(np, "sin", _rounded_sin)
     monkeypatch.setattr(np, "arctan2", _rounded_arctan2)
     monkeypatch.setattr(np, "arccos", _rounded_arccos)
 
@@ -295,6 +295,6 @@ def test_grow__run(rng_type, monkeypatch):
 
     # _check_neurots_soma(astro_grower.soma_grower.soma)
     # rtol is to to inconsistencies accross machines
-    astro_grower.neuron.write(_path / "astrocyte.h5")
+    #astro_grower.neuron.write(_path / "astrocyte.h5")
     difference = diff(astro_grower.neuron, _path / "astrocyte.h5")
     assert not difference, difference.info
