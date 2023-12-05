@@ -70,6 +70,6 @@ def directional(direction, angles):
     theta1 = angles[3]
 
     dir2 = rt.rotate_vector(direction, [0, 0, 1], phi1)
-    #dir2 = rt.rotate_vector(dir2, [1, 0, 0], theta1)
+    dir2 = rt.rotate_vector(dir2, [1, 0, 0], theta1)
 
     return (np.array(direction), np.array(dir2))
