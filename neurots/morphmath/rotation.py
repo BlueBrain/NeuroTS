@@ -54,7 +54,7 @@ def rotation_around_axis(axis, angle):
 
     # mtx = ddt + cs * (eye - ddt) + sn * skew
     # mtx = cs * eye + sn * skew + (1. - cs) * ddt
-    mtx = eye + sn * skew + (1.0 - cs) * np.linalg.matrix_power(skew, 2)
+    mtx = eye + sn * skew + (1.0 - cs) * np.round(np.linalg.matrix_power(skew, 2), 4)
     return mtx
 
 
