@@ -282,5 +282,6 @@ def test_grow__run(rng_type, monkeypatch):
     astro_grower.grow()
 
     _check_neurots_soma(astro_grower.soma_grower.soma)
-    difference = diff(astro_grower.neuron, _path / "astrocyte.h5")
+    # rtol is to to inconsistencies accross machines
+    difference = diff(astro_grower.neuron, _path / "astrocyte.h5", rtol=1e-3)
     assert not difference, difference.info
