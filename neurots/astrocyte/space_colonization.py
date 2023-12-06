@@ -81,9 +81,9 @@ def _repulsion(points, current_point, length_constant):
 
     decay_rate = 1.0 / length_constant
     lengths = np.linalg.norm(vectors, axis=1)
-    # we round below as if lengths is small, this become sensitive to numerical error
+    # we regularise below because if lengths is small, this become sensitive to numerical error
     # for example small differences across systems
-    u_vectors = np.round(vectors / lengths[:, None], 4)
+    u_vectors = vectors / (lengths[:, None] + 1e-6)
 
     contributions = np.exp(lengths * -decay_rate)
     return contributions.dot(u_vectors) / len(vectors)
