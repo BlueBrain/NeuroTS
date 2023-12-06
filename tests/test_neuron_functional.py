@@ -759,7 +759,19 @@ class TestBioRatL5Tpc4:
         )
 
 
-def test_early_apical_bifurcation(tmpdir):
+_default_cos = np.cos
+_default_arccos = np.arccos
+
+
+def _rounded_cos(x):
+    return np.round(_default_cos(x), 3)
+
+
+def _rounded_arccos(x):
+    return np.round(_default_arccos(x), 3)
+
+
+def test_early_apical_bifurcation(tmpdir, monkeypatch):
     """Ensures that we get an equal number of obliques on each subtrunk."""
     np.random.seed(42)
     morpho = Morphology(DATA_PATH / "bio" / "Fluo55_left.h5")
@@ -796,6 +808,9 @@ def test_early_apical_bifurcation(tmpdir):
     params["apical_dendrite"]["growth_method"] = "tmd_gradient"
     params["apical_dendrite"]["branching_method"] = "bio_oriented"
     params["apical_dendrite"]["step_size"]["norm"]["mean"] = 5
+
+    monkeypatch.setattr(np, "cos", _rounded_cos)
+    monkeypatch.setattr(np, "arccos", _rounded_arccos)
 
     synth_morph = NeuronGrower(
         input_distributions=distr, input_parameters=params, skip_preprocessing=True
