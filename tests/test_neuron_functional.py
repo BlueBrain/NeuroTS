@@ -34,6 +34,7 @@ from tempfile import TemporaryDirectory
 import numpy as np
 import pytest
 import tmd
+from pathlib import Path
 from morph_tool import diff
 from neurom.core import Morphology
 from numpy.testing import assert_almost_equal
@@ -41,10 +42,14 @@ from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_array_equal
 from scipy.spatial.distance import cdist
 
-from neurots.generate.diametrizer import diametrize_constant_per_neurite
+from morphio import PointLevel, SectionType
 from neurots.generate.grower import NeuronGrower
+from neurots import extract_input
+
+from neurots.generate.diametrizer import diametrize_constant_per_neurite
 from neurots.preprocess.exceptions import NeuroTSValidationError
 
+DATA_PATH = Path(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "test_data"))
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
@@ -752,3 +757,48 @@ class TestBioRatL5Tpc4:
             rng_or_seed=build_random_generator(0),
             output_dir=tmpdir,
         )
+
+
+def test_early_apical_bifurcation(tmpdir):
+    """Ensures that we get an equal number of obliques on each subtrunk."""
+    np.random.seed(42)
+    morpho = Morphology(DATA_PATH / "bio" / "Fluo55_left.h5")
+    for section in morpho.root_sections:
+        if section.type in [SectionType.apical_dendrite, SectionType.axon]:
+            morpho.delete_section(section, recursive=True)
+
+    root = morpho.append_root_section(
+        PointLevel([[0, 1, 0], [0, 10, 0]], [2, 2]), SectionType.apical_dendrite
+    )
+    main1_0 = root.append_section(PointLevel([[0, 10, 0], [-10, 20, 0]], [1, 1]))
+    main2_0 = root.append_section(PointLevel([[0, 10, 0], [10, 30, 0]], [1, 1]))
+
+    main1_0.append_section(PointLevel([[-10, 20, 0], [-20, 20, 0]], [0.5, 0.5]))
+    main1_1 = main1_0.append_section(PointLevel([[-10, 20, 0], [-15, 50, 0]], [1, 1]))
+
+    main2_0.append_section(PointLevel([[10, 30, 0], [20, 30, 0]], [0.5, 0.5]))
+    main2_1 = main2_0.append_section(PointLevel([[10, 30, 0], [15, 40, 0]], [1, 1]))
+
+    main1_1.append_section(PointLevel([[-15, 50, 0], [-25, 50, 0]], [0.5, 0.5]))
+    main1_1.append_section(PointLevel([[-15, 50, 0], [-20, 100, 0]], [1, 1]))
+
+    main2_1.append_section(PointLevel([[15, 40, 0], [25, 40, 0]], [0.5, 0.5]))
+    main2_1.append_section(PointLevel([[15, 40, 0], [20, 110, 0]], [1, 1]))
+
+    morpho.write(tmpdir / "input_cell.asc")
+    distr = extract_input.distributions(
+        str(tmpdir / "input_cell.asc"), neurite_types=["apical_dendrite"]
+    )
+    params = extract_input.parameters(neurite_types=["apical_dendrite"])
+    params["apical_dendrite"]["randomness"] = 0.05
+    params["apical_dendrite"]["bias"] = 1.0
+    params["apical_dendrite"]["bias_length"] = 0.9
+    params["apical_dendrite"]["growth_method"] = "tmd_gradient"
+    params["apical_dendrite"]["branching_method"] = "bio_oriented"
+    params["apical_dendrite"]["step_size"]["norm"]["mean"] = 5
+
+    synth_morph = NeuronGrower(
+        input_distributions=distr, input_parameters=params, skip_preprocessing=True
+    ).grow()
+    difference = diff(synth_morph, _path + "/bi_apical.asc")
+    assert not difference, difference.info
