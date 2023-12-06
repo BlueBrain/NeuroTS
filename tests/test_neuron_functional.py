@@ -29,24 +29,24 @@ import json
 import os
 from os.path import basename
 from os.path import join
+from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import numpy as np
 import pytest
 import tmd
-from pathlib import Path
 from morph_tool import diff
+from morphio import PointLevel
+from morphio import SectionType
 from neurom.core import Morphology
 from numpy.testing import assert_almost_equal
 from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_array_equal
 from scipy.spatial.distance import cdist
 
-from morphio import PointLevel, SectionType
-from neurots.generate.grower import NeuronGrower
 from neurots import extract_input
-
 from neurots.generate.diametrizer import diametrize_constant_per_neurite
+from neurots.generate.grower import NeuronGrower
 from neurots.preprocess.exceptions import NeuroTSValidationError
 
 DATA_PATH = Path(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "test_data"))
