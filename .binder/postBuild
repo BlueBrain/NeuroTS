@@ -1,2 +1,1 @@
 jupyter labextension install jupyterlab-plotly
-pip install neurots neurom[plotly] diameter-synthesis>=0.4
