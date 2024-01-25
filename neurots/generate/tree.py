@@ -272,6 +272,12 @@ class TreeGrower:
                     # Save the final normed direction of parent
                     latest = section_grower.latest_directions[-1]
                     section_grower.id = section.id
+
+                    # we need this so that the path length matches due to the child.first_point()
+                    for other_section in self.active_sections:
+                        if other_section != section_grower:
+                            other_section.next()
+
                     # the current section_grower bifurcates
                     # Returns two section_grower dictionaries: (S1, S2)
                     for child_section in self.growth_algo.bifurcate(section_grower):
@@ -291,6 +297,3 @@ class TreeGrower:
 
                 else:
                     raise NeuroTSError(f"Unknown state during growth: {state}")  # pragma: no cover
-            else:
-                # we need this so that the pathlenght match due the child.first_point() in bifs
-                section_grower.next()

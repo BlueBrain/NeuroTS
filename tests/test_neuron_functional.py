@@ -29,22 +29,27 @@ import json
 import os
 from os.path import basename
 from os.path import join
+from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import numpy as np
 import pytest
 import tmd
 from morph_tool import diff
+from morphio import PointLevel
+from morphio import SectionType
 from neurom.core import Morphology
 from numpy.testing import assert_almost_equal
 from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_array_equal
 from scipy.spatial.distance import cdist
 
+from neurots import extract_input
 from neurots.generate.diametrizer import diametrize_constant_per_neurite
 from neurots.generate.grower import NeuronGrower
 from neurots.preprocess.exceptions import NeuroTSValidationError
 
+DATA_PATH = Path(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "test_data"))
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
@@ -57,7 +62,7 @@ def build_random_generator(seed=None):
 def assert_close_persistent_diagram(actual, expected):
     # compute distances between points
     distances = np.min(cdist(np.array(tmd.analysis.sort_ph(expected)), actual), axis=0)
-    # We compare distances between expected and generated peristence as it is more stable to check.
+    # We compare distances between expected and generated persistence as it is more stable to check.
     # This comparison does not depend on ordering of the points
     # and ensures that the points of the original persistence are consistently generated.
     assert_almost_equal(len(expected), len(actual))
@@ -253,9 +258,8 @@ def test_convert_orientation2points():
     # Test with existing trunks
     ng.grow()
     pts = ng._convert_orientation2points(None, 2, distributions["apical_dendrite"], {})
-
     assert_array_almost_equal(
-        pts, [[3.988692, -4.746541, -8.403649], [4.742347, 8.33385, 4.137356]]
+        pts, [[7.67743835, -1.93761793, 6.80905306], [9.98169472, 2.83123167, -1.18765494]]
     )
 
     with pytest.raises(ValueError):
@@ -294,14 +298,14 @@ def test_breaker_of_tmd_algo():
     N = NeuronGrower(input_distributions=distributions, input_parameters=params)
     n = N.grow()
 
-    assert_array_equal(N.apical_sections, [31])
+    assert_array_equal(N.apical_sections, [10])
     assert_array_almost_equal(
         n.sections[118].points[-1],
-        np.array([-36.22734, -13.58953, -26.91612]),
+        np.array([-170.45485, 42.04766, -26.375393]),
         decimal=5,
     )
     assert_array_almost_equal(
-        n.sections[30].points[-1], np.array([-2.1314, 39.17162, 0.53984]), decimal=5
+        n.sections[30].points[-1], np.array([55.375633, 63.321762, -3.612582]), decimal=5
     )
 
     # Test with a specific random generator
@@ -310,14 +314,14 @@ def test_breaker_of_tmd_algo():
     N = NeuronGrower(input_distributions=distributions, input_parameters=params, rng_or_seed=rng)
     n = N.grow()
 
-    assert_array_equal(N.apical_sections, [31])
+    assert_array_equal(N.apical_sections, [10])
     assert_array_almost_equal(
         n.sections[118].points[-1],
-        np.array([-36.22734, -13.58953, -26.91612]),
+        np.array([-170.45485, 42.04766, -26.375393]),
         decimal=5,
     )
     assert_array_almost_equal(
-        n.sections[30].points[-1], np.array([-2.1314, 39.17162, 0.53984]), decimal=5
+        n.sections[30].points[-1], np.array([55.375633, 63.321762, -3.612582]), decimal=5
     )
 
 
@@ -428,10 +432,10 @@ def test_basic_grower_with_generator():
         join(_path, "trunk_parameters.json"),
     )
     expected_pts = [
-        [-0.7351528406143188, 7.644972801208496, 11.233667373657227],
-        [-12.953228950500488, -1.2456032037734985, 2.840653657913208],
-        [11.739761352539062, -0.0489075593650341, 6.065145492553711],
-        [-2.473414421081543, 13.031773567199707, 1.1617510318756104],
+        [-0.7312348484992981, 7.604228973388672, 11.173797607421875],
+        [-13.377432823181152, -1.2863954305648804, 2.9336819648742676],
+        [11.861421585083008, -0.049414388835430145, 6.1279988288879395],
+        [-2.3804218769073486, 12.54181957244873, 1.118072748184204],
     ]
 
     rng = np.random.default_rng(0)
@@ -753,3 +757,48 @@ class TestBioRatL5Tpc4:
             rng_or_seed=build_random_generator(0),
             output_dir=tmpdir,
         )
+
+
+def test_early_apical_bifurcation(tmpdir):
+    """Ensures that we get an equal number of obliques on each subtrunk."""
+    np.random.seed(42)
+    morpho = Morphology(DATA_PATH / "bio" / "Fluo55_left.h5")
+    for section in morpho.root_sections:
+        if section.type in [SectionType.apical_dendrite, SectionType.axon]:
+            morpho.delete_section(section, recursive=True)
+
+    root = morpho.append_root_section(
+        PointLevel([[0, 1, 0], [0, 10, 0]], [2, 2]), SectionType.apical_dendrite
+    )
+    main1_0 = root.append_section(PointLevel([[0, 10, 0], [-10, 20, 0]], [1, 1]))
+    main2_0 = root.append_section(PointLevel([[0, 10, 0], [10, 30, 0]], [1, 1]))
+
+    main1_0.append_section(PointLevel([[-10, 20, 0], [-20, 20, 0]], [0.5, 0.5]))
+    main1_1 = main1_0.append_section(PointLevel([[-10, 20, 0], [-15, 50, 0]], [1, 1]))
+
+    main2_0.append_section(PointLevel([[10, 30, 0], [20, 30, 0]], [0.5, 0.5]))
+    main2_1 = main2_0.append_section(PointLevel([[10, 30, 0], [15, 40, 0]], [1, 1]))
+
+    main1_1.append_section(PointLevel([[-15, 50, 0], [-25, 50, 0]], [0.5, 0.5]))
+    main1_1.append_section(PointLevel([[-15, 50, 0], [-20, 100, 0]], [1, 1]))
+
+    main2_1.append_section(PointLevel([[15, 40, 0], [25, 40, 0]], [0.5, 0.5]))
+    main2_1.append_section(PointLevel([[15, 40, 0], [20, 110, 0]], [1, 1]))
+
+    morpho.write(tmpdir / "input_cell.asc")
+    distr = extract_input.distributions(
+        str(tmpdir / "input_cell.asc"), neurite_types=["apical_dendrite"]
+    )
+    params = extract_input.parameters(neurite_types=["apical_dendrite"])
+    params["apical_dendrite"]["randomness"] = 0.05
+    params["apical_dendrite"]["bias"] = 1.0
+    params["apical_dendrite"]["bias_length"] = 0.9
+    params["apical_dendrite"]["growth_method"] = "tmd_gradient"
+    params["apical_dendrite"]["branching_method"] = "bio_oriented"
+    params["apical_dendrite"]["step_size"]["norm"]["mean"] = 5
+
+    synth_morph = NeuronGrower(
+        input_distributions=distr, input_parameters=params, skip_preprocessing=True
+    ).grow()
+    difference = diff(synth_morph, _path + "/bi_apical.asc", rtol=1e-3, atol=1e-2)
+    assert not difference, difference.info
