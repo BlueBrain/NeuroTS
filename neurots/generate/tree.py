@@ -287,6 +287,8 @@ class TreeGrower:
                             parent=section, pathlength=section_grower.pathlength, **child_section
                         )
                         # Copy the final normed direction of parent to all children
+                        # this results in smoother bif angles, remove for sharper angles
+                        child.latest_directions.append(latest)
                         # Generate the first point of the section
                         child.first_point()
                     self.active_sections.remove(section_grower)
