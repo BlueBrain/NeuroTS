@@ -31,6 +31,13 @@ def test_get_bif_directional():
             np.array([0.0, 1.0 / np.sqrt(2), 1.0 / np.sqrt(2)]),
         ),
     )
+    assert_array_almost_equal(
+        _bf.directional([0.0, 1.0, 0.0], [0.0, 0.0, 0.0, np.pi / 4], pia_direction=[1, 0, 0]),
+        (
+            np.array([0.0, 1.0, 0.0]),
+            np.array([0.0, 1.0, 0.0]),
+        ),
+    )
 
 
 def test_get_bif_bio_oriented():
@@ -46,9 +53,20 @@ def test_get_bif_bio_oriented():
         (np.array([0.0, 1.0 / np.sqrt(2), 1.0 / np.sqrt(2)]), np.array([0.0, 0, 1])),
     )
 
+    assert_array_almost_equal(
+        _bf.bio_oriented(
+            [0.0, 1.0, 0.0], [0.0, np.pi / 4, 0.0, np.pi / 4], pia_direction=[1, 0, 0]
+        ),
+        (np.array([0.0, 1.0, 0.0]), np.array([0.0, 1.0, 0.0])),
+    )
+
 
 def test_get_bif_symmetric():
     assert_array_almost_equal(
         _bf.symmetric([0, 0, 1], [1, 1, 1, 1]),
         [[0.0, -0.479426, 0.877583], [0.0, 0.479426, 0.877583]],
+    )
+    assert_array_almost_equal(
+        _bf.symmetric([0, 0, 1], [1, 1, 1, 1], pia_direction=[1, 0, 0]),
+        [[-0.479426, 0.0, 0.877583], [0.479426, 0.0, 0.877583]],
     )
