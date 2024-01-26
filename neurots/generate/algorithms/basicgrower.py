@@ -40,7 +40,7 @@ class TrunkAlgo(AbstractAlgo):
 
         return stop, num_sec
 
-    def bifurcate(self, current_section):
+    def bifurcate(self, current_section, pia_direction=None):
         """When the section bifurcates two new sections are created.
 
         This method computes from the current state the data required for the
@@ -48,11 +48,12 @@ class TrunkAlgo(AbstractAlgo):
 
         Args:
             current_section (neurots.generate.section.SectionGrowerPath): The current section.
+            pia_direction (numpy.ndarray): Direction of the pia if different from `[0, 1, 0]`.
 
         Returns:
             tuple[dict, dict]: Two dictionaries containing the two children sections data.
         """
-        dir1, dir2 = self.bif_method()
+        dir1, dir2 = self.bif_method(pia_direction=pia_direction)
         first_point = np.array(current_section.last_point)
         stop = current_section.stop_criteria
 

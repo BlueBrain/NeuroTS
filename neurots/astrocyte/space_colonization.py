@@ -403,7 +403,7 @@ class SpaceColonization(TMDAlgo):
 
         return persistence
 
-    def bifurcate(self, current_section):
+    def bifurcate(self, current_section, pia_direction=None):
         """When the section bifurcates two new sections need to be created.
 
         This method computes from the current state the data required for the
@@ -478,7 +478,7 @@ class SpaceColonizationTarget(SpaceColonization):
         stop1["target_id"] = stop2["target_id"] = self.params["target_id"]
         return stop1, stop2
 
-    def bifurcate(self, current_section):
+    def bifurcate(self, current_section, pia_direction=None):
         """When the section bifurcates two new sections need to be created.
 
         This method computes from the current state the data required for the

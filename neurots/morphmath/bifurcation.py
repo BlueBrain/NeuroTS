@@ -6,12 +6,12 @@
 
 import numpy as np
 
-from neurots.utils import PIA_DIRECTION
 import neurots.morphmath.rotation as rt
 from neurots.morphmath.utils import get_random_point
+from neurots.utils import PIA_DIRECTION
 
 
-def random(random_generator=np.random):
+def random(random_generator=np.random, pia_direction=None):
     """Get 3-d coordinates of a new random point.
 
     The distance between the produced point and (0,0,0) is given by the value D.
