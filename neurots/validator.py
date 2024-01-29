@@ -19,17 +19,20 @@ Visit https://json-schema.org/understanding-json-schema/ for more information ab
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import json
-from pathlib import Path
+
+try:
+    import importlib_resources as resources
+except ImportError:
+    from importlib import resources
 
 import jsonschema
-import pkg_resources
 
-SCHEMA_PATH = pkg_resources.resource_filename("neurots", "schemas")
+SCHEMA_PATH = resources.files("neurots") / "schemas"
 
-with Path(SCHEMA_PATH, "parameters.json").open(encoding="utf-8") as f:
+with (SCHEMA_PATH / "parameters.json").open(encoding="utf-8") as f:
     PARAMS_SCHEMA = json.load(f)
 
-with Path(SCHEMA_PATH, "distributions.json").open(encoding="utf-8") as f:
+with (SCHEMA_PATH / "distributions.json").open(encoding="utf-8") as f:
     DISTRIBS_SCHEMA = json.load(f)
 
 

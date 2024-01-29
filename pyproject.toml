@@ -34,3 +34,7 @@ force_single_line = true
 testpaths = [
     "tests",
 ]
+filterwarnings = [
+    "ignore:The --rsyncdir command.*:DeprecationWarning:xdist",
+    "ignore:Pyarrow will become a required dependency of pandas.*:DeprecationWarning:diameter-synthesis",
+]
