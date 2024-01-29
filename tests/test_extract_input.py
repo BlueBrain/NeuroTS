@@ -27,13 +27,13 @@ import tmd
 from neurom import load_morphologies
 from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_equal
-from pkg_resources import parse_version
+from packaging import version
 
 from neurots import NeuroTSError
 from neurots import extract_input
 from neurots import validator
 
-_OLD_NUMPY = parse_version(np.__version__) < parse_version("1.21")
+_OLD_NUMPY = version.parse(np.__version__) < version.parse("1.21")
 
 _PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "test_data")
 POP_PATH = os.path.join(_PATH, "bio/")
@@ -883,3 +883,6 @@ def test_transform_distr():
     ss = neurom.stats.fit(data, distribution="expon")
     res = extract_input.from_neurom.transform_distr(ss)
     assert_equal(res, {"expon": {"loc": 0.005522117123602399, "lambda": 2.1521175837421254}})
+
+    ss = neurom.stats.fit(data, distribution="exponnorm")
+    assert extract_input.from_neurom.transform_distr(ss) is None
