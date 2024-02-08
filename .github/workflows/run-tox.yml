@@ -61,6 +61,7 @@ jobs:
         directory: ./reports
         flags: pytest
         name: "NeuroTS-py${{ matrix.python-version }}-${{ matrix.min_versions }}"
+        token: ${{ secrets.CODECOV_TOKEN }}
     - name: Upload test artifacts
       uses: actions/upload-artifact@v4
       if: always()
