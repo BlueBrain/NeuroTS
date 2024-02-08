@@ -55,12 +55,13 @@ jobs:
       with:
         report_paths: 'reports/pytest-*.xml'
     - name: Upload to codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         fail_ci_if_error: false
         directory: ./reports
         flags: pytest
         name: "NeuroTS-py${{ matrix.python-version }}-${{ matrix.min_versions }}"
+        token: ${{ secrets.CODECOV_TOKEN }}
     - name: Upload test artifacts
       uses: actions/upload-artifact@v4
       if: always()
