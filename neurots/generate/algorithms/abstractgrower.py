@@ -36,7 +36,7 @@ class AbstractAlgo:
         """
 
     @abc.abstractmethod
-    def bifurcate(self, current_section, pia_direction=None):
+    def bifurcate(self, current_section):
         """When the section bifurcates two new sections need to be created.
 
         This method computes from the current state the data required for the
