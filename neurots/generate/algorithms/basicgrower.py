@@ -11,6 +11,8 @@ import numpy as np
 from neurots.generate.algorithms.abstractgrower import AbstractAlgo
 from neurots.generate.algorithms.common import bif_methods
 from neurots.generate.algorithms.common import section_data
+from neurots.morphmath import rotation
+from neurots.utils import PIA_DIRECTION
 
 logger = logging.getLogger(__name__)
 
@@ -25,10 +27,24 @@ class TrunkAlgo(AbstractAlgo):
         context (Any): An object containing contextual information.
     """
 
-    def __init__(self, input_data, params, start_point, context=None, **_):
+    def __init__(
+        self,
+        input_data,
+        params,
+        start_point,
+        context=None,
+        pia_direction=None,
+        **_,
+    ):
         """Constructor of the TrunkAlgo class."""
         super().__init__(input_data, params, start_point, context)
         self.bif_method = bif_methods[params["branching_method"]]
+        if pia_direction is None:
+            self.pia_rotation = np.eye(3)
+        else:
+            self.pia_rotation = rotation.rotation_matrix_from_vectors(
+                PIA_DIRECTION, pia_direction
+            ).T
 
     def initialize(self):
         """Generates the data to be used for the initialization of the first section to be grown.
@@ -40,7 +56,7 @@ class TrunkAlgo(AbstractAlgo):
 
         return stop, num_sec
 
-    def bifurcate(self, current_section, pia_direction=None):
+    def bifurcate(self, current_section):
         """When the section bifurcates two new sections are created.
 
         This method computes from the current state the data required for the
@@ -48,12 +64,11 @@ class TrunkAlgo(AbstractAlgo):
 
         Args:
             current_section (neurots.generate.section.SectionGrowerPath): The current section.
-            pia_direction (numpy.ndarray): Direction of the pia if different from `[0, 1, 0]`.
 
         Returns:
             tuple[dict, dict]: Two dictionaries containing the two children sections data.
         """
-        dir1, dir2 = self.bif_method(pia_direction=pia_direction)
+        dir1, dir2 = self.bif_method(pia_rotation=self.pia_rotation)
         first_point = np.array(current_section.last_point)
         stop = current_section.stop_criteria
 
