@@ -54,12 +54,11 @@ class TMDAlgo(AbstractAlgo):
         self.apical_section = None
         self.apical_point_distance_from_soma = 0.0
         self.persistence_length = self.barcode.get_persistence_length()
-        if pia_direction is None:
-            self.pia_rotation = np.eye(3)
-        else:
-            self.pia_rotation = rotation.rotation_matrix_from_vectors(
-                PIA_DIRECTION, pia_direction
-            ).T
+        self.pia_rotation = (
+            rotation.rotation_matrix_from_vectors(PIA_DIRECTION, pia_direction).T
+            if pia_direction is not None
+            else None
+        )
 
     def select_persistence(self, input_data, random_generator=np.random):
         """Select the persistence.
