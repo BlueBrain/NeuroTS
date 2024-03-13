@@ -23,7 +23,7 @@ class AbstractAlgo:
 
     def __init__(self, input_data, params, start_point, context):
         """The TreeGrower Algorithm initialization."""
-        self.context = context
+        self.context = context if context is not None else {}
         self.input_data = copy.deepcopy(input_data)
         self.params = copy.deepcopy(params)
         self.start_point = start_point

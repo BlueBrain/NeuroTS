@@ -17,7 +17,6 @@ from neurots.generate.algorithms.common import section_data
 from neurots.morphmath import rotation
 from neurots.morphmath import sample
 from neurots.morphmath.utils import norm
-from neurots.utils import PIA_DIRECTION
 
 L = logging.getLogger(__name__)
 
@@ -33,7 +32,6 @@ class TMDAlgo(AbstractAlgo):
             the "min_bar_length" parameter are validated.
         context (Any): An object containing contextual information.
         random_generator (numpy.random.Generator): The random number generator to use.
-        pia_direction (list[float]): The direction of the pia, None corresponds to [0, 1, 0].
     """
 
     def __init__(
@@ -43,7 +41,6 @@ class TMDAlgo(AbstractAlgo):
         start_point,
         context=None,
         random_generator=np.random,
-        pia_direction=None,
         **_,
     ):
         """TMD basic grower."""
@@ -54,11 +51,6 @@ class TMDAlgo(AbstractAlgo):
         self.apical_section = None
         self.apical_point_distance_from_soma = 0.0
         self.persistence_length = self.barcode.get_persistence_length()
-        self.pia_rotation = (
-            rotation.rotation_matrix_from_vectors(PIA_DIRECTION, pia_direction).T
-            if pia_direction is not None
-            else None
-        )
 
     def select_persistence(self, input_data, random_generator=np.random):
         """Select the persistence.
@@ -171,7 +163,7 @@ class TMDAlgo(AbstractAlgo):
         ang = self.barcode.angles[current_section.stop_criteria["TMD"].bif_id]
 
         dir1, dir2 = self.bif_method(
-            current_section.history(), angles=ang, pia_rotation=self.pia_rotation
+            current_section.history(), angles=ang, y_rotation=self.context.get("y_rotation")
         )
         first_point = np.array(current_section.last_point)
 
@@ -261,7 +253,7 @@ class TMDApicalAlgo(TMDAlgo):
 
         if current_section.process == "major":
             dir1, dir2 = bif_methods["directional"](
-                current_section.direction, angles=ang, pia_rotation=self.pia_rotation
+                current_section.direction, angles=ang, y_rotation=self.context.get('y_rotation')
             )
 
             if not self._found_last_bif:
@@ -278,7 +270,7 @@ class TMDApicalAlgo(TMDAlgo):
                     self._found_last_bif = True
         else:
             dir1, dir2 = self.bif_method(
-                current_section.history(), angles=ang, pia_rotation=self.pia_rotation
+                current_section.history(), angles=ang, y_rotation=self.context.get("y_rotation")
             )
             process1 = "secondary"
             process2 = "secondary"

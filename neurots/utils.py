@@ -10,7 +10,7 @@ from copy import deepcopy
 import numpy as np
 from neurom import COLS
 
-PIA_DIRECTION = [0.0, 1.0, 0.0]
+Y_DIRECTION = [0.0, 1.0, 0.0]
 
 
 class NeuroTSError(Exception):

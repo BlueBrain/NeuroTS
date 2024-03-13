@@ -122,14 +122,12 @@ class TreeGrower:
     def _initialize_algorithm(self):
         """Initialization steps for TreeGrower."""
         grow_meth = growth_algorithms[self.params["growth_method"]]
-
         growth_algo = grow_meth(
             input_data=self.distr,
             params=self.params,
             start_point=self.point,
             context=self.context,
             random_generator=self._rng,
-            pia_direction=self.params.get("pia_direction"),
         )
 
         stop, num_sec = growth_algo.initialize()

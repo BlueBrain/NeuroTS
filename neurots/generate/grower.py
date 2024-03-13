@@ -28,6 +28,8 @@ from numpy.random import Generator
 from numpy.random import RandomState
 from numpy.random import SeedSequence
 
+from neurots.morphmath import rotation
+from neurots.utils import Y_DIRECTION
 from neurots.generate import diametrizer
 from neurots.generate import orientations as _oris
 from neurots.generate.orientations import OrientationManager
@@ -91,7 +93,7 @@ class NeuronGrower:
     ):
         """Constructor of the NeuronGrower class."""
         self.neuron = Morphology()
-        self.context = context
+        self.context = self.process_context(context)
         if rng_or_seed is None or isinstance(
             rng_or_seed, (int, np.integer, SeedSequence, BitGenerator)
         ):
@@ -134,6 +136,16 @@ class NeuronGrower:
         self._init_diametrizer(external_diametrizer=external_diametrizer)
 
         self._trunk_orientations_class = trunk_orientations_class
+
+    def process_context(self, context):
+        """Process the context if it is a dictionary."""
+        if context is None:
+            context = {}
+        if "y_direction" in context:
+            context["y_rotation"] = rotation.rotation_matrix_from_vectors(
+                Y_DIRECTION, context["y_direction"]
+            )
+        return context
 
     def next(self):
         """Call the "next" method of each neurite grower."""
@@ -373,7 +385,6 @@ class NeuronGrower:
         )
         for neurite_type in self.input_parameters["grow_types"]:
             orientations = trunk_orientations_manager.compute_tree_type_orientations(neurite_type)
-
             for p in self.soma_grower.add_points_from_orientations(orientations):
                 self.active_neurites.append(
                     TreeGrower(

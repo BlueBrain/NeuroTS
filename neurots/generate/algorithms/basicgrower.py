@@ -12,7 +12,6 @@ from neurots.generate.algorithms.abstractgrower import AbstractAlgo
 from neurots.generate.algorithms.common import bif_methods
 from neurots.generate.algorithms.common import section_data
 from neurots.morphmath import rotation
-from neurots.utils import PIA_DIRECTION
 
 logger = logging.getLogger(__name__)
 
@@ -33,18 +32,11 @@ class TrunkAlgo(AbstractAlgo):
         params,
         start_point,
         context=None,
-        pia_direction=None,
         **_,
     ):
         """Constructor of the TrunkAlgo class."""
         super().__init__(input_data, params, start_point, context)
         self.bif_method = bif_methods[params["branching_method"]]
-        if pia_direction is None:
-            self.pia_rotation = np.eye(3)
-        else:
-            self.pia_rotation = rotation.rotation_matrix_from_vectors(
-                PIA_DIRECTION, pia_direction
-            ).T
 
     def initialize(self):
         """Generates the data to be used for the initialization of the first section to be grown.

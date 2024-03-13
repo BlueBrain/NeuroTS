@@ -72,7 +72,7 @@ class SectionGrower:
         self.stop_criteria = stop_criteria
         self.process = process
         self.latest_directions = deque(maxlen=MEMORY)
-        self.context = context
+        self.context = context if context is not None else {}
         self._rng = random_generator
         self.step_size_distribution = step_size_distribution
         self.pathlength = 0 if parent is None else pathlength
@@ -97,6 +97,9 @@ class SectionGrower:
 
         if add_random_component:
             random_component = self.params.randomness * get_random_point(random_generator=self._rng)
+            # this is needed only to get 100% reproducibility
+            if self.context.get("y_rotation") is not None:
+                random_component = self.context["y_rotation"].dot(random_component)
             if extra_randomness > 0:  # pragma: no cover
                 random_component *= extra_randomness
             direction += random_component
