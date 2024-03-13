@@ -77,7 +77,7 @@ class SectionGrower:
         self.stop_criteria = stop_criteria
         self.process = process
         self.latest_directions = deque(maxlen=MEMORY)
-        self.context = context
+        self.context = context if context is not None else {}
         self._rng = random_generator
         self.step_size_distribution = step_size_distribution
         self.pathlength = 0 if parent is None else pathlength
@@ -93,9 +93,15 @@ class SectionGrower:
 
     def next_point(self, current_point):
         """Returns the next point depending on the growth method and the previous point."""
+        p = get_random_point(random_generator=self._rng)
+
+        # this is needed only to get 100% reproducibility
+        if self.context.get("y_rotation") is not None:
+            p = self.context["y_rotation"].dot(p)
+
         direction = (
             self.params.targeting * self.direction
-            + self.params.randomness * get_random_point(random_generator=self._rng)
+            + self.params.randomness * p
             + self.params.history * self.history()
         )
 
