@@ -72,7 +72,7 @@ class SectionGrower:
         self.stop_criteria = stop_criteria
         self.process = process
         self.latest_directions = deque(maxlen=MEMORY)
-        self.context = context if context is not None else {}
+        self.context = context
         self._rng = random_generator
         self.step_size_distribution = step_size_distribution
         self.pathlength = 0 if parent is None else pathlength

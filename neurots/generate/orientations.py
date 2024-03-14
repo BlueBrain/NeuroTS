@@ -59,7 +59,7 @@ class OrientationManagerBase:
         self._soma = soma
         self._parameters = parameters
         self._distributions = distributions
-        self._context = context if context is not None else {}
+        self._context = context
         self._rng = rng
 
         self._orientations = {}
