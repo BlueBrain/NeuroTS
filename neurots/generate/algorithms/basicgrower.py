@@ -22,7 +22,6 @@ import numpy as np
 from neurots.generate.algorithms.abstractgrower import AbstractAlgo
 from neurots.generate.algorithms.common import bif_methods
 from neurots.generate.algorithms.common import section_data
-from neurots.morphmath import rotation
 
 logger = logging.getLogger(__name__)
 
@@ -37,14 +36,7 @@ class TrunkAlgo(AbstractAlgo):
         context (Any): An object containing contextual information.
     """
 
-    def __init__(
-        self,
-        input_data,
-        params,
-        start_point,
-        context=None,
-        **_,
-    ):
+    def __init__(self, input_data, params, start_point, context=None, **_):
         """Constructor of the TrunkAlgo class."""
         super().__init__(input_data, params, start_point, context)
         self.bif_method = bif_methods[params["branching_method"]]
@@ -71,7 +63,7 @@ class TrunkAlgo(AbstractAlgo):
         Returns:
             tuple[dict, dict]: Two dictionaries containing the two children sections data.
         """
-        dir1, dir2 = self.bif_method(pia_rotation=self.pia_rotation)
+        dir1, dir2 = self.bif_method(pia_rotation=self.context.get("y_rotation"))
         first_point = np.array(current_section.last_point)
         stop = current_section.stop_criteria
 

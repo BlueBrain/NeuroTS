@@ -22,9 +22,10 @@ Synthesize a single neuron
 This example shows how to synthesize a single cell with simple parameters.
 """
 
-import numpy as np
-from pathlib import Path
 import json
+from pathlib import Path
+
+import numpy as np
 
 import neurots
 

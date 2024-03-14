@@ -25,7 +25,6 @@ from neurots.generate.algorithms.barcode import Barcode
 from neurots.generate.algorithms.common import TMDStop
 from neurots.generate.algorithms.common import bif_methods
 from neurots.generate.algorithms.common import section_data
-from neurots.morphmath import rotation
 from neurots.morphmath import sample
 from neurots.morphmath.utils import norm
 
@@ -264,7 +263,7 @@ class TMDApicalAlgo(TMDAlgo):
 
         if current_section.process == "major":
             dir1, dir2 = bif_methods["directional"](
-                current_section.direction, angles=ang, y_rotation=self.context.get('y_rotation')
+                current_section.direction, angles=ang, y_rotation=self.context.get("y_rotation")
             )
 
             if not self._found_last_bif:
