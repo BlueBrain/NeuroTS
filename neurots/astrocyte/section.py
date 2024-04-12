@@ -65,7 +65,7 @@ def grow_to_target(start_point, start_direction, target_point, segment_length, p
         )
 
         point += segment_length * direction
-        points.append(point)
+        points.append(point.copy())
 
     # add the target point if the new point does not coincide
     if not np.allclose(point, target_point):
