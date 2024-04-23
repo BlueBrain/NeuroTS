@@ -38,6 +38,7 @@ import tmd
 from morph_tool import diff
 from morphio import PointLevel
 from morphio import SectionType
+from morphio.mut import Morphology as MorphioMorphology
 from neurom.core import Morphology
 from numpy.testing import assert_almost_equal
 from numpy.testing import assert_array_almost_equal
@@ -762,7 +763,7 @@ class TestBioRatL5Tpc4:
 def test_early_apical_bifurcation(tmpdir):
     """Ensures that we get an equal number of obliques on each subtrunk."""
     np.random.seed(42)
-    morpho = Morphology(DATA_PATH / "bio" / "Fluo55_left.h5")
+    morpho = MorphioMorphology(DATA_PATH / "bio" / "Fluo55_left.h5")
     for section in morpho.root_sections:
         if section.type in [SectionType.apical_dendrite, SectionType.axon]:
             morpho.delete_section(section, recursive=True)
