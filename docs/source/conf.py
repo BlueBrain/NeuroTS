@@ -88,6 +88,9 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
 }
 
+# Remove some Sphinx warnings
+suppress_warnings = ["config.cache"]
+
 sphinx_gallery_conf = {
     "download_all_examples": False,
     "examples_dirs": "../../examples",
