@@ -9,7 +9,7 @@ The checkers should be registered to be executed in the preprocess step using th
 `@register_global_validator` if they need the entire data.
 """
 
-# Copyright (C) 2022  Blue Brain Project, EPFL
+# Copyright (C) 2021-2024  Blue Brain Project, EPFL
 #
 # SPDX-License-Identifier: Apache-2.0
 
