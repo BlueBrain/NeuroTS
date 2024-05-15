@@ -1,19 +1,8 @@
 """Setup for the NeuroTS package."""
 
-# Copyright (C) 2021  Blue Brain Project, EPFL
+# Copyright (C) 2021-2024  Blue Brain Project, EPFL
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# SPDX-License-Identifier: Apache-2.0
 
 from pathlib import Path
 
@@ -64,7 +53,7 @@ setup(
         "Tracker": "https://github.com/BlueBrain/NeuroTS/issues",
         "Source": "https://github.com/BlueBrain/NeuroTS",
     },
-    license="GNU General Public License v3.0",
+    license="Apache License 2.0",
     packages=find_namespace_packages(include=["neurots*"]),
     python_requires=">=3.8",
     use_scm_version=True,
