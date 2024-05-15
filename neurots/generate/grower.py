@@ -305,14 +305,17 @@ class NeuronGrower:
 
         legacy_mode = not isinstance(self.input_parameters[tree_types[0]]["orientation"], dict)
 
-        if not legacy_mode:
-            trunk_orientations_manager = self._trunk_orientations_class(
+        trunk_orientations_manager = (
+            self._trunk_orientations_class(
                 soma=self.soma_grower.soma,
                 parameters=self.input_parameters,
                 distributions=self.input_distributions,
                 context=self.context,
                 rng=self._rng,
             )
+            if not legacy_mode
+            else None
+        )
 
         for type_of_tree in tree_types:
             params = self.input_parameters[type_of_tree]
