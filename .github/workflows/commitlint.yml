@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '20'
       - run: npm install -g --force commitlint @commitlint/cli commitlint-plugin-cleanfeet
       - run: npm install conventional-changelog-conventionalcommits
       - run: touch .git/COMMIT_EDITMSG

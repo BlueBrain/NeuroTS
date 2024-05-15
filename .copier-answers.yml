@@ -1,10 +1,10 @@
 # Changes here will be overwritten by Copier
 
-_commit: 0.1.54
+_commit: 0.1.57
 _src_path: git@bbpgitlab.epfl.ch:neuromath/python-template.git
 author_email: ''
 author_name: Blue Brain Project, EPFL
-copyright_license: GNU General Public License v3.0
+copyright_license: Apache License 2.0
 copyright_year: '2022'
 distribution_name: NeuroTS
 download_url: https://github.com/BlueBrain/NeuroTS
