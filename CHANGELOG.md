@@ -1,5 +1,23 @@
 # Changelog
 
+## [3.6.0](https://github.com/BlueBrain/NeuroTS/compare/3.5.0..3.6.0)
+
+> 15 May 2024
+
+### Build
+
+- Freeze docutils version to be compatible with m2r2 (Adrien Berchet - [#105](https://github.com/BlueBrain/NeuroTS/pull/105))
+
+### Fixes
+
+- Astrocyte grower infinite loop  (jacquemi-bbp - [#104](https://github.com/BlueBrain/NeuroTS/pull/104))
+- Better first_point fix (Alexis Arnaudon - [#96](https://github.com/BlueBrain/NeuroTS/pull/96))
+
+### Chores And Housekeeping
+
+- Change license from GPLv3 to Apache-v2 (Adrien Berchet - [#106](https://github.com/BlueBrain/NeuroTS/pull/106))
+- Remove some warnings (Adrien Berchet - [#100](https://github.com/BlueBrain/NeuroTS/pull/100))
+
 ## [3.5.0](https://github.com/BlueBrain/NeuroTS/compare/3.4.2..3.5.0)
 
 > 21 November 2023
