@@ -14,6 +14,7 @@ import numpy as np
 import pytest
 import tmd
 from neurom import load_morphologies
+from neurom import load_morphology
 from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_equal
 from packaging import version
@@ -92,32 +93,32 @@ def test_trunk_distr(POPUL, NEU):
             "pia_3d_angles": {
                 "data": {
                     "weights": [
-                        1.2274214110745432,
-                        0.6137107055372726,
-                        0.6137107055372716,
-                        0.6137107055372716,
-                        1.2274214110745432,
-                        0.6137107055372716,
-                        1.841132116611821,
+                        1.2274214157682999,
+                        0.6137107078841489,
+                        0.6137107078841489,
+                        0.6137107078841499,
+                        1.2274214157682999,
+                        0.6137107078841489,
+                        1.8411321236524465,
                         0.0,
                         0.0,
-                        1.2274214110745432,
+                        1.2274214157682979,
                     ]
                 }
             },
             "apical_3d_angles": {
                 "data": {
                     "weights": [
-                        1.0248077967009541,
+                        1.0248078311131459,
                         0.0,
-                        1.0248077967009541,
-                        2.0496155934019082,
-                        0.5124038983504771,
-                        1.0248077967009541,
+                        1.0248078311131459,
+                        2.0496156622262918,
+                        0.5124039155565729,
+                        1.0248078311131459,
                         0.0,
                         0.0,
-                        0.5124038983504771,
-                        0.5124038983504771,
+                        0.5124039155565737,
+                        0.5124039155565737,
                     ]
                 }
             },
@@ -413,8 +414,19 @@ def test_number_neurites_cut_pop(POPUL):
         smallest = 0
         biggest = 1
 
-    for i in list(range(0, len(neurons[biggest].root_sections) - 1))[::-1]:
-        neurons[biggest].delete_section(neurons[biggest].root_sections[i], recursive=True)
+    neurom_obj = neurons[biggest]
+
+    # neurom>=4.0
+    if hasattr(neurom_obj, "to_morphio"):
+        morphio_obj = neurom_obj.to_morphio().as_mutable()
+    else:
+        morphio_obj = neurom_obj
+
+    for _ in list(range(0, len(morphio_obj.root_sections) - 1))[::-1]:
+        morphio_obj.delete_section(morphio_obj.root_sections[-1], recursive=True)
+
+    # convert it back to neurom obj
+    neurons[biggest] = load_morphology(morphio_obj)
 
     POPUL = neurom.core.population.Population(neurons)
     assert_equal(len(neurons), 2)
@@ -823,35 +835,35 @@ def test_trunk_neurite_3d_angles(POPUL):
     )
     assert_array_almost_equal(
         angles["trunk"]["pia_3d_angles"]["data"]["weights"],
-        [44.52200752438604, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 44.52200752438582],
+        [44.52203346136404, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 44.52203346136382],
     )
 
     angles = extract_input.from_neurom.trunk_neurite(POPUL, neurom.BASAL_DENDRITE, bins=10)
     assert angles["trunk"]["pia_3d_angles"] == {
         "data": {
             "bins": [
-                1.2145526099759574,
-                1.3398935503066864,
-                1.4652344906374157,
-                1.590575430968145,
-                1.7159163712988743,
-                1.8412573116296036,
-                1.9665982519603327,
-                2.0919391922910617,
-                2.217280132621791,
-                2.3426210729525203,
+                1.2145526047935284,
+                1.3398935446449443,
+                1.46523448449636,
+                1.5905754243477759,
+                1.7159163641991912,
+                1.841257304050607,
+                1.9665982439020229,
+                2.0919391837534382,
+                2.217280123604854,
+                2.34262106345627,
             ],
             "weights": [
-                1.2274214110745432,
-                0.6137107055372726,
-                0.6137107055372716,
-                0.6137107055372716,
-                1.2274214110745432,
-                0.6137107055372716,
-                1.841132116611821,
+                1.2274214157682999,
+                0.6137107078841489,
+                0.6137107078841489,
+                0.6137107078841499,
+                1.2274214157682999,
+                0.6137107078841489,
+                1.8411321236524465,
                 0.0,
                 0.0,
-                1.2274214110745432,
+                1.2274214157682979,
             ],
         }
     }

@@ -11,6 +11,7 @@ import numpy as np
 from neurom import get
 from neurom.core.morphology import Section
 from neurom.core.morphology import iter_neurites
+from neurom.core.morphology import iter_sections
 from neurom.morphmath import segment_length
 from neurom.morphmath import segment_radius
 
@@ -44,7 +45,7 @@ def terminal_diam(tree):
     mean_diam = np.mean(tree.points[:, 3])
     term_diam = [
         2.0 * t.points[-1, 3]
-        for t in Section.ileaf(next(tree.iter_sections()))
+        for t in Section.ileaf(next(iter_sections(tree)))
         if t.points[-1, 3] < 1.2 * mean_diam
     ]
 
@@ -54,14 +55,14 @@ def terminal_diam(tree):
 def section_taper(tree):
     """Returns the tapering of the *diameters* within the sections of a tree."""
     # Exclude the trunk = first section, taper should not be x2 because it is relative
-    tapers = [section_mean_taper(s) for s in tree.iter_sections()]
+    tapers = [section_mean_taper(s) for s in iter_sections(tree)]
     return [taper for taper in tapers if taper][1:]
 
 
 def section_trunk_taper(tree):
     """Returns the tapering of the *diameters* within the sections of a tree."""
     # Exclude the trunk = first section, taper should not be x2 because it is relative
-    return section_mean_taper(next(tree.iter_sections()))
+    return section_mean_taper(next(iter_sections(tree)))
 
 
 def model(input_object):
