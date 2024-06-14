@@ -9,7 +9,7 @@ import numpy as np
 from neurom import stats
 from neurom.features.morphology import trunk_vectors
 
-from neurots.utils import PIA_DIRECTION
+from neurots.utils import Y_DIRECTION
 
 
 def transform_distr(opt_distr):
@@ -130,7 +130,7 @@ def trunk_neurite_3d_angles(pop, neurite_type, bins):
     apical_3d_angles = []
     for morph in pop.morphologies:
         vecs = trunk_vectors(morph, neurite_type=neurite_type)
-        pia_3d_angles += [nm.morphmath.angle_between_vectors(PIA_DIRECTION, vec) for vec in vecs]
+        pia_3d_angles += [nm.morphmath.angle_between_vectors(Y_DIRECTION, vec) for vec in vecs]
         if neurite_type.name != "apical_dendrite":
             apical_ref_vec = trunk_vectors(morph, neurite_type=nm.APICAL_DENDRITE)
             if len(apical_ref_vec) > 0:

@@ -264,6 +264,27 @@ def test_spherical_angles_to_orientations():
     )
 
 
+def test_spherical_angles_to_pia_orientations():
+    phis = [0.5 * np.pi, np.pi, np.pi]
+
+    thetas = [0.5 * np.pi, np.pi, 0.5 * np.pi]
+
+    expected_orientations = [[0.0, 0.0, 1.0], [0.0, -1.0, 0.0], [-1.0, 0.0, 0.0]]
+
+    npt.assert_allclose(
+        tested.spherical_angles_to_pia_orientations(phis, thetas),
+        expected_orientations,
+        atol=1e-6,
+    )
+
+    expected_orientations = [[0.0, 0.0, 1.0], [-1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]
+    npt.assert_allclose(
+        tested.spherical_angles_to_pia_orientations(phis, thetas, pia_direction=[1.0, 0.0, 0.0]),
+        expected_orientations,
+        atol=1e-6,
+    )
+
+
 def test_points_to_orientations():
     origin = np.array([0.0, 0.0, 0.0])
     points = np.array([[2.0, 0.0, 0.0], [0.0, 0.0, 3.0]])

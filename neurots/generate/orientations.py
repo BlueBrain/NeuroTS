@@ -16,7 +16,7 @@ from scipy.special import expit
 from neurots.morphmath import rotation
 from neurots.morphmath import sample
 from neurots.morphmath.utils import normalize_vectors
-from neurots.utils import PIA_DIRECTION
+from neurots.utils import Y_DIRECTION
 from neurots.utils import NeuroTSError
 
 _TWOPI = 2.0 * np.pi
@@ -221,7 +221,7 @@ class OrientationManager(OrientationManagerBase):
         the second angle to obtain a 3d direction. For multiple apical trees, `mean` and `std`
         should be two lists with lengths equal to number of trees, otherwise it can be a float.
 
-        Pia direction can be overwritten by the parameter 'pia_direction' value.
+        Pia direction can be overwritten by the parameter 'y_direction' value from context.
         """
         n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
         if (
@@ -249,7 +249,7 @@ class OrientationManager(OrientationManagerBase):
 
             phis = self._rng.uniform(0, 2 * np.pi, len(means))
             angles += spherical_angles_to_pia_orientations(
-                phis, thetas, self._parameters.get("pia_direction", None)
+                phis, thetas, self._context.get("y_rotation", None)
             ).tolist()
         return np.array(angles)
 
@@ -259,10 +259,10 @@ class OrientationManager(OrientationManagerBase):
         See :func:`_sample_trunk_from_3d_angle` for more details on the algorithm.
         """
         n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
-        pia_direction = self._parameters.get("pia_direction", PIA_DIRECTION)
+        y_direction = self._context.get("y_direction", Y_DIRECTION)
         return np.asarray(
             [
-                _sample_trunk_from_3d_angle(self._parameters, self._rng, tree_type, pia_direction)
+                _sample_trunk_from_3d_angle(self._parameters, self._rng, tree_type, y_direction)
                 for _ in range(n_orientations)
             ]
         )
@@ -446,13 +446,13 @@ def compute_interval_n_tree(soma, n_trees, rng=np.random):
     return phi_intervals, interval_n_trees
 
 
-def spherical_angles_to_pia_orientations(phis, thetas, pia_direction=None):
+def spherical_angles_to_pia_orientations(phis, thetas, y_rotation=None):
     """Compute orientation from spherical angles where thetas are wrt to pia (default=`[0, 1, 0]`).
 
     Args:
         phis (numpy.ndarray): Polar angles.
         thetas (numpy.ndarray): Azimuthal angles.
-        pia_direction (numpy.ndarray): Direction of pia if different from `[0, 1, 0]`.
+        y_rotation (numpy.ndarray): Rotation of y direction if different from `[0, 1, 0]`.
 
     Returns:
         numpy.ndarray: The orientation vectors where each row corresponds to a phi-theta pair.
@@ -461,8 +461,8 @@ def spherical_angles_to_pia_orientations(phis, thetas, pia_direction=None):
     vector = np.column_stack(
         (np.cos(phis) * np.sin(thetas), np.cos(thetas), np.sin(phis) * np.sin(thetas))
     )
-    if pia_direction is not None:
-        vector = vector.dot(rotation.rotation_matrix_from_vectors(PIA_DIRECTION, pia_direction).T)
+    if y_rotation is not None:
+        vector = vector.dot(y_rotation.T)
     return vector
 
 
@@ -649,12 +649,14 @@ def _sample_trunk_from_3d_angle(parameters, rng, tree_type, ref_dir, max_tries=1
     n_try = 0
     while n_try < max_tries:
         propose = sample.sample_spherical_unit_vectors(rng)
-        angle = nm.morphmath.angle_between_vectors(ref_dir, propose)
+        angle = nm.morphmath.angle_between_vectors(Y_DIRECTION, propose)
         if rng.binomial(1, prob(angle, *params)):
-            return propose
+            break
         n_try += 1
     warnings.warn(
         """We could not sample from distribution, so we take a random point.
                     Consider checking the given probability distribution."""
     )
-    return sample.sample_spherical_unit_vectors(rng)
+    if ref_dir is not None:
+        propose = rotation.rotation_matrix_from_vectors(Y_DIRECTION, ref_dir).dot(propose)
+    return propose

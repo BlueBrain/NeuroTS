@@ -82,9 +82,15 @@ class SectionGrower:
 
     def next_point(self, current_point):
         """Returns the next point depending on the growth method and the previous point."""
+        random_point = get_random_point(random_generator=self._rng)
+
+        # this is needed only to get 100% reproducibility
+        if self.context.get("y_rotation") is not None:
+            random_point = self.context["y_rotation"].dot(random_point)
+
         direction = (
             self.params.targeting * self.direction
-            + self.params.randomness * get_random_point(random_generator=self._rng)
+            + self.params.randomness * random_point
             + self.params.history * self.history()
         )
 
