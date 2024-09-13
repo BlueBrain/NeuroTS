@@ -20,7 +20,7 @@ DISTANCE_MIN = 1e-8
 WEIGHTS = np.exp(np.arange(1, MEMORY + 1) - MEMORY)
 
 # default parameters for accept/reject
-DEFAULT_MAX_TRIES = 100
+DEFAULT_MAX_TRIES = 50
 DEFAULT_RANDOMNESS_INCREASE = 0.5
 
 

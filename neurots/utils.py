@@ -101,8 +101,7 @@ def accept_reject(
     propose,
     probability,
     rng,
-    default_propose=None,
-    max_tries=100,
+    max_tries=50,
     randomness_increase=0.5,
     **probability_kwargs,
 ):
@@ -114,14 +113,14 @@ def accept_reject(
         probability (callable): function to compute probability, first arg is the poposal (output of
             `propose` function), and takes extra kwargs via `probability_kwargs`
         rng (np.random._generator.Generator): random number generator
-        default_propose (callable): function to use if we cannot accept a proposal,
-            if None, propose is used
-        max_tries (int): maximum number of tries to accept before `default_propose` is called
+        max_tries (int): maximum number of tries to accept before we return best proposal
         randomness_increase (float): increase of noise amplitude after each try
         probability_kwargs (dict): parameters for `probability` function
 
     """
     n_tries = 0
+    best_proposal = None
+    best_p = 0
     while n_tries < max_tries:
         proposal = propose(n_tries * randomness_increase)
         _prob = probability(proposal, **probability_kwargs)
@@ -131,11 +130,9 @@ def accept_reject(
 
         if rng.binomial(1, _prob):
             return proposal
+        if _prob > best_p:
+            best_p = _prob
+            best_proposal = proposal
         n_tries += 1
-    warnings.warn(
-        "We could not sample from distribution, we take a random point unless a 'default_propose' "
-        "function is provided. Consider checking the given probability distribution."
-    )
-    if default_propose is not None:
-        return default_propose()
-    return proposal
+    warnings.warn("We could not sample from distribution, we take best sample.")
+    return best_proposal
