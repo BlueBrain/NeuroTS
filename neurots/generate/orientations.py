@@ -310,13 +310,7 @@ class OrientationManager(OrientationManagerBase):
                         p *= constraint["trunk_prob"](proposal, self._soma.center)
             return p
 
-        def default_propose():
-            """Trunk angle returned if we cannot accept one after `max_tries`."""
-            return sample.sample_spherical_unit_vectors(self._rng)
-
-        return accept_reject(
-            propose, prob, self._rng, default_propose=default_propose, max_tries=max_tries
-        )
+        return accept_reject(propose, prob, self._rng, max_tries=max_tries)
 
 
 def spherical_angles_to_orientations(phis, thetas):
