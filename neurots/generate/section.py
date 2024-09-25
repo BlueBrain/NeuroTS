@@ -85,19 +85,23 @@ class SectionGrower:
         """Increases the path distance."""
         self.pathlength += length
 
-    def _propose(self, extra_randomness=0.0):
+    def _propose(self, extra_randomness=None, add_random_component=True):
         """Propose the direction for a next section point.
 
         Args:
             extra_randomness (float): artificially increase the randomness to allow for context
+            add_random_component (bool): add a random component to the direction
         """
         direction = self.params.targeting * self.direction + self.params.history * self.history()
-        if extra_randomness > -1:
-            direction += (
-                self.params.randomness
-                * get_random_point(random_generator=self._rng)
-                * (1.0 + extra_randomness)
-            )
+
+        if add_random_component:
+            random_component =  (
+                    self.params.randomness
+                    * get_random_point(random_generator=self._rng)
+                )
+            if extra_randomness is not None:
+                random_component *= extra_randomness
+            direction += random_component
 
         return direction / vectorial_norm(direction)
 
