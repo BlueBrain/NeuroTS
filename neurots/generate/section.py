@@ -95,23 +95,21 @@ class SectionGrower:
         direction = self.params.targeting * self.direction + self.params.history * self.history()
 
         if add_random_component:
-            random_component =  (
-                    self.params.randomness
-                    * get_random_point(random_generator=self._rng)
-                )
+            random_component = self.params.randomness * get_random_point(random_generator=self._rng)
             if extra_randomness is not None:
                 random_component *= extra_randomness
             direction += random_component
 
         return direction / vectorial_norm(direction)
 
-    def next_point(self, extra_randomness=0):
+    def next_point(self, add_random_component=True, extra_randomness=None):
         """Returns the next point depending on the growth method and the previous point.
 
         If a context is present, an accept-reject mechanism will be used to alter the next point.
 
         Args:
-            extra_randomness (float): only used without constraints if -1.0 no randomness is applied
+            add_random_component (bool): add a random component to the direction
+            extra_randomness (float): only used without constraints
         """
         if self.context is not None and self.context.get("constraints", []):  # pragma: no cover
 
@@ -144,11 +142,14 @@ class SectionGrower:
                 prob,
                 self._rng,
                 max_tries=max_tries,
+                add_random_component=add_random_component,
                 randomness_increase=randomness_increase,
                 current_point=self.last_point,
             )
         else:
-            direction = self._propose(extra_randomness)
+            direction = self._propose(
+                add_random_component=add_random_component, extra_randomness=extra_randomness
+            )
 
         seg_length = self.step_size_distribution.draw_positive()
         next_point = self.last_point + seg_length * direction
@@ -168,7 +169,7 @@ class SectionGrower:
             The growth process cannot terminate before this point, as a first point will always be
             added to an active section.
         """
-        self.next_point(extra_randomness=-1.0)
+        self.next_point(add_random_component=False)
 
     def check_stop(self):
         """Checks if any num_seg criteria is fulfilled.
