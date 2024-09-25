@@ -117,8 +117,8 @@ class SectionGrower:
                     p *= constraint["section_prob"](*args, **kwargs)
                 return p
 
-            max_tries = DEFAULT_MAX_TRIES
-            randomness_increase = DEFAULT_RANDOMNESS_INCREASE
+            max_tries = -1
+            randomness_increase = -1
             for constraint in self.context["constraints"]:
                 max_tries = max(
                     max_tries,
@@ -130,6 +130,10 @@ class SectionGrower:
                         "randomness_increase", DEFAULT_RANDOMNESS_INCREASE
                     ),
                 )
+            if max_tries < 0:
+                max_tries = DEFAULT_MAX_TRIES
+            if randomness_increase < 0:
+                randomness_increase = DEFAULT_RANDOMNESS_INCREASE
 
             direction = accept_reject(
                 self._propose,
