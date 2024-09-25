@@ -517,12 +517,10 @@ def test_orientation_manager__apical_constraint():
         om.compute_tree_type_orientations(tree_type)
 
     with pytest.warns(UserWarning) as record:
-        tested._sample_trunk_from_3d_angle(
-            parameters, om._rng, "basal_dendrite", [0, 0, 1], max_tries=-1
-        )
+        om._sample_trunk_from_3d_angle("basal_dendrite", [0, 0, 1], max_tries=-1)
     assert len(record.list) == 1
     assert str(record.list[0].message).startswith(
-        "We could not sample from distribution, so we take a random point."
+        "We could not sample from distribution, we take best sample."
     )
 
     actual = om.get_tree_type_orientations("basal_dendrite")

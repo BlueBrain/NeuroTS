@@ -120,7 +120,7 @@ def accept_reject(
     """
     n_tries = 0
     best_proposal = None
-    best_p = 0
+    best_p = -1.0
     while n_tries < max_tries:
         proposal = propose(n_tries * randomness_increase)
         _prob = probability(proposal, **probability_kwargs)
@@ -130,9 +130,11 @@ def accept_reject(
 
         if rng.binomial(1, _prob):
             return proposal
+
         if _prob > best_p:
             best_p = _prob
             best_proposal = proposal
+
         n_tries += 1
     warnings.warn("We could not sample from distribution, we take best sample.")
     return best_proposal
