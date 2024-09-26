@@ -209,13 +209,13 @@ def test_colonization_split():
 
     module = "neurots.astrocyte.space_colonization."
 
-    with patch(module + "_repulsion") as repulsion, patch(
-        module + "upper_half_ball_query"
-    ) as half_ball_query, patch(module + "_fallback_strategy") as fallback_strategy, patch(
-        module + "_colonization_strategy_primary"
-    ) as primary_strategy, patch(
-        module + "_colonization_strategy_secondary"
-    ) as secondary_strategy:
+    with (
+        patch(module + "_repulsion") as repulsion,
+        patch(module + "upper_half_ball_query") as half_ball_query,
+        patch(module + "_fallback_strategy") as fallback_strategy,
+        patch(module + "_colonization_strategy_primary") as primary_strategy,
+        patch(module + "_colonization_strategy_secondary") as secondary_strategy,
+    ):
         repulsion.return_value = np.array([3.0, 2.0, 1.0])
         half_ball_query.return_value = []
 
@@ -344,13 +344,12 @@ def test_colonization_split_with_target_influence():
 
     module = "neurots.astrocyte.space_colonization."
 
-    with patch(module + "_colonization_split") as mock_colonization_split, patch(
-        module + "in_squared_proximity"
-    ) as mock_in_squared_proximity, patch(
-        module + "_add_attraction_bias"
-    ) as mock_add_attraction_bias, patch(
-        module + "_majorize_process"
-    ) as mock_majorize_process:
+    with (
+        patch(module + "_colonization_split") as mock_colonization_split,
+        patch(module + "in_squared_proximity") as mock_in_squared_proximity,
+        patch(module + "_add_attraction_bias") as mock_add_attraction_bias,
+        patch(module + "_majorize_process") as mock_majorize_process,
+    ):
         mock_colonization_split.return_value = (
             np.array([0.0, 0.0, 1.0]),
             None,
