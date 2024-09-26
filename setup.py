@@ -1,12 +1,9 @@
 """Setup for the NeuroTS package."""
 
-<<<<<<< before updating
 # Copyright (C) 2021-2024  Blue Brain Project, EPFL
 #
 # SPDX-License-Identifier: Apache-2.0
 
-=======
->>>>>>> after updating
 from pathlib import Path
 
 from setuptools import find_namespace_packages
@@ -37,20 +34,14 @@ doc_reqs = [
 test_reqs = [
     "dictdiffer>=0.5",
     "mock>=3",
-<<<<<<< before updating
-    "morph-tool>=2.9",
-    "pytest>=6",
-    "pytest-cov>=3",
-    "pytest-html>=2",
-    "pytest-xdist>=2",
-    "tqdm>=4.8.4",
-=======
     "pytest>=6.1",
     "pytest-click>=1.1",
     "pytest-console-scripts>=1.4",
     "pytest-cov>=4.1",
     "pytest-html>=3.2",
->>>>>>> after updating
+    "pytest-xdist>=2",
+    "morph-tool>=2.9",
+    "tqdm>=4.8.4",
 ]
 
 setup(
