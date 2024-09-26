@@ -34,13 +34,13 @@ doc_reqs = [
 test_reqs = [
     "dictdiffer>=0.5",
     "mock>=3",
-    "pytest>=6.1",
+    "morph-tool>=2.9",
     "pytest-click>=1.1",
     "pytest-console-scripts>=1.4",
     "pytest-cov>=4.1",
     "pytest-html>=3.2",
     "pytest-xdist>=2",
-    "morph-tool>=2.9",
+    "pytest>=6.1",
     "tqdm>=4.8.4",
 ]
 
