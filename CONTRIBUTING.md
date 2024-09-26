@@ -59,7 +59,7 @@ When you wish to contribute to the code base, please consider the following guid
   or
 
   ```shell
-  tox -e py38 -e lint -e docs -e check-packaging
+  tox -e py39 -e lint -e docs -e check-packaging
   ```
 
 * Commit your changes using a descriptive commit message.

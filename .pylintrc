@@ -4,7 +4,11 @@ disable=
 	invalid-name,
 	len-as-condition,
 	no-else-return,
+<<<<<<< before updating
     broad-exception-raised
+=======
+	too-many-positional-arguments
+>>>>>>> after updating
 
 [FORMAT]
 # Regexp for a line that is allowed to be longer than the limit.

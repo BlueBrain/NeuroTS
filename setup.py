@@ -1,9 +1,12 @@
 """Setup for the NeuroTS package."""
 
+<<<<<<< before updating
 # Copyright (C) 2021-2024  Blue Brain Project, EPFL
 #
 # SPDX-License-Identifier: Apache-2.0
 
+=======
+>>>>>>> after updating
 from pathlib import Path
 
 from setuptools import find_namespace_packages
@@ -34,12 +37,20 @@ doc_reqs = [
 test_reqs = [
     "dictdiffer>=0.5",
     "mock>=3",
+<<<<<<< before updating
     "morph-tool>=2.9",
     "pytest>=6",
     "pytest-cov>=3",
     "pytest-html>=2",
     "pytest-xdist>=2",
     "tqdm>=4.8.4",
+=======
+    "pytest>=6.1",
+    "pytest-click>=1.1",
+    "pytest-console-scripts>=1.4",
+    "pytest-cov>=4.1",
+    "pytest-html>=3.2",
+>>>>>>> after updating
 ]
 
 setup(
@@ -55,7 +66,7 @@ setup(
     },
     license="Apache License 2.0",
     packages=find_namespace_packages(include=["neurots*"]),
-    python_requires=">=3.8",
+    python_requires=">=3.9",
     use_scm_version=True,
     setup_requires=[
         "setuptools_scm",
@@ -72,10 +83,10 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
 )
