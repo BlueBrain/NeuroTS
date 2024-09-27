@@ -4,7 +4,7 @@ disable=
 	invalid-name,
 	len-as-condition,
 	no-else-return,
-    broad-exception-raised
+    broad-exception-raised,
 	too-many-positional-arguments
 
 [FORMAT]
