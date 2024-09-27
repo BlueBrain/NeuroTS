@@ -15,7 +15,7 @@ reqs = [
     "matplotlib>=3.4",
     "morphio>=3.3.6,<4.0",
     "neurom>=3.0,<4.0",
-    "numpy>=1.22.0",
+    "numpy>=1.22.0,<2",
     "packaging>=20",
     "scipy>=1.6",
     "tmd>=2.3.0",
@@ -35,10 +35,10 @@ test_reqs = [
     "dictdiffer>=0.5",
     "mock>=3",
     "morph-tool>=2.9",
-    "pytest>=6",
-    "pytest-cov>=3",
-    "pytest-html>=2",
+    "pytest-cov>=4.1",
+    "pytest-html>=3.2",
     "pytest-xdist>=2",
+    "pytest>=6.1",
     "tqdm>=4.8.4",
 ]
 
@@ -55,7 +55,7 @@ setup(
     },
     license="Apache License 2.0",
     packages=find_namespace_packages(include=["neurots*"]),
-    python_requires=">=3.8",
+    python_requires=">=3.9",
     use_scm_version=True,
     setup_requires=[
         "setuptools_scm",
@@ -72,10 +72,10 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
 )

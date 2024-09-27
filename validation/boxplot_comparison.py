@@ -1,5 +1,6 @@
 """Example for comparing a neuron to a population
    using their morphometrics"""
+
 import neurom as nm
 import numpy as np
 import pylab as plt

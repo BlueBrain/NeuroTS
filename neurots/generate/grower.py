@@ -179,9 +179,11 @@ class NeuronGrower:
         self.neuron = Morphology(self.neuron)
 
         self.apical_sections = [
-            point_to_section_segment(self.neuron, apical_point)[0]
-            if apical_point is not None
-            else None
+            (
+                point_to_section_segment(self.neuron, apical_point)[0]
+                if apical_point is not None
+                else None
+            )
             for apical_point in apical_points
         ]
 

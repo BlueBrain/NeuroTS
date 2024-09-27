@@ -1,5 +1,6 @@
 """Example for comparing two populations using
    the violin plots from their morphometrics"""
+
 import neurom as nm
 import numpy as np
 import pandas

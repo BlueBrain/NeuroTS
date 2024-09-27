@@ -13,12 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
         min_versions: ["min_versions", "latest_versions"]
         exclude:
           - min_versions: "min_versions"
         include:
-          - python-version: "3.8"
+          - python-version: "3.9"
             min_versions: "min_versions"
 
     steps:

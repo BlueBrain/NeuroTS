@@ -8,6 +8,8 @@ jobs:
   check-pr-title:
     name: Check PR title
     runs-on: ubuntu-latest
+    env:
+      PR_TITLE: ${{ github.event.pull_request.title }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,4 +18,4 @@ jobs:
       - run: npm install -g --force commitlint @commitlint/cli commitlint-plugin-cleanfeet
       - run: npm install conventional-changelog-conventionalcommits
       - run: touch .git/COMMIT_EDITMSG
-      - run: echo "${{ github.event.pull_request.title }}" | commitlint
+      - run: echo "$PR_TITLE" | commitlint
