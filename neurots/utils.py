@@ -110,8 +110,8 @@ def accept_reject(
     Args:
         propose (callable): function to propose a move, which has an 'noise' argument to allow
             for increasing randomness and faster acceptance (to allow sharp turns, etc...)
-        probability (callable): function to compute probability, first arg is the poposal (output of
-            `propose` function), and takes extra kwargs via `probability_kwargs`
+        probability (callable): function to compute probability, first arg is the proposal (output
+             of `propose` function), and takes extra kwargs via `probability_kwargs`
         rng (np.random._generator.Generator): random number generator
         max_tries (int): maximum number of tries to accept before we return best proposal
         randomness_increase (float): increase of noise amplitude after each try
