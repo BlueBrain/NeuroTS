@@ -142,7 +142,6 @@ class SectionGrower:
                 prob,
                 self._rng,
                 max_tries=max_tries,
-                add_random_component=add_random_component,
                 randomness_increase=randomness_increase,
                 current_point=self.last_point,
             )
