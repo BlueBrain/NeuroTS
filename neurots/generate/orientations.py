@@ -18,6 +18,7 @@ from neurots.morphmath import sample
 from neurots.morphmath.utils import normalize_vectors
 from neurots.utils import PIA_DIRECTION
 from neurots.utils import NeuroTSError
+from neurots.utils import accept_reject
 
 _TWOPI = 2.0 * np.pi
 FIT_3D_ANGLES_BOUNDS = {
@@ -256,13 +257,13 @@ class OrientationManager(OrientationManagerBase):
     def _mode_pia_constraint(self, _, tree_type):
         """Create trunks from distribution of angles with pia (`[0 , 1, 0]`) direction.
 
-        See :func:`_sample_trunk_from_3d_angle` for more details on the algorithm.
+        See :func:`self._sample_trunk_from_3d_angle` for more details on the algorithm.
         """
         n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
         pia_direction = self._parameters.get("pia_direction", PIA_DIRECTION)
         return np.asarray(
             [
-                _sample_trunk_from_3d_angle(self._parameters, self._rng, tree_type, pia_direction)
+                self._sample_trunk_from_3d_angle(tree_type, pia_direction)
                 for _ in range(n_orientations)
             ]
         )
@@ -270,16 +271,46 @@ class OrientationManager(OrientationManagerBase):
     def _mode_apical_constraint(self, _, tree_type):
         """Create trunks from distribution of angles with apical direction.
 
-        See :func:`_sample_trunk_from_3d_angle` for more details on the algorithm.
+        See :func:`self._sample_trunk_from_3d_angle` for more details on the algorithm.
         """
         n_orientations = sample.n_neurites(self._distributions[tree_type]["num_trees"], self._rng)
         ref_dir = self._orientations["apical_dendrite"][0]
         return np.asarray(
-            [
-                _sample_trunk_from_3d_angle(self._parameters, self._rng, tree_type, ref_dir)
-                for _ in range(n_orientations)
-            ]
+            [self._sample_trunk_from_3d_angle(tree_type, ref_dir) for _ in range(n_orientations)]
         )
+
+    def _sample_trunk_from_3d_angle(self, tree_type, ref_dir, max_tries=100):
+        """Sample trunk directions from fit of distribution of `3d_angles` wrt to `ref_dir`.
+
+        We use the accept-reject algorithm so we can sample from any distribution.
+        After a number of unsuccessful tries (default=100), we stop and return a random direction.
+        We also issue a warning so the user is aware that the provided distribution may have issues,
+        mostly related to large region of small probabilities.
+        """
+
+        def propose(_):
+            """Propose a trunk angle."""
+            return sample.sample_spherical_unit_vectors(self._rng)
+
+        def prob(proposal):
+            """Probability function to accept a trunk angle."""
+            val = nm.morphmath.angle_between_vectors(ref_dir, proposal)
+            _prob = get_probability_function(
+                form=self._parameters[tree_type]["orientation"]["values"]["form"],
+                with_density=False,
+            )
+            params = self._parameters[tree_type]["orientation"]["values"]["params"]
+            p = _prob(val, *params)
+
+            if self._context is not None and self._context.get(
+                "constraints", []
+            ):  # pragma: no cover
+                for constraint in self._context["constraints"]:
+                    if "trunk_prob" in constraint:
+                        p *= constraint["trunk_prob"](proposal, self._soma.center)
+            return p
+
+        return accept_reject(propose, prob, self._rng, max_tries=max_tries)
 
 
 def spherical_angles_to_orientations(phis, thetas):
@@ -631,30 +662,3 @@ def fit_3d_angles(tmd_parameters, tmd_distributions):
             )
 
     return tmd_parameters
-
-
-def _sample_trunk_from_3d_angle(parameters, rng, tree_type, ref_dir, max_tries=100):
-    """Sample trunk directions from fit of distribution of `3d_angles` wrt to `ref_dir`.
-
-    We use the accept-reject algorithm so we can sample from any distribution.
-    After a number of unsuccessful tries (default=100), we stop and return a random direction.
-    We also issue a warning so the user is aware that the provided distribution may have issues,
-    mostly related to large region of small probabilities.
-    """
-    prob = get_probability_function(
-        form=parameters[tree_type]["orientation"]["values"]["form"],
-        with_density=False,
-    )
-    params = parameters[tree_type]["orientation"]["values"]["params"]
-    n_try = 0
-    while n_try < max_tries:
-        propose = sample.sample_spherical_unit_vectors(rng)
-        angle = nm.morphmath.angle_between_vectors(ref_dir, propose)
-        if rng.binomial(1, prob(angle, *params)):
-            return propose
-        n_try += 1
-    warnings.warn(
-        """We could not sample from distribution, so we take a random point.
-                    Consider checking the given probability distribution."""
-    )
-    return sample.sample_spherical_unit_vectors(rng)
