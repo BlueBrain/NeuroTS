@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from collections import deque
-
+from functools import partial
 import numpy as np
 from numpy.linalg import norm as vectorial_norm  # vectorial_norm used for array of vectors
 
@@ -85,7 +85,7 @@ class SectionGrower:
         """Increases the path distance."""
         self.pathlength += length
 
-    def _propose(self, extra_randomness=None, add_random_component=True):
+    def _propose(self, extra_randomness=0, add_random_component=True):
         """Propose the direction for a next section point.
 
         Args:
@@ -96,13 +96,13 @@ class SectionGrower:
 
         if add_random_component:
             random_component = self.params.randomness * get_random_point(random_generator=self._rng)
-            if extra_randomness is not None:
+            if extra_randomness > 0:
                 random_component *= extra_randomness
             direction += random_component
 
         return direction / vectorial_norm(direction)
 
-    def next_point(self, add_random_component=True, extra_randomness=None):
+    def next_point(self, add_random_component=True, extra_randomness=0):
         """Returns the next point depending on the growth method and the previous point.
 
         If a context is present, an accept-reject mechanism will be used to alter the next point.
@@ -138,7 +138,10 @@ class SectionGrower:
                 randomness_increase = DEFAULT_RANDOMNESS_INCREASE
 
             direction = accept_reject(
-                self._propose,
+                partial(
+                    self._propose,
+                    add_random_component=add_random_component,
+                ),
                 prob,
                 self._rng,
                 max_tries=max_tries,
