@@ -50,7 +50,7 @@ jobs:
         pip install tox
         tox run -e min_versions
     - name: JUnit Report Action
-      uses: mikepenz/action-junit-report@v4
+      uses: mikepenz/action-junit-report@v5
       if: always() # always run even if the previous step fails
       with:
         report_paths: 'reports/pytest-*.xml'
