@@ -6,6 +6,7 @@
 
 from collections import deque
 from functools import partial
+
 import numpy as np
 from numpy.linalg import norm as vectorial_norm  # vectorial_norm used for array of vectors
 
