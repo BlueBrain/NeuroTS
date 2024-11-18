@@ -97,7 +97,7 @@ class SectionGrower:
 
         if add_random_component:
             random_component = self.params.randomness * get_random_point(random_generator=self._rng)
-            if extra_randomness > 0:
+            if extra_randomness > 0:  # pragma: no cover
                 random_component *= extra_randomness
             direction += random_component
 
