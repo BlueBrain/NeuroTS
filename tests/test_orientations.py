@@ -15,8 +15,8 @@ from numpy import testing as npt
 from neurots.generate import orientations as tested
 from neurots.generate.soma import Soma
 from neurots.morphmath import rotation
-from neurots.utils import NeuroTSError
 from neurots.utils import Y_DIRECTION
+from neurots.utils import NeuroTSError
 
 
 def test_orientation_manager__constructor():
@@ -372,7 +372,7 @@ def test_orientation_manager__mode_normal_pia_constraint():
         soma=None,
         parameters=parameters,
         distributions=distributions,
-        context={},
+        context=None,
         rng=np.random.default_rng(seed=0),
     )
 
@@ -389,7 +389,7 @@ def test_orientation_manager__mode_normal_pia_constraint():
         soma=None,
         parameters=parameters,
         distributions=distributions,
-        context={},
+        context=None,
         rng=np.random.default_rng(seed=0),
     )
 
@@ -406,7 +406,7 @@ def test_orientation_manager__mode_normal_pia_constraint():
         soma=None,
         parameters=parameters,
         distributions=distributions,
-        context={},
+        context=None,
         rng=np.random.default_rng(seed=0),
     )
 
@@ -459,7 +459,7 @@ def test_orientation_manager__pia_constraint():
         soma=None,
         parameters=parameters,
         distributions=distributions,
-        context={},
+        context=None,
         rng=np.random.default_rng(seed=0),
     )
 
