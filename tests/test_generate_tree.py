@@ -76,6 +76,21 @@ def test_TreeGrower():
             sections[len(sections) - num - 1],
         )
 
+    grower = NeuronGrower(
+        input_distributions=distributions,
+        input_parameters=params,
+        context={"y_direction": [1, 0, 0]},
+    )
+
+    assert grower.context["y_direction"] == [1, 0, 0]
+    npt.assert_array_equal(
+        grower.context["y_rotation"], np.array([[0.0, 1.0, 0.0], [-1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
+    )
+    grower = NeuronGrower(
+        input_distributions=distributions, input_parameters=params, context="OTHER"
+    )
+    assert grower.context == "OTHER"
+
 
 def test_TreeGrower_termination_length():
     np.random.seed(0)
