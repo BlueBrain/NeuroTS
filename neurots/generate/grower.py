@@ -140,7 +140,9 @@ class NeuronGrower:
     def _process_context(self, context):
         """Apply some required processing to the context dictionary."""
         if context is None:
-            context = {}
+            return {}
+        if not isinstance(context, dict):
+            return context
 
         # we ofen need to use the y_direction as a rotation, so we save to it once here
         if "y_direction" in context:
