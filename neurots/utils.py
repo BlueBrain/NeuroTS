@@ -95,3 +95,46 @@ def point_to_section_segment(neuron, point, rtol=1e-05, atol=1e-08):
             return section.id, offset[0][0]
 
     raise ValueError(f"Cannot find point in morphology that matches: {point}")
+
+
+def accept_reject(
+    propose,
+    probability,
+    rng,
+    max_tries=50,
+    randomness_increase=0.5,
+    **probability_kwargs,
+):
+    """Generic accept/reject algorithm.
+
+    Args:
+        propose (callable): function to propose a move, which has an 'noise' argument to allow
+            for increasing randomness and faster acceptance (to allow sharp turns, etc...)
+        probability (callable): function to compute probability, first arg is the proposal (output
+             of `propose` function), and takes extra kwargs via `probability_kwargs`
+        rng (np.random._generator.Generator): random number generator
+        max_tries (int): maximum number of tries to accept before we return best proposal
+        randomness_increase (float): increase of noise amplitude after each try
+        probability_kwargs (dict): parameters for `probability` function
+
+    """
+    n_tries = 0
+    best_proposal = None
+    best_p = -1.0
+    while n_tries < max_tries:
+        proposal = propose(n_tries * randomness_increase)
+        _prob = probability(proposal, **probability_kwargs)
+        if _prob == 1.0:
+            # this ensures we don't change rng for the tests, but its not really needed
+            return proposal
+
+        if rng.binomial(1, _prob):
+            return proposal
+
+        if _prob > best_p:
+            best_p = _prob
+            best_proposal = proposal
+
+        n_tries += 1
+    warnings.warn("We could not sample from distribution, we take best sample.")
+    return best_proposal

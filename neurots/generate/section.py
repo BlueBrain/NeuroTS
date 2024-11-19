@@ -5,18 +5,24 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from collections import deque
+from functools import partial
 
 import numpy as np
 from numpy.linalg import norm as vectorial_norm  # vectorial_norm used for array of vectors
 
 from neurots.morphmath.utils import get_random_point  # norm used for single vectors
 from neurots.morphmath.utils import norm
+from neurots.utils import accept_reject
 
 MEMORY = 5
 DISTANCE_MIN = 1e-8
 
 # Memory decreases with distance from current point
 WEIGHTS = np.exp(np.arange(1, MEMORY + 1) - MEMORY)
+
+# default parameters for accept/reject
+DEFAULT_MAX_TRIES = 50
+DEFAULT_RANDOMNESS_INCREASE = 0.5
 
 
 class SectionGrower:
@@ -80,19 +86,81 @@ class SectionGrower:
         """Increases the path distance."""
         self.pathlength += length
 
-    def next_point(self, current_point):
-        """Returns the next point depending on the growth method and the previous point."""
-        direction = (
-            self.params.targeting * self.direction
-            + self.params.randomness * get_random_point(random_generator=self._rng)
-            + self.params.history * self.history()
-        )
+    def _propose(self, extra_randomness=0, add_random_component=True):
+        """Propose the direction for a next section point.
 
-        direction = direction / vectorial_norm(direction)
+        Args:
+            extra_randomness (float): artificially increase the randomness to allow for context
+            add_random_component (bool): add a random component to the direction
+        """
+        direction = self.params.targeting * self.direction + self.params.history * self.history()
+
+        if add_random_component:
+            random_component = self.params.randomness * get_random_point(random_generator=self._rng)
+            if extra_randomness > 0:  # pragma: no cover
+                random_component *= extra_randomness
+            direction += random_component
+
+        return direction / vectorial_norm(direction)
+
+    def next_point(self, add_random_component=True, extra_randomness=0):
+        """Returns the next point depending on the growth method and the previous point.
+
+        If a context is present, an accept-reject mechanism will be used to alter the next point.
+
+        Args:
+            add_random_component (bool): add a random component to the direction
+            extra_randomness (float): only used without constraints
+        """
+        if self.context is not None and self.context.get("constraints", []):  # pragma: no cover
+
+            def prob(*args, **kwargs):
+                p = 1.0
+                for constraint in self.context["constraints"]:
+                    p *= constraint["section_prob"](*args, **kwargs)
+                return p
+
+            max_tries = -1
+            randomness_increase = -1
+            for constraint in self.context["constraints"]:
+                max_tries = max(
+                    max_tries,
+                    constraint.get("params_section", {}).get("max_tries", DEFAULT_MAX_TRIES),
+                )
+                randomness_increase = max(
+                    randomness_increase,
+                    constraint.get("params_section", {}).get(
+                        "randomness_increase", DEFAULT_RANDOMNESS_INCREASE
+                    ),
+                )
+            if max_tries < 0:
+                max_tries = DEFAULT_MAX_TRIES
+            if randomness_increase < 0:
+                randomness_increase = DEFAULT_RANDOMNESS_INCREASE
+
+            direction = accept_reject(
+                partial(
+                    self._propose,
+                    add_random_component=add_random_component,
+                ),
+                prob,
+                self._rng,
+                max_tries=max_tries,
+                randomness_increase=randomness_increase,
+                current_point=self.last_point,
+            )
+        else:
+            direction = self._propose(
+                add_random_component=add_random_component, extra_randomness=extra_randomness
+            )
+
         seg_length = self.step_size_distribution.draw_positive()
-        next_point = current_point + seg_length * direction
+        next_point = self.last_point + seg_length * direction
         self.update_pathlength(seg_length)
-        return next_point, direction
+
+        self.latest_directions.append(direction)
+        self.points.append(next_point)
+        self.post_next_point()
 
     def first_point(self):
         """Generates the first point of the section from the growth method and the previous point.
@@ -104,16 +172,7 @@ class SectionGrower:
             The growth process cannot terminate before this point, as a first point will always be
             added to an active section.
         """
-        direction = self.params.targeting * self.direction + self.params.history * self.history()
-
-        direction = direction / vectorial_norm(direction)
-        seg_length = self.step_size_distribution.draw_positive()
-        point = self.last_point + seg_length * direction
-        self.update_pathlength(seg_length)
-
-        self.latest_directions.append(direction)
-        self.points.append(point)
-        self.post_next_point()
+        self.next_point(add_random_component=False)
 
     def check_stop(self):
         """Checks if any num_seg criteria is fulfilled.
@@ -139,11 +198,7 @@ class SectionGrower:
 
     def next(self):
         """Creates one point and returns the next state: bifurcate, terminate or continue."""
-        curr_point = self.last_point
-        point, direction = self.next_point(curr_point)
-        self.latest_directions.append(direction)
-        self.points.append(point)
-        self.post_next_point()
+        self.next_point()
 
         if self.check_stop():
             return "continue"

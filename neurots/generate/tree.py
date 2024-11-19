@@ -164,6 +164,16 @@ class TreeGrower:
             children (int): The number of children.
         """
         SGrower = section_growers[self.params["metric"]]
+        context = copy.deepcopy(self.context)
+        if self.context is not None and "constraints" in self.context:  # pragma: no cover
+            context["constraints"] = [
+                constraint
+                for constraint in self.context["constraints"]
+                if "section_prob" in constraint
+                and SectionType(self.params["tree_type"]).name
+                in constraint.get("neurite_types", [])
+                and process in constraint.get("processes", ["major", "secondary"])
+            ]
 
         sec_grower = SGrower(
             parent=parent,
@@ -175,7 +185,7 @@ class TreeGrower:
             stop_criteria=copy.deepcopy(stop),
             step_size_distribution=self.seg_length_distr,
             pathlength=pathlength,
-            context=self.context,
+            context=context,
             random_generator=self._rng,
         )
 
