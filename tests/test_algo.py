@@ -39,7 +39,7 @@ def _setup_test(Algo, Grower, custom_parameters=None):
         parameters.update(custom_parameters)
 
     np.random.seed(42)
-    algo = Algo(distributions, parameters, [0, 0, 1])
+    algo = Algo(distributions, parameters, [0, 0, 1], context={})
     seg_len = sample.Distr(parameters["step_size"])
 
     section_parameters = SectionParameters(

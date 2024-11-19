@@ -311,7 +311,7 @@ class OrientationManager(OrientationManagerBase):
             return p
 
         res = accept_reject(propose, prob, self._rng, max_tries=max_tries)
-        if ref_dir is not None:
+        if ref_dir is not None and res is not None:
             res = rotation.rotation_matrix_from_vectors(Y_DIRECTION, ref_dir).dot(res)
         return res
 

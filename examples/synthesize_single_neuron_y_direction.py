@@ -62,7 +62,7 @@ def run(output_dir, data_dir):
     N = neurots.NeuronGrower(
         input_distributions=data_dir / "bio_distr.json",
         input_parameters=params,
-        context={"y_direction": [0.0, 1.0, 0.0]},
+        #context={"y_direction": [0.0, 1.0, 0.0]},
     )
 
     # Grow the neuron
