@@ -165,7 +165,7 @@ class TreeGrower:
         """
         SGrower = section_growers[self.params["metric"]]
         context = copy.deepcopy(self.context)
-        if self.context is not None and "constraints" in self.context:  # pragma: no cover
+        if "constraints" in self.context:  # pragma: no cover
             context["constraints"] = [
                 constraint
                 for constraint in self.context["constraints"]

@@ -294,7 +294,7 @@ class OrientationManager(OrientationManagerBase):
 
         def prob(proposal):
             """Probability function to accept a trunk angle."""
-            val = nm.morphmath.angle_between_vectors(Y_DIRECTION, proposal)
+            val = nm.morphmath.angle_between_vectors(ref_dir, proposal)
             _prob = get_probability_function(
                 form=self._parameters[tree_type]["orientation"]["values"]["form"],
                 with_density=False,
@@ -302,18 +302,13 @@ class OrientationManager(OrientationManagerBase):
             params = self._parameters[tree_type]["orientation"]["values"]["params"]
             p = _prob(val, *params)
 
-            if self._context is not None and self._context.get(
-                "constraints", []
-            ):  # pragma: no cover
+            if self._context.get("constraints", []):  # pragma: no cover
                 for constraint in self._context["constraints"]:
                     if "trunk_prob" in constraint:
                         p *= constraint["trunk_prob"](proposal, self._soma.center)
             return p
 
-        res = accept_reject(propose, prob, self._rng, max_tries=max_tries)
-        if ref_dir is not None and res is not None:
-            res = rotation.rotation_matrix_from_vectors(Y_DIRECTION, ref_dir).dot(res)
-        return res
+        return accept_reject(propose, prob, self._rng, max_tries=max_tries)
 
 
 def spherical_angles_to_orientations(phis, thetas):
