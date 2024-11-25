@@ -161,7 +161,9 @@ class TMDAlgo(AbstractAlgo):
         self.barcode.remove_bif(current_section.stop_criteria["TMD"].bif_id)
         ang = self.barcode.angles[current_section.stop_criteria["TMD"].bif_id]
 
-        dir1, dir2 = self.bif_method(current_section.history(), angles=ang)
+        dir1, dir2 = self.bif_method(
+            current_section.history(), angles=ang, y_rotation=self.context.get("y_rotation")
+        )
         first_point = np.array(current_section.last_point)
 
         stop1, stop2 = self.get_stop_criteria(current_section)
@@ -249,7 +251,9 @@ class TMDApicalAlgo(TMDAlgo):
         first_point = np.array(current_section.last_point)
 
         if current_section.process == "major":
-            dir1, dir2 = bif_methods["directional"](current_section.direction, angles=ang)
+            dir1, dir2 = bif_methods["directional"](
+                current_section.direction, angles=ang, y_rotation=self.context.get("y_rotation")
+            )
 
             if not self._found_last_bif:
                 self.apical_section = current_section.id
@@ -264,7 +268,9 @@ class TMDApicalAlgo(TMDAlgo):
                 if not self._found_last_bif:
                     self._found_last_bif = True
         else:
-            dir1, dir2 = self.bif_method(current_section.history(), angles=ang)
+            dir1, dir2 = self.bif_method(
+                current_section.history(), angles=ang, y_rotation=self.context.get("y_rotation")
+            )
             process1 = "secondary"
             process2 = "secondary"
 

@@ -35,9 +35,11 @@ from neurots.generate.orientations import check_3d_angles
 from neurots.generate.soma import Soma
 from neurots.generate.soma import SomaGrower
 from neurots.generate.tree import TreeGrower
+from neurots.morphmath import rotation
 from neurots.morphmath import sample
 from neurots.morphmath.utils import normalize_vectors
 from neurots.preprocess import preprocess_inputs
+from neurots.utils import Y_DIRECTION
 from neurots.utils import NeuroTSError
 from neurots.utils import convert_from_legacy_neurite_type
 from neurots.utils import point_to_section_segment
@@ -91,7 +93,7 @@ class NeuronGrower:
     ):
         """Constructor of the NeuronGrower class."""
         self.neuron = Morphology()
-        self.context = context
+        self.context = self._process_context(context)
         if rng_or_seed is None or isinstance(
             rng_or_seed, (int, np.integer, SeedSequence, BitGenerator)
         ):
@@ -134,6 +136,20 @@ class NeuronGrower:
         self._init_diametrizer(external_diametrizer=external_diametrizer)
 
         self._trunk_orientations_class = trunk_orientations_class
+
+    def _process_context(self, context):
+        """Apply some required processing to the context dictionary."""
+        if context is None:
+            return {}
+        if not isinstance(context, dict):
+            return context
+
+        # we ofen need to use the y_direction as a rotation, so we save to it once here
+        if "y_direction" in context:
+            context["y_rotation"] = rotation.rotation_matrix_from_vectors(
+                Y_DIRECTION, context["y_direction"]
+            )
+        return context
 
     def next(self):
         """Call the "next" method of each neurite grower."""
@@ -363,11 +379,7 @@ class NeuronGrower:
                 )
 
     def _3d_angles_grow_trunks(self):
-        """Grow trunk with 3d_angles method via :func:`.orientation.OrientationManager` class.
-
-        Args:
-            input_parameters_with_3d_anglles (dict): input_parameters with fits for 3d angles
-        """
+        """Grow trunk with 3d_angles method via :func:`.orientation.OrientationManager` class."""
         trunk_orientations_manager = self._trunk_orientations_class(
             soma=self.soma_grower.soma,
             parameters=self.input_parameters,

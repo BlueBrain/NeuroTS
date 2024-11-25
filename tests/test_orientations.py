@@ -14,6 +14,8 @@ from numpy import testing as npt
 
 from neurots.generate import orientations as tested
 from neurots.generate.soma import Soma
+from neurots.morphmath import rotation
+from neurots.utils import Y_DIRECTION
 from neurots.utils import NeuroTSError
 
 
@@ -264,6 +266,29 @@ def test_spherical_angles_to_orientations():
     )
 
 
+def test_spherical_angles_to_pia_orientations():
+    phis = [0.5 * np.pi, np.pi, np.pi]
+
+    thetas = [0.5 * np.pi, np.pi, 0.5 * np.pi]
+
+    expected_orientations = [[0.0, 0.0, 1.0], [0.0, -1.0, 0.0], [-1.0, 0.0, 0.0]]
+
+    npt.assert_allclose(
+        tested.spherical_angles_to_pia_orientations(phis, thetas),
+        expected_orientations,
+        atol=1e-6,
+    )
+
+    expected_orientations = [[0.0, 0.0, 1.0], [-1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]
+    y_rotation = rotation.rotation_matrix_from_vectors(Y_DIRECTION, [1.0, 0.0, 0.0])
+
+    npt.assert_allclose(
+        tested.spherical_angles_to_pia_orientations(phis, thetas, y_rotation=y_rotation),
+        expected_orientations,
+        atol=1e-6,
+    )
+
+
 def test_points_to_orientations():
     origin = np.array([0.0, 0.0, 0.0])
     points = np.array([[2.0, 0.0, 0.0], [0.0, 0.0, 3.0]])
@@ -392,13 +417,13 @@ def test_orientation_manager__mode_normal_pia_constraint():
     expected = np.array([[0.8067661158336028, 0.5513710782140335, 0.21241084824428402]])
     npt.assert_allclose(actual, expected, rtol=1e-5)
 
-    # test other pia direction
-    parameters["pia_direction"] = [1, 0, 0]
+    # test other y direction
+    y_rotation = rotation.rotation_matrix_from_vectors(Y_DIRECTION, [1.0, 0.0, 0.0])
     om = tested.OrientationManager(
         soma=None,
         parameters=parameters,
         distributions=distributions,
-        context=None,
+        context={"y_rotation": y_rotation},
         rng=np.random.default_rng(seed=0),
     )
 

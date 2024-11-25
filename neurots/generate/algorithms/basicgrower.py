@@ -52,7 +52,7 @@ class TrunkAlgo(AbstractAlgo):
         Returns:
             tuple[dict, dict]: Two dictionaries containing the two children sections data.
         """
-        dir1, dir2 = self.bif_method()
+        dir1, dir2 = self.bif_method(y_rotation=self.context.get("y_rotation"))
         first_point = np.array(current_section.last_point)
         stop = current_section.stop_criteria
 
