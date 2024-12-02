@@ -233,42 +233,41 @@ class OrientationManager(OrientationManagerBase):
             n_orientations = 1
 
         angles = []
-        for _ in range(n_orientations):
 
-            def propose(_):
-                means = values_dict["direction"]["mean"]
-                means = means if isinstance(means, list) else [means]
-                stds = values_dict["direction"]["std"]
-                stds = stds if isinstance(stds, list) else [stds]
+        def propose(_):
+            means = values_dict["direction"]["mean"]
+            means = means if isinstance(means, list) else [means]
+            stds = values_dict["direction"]["std"]
+            stds = stds if isinstance(stds, list) else [stds]
 
-                thetas = []
-                for mean, std in zip(means, stds):
-                    if mean == 0:
-                        if std > 0:
-                            thetas.append(np.clip(self._rng.exponential(std), 0, np.pi))
-                        else:
-                            thetas.append(0)
+            thetas = []
+            for mean, std in zip(means, stds):
+                if mean == 0:
+                    if std > 0:
+                        thetas.append(np.clip(self._rng.exponential(std), 0, np.pi))
                     else:
-                        thetas.append(np.clip(self._rng.normal(mean, std), 0, np.pi))
+                        thetas.append(0)
+                else:
+                    thetas.append(np.clip(self._rng.normal(mean, std), 0, np.pi))
 
-                phis = self._rng.uniform(0, 2 * np.pi, len(means))
-                return spherical_angles_to_pia_orientations(
-                    phis, thetas, self._context.get("y_rotation", None)
-                ).tolist()[0]
+            phis = self._rng.uniform(0, 2 * np.pi, len(means))
+            return spherical_angles_to_pia_orientations(
+                phis, thetas, self._context.get("y_rotation", None)
+            ).tolist()[0]
 
-            if self._context is not None and self._context.get(
-                "constraints", []
-            ):  # pragma: no cover
+        if self._context is not None and self._context.get("constraints", []):  # pragma: no cover
 
-                def prob(proposal):
-                    p = 1.0
-                    for constraint in self._context["constraints"]:
-                        if "trunk_prob" in constraint:
-                            p = min(p, constraint["trunk_prob"](proposal, self._soma.center))
-                    return p
+            def prob(proposal):
+                p = 1.0
+                for constraint in self._context["constraints"]:
+                    if "trunk_prob" in constraint:
+                        p = min(p, constraint["trunk_prob"](proposal, self._soma.center))
+                return p
 
+            for _ in range(n_orientations):
                 angles.append(accept_reject(propose, prob, self._rng, max_tries=max_tries))
-            else:
+        else:
+            for _ in range(n_orientations):
                 angles.append(propose(_))
         return np.array(angles)
 
