@@ -212,7 +212,7 @@ class OrientationManager(OrientationManagerBase):
             [sample.sample_spherical_unit_vectors(rng=self._rng) for _ in range(n_orientations)]
         )
 
-    def _mode_normal_pia_constraint(self, values_dict, tree_type):
+    def _mode_normal_pia_constraint(self, values_dict, tree_type, max_tries=100):
         """Returns orientations using normal/exp distribution along a direction.
 
         The `direction` value should be a dict with two entries: `mean` and `std`. The mean is the
@@ -233,11 +233,13 @@ class OrientationManager(OrientationManagerBase):
             n_orientations = 1
 
         angles = []
-        for _ in range(n_orientations):
+
+        def propose(_):
             means = values_dict["direction"]["mean"]
             means = means if isinstance(means, list) else [means]
             stds = values_dict["direction"]["std"]
             stds = stds if isinstance(stds, list) else [stds]
+
             thetas = []
             for mean, std in zip(means, stds):
                 if mean == 0:
@@ -249,9 +251,24 @@ class OrientationManager(OrientationManagerBase):
                     thetas.append(np.clip(self._rng.normal(mean, std), 0, np.pi))
 
             phis = self._rng.uniform(0, 2 * np.pi, len(means))
-            angles += spherical_angles_to_pia_orientations(
+            return spherical_angles_to_pia_orientations(
                 phis, thetas, self._context.get("y_rotation", None)
-            ).tolist()
+            ).tolist()[0]
+
+        if self._context is not None and self._context.get("constraints", []):  # pragma: no cover
+
+            def prob(proposal):
+                p = 1.0
+                for constraint in self._context["constraints"]:
+                    if "trunk_prob" in constraint:
+                        p = min(p, constraint["trunk_prob"](proposal, self._soma.center))
+                return p
+
+            for _ in range(n_orientations):
+                angles.append(accept_reject(propose, prob, self._rng, max_tries=max_tries))
+        else:
+            for _ in range(n_orientations):
+                angles.append(propose(_))
         return np.array(angles)
 
     def _mode_pia_constraint(self, _, tree_type):
@@ -305,7 +322,7 @@ class OrientationManager(OrientationManagerBase):
             if self._context.get("constraints", []):  # pragma: no cover
                 for constraint in self._context["constraints"]:
                     if "trunk_prob" in constraint:
-                        p *= constraint["trunk_prob"](proposal, self._soma.center)
+                        p = min(p, constraint["trunk_prob"](proposal, self._soma.center))
             return p
 
         return accept_reject(propose, prob, self._rng, max_tries=max_tries)

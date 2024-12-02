@@ -102,7 +102,7 @@ def accept_reject(
     probability,
     rng,
     max_tries=50,
-    randomness_increase=0.5,
+    randomness_increase=1.2,
     **probability_kwargs,
 ):
     """Generic accept/reject algorithm.
@@ -122,7 +122,7 @@ def accept_reject(
     best_proposal = None
     best_p = -1.0
     while n_tries < max_tries:
-        proposal = propose(n_tries * randomness_increase)
+        proposal = propose((1 + n_tries) * randomness_increase)
         _prob = probability(proposal, **probability_kwargs)
         if _prob == 1.0:
             # this ensures we don't change rng for the tests, but its not really needed
@@ -134,7 +134,6 @@ def accept_reject(
         if _prob > best_p:
             best_p = _prob
             best_proposal = proposal
-
         n_tries += 1
     warnings.warn("We could not sample from distribution, we take best sample.")
     return best_proposal

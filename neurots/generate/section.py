@@ -22,7 +22,7 @@ WEIGHTS = np.exp(np.arange(1, MEMORY + 1) - MEMORY)
 
 # default parameters for accept/reject
 DEFAULT_MAX_TRIES = 50
-DEFAULT_RANDOMNESS_INCREASE = 0.5
+DEFAULT_RANDOMNESS_INCREASE = 1.2
 
 
 class SectionGrower:
@@ -94,13 +94,11 @@ class SectionGrower:
             add_random_component (bool): add a random component to the direction
         """
         direction = self.params.targeting * self.direction + self.params.history * self.history()
-
-        if add_random_component:
+        if add_random_component or extra_randomness > 0.0:
             random_component = self.params.randomness * get_random_point(random_generator=self._rng)
             if extra_randomness > 0:  # pragma: no cover
                 random_component *= extra_randomness
             direction += random_component
-
         return direction / vectorial_norm(direction)
 
     def next_point(self, add_random_component=True, extra_randomness=0):
@@ -117,7 +115,7 @@ class SectionGrower:
             def prob(*args, **kwargs):
                 p = 1.0
                 for constraint in self.context["constraints"]:
-                    p *= constraint["section_prob"](*args, **kwargs)
+                    p = min(p, constraint["section_prob"](*args, **kwargs))
                 return p
 
             max_tries = -1
