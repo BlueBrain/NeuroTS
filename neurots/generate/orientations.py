@@ -234,23 +234,24 @@ class OrientationManager(OrientationManagerBase):
 
         angles = []
         for _ in range(n_orientations):
-            means = values_dict["direction"]["mean"]
-            means = means if isinstance(means, list) else [means]
-            stds = values_dict["direction"]["std"]
-            stds = stds if isinstance(stds, list) else [stds]
-            thetas = []
-            for mean, std in zip(means, stds):
-                if mean == 0:
-                    if std > 0:
-                        thetas.append(np.clip(self._rng.exponential(std), 0, np.pi))
-                    else:
-                        thetas.append(0)
-                else:
-                    thetas.append(np.clip(self._rng.normal(mean, std), 0, np.pi))
-
-            phis = self._rng.uniform(0, 2 * np.pi, len(means))
 
             def propose(_):
+                means = values_dict["direction"]["mean"]
+                means = means if isinstance(means, list) else [means]
+                stds = values_dict["direction"]["std"]
+                stds = stds if isinstance(stds, list) else [stds]
+
+                thetas = []
+                for mean, std in zip(means, stds):
+                    if mean == 0:
+                        if std > 0:
+                            thetas.append(np.clip(self._rng.exponential(std), 0, np.pi))
+                        else:
+                            thetas.append(0)
+                    else:
+                        thetas.append(np.clip(self._rng.normal(mean, std), 0, np.pi))
+
+                phis = self._rng.uniform(0, 2 * np.pi, len(means))
                 return spherical_angles_to_pia_orientations(
                     phis, thetas, self._context.get("y_rotation", None)
                 ).tolist()[0]
