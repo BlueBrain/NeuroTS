@@ -1,5 +1,26 @@
 # Changelog
 
+## [3.6.1](https://github.com/BlueBrain/NeuroTS/compare/3.6.0..3.6.1)
+
+> 3 December 2024
+
+### Fixes
+
+- Fix AR algo (Alexis Arnaudon - [#112](https://github.com/BlueBrain/NeuroTS/pull/112))
+- Make bifurcation angles globally invariant (Alexis Arnaudon - [#95](https://github.com/BlueBrain/NeuroTS/pull/95))
+
+### Chores And Housekeeping
+
+- Bump Copier template (Alexis Arnaudon - [#108](https://github.com/BlueBrain/NeuroTS/pull/108))
+
+### Documentation Changes
+
+- Fix RTD (Adrien Berchet - [#109](https://github.com/BlueBrain/NeuroTS/pull/109))
+
+### General Changes
+
+- Add context handling with accept/reject (Alexis Arnaudon - [#61](https://github.com/BlueBrain/NeuroTS/pull/61))
+
 ## [3.6.0](https://github.com/BlueBrain/NeuroTS/compare/3.5.0..3.6.0)
 
 > 15 May 2024
