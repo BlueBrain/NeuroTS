@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.6.1](https://github.com/BlueBrain/NeuroTS/compare/3.6.0..3.6.1)
+## [3.7.0](https://github.com/BlueBrain/NeuroTS/compare/3.6.0..3.7.0)
 
 > 3 December 2024
 
